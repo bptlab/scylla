@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bsim:globalConfiguration xmlns:bsim="http://bsim.hpi.uni-potsdam.de/scylla/simModel" id="GlobalConf_1" targetNamespace="http://www.hpi.de">
+	<bsim:resourceAssignmentOrder>priority,simulationTime</bsim:resourceAssignmentOrder>
+	<bsim:randomSeed>3096</bsim:randomSeed>
+	<bsim:zoneOffset>+00:00</bsim:zoneOffset>
+	<bsim:resourceData>
+		<bsim:dynamicResource id="Student" name="master student" defaultQuantity="5" defaultCost="10" defaultTimeUnit="MINUTES" >
+		</bsim:dynamicResource>
+		<bsim:dynamicResource id="Professor" name="professor abc" defaultQuantity="2" defaultCost="50" defaultTimeUnit="MINUTES">
+		</bsim:dynamicResource>
+	</bsim:resourceData>
+</bsim:globalConfiguration>

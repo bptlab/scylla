@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bsim:definitions xmlns:bsim="http://bsim.hpi.uni-potsdam.de/scylla/simModel" id="Simulation_5" targetNamespace="http://www.hpi.de">
+	<bsim:simulationConfiguration id="SimulationConfiguration_5" processRef="orderProcess" processInstances="10" startDateTime="2016-07-04T14:00:00.000" randomSeed="9281" ><!--resourceAssignmentOrder="priority,simulationTime" endDateTime="2016-08-05T15:00:00.000+02:00">-->
+		<bsim:startEvent id="StartEvent_1">
+	    	<bsim:arrivalRate timeUnit="MINUTES">
+	    		<bsim:exponentialDistribution>
+	    			<bsim:mean>1</bsim:mean>
+	    		</bsim:exponentialDistribution>
+	    	</bsim:arrivalRate>
+	    </bsim:startEvent>
+	    <bsim:task id="Task_0zs8ai5" name="Approve order">
+	    	<bsim:duration timeUnit="MINUTES">
+	    		<bsim:exponentialDistribution>
+	    			<bsim:mean>2</bsim:mean>
+	    		</bsim:exponentialDistribution>
+	    	</bsim:duration>
+	    	<bsim:resources>
+	    		<bsim:resource id="Customer Care" amount="1"/>
+	    	</bsim:resources>
+	    </bsim:task>
+	    <bsim:exclusiveGateway id="ExclusiveGateway_1">
+	      <bsim:outgoingSequenceFlow id="SequenceFlow_4">
+	      	<bsim:branchingProbability>0.1</bsim:branchingProbability>
+	      </bsim:outgoingSequenceFlow>
+	      <bsim:outgoingSequenceFlow id="SequenceFlow_3">
+	      	<bsim:branchingProbability>0.9</bsim:branchingProbability>
+	      </bsim:outgoingSequenceFlow>
+	    </bsim:exclusiveGateway>
+	    <bsim:subProcess id="SubProcess_1jvlipe" name="Batch Region">
+		    <bsim:task id="Task_0me73xw" name="Pack order">
+		    	<bsim:duration timeUnit="MINUTES">
+		    		<bsim:exponentialDistribution>
+		    			<bsim:mean>2</bsim:mean>
+		    		</bsim:exponentialDistribution>
+		    	</bsim:duration>
+		    	<bsim:resources>
+		    		<bsim:resource id="Warehouse" amount="1"/>
+		    	</bsim:resources>
+		    </bsim:task>
+		    <bsim:task id="Task_1nt4ran" name="Send order">
+		    	<bsim:duration timeUnit="MINUTES">
+		    		<bsim:exponentialDistribution>
+		    			<bsim:mean>2</bsim:mean>
+		    			<bsim:standardDeviation>0.5</bsim:standardDeviation>
+		    		</bsim:exponentialDistribution>
+		    	</bsim:duration>
+		    	<bsim:resources>
+		    		<bsim:resource id="Warehouse" amount="1"/>
+		    	</bsim:resources>
+		    </bsim:task>
+	    </bsim:subProcess>
+	    <bsim:task id="Task_0ox3m1q" name="Archive order">
+	    	<bsim:duration timeUnit="SECONDS">
+	    		<bsim:constantDistribution>
+	    			<bsim:constantValue>1</bsim:constantValue>
+	    		</bsim:constantDistribution>
+	    	</bsim:duration>
+	    	<bsim:resources>
+	    		<bsim:resource id="System" amount="1"/>
+	    	</bsim:resources>
+	    </bsim:task>
+	</bsim:simulationConfiguration>
+</bsim:definitions>

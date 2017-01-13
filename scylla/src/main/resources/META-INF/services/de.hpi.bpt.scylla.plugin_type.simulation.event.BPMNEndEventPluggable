@@ -1,0 +1,5 @@
+de.hpi.bpt.scylla.plugin.subprocess.SubprocessBPMNEEPlugin
+de.hpi.bpt.scylla.plugin.bpmntimer.BPMNTimerBPMNEEPlugin
+de.hpi.bpt.scylla.plugin.bpmnerror.BPMNErrorBPMNEEPlugin
+de.hpi.bpt.scylla.plugin.bpmnescalation.BPMNEscalationBPMNEEPlugin
+de.hpi.bpt.scylla.plugin.batch.BatchBPMNEEPlugin

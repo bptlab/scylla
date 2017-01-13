@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scy:definitions xmlns:scy="http://scy.hpi.uni-potsdam.de/scylla/simModel" id="Simulation_6" targetNamespace="http://www.hpi.de">
+	<scy:simulationConfiguration id="SimulationConfiguration_6" processRef="returnProcess" processInstances="100" startDateTime="2016-07-04T09:00:00.000" endDateTime="2016-07-10T17:00:00.000" randomSeed="9281" ><!--resourceAssignmentOrder="priority,simulationTime">-->
+		<scy:startEvent id="StartEvent_1">
+	    	<scy:arrivalRate timeUnit="MINUTES">
+	    		<scy:exponentialDistribution>
+	    			<scy:mean>2</scy:mean>
+	    		</scy:exponentialDistribution>
+	    	</scy:arrivalRate>
+	    </scy:startEvent>
+	    <scy:task id="Task_0zs8ai5" name="Handle return request">
+	    	<scy:duration timeUnit="MINUTES">
+	    		<scy:exponentialDistribution>
+	    			<scy:mean>3</scy:mean>
+	    		</scy:exponentialDistribution>
+	    	</scy:duration>
+	    	<scy:resources>
+	    		<scy:resource id="Customer Care" amount="1"/>
+	    	</scy:resources>
+	    </scy:task>
+	    <scy:task id="Task_0ox3m1q" name="Archive return request">
+	    	<scy:duration timeUnit="MINUTES">
+	    		<scy:exponentialDistribution>
+	    			<scy:mean>2</scy:mean>
+	    		</scy:exponentialDistribution>
+	    	</scy:duration>
+	    	<scy:resources>
+	    		<scy:resource id="Customer Care" amount="1"/>
+	    	</scy:resources>
+	    </scy:task>
+	    <scy:subProcess id="SubProcess_1g5l68i" name="Collect return">
+			<scy:batchRegion>
+				<scy:maxBatchSize>5</scy:maxBatchSize>
+				<scy:activationRule>
+					<scy:minMaxRule minInstances="2" minTimeout="PT3M" maxInstances="5" maxTimeout="PT8M"/>
+				</scy:activationRule>
+				<scy:groupingCharacteristic>
+					<scy:processVariable>customerStatus</scy:processVariable>
+					<scy:processVariable>deliveryHour</scy:processVariable>
+				</scy:groupingCharacteristic>
+ 			</scy:batchRegion>
+	    	<scy:task id="Task_0oiehpw" name="Take parcel from staging area">
+		    	<scy:duration timeUnit="MINUTES">
+		    		<scy:constantDistribution>
+		    			<scy:constantValue>6</scy:constantValue>
+		    		</scy:constantDistribution>
+		    	</scy:duration>
+		    	<scy:resources>
+		    		<scy:resource id="Warehouse" amount="1"/>
+		    	</scy:resources>
+		    </scy:task>
+	    	<scy:task id="Task_00qgayk" name="Bring parcel to inspection room">
+	    		<scy:duration timeUnit="MINUTES">
+		    		<scy:empiricalDistribution>
+		    	<!--		<scy:entry value="2" frequency="1"/>
+		    			<scy:entry value="6" frequency="1"/>-->
+		    			<scy:entry value="10" frequency="1"/>
+		    		</scy:empiricalDistribution>
+		    	</scy:duration>
+		    	<scy:resources>
+		    		<scy:resource id="Warehouse" amount="1"/>
+		    	</scy:resources>
+	    	</scy:task>
+	    </scy:subProcess>
+	    <scy:task id="Task_1qos0r1" name="Report about taking too long">
+	    	<scy:duration timeUnit="SECONDS">
+	    		<scy:constantDistribution>
+	    			<scy:constantValue>1</scy:constantValue>
+	    		</scy:constantDistribution>
+	    	</scy:duration>
+	    	<scy:resources>
+	    		<scy:resource id="System" amount="1"/>
+	    	</scy:resources>
+	    </scy:task>
+	</scy:simulationConfiguration>
+</scy:definitions>

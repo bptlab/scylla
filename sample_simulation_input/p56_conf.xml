@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scy:globalConfiguration xmlns:scy="http://scy.hpi.uni-potsdam.de/scylla/simModel" id="GlobalConf_1" targetNamespace="http://www.hpi.de">
+	<scy:resourceAssignmentOrder>simulationTime</scy:resourceAssignmentOrder>
+<!--	<scy:randomSeed>3096</scy:randomSeed> -->
+	<scy:zoneOffset>+00:00</scy:zoneOffset>
+	<scy:timetables>
+		<scy:timetable id="Default">
+			<scy:timetableItem from="MONDAY" to="MONDAY" beginTime="09:00:00" endTime="17:00:00"/>
+			<scy:timetableItem from="TUESDAY" to="TUESDAY" beginTime="09:00:00" endTime="17:00:00"/>
+			<scy:timetableItem from="WEDNESDAY" to="WEDNESDAY" beginTime="09:00:00" endTime="17:00:00"/>
+		<!--	<scy:timetableItem from="THURSDAY" to="THURSDAY" beginTime="09:00:00" endTime="17:00:00"/>
+			<scy:timetableItem from="FRIDAY" to="FRIDAY" beginTime="09:00:00" endTime="17:00:00"/>
+			<scy:timetableItem from="MONDAY" to="FRIDAY" beginTime="09:00:00" endTime="17:00:00"/> -->
+		</scy:timetable>
+	</scy:timetables>
+	<scy:resourceData>
+		<scy:dynamicResource id="Warehouse" name="Warehouse employee" defaultQuantity="10" defaultCost="8.50" defaultTimeUnit="HOURS" defaultTimetableId="Default">
+			<scy:instance name="Anna" />
+			<scy:instance name="Bernd" />
+			<scy:instance name="Chris" />
+			<scy:instance name="Dieter" />
+			<scy:instance name="Egon" />
+			<scy:instance name="Frank" />
+			<scy:instance name="Gustav" />
+			<scy:instance name="Hannah" />
+			<scy:instance name="Ingo" />
+			<scy:instance name="Jakob" />
+		</scy:dynamicResource>
+		<scy:dynamicResource id="Customer Care" name="Customer employee" defaultQuantity="3" defaultCost="8.50" defaultTimeUnit="HOURS" defaultTimetableId="Default">
+			<scy:instance name="Karl" />
+			<scy:instance name="Lena" />
+			<scy:instance name="Marc" />
+		</scy:dynamicResource>
+		<scy:dynamicResource id="System" name="System" defaultQuantity="1" defaultCost="1.50" defaultTimeUnit="HOURS">
+		</scy:dynamicResource>
+	</scy:resourceData>
+</scy:globalConfiguration>

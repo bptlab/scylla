@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpt="https://bpt.hpi.uni-potsdam.de/Public/LuisePufahl" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" id="_jH_ZoHM4EeWu8ZidZ9qLYQ" targetNamespace="http://camunda.org/schema/1.0/bpmn" exporter="camunda modeler" exporterVersion="2.7.0" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" xmlns:qbp="http://www.qbp-simulator.com/Schema201212">
+  <bpmn2:process id="orderProcess" name="Ordering Process" isExecutable="true">
+    <bpmn2:startEvent id="StartEvent_1" name="Order received" camunda:formKey="embedded:app:forms/orderReceived.html">
+      <bpmn2:outgoing>SequenceFlow_1</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:sequenceFlow id="SequenceFlow_1" name="" sourceRef="StartEvent_1" targetRef="Task_0zs8ai5"/>
+    <bpmn2:exclusiveGateway id="ExclusiveGateway_1">
+      <bpmn2:incoming>SequenceFlow_2</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_4</bpmn2:outgoing>
+      <bpmn2:outgoing>SequenceFlow_3</bpmn2:outgoing>
+    </bpmn2:exclusiveGateway>
+    <bpmn2:sequenceFlow id="SequenceFlow_2" name="" sourceRef="Task_0zs8ai5" targetRef="ExclusiveGateway_1"/>
+    <bpmn2:endEvent id="EndEvent_1">
+      <bpmn2:incoming>SequenceFlow_4</bpmn2:incoming>
+    </bpmn2:endEvent>
+    <bpmn2:sequenceFlow id="SequenceFlow_4" name="" sourceRef="ExclusiveGateway_1" targetRef="EndEvent_1">
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">${false}</bpmn2:conditionExpression>
+    </bpmn2:sequenceFlow>
+    <bpmn2:endEvent id="EndEvent_2">
+      <bpmn2:incoming>SequenceFlow_7</bpmn2:incoming>
+    </bpmn2:endEvent>
+    <bpmn2:sequenceFlow id="SequenceFlow_7" name="" sourceRef="Task_0ox3m1q" targetRef="EndEvent_2"/>
+    <bpmn2:task id="Task_0zs8ai5" name="Approve order">
+      <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_2</bpmn2:outgoing>
+    </bpmn2:task>
+    <bpmn2:subProcess id="SubProcess_1jvlipe" name="Batch Region">
+      <bpmn2:extensionElements>
+        <bpt:batchRegion id="batch1">
+          <bpt:groupingCharacteristic>
+            <bpt:processVariable id="1">custName</bpt:processVariable>
+            <bpt:processVariable id="1">custAdress</bpt:processVariable>
+          </bpt:groupingCharacteristic>
+          <bpt:maxCapacity>3</bpt:maxCapacity>
+          <bpt:thresholdRule num="2" timeout="PT10S"/>
+        </bpt:batchRegion>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>SequenceFlow_3</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_15abaew</bpmn2:outgoing>
+      <bpmn2:startEvent id="StartEvent_0re0ph1">
+        <bpmn2:outgoing>SequenceFlow_0wlwshd</bpmn2:outgoing>
+      </bpmn2:startEvent>
+      <bpmn2:endEvent id="EndEvent_16y5md6">
+        <bpmn2:incoming>SequenceFlow_0ym2a03</bpmn2:incoming>
+      </bpmn2:endEvent>
+      <bpmn2:sequenceFlow id="SequenceFlow_0ym2a03" sourceRef="Task_1nt4ran" targetRef="EndEvent_16y5md6"/>
+      <bpmn2:sequenceFlow id="SequenceFlow_1354chg" sourceRef="Task_0me73xw" targetRef="Task_1nt4ran"/>
+      <bpmn2:sequenceFlow id="SequenceFlow_0wlwshd" sourceRef="StartEvent_0re0ph1" targetRef="Task_0me73xw"/>
+      <bpmn2:task id="Task_0me73xw" name="Pack order">
+        <bpmn2:incoming>SequenceFlow_0wlwshd</bpmn2:incoming>
+        <bpmn2:outgoing>SequenceFlow_1354chg</bpmn2:outgoing>
+      </bpmn2:task>
+      <bpmn2:task id="Task_1nt4ran" name="Send order">
+        <bpmn2:incoming>SequenceFlow_1354chg</bpmn2:incoming>
+        <bpmn2:outgoing>SequenceFlow_0ym2a03</bpmn2:outgoing>
+      </bpmn2:task>
+    </bpmn2:subProcess>
+    <bpmn2:sequenceFlow id="SequenceFlow_15abaew" sourceRef="SubProcess_1jvlipe" targetRef="Task_0ox3m1q"/>
+    <bpmn2:sequenceFlow id="SequenceFlow_3" name="" sourceRef="ExclusiveGateway_1" targetRef="SubProcess_1jvlipe">
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">${true}</bpmn2:conditionExpression>
+    </bpmn2:sequenceFlow>
+    <bpmn2:task id="Task_0ox3m1q" name="Archive order">
+      <bpmn2:incoming>SequenceFlow_15abaew</bpmn2:incoming>
+      <bpmn2:outgoing>SequenceFlow_7</bpmn2:outgoing>
+    </bpmn2:task>
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="orderProcess">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="216" y="242" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="SequenceFlow_1" sourceElement="_BPMNShape_StartEvent_2" targetElement="_BPMNShape_UserTask_2">
+        <di:waypoint xsi:type="dc:Point" x="252" y="260"/>
+        <di:waypoint xsi:type="dc:Point" x="302" y="260"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_ExclusiveGateway_2" bpmnElement="ExclusiveGateway_1" isMarkerVisible="true">
+        <dc:Bounds x="452" y="235" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_2" bpmnElement="SequenceFlow_2" sourceElement="_BPMNShape_UserTask_2" targetElement="_BPMNShape_ExclusiveGateway_2">
+        <di:waypoint xsi:type="dc:Point" x="402" y="260"/>
+        <di:waypoint xsi:type="dc:Point" x="452" y="260"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_EndEvent_2" bpmnElement="EndEvent_1">
+        <dc:Bounds x="560" y="414" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="533" y="450" width="90" height="20"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_4" bpmnElement="SequenceFlow_4" sourceElement="_BPMNShape_ExclusiveGateway_2" targetElement="_BPMNShape_EndEvent_2">
+        <di:waypoint xsi:type="dc:Point" x="477" y="285"/>
+        <di:waypoint xsi:type="dc:Point" x="477" y="432"/>
+        <di:waypoint xsi:type="dc:Point" x="560" y="432"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_EndEvent_3" bpmnElement="EndEvent_2">
+        <dc:Bounds x="1245" y="242" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1218" y="278" width="90" height="20"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_7" bpmnElement="SequenceFlow_7" sourceElement="_BPMNShape_UserTask_5" targetElement="_BPMNShape_EndEvent_3">
+        <di:waypoint xsi:type="dc:Point" x="1198" y="260"/>
+        <di:waypoint xsi:type="dc:Point" x="1245" y="260"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Task_0zs8ai5_di" bpmnElement="Task_0zs8ai5">
+        <dc:Bounds x="302" y="220" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SubProcess_1jvlipe_di" bpmnElement="SubProcess_1jvlipe" isExpanded="true">
+        <dc:Bounds x="562" y="160" width="489" height="198"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartEvent_0re0ph1_di" bpmnElement="StartEvent_0re0ph1">
+        <dc:Bounds x="598" y="238" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="571" y="274" width="90" height="20"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_16y5md6_di" bpmnElement="EndEvent_16y5md6">
+        <dc:Bounds x="973" y="238" width="36" height="36"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="946" y="274" width="90" height="20"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0ym2a03_di" bpmnElement="SequenceFlow_0ym2a03">
+        <di:waypoint xsi:type="dc:Point" x="921" y="256"/>
+        <di:waypoint xsi:type="dc:Point" x="973" y="256"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="913" y="246" width="90" height="20"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1354chg_di" bpmnElement="SequenceFlow_1354chg">
+        <di:waypoint xsi:type="dc:Point" x="780" y="256"/>
+        <di:waypoint xsi:type="dc:Point" x="821" y="256"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="693" y="246" width="90" height="20"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0wlwshd_di" bpmnElement="SequenceFlow_0wlwshd">
+        <di:waypoint xsi:type="dc:Point" x="634" y="256"/>
+        <di:waypoint xsi:type="dc:Point" x="680" y="256"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="612" y="246" width="90" height="20"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_15abaew_di" bpmnElement="SequenceFlow_15abaew">
+        <di:waypoint xsi:type="dc:Point" x="1051" y="259"/>
+        <di:waypoint xsi:type="dc:Point" x="1098" y="260"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="928.5" y="250" width="90" height="20"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_3" bpmnElement="SequenceFlow_3" sourceElement="_BPMNShape_ExclusiveGateway_2" targetElement="_BPMNShape_UserTask_3">
+        <di:waypoint xsi:type="dc:Point" x="502" y="260"/>
+        <di:waypoint xsi:type="dc:Point" x="562" y="259"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Task_0me73xw_di" bpmnElement="Task_0me73xw">
+        <dc:Bounds x="680" y="216" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_1nt4ran_di" bpmnElement="Task_1nt4ran">
+        <dc:Bounds x="821" y="216" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_0ox3m1q_di" bpmnElement="Task_0ox3m1q">
+        <dc:Bounds x="1098" y="220" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+<qbp:processSimulationInfo currency="EUR" processInstances="10" startDateTime="2016-07-02T12:22:57.000+00:00" xmlns:qbp="http://www.qbp-simulator.com/Schema201212" id="qbp_4c6f084b-ca1f-e6d9-3f39-4258a3f8f783"><qbp:arrivalRateDistribution type="EXPONENTIAL" mean="0" arg1="60" arg2="0" id="qbp_996aae3a-e94f-4c03-a020-cb0a5da157a0"><qbp:timeUnit id="qbp_4ec1c268-bd46-6d70-a2dd-5f0e94bd82ed">minutes</qbp:timeUnit></qbp:arrivalRateDistribution><qbp:resources id="qbp_7f49cfd2-6367-0fe4-a8d6-85527376d7b6"><qbp:resource id="QBP_DEFAULT_RESOURCE" name="Warehouse employee" costPerHour="8.50" totalAmount="10" timetableId="QBP_DEFAULT_TIMETABLE"/><qbp:resource id="qbp_90fdc5c3-55e6-37fc-e8f0-44c8e89f5897" name="Ordering employee" costPerHour="8.50" totalAmount="3" timetableId="QBP_DEFAULT_TIMETABLE"/><qbp:resource id="qbp_c2014798-1bb4-c788-fbc9-638fa5c2e4fa" name="System" costPerHour="1.50" totalAmount="1" timetableId="QBP_DEFAULT_TIMETABLE"/></qbp:resources><qbp:timetables id="qbp_aa6584a8-76b1-1faf-3c13-79e865538cfa"><qbp:timetable id="QBP_DEFAULT_TIMETABLE" default="true"><qbp:rules id="qbp_40774044-75d5-083c-9773-9b38411bc608"><qbp:rule fromWeekDay="MONDAY" toWeekDay="FRIDAY" fromTime="09:00:00.000+00:00" toTime="17:00:00.000+00:00" id="qbp_d486b191-15ce-8033-dc6f-c194c0a7e618"/></qbp:rules></qbp:timetable></qbp:timetables><qbp:elements id="qbp_9f50f99f-a55a-ce5e-a988-e4329323d78a"><qbp:element fixedCost="0" elementId="Task_0zs8ai5" id="qbp_2e608f5a-b24d-7703-96e0-f208cc45dfbe"><qbp:durationDistribution type="EXPONENTIAL" mean="0" arg1="120" arg2="0" id="qbp_0afcd2e5-fc4d-d030-61a6-4fd8272cb6df"><qbp:timeUnit id="qbp_c7a7cb83-b4b1-39d2-4d23-a2041efc963c">minutes</qbp:timeUnit></qbp:durationDistribution><qbp:resourceIds id="qbp_d4096550-5146-4c45-e5a3-47e0ead8d306"><qbp:resourceId id="qbp_ef5ead49-d11c-4f53-a49e-f0bd65218afe">qbp_90fdc5c3-55e6-37fc-e8f0-44c8e89f5897</qbp:resourceId></qbp:resourceIds></qbp:element><qbp:element fixedCost="3" elementId="Task_0me73xw" id="qbp_23216694-7b4d-c258-3ce8-bf4e5f5f4585"><qbp:durationDistribution type="EXPONENTIAL" mean="0" arg1="240" arg2="0" id="qbp_db12c3d9-6ab6-1e46-74b2-50e2c9ee32b6"><qbp:timeUnit id="qbp_68ef50f0-b617-78f6-f9fe-7b73bc4396f1">minutes</qbp:timeUnit></qbp:durationDistribution><qbp:resourceIds id="qbp_c40ee244-3651-f7e0-244c-66c141f98b0c"><qbp:resourceId id="qbp_fcf9a7bc-3a28-0d05-99a9-1a10354ac72d">QBP_DEFAULT_RESOURCE</qbp:resourceId></qbp:resourceIds></qbp:element><qbp:element fixedCost="0" elementId="Task_1nt4ran" id="qbp_27565645-8d43-dc10-f492-2ca88b5c12f8"><qbp:durationDistribution type="NORMAL" mean="120" arg1="30" arg2="0" id="qbp_a0ff9b31-d019-c989-7764-f3e591878e85"><qbp:timeUnit id="qbp_18feb079-2a8b-2737-3deb-c6840ea8816d">minutes</qbp:timeUnit></qbp:durationDistribution><qbp:resourceIds id="qbp_6de62243-20bf-7a24-e604-b6355d80b7c0"><qbp:resourceId id="qbp_ec1a755f-6420-341d-0abd-117c1eee5332">QBP_DEFAULT_RESOURCE</qbp:resourceId></qbp:resourceIds></qbp:element><qbp:element fixedCost="0" elementId="Task_0ox3m1q" id="qbp_e9ce4a9f-b4d9-0d2e-2637-4cd96a73414c"><qbp:durationDistribution type="FIXED" mean="1" arg1="0" arg2="0" id="qbp_af3c5352-a7ad-544d-f2c5-6d35ee583cec"><qbp:timeUnit id="qbp_04a309d0-9000-2ac4-7d1e-815bfb4a394c">seconds</qbp:timeUnit></qbp:durationDistribution><qbp:resourceIds id="qbp_40ac444c-4f23-5851-5096-e0f34e88a53a"><qbp:resourceId id="qbp_97627617-cab9-dac1-4229-634dccbcfd88">qbp_c2014798-1bb4-c788-fbc9-638fa5c2e4fa</qbp:resourceId></qbp:resourceIds></qbp:element></qbp:elements><qbp:sequenceFlows id="qbp_b1f262db-e5ba-8f7d-5527-2dc889f0b84c"><qbp:sequenceFlow elementId="SequenceFlow_4" executionProbability="0.1" id="qbp_a5580d06-6d3b-17bc-5347-0f8682374597"/><qbp:sequenceFlow elementId="SequenceFlow_3" executionProbability="0.9" id="qbp_3716dd66-6acf-4b91-bad8-3e3acf744898"/></qbp:sequenceFlows></qbp:processSimulationInfo></bpmn2:definitions>

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bsim:definitions xmlns:bsim="http://bsim.hpi.uni-potsdam.de/scylla/simModel" id="Simulation_3" targetNamespace="http://www.hpi.de">
+	<bsim:simulationConfiguration id="SimulationConfiguration_3" processRef="Process_3" processInstances="30" startDateTime="2016-08-01T10:00:00.000+02:00" endDateTime="2016-08-05T14:00:00.000+02:00"> <!-- randomSeed="3096"> -->
+		<bsim:startEvent id="sid-F90DAA2B-02DF-429F-A93D-09578F648CF0">
+	    	<bsim:arrivalRate timeUnit="MINUTES">
+	    		<bsim:constantDistribution>
+	    			<bsim:constantValue>2</bsim:constantValue>
+	    		</bsim:constantDistribution>
+	    	</bsim:arrivalRate>
+	    </bsim:startEvent>
+	    <bsim:task id="sid-37D8C290-55AB-498F-B6C0-747D7BBBFE9E" name="be happy">
+	    	<bsim:duration timeUnit="MINUTES">
+	    		<bsim:constantDistribution>
+	    			<bsim:constantValue>30</bsim:constantValue>
+	    		</bsim:constantDistribution>
+	    	</bsim:duration>
+	    	<bsim:resources>
+	    		<bsim:resource id="Professor" amount="1"/>
+	    	</bsim:resources>
+	    </bsim:task>
+	    <bsim:task id="sid-43DB2631-1FBB-4AB6-919B-7FCFD1D3CA70" name="read message">
+	    	<bsim:duration timeUnit="MINUTES">
+	    		<bsim:constantDistribution>
+	    			<bsim:constantValue>30</bsim:constantValue>
+	    		</bsim:constantDistribution>
+	    	</bsim:duration>
+	    	<bsim:resources>
+	    		<bsim:resource id="Student" amount="1"/>
+	    	</bsim:resources>
+	    </bsim:task>
+	    <bsim:task id="sid-3D1F54AF-5FEF-464D-B45A-9C05224FAC1D" name="report error">
+	    	<bsim:duration timeUnit="MINUTES">
+	    		<bsim:constantDistribution>
+	    			<bsim:constantValue>30</bsim:constantValue>
+	    		</bsim:constantDistribution>
+	    	</bsim:duration>
+	    	<bsim:resources>
+	    		<bsim:resource id="Student" amount="1"/>
+	    	</bsim:resources>
+	    </bsim:task>
+	    <bsim:task id="sid-8D546A5C-D4BE-47E5-8E23-F46696A5C835" name="be sad because time is over">
+	    	<bsim:duration timeUnit="MINUTES">
+	    		<bsim:constantDistribution>
+	    			<bsim:constantValue>30</bsim:constantValue>
+	    		</bsim:constantDistribution>
+	    	</bsim:duration>
+	    	<bsim:resources>
+	    		<bsim:resource id="Student" amount="1"/>
+	    	</bsim:resources>
+	    </bsim:task>
+	    <bsim:task id="sid-9DC04F1F-6FE6-4981-A9D3-602B9C4ED895" name="deal with condition">
+	    	<bsim:duration timeUnit="MINUTES">
+	    		<bsim:constantDistribution>
+	    			<bsim:constantValue>30</bsim:constantValue>
+	    		</bsim:constantDistribution>
+	    	</bsim:duration>
+	    	<bsim:resources>
+	    		<bsim:resource id="Student" amount="1"/>
+	    	</bsim:resources>
+	    </bsim:task>
+	    <bsim:subProcess id="SubProcess_3" name="write thesis">
+		    <bsim:task id="sid-D9FE1F5B-D0AD-4897-A2E5-F0234D8FC6EE" name="read paper">
+		    	<bsim:duration timeUnit="MINUTES">
+		    		<bsim:constantDistribution>
+		    			<bsim:constantValue>50</bsim:constantValue>
+		    		</bsim:constantDistribution>
+		    	</bsim:duration>
+	    	<bsim:resources>
+	    		<bsim:resource id="Student" amount="1"/>
+	    	</bsim:resources>
+		    </bsim:task>
+		    <bsim:exclusiveGateway id="sid-DE5D1777-B468-4B65-8C18-E2260A58673C">
+		      <bsim:outgoingSequenceFlow id="sid-91AF73BE-E60D-43E3-9A39-0FD956A7A94A">
+		      	<bsim:branchingProbability>0.5</bsim:branchingProbability>
+		      </bsim:outgoingSequenceFlow>
+		      <bsim:outgoingSequenceFlow id="sid-D06D0191-B86B-4FA9-B5C7-5DF437A7993B">
+		      	<bsim:branchingProbability>0.2</bsim:branchingProbability>
+		      </bsim:outgoingSequenceFlow>
+		    </bsim:exclusiveGateway>
+		    <bsim:task id="sid-939FD59F-5F70-4261-9F8F-AC9F884E60B2" name="search for new paper">
+		    	<bsim:duration timeUnit="MINUTES">
+		    		<bsim:constantDistribution>
+		    			<bsim:constantValue>70</bsim:constantValue>
+		    		</bsim:constantDistribution>
+		    	</bsim:duration>
+	    	<bsim:resources>
+	    		<bsim:resource id="Student" amount="2"/>
+	    	</bsim:resources>
+		    </bsim:task>
+		    <bsim:task id="sid-3E857BAC-EFB7-437D-BA3A-3F6FC6634DBD" name="write chapters">
+		    	<bsim:duration timeUnit="MINUTES">
+		    		<bsim:constantDistribution>
+		    			<bsim:constantValue>40</bsim:constantValue>
+		    		</bsim:constantDistribution>
+		    	</bsim:duration>
+	    	<bsim:resources>
+	    		<bsim:resource id="Student" amount="1"/>
+	    	</bsim:resources>
+		    </bsim:task>
+	    	<bsim:boundaryEvents>
+	    		<!--<bsim:boundaryEvent id="sid-71507C76-09EA-41FF-86AB-004A2447257A" name="error in">
+	    			<bsim:eventProbability>0.05</bsim:eventProbability>
+			    	<bsim:arrivalRate timeUnit="MINUTES">
+			    		<bsim:constantDistribution>
+			    			<bsim:constantValue>2</bsim:constantValue>
+			    		</bsim:constantDistribution>
+			    	</bsim:arrivalRate>
+	    		</bsim:boundaryEvent>-->
+	    		<bsim:boundaryEvent id="sid-7B837D24-6D92-4EAA-BECD-DA436E6853E5" name="message in" >
+	    			<bsim:eventProbability>0.4</bsim:eventProbability>
+			    	<bsim:arrivalRate timeUnit="MINUTES">
+			    		<bsim:constantDistribution>
+			    			<bsim:constantValue>30</bsim:constantValue>
+			    		</bsim:constantDistribution>
+			    	</bsim:arrivalRate>
+	    		</bsim:boundaryEvent>
+	    		<bsim:boundaryEvent id="sid-17EFE732-CE01-4205-AC11-4AB5B52484D3" name="condition in">
+	    			<bsim:eventProbability>0.4</bsim:eventProbability>
+			    	<bsim:arrivalRate timeUnit="MINUTES">
+			    		<bsim:constantDistribution>
+			    			<bsim:constantValue>40</bsim:constantValue>
+			    		</bsim:constantDistribution>
+			    	</bsim:arrivalRate>
+	    		</bsim:boundaryEvent>
+	    	</bsim:boundaryEvents>
+	    </bsim:subProcess>
+	</bsim:simulationConfiguration>
+</bsim:definitions>

@@ -1,0 +1,3 @@
+de.hpi.bpt.scylla.plugin.statslogger.StatisticsLogger
+de.hpi.bpt.scylla.plugin.xeslogger.XESLogger
+#de.hpi.bpt.scylla.plugin.batch.BatchLogger

@@ -1,0 +1,3 @@
+de.hpi.bpt.scylla.plugin.subprocess.SubprocessTBPlugin
+de.hpi.bpt.scylla.plugin.boundaryevent.BoundaryTBPlugin
+de.hpi.bpt.scylla.plugin.batch.BatchTBPlugin

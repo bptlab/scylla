@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bsim:definitions xmlns:bsim="http://bsim.hpi.uni-potsdam.de/scylla/simModel" id="Simulation_2" targetNamespace="http://www.hpi.de">
+	<bsim:simulationConfiguration id="SimulationConfiguration_4" processRef="Process_4" processInstances="10" startDateTime="2016-08-01T11:00:00" endDateTime="2016-08-01T13:00:00" resourceAssignmentOrder="simulationTime" randomSeed="9281">
+	    <bsim:startEvent id="StartEvent_1">
+	    	<bsim:arrivalRate timeUnit="MINUTES">
+	    		<bsim:exponentialDistribution>
+	    			<bsim:mean>2</bsim:mean>
+	    		</bsim:exponentialDistribution>
+	    	</bsim:arrivalRate>
+	    </bsim:startEvent>
+	    <bsim:task id="Task_08g3sxo" name="do some A">
+	    	<bsim:duration timeUnit="SECONDS">
+	    		<bsim:constantDistribution>
+	    			<bsim:constantValue>90</bsim:constantValue>
+	    		</bsim:constantDistribution>
+	    	</bsim:duration>
+	    	<bsim:resources>
+	    		<bsim:resource id="Professor" amount="1">
+			    	<bsim:assignmentDefinition>
+						<bsim:priority>1</bsim:priority>
+					</bsim:assignmentDefinition>
+				</bsim:resource>
+	    	</bsim:resources>
+	    </bsim:task>
+	    <bsim:task id="Task_02xic69" name="do some C1">
+	    	<bsim:duration timeUnit="SECONDS">
+	    		<bsim:constantDistribution>
+	    			<bsim:constantValue>90</bsim:constantValue>
+	    		</bsim:constantDistribution>
+	    	</bsim:duration>
+	    	<bsim:resources>
+	    		<bsim:resource id="Professor" amount="1">
+			    	<bsim:assignmentDefinition>
+						<bsim:priority>1</bsim:priority>
+					</bsim:assignmentDefinition>
+				</bsim:resource>
+	    	</bsim:resources>
+	    </bsim:task>
+	    <bsim:task id="Task_1g76snk" name="do some C2">
+	    	<bsim:duration timeUnit="SECONDS">
+	    		<bsim:constantDistribution>
+	    			<bsim:constantValue>90</bsim:constantValue>
+	    		</bsim:constantDistribution>
+	    	</bsim:duration>
+	    	<bsim:resources>
+	    		<bsim:resource id="Professor" amount="1">
+			    	<bsim:assignmentDefinition>
+						<bsim:priority>1</bsim:priority>
+					</bsim:assignmentDefinition>
+				</bsim:resource>
+	    	</bsim:resources>
+	    </bsim:task>
+	    <bsim:task id="Task_0i35kat" name="do some B">
+	    	<bsim:duration timeUnit="SECONDS">
+	    		<bsim:constantDistribution>
+	    			<bsim:constantValue>90</bsim:constantValue>
+	    		</bsim:constantDistribution>
+	    	</bsim:duration>
+	    	<bsim:resources>
+	    		<bsim:resource id="Professor" amount="1">
+			    	<bsim:assignmentDefinition>
+						<bsim:priority>1</bsim:priority>
+					</bsim:assignmentDefinition>
+				</bsim:resource>
+	    	</bsim:resources>
+	    </bsim:task>
+	    <bsim:task id="Task_1gtxxf2" name="do some D">
+	    	<bsim:duration timeUnit="SECONDS">
+	    		<bsim:constantDistribution>
+	    			<bsim:constantValue>90</bsim:constantValue>
+	    		</bsim:constantDistribution>
+	    	</bsim:duration>
+	    	<bsim:resources>
+	    		<bsim:resource id="Professor" amount="1">
+			    	<bsim:assignmentDefinition>
+						<bsim:priority>1</bsim:priority>
+					</bsim:assignmentDefinition>
+				</bsim:resource>
+	    	</bsim:resources>
+	    </bsim:task>
+	    <bsim:exclusiveGateway id="ExclusiveGateway_0rr9f8n">
+	      <bsim:outgoingSequenceFlow id="SequenceFlow_0orm7zg">
+	      	<bsim:branchingProbability>0.99</bsim:branchingProbability>
+	      </bsim:outgoingSequenceFlow>
+	      <bsim:outgoingSequenceFlow id="SequenceFlow_0043gzj">
+	      	<bsim:branchingProbability>0.01</bsim:branchingProbability>
+	      </bsim:outgoingSequenceFlow>
+	    </bsim:exclusiveGateway>
+	</bsim:simulationConfiguration>
+</bsim:definitions>
