@@ -1,5 +1,8 @@
 package de.hpi.bpt.scylla;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * Scylla is an extensible simulator for business processes in BPMN. <br>
  * This class initializes and runs the {@link SimulationManager} which simulates the processes based on the given input.
@@ -7,10 +10,46 @@ package de.hpi.bpt.scylla;
  * @author Tsun Yin Wong
  *
  */
-public class Scylla {
+public class Scylla { 
 
     public static void main(String[] args) {
 
+    	/**
+    	 * Command line argument parsing
+    	 */
+    	
+    	// current directory default output folder
+    	String outputFolder = "";
+    	List<String> processModels = new LinkedList<String>();
+    	List<String> simulationConfigurations = new LinkedList<String>();
+    	String globalConfiguration = null;
+    	for (int i = 0; i < args.length; i++) {
+    		String arg = args[i];
+    		System.out.println(i + ": " + args[i]);
+    		if (arg.equals("-p")) {
+    			processModels = readFilenames(args, i+1);
+    			i += processModels.size();
+    		} else if (arg.equals("-s")) {
+    			simulationConfigurations = readFilenames(args, i+1);
+    			i += simulationConfigurations.size();
+    		} else if (arg.equals("-g")) {
+    			i++;
+    			if (i < args.length) {
+    				globalConfiguration = args[i];
+    			}
+    		} else if (arg.equals("-o")) {
+    			i++;
+    			if (i < args.length) {
+    				outputFolder = args[i];
+    			}
+    		}
+    	}
+    	
+    	if (processModels.isEmpty() || simulationConfigurations.isEmpty() || globalConfiguration == null || globalConfiguration.isEmpty()) {
+    		System.err.println("Usage: scylla -o [output folder] -p [process model bpmns] -s [simulation configuration xmls] -g [global configuration xml]");
+    		System.exit(1);
+    	}
+    	
         /**
          * BEGIN of simulation scenarios
          */
@@ -18,30 +57,18 @@ public class Scylla {
         /**
          * Simulation scenarios to test plug-ins.
          */
-
-        String folder = "F:\\desmoj_reports\\batch\\";
-
-        // String[] bpmnFilename = new String[] { folder + "p1_boundary.bpmn", folder + "p2_normal.bpmn",
-        // folder + "p3_subproc.bpmn" };
-        // String[] simFilenames = new String[] { folder + "p1_boundary_sim.xml", folder + "p2_normal_sim.xml",
-        // folder + "p3_subproc_sim.xml" };
-        // String resFilename = folder + "p0_globalconf_without.xml";
-
-        // String[] bpmnFilename = new String[] { folder + "p4_parallelx.bpmn" };
-        // String[] simFilenames = new String[] { folder + "p4_parallel_sim.xml" };
-        // String resFilename = folder + "p0_globalconf_without.xml";
-
-        String[] bpmnFilename = new String[] { folder + "p5_batch.bpmn", folder + "p6_return.bpmn" };
-        String[] simFilenames = new String[] { folder + "p5_batch_sim.xml", folder + "p6_return_sim.xml" };
-        String resFilename = folder + "p56_conf_thesis.xml";
+    	
+    	// -p p1_boundary.bpmn p2_normal.bpmn p3_subproc.bpmn -s p1_boundary_sim.xml p2_normal_sim.xml p3_subproc_sim.xml -g p0_globalconf_without.xml
+    	
+    	// -p p4_parallelx.bpmn -s p4_parallel_sim.xml -g p0_globalconf_without.xml
+    	
+    	// -p p5_batch.bpmn p6_return.bpmn -s p5_batch_sim.xml p6_return_sim.xml -g p56_conf_thesis.xml
 
         /**
          * Simulation scenarios to test batch processes. May be used for regular simulation.
          */
-
-        // String[] bpmnFilename = new String[] { folder + "p61_return_batch.bpmn" };
-        // String[] simFilenames = new String[] { folder + "p61_return_batch_sim.xml" };
-        // String resFilename = folder + "p61_conf_batch.xml";
+        
+        // -p p61_return_batch.bpmn -s p61_return_batch_sim.xml -g p61_conf_batch.xml
 
         /**
          * END of simulation scenarios
@@ -50,9 +77,26 @@ public class Scylla {
         boolean enableBpsLogging = true;
         boolean enableDesmojLogging = true;
 
-        SimulationManager manager = new SimulationManager(folder, bpmnFilename, simFilenames, resFilename,
+        SimulationManager manager = new SimulationManager(outputFolder, processModels.toArray(new String[0]), simulationConfigurations.toArray(new String[0]), globalConfiguration,
                 enableBpsLogging, enableDesmojLogging);
         manager.run();
+    }
+    
+    private static List<String> readFilenames(String[] args, int index) {
+    	List<String> filenames = new LinkedList<String>();
+    	if (index >= args.length)
+    		return filenames;
+    	String arg = args[index];
+    	while (!arg.equals("-o") && !arg.equals("-p") && !arg.equals("-s") && !arg.equals("-g")) {
+    		filenames.add(arg);
+    		index += 1;
+    		if (index < args.length) {
+    			arg = args[index];
+    		} else {
+    			break;
+    		}
+    	}
+    	return filenames;
     }
 
 }
