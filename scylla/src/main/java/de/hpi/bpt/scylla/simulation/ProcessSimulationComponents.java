@@ -7,28 +7,13 @@ import java.util.concurrent.TimeUnit;
 import de.hpi.bpt.scylla.exception.ScyllaRuntimeException;
 import de.hpi.bpt.scylla.logger.DebugLogger;
 import de.hpi.bpt.scylla.model.configuration.SimulationConfiguration;
-import de.hpi.bpt.scylla.model.configuration.distribution.BinomialDistribution;
-import de.hpi.bpt.scylla.model.configuration.distribution.ConstantDistribution;
 import de.hpi.bpt.scylla.model.configuration.distribution.Distribution;
-import de.hpi.bpt.scylla.model.configuration.distribution.EmpiricalDistribution;
-import de.hpi.bpt.scylla.model.configuration.distribution.ErlangDistribution;
-import de.hpi.bpt.scylla.model.configuration.distribution.ExponentialDistribution;
-import de.hpi.bpt.scylla.model.configuration.distribution.NormalDistribution;
-import de.hpi.bpt.scylla.model.configuration.distribution.PoissonDistribution;
-import de.hpi.bpt.scylla.model.configuration.distribution.TriangularDistribution;
-import de.hpi.bpt.scylla.model.configuration.distribution.UniformDistribution;
+import de.hpi.bpt.scylla.model.configuration.distribution.TimeDistributionWrapper;
 import de.hpi.bpt.scylla.model.process.CommonProcessElements;
 import de.hpi.bpt.scylla.model.process.ProcessModel;
 import de.hpi.bpt.scylla.plugin_type.simulation.DistributionConversionPluggable;
+import de.hpi.bpt.scylla.simulation.utils.SimulationUtils;
 import desmoj.core.dist.ContDistErlang;
-import desmoj.core.dist.ContDistExponential;
-import desmoj.core.dist.ContDistNormal;
-import desmoj.core.dist.ContDistTriangular;
-import desmoj.core.dist.ContDistUniform;
-import desmoj.core.dist.DiscreteDistBinomial;
-import desmoj.core.dist.DiscreteDistConstant;
-import desmoj.core.dist.DiscreteDistEmpirical;
-import desmoj.core.dist.DiscreteDistPoisson;
 import desmoj.core.dist.NumericalDist;
 
 /**
@@ -82,15 +67,15 @@ public class ProcessSimulationComponents {
 
     public void init() {
         try {
-            Map<Integer, Distribution> arrivalRates = simulationConfiguration.getArrivalRates();
-            Map<Integer, Distribution> durations = simulationConfiguration.getDurations();
+            Map<Integer, TimeDistributionWrapper> arrivalRates = simulationConfiguration.getArrivalRates();
+            Map<Integer, TimeDistributionWrapper> durations = simulationConfiguration.getDurations();
+            Map<Integer, TimeDistributionWrapper> arrivalRatesAndDurations = new HashMap<Integer, TimeDistributionWrapper>();
 
-            Map<Integer, Distribution> arrivalRatesAndDurations = new HashMap<Integer, Distribution>();
             arrivalRatesAndDurations.putAll(arrivalRates);
             arrivalRatesAndDurations.putAll(durations);
 
             for (Integer nodeId : arrivalRatesAndDurations.keySet()) {
-                Distribution dist = arrivalRatesAndDurations.get(nodeId);
+            	TimeDistributionWrapper dist = arrivalRatesAndDurations.get(nodeId);
                 TimeUnit distTimeUnit = dist.getTimeUnit();
                 if (distTimeUnit.ordinal() < model.getSmallestTimeUnit().ordinal()) {
                     model.setSmallestTimeUnit(distTimeUnit);
@@ -116,77 +101,17 @@ public class ProcessSimulationComponents {
         }
     }
 
-    private void convertToDesmojDistributions(Map<Integer, Distribution> arrivalRatesAndDurations)
+    private void convertToDesmojDistributions(Map<Integer, TimeDistributionWrapper> arrivalRatesAndDurations)
             throws InstantiationException {
         distributions = new HashMap<Integer, NumericalDist<?>>();
         Long randomSeed = simulationConfiguration.getRandomSeed();
         for (Integer nodeId : arrivalRatesAndDurations.keySet()) {
-
-            Distribution dist = arrivalRatesAndDurations.get(nodeId);
-            TimeUnit distTimeUnit = dist.getTimeUnit();
+        	TimeDistributionWrapper distWrapper = arrivalRatesAndDurations.get(nodeId);
+            TimeUnit distTimeUnit = distWrapper.getTimeUnit();
+            Distribution dist = distWrapper.getDistribution();
             distributionTimeUnits.put(nodeId, distTimeUnit);
             String name = processModel.getModelScopeId() + "_" + nodeId.toString();
-            NumericalDist<?> desmojDist;
-            if (dist instanceof BinomialDistribution) {
-                BinomialDistribution binDist = (BinomialDistribution) dist;
-                double probability = binDist.getProbability();
-                int amount = binDist.getAmount();
-                desmojDist = new DiscreteDistBinomial(model, name, probability, amount, showInReport, showInTrace);
-            }
-            else if (dist instanceof ConstantDistribution) {
-                ConstantDistribution conDist = (ConstantDistribution) dist;
-                double constantValue = conDist.getConstantValue();
-                desmojDist = new DiscreteDistConstant<Number>(model, name, constantValue, showInReport, showInTrace);
-            }
-            else if (dist instanceof EmpiricalDistribution) {
-                EmpiricalDistribution empDist = (EmpiricalDistribution) dist;
-                Map<Double, Double> entries = empDist.getEntries();
-                DiscreteDistEmpirical<Double> cde = new DiscreteDistEmpirical<Double>(model, name, showInReport,
-                        showInTrace);
-                for (Double value : entries.keySet()) {
-                    Double frequency = entries.get(value);
-                    cde.addEntry(value, frequency);
-                }
-                desmojDist = cde;
-            }
-            else if (dist instanceof ErlangDistribution) {
-                ErlangDistribution erlDist = (ErlangDistribution) dist;
-                double mean = erlDist.getMean();
-                long order = erlDist.getOrder();
-                desmojDist = new ContDistErlang(model, name, order, mean, showInReport, showInTrace);
-            }
-            else if (dist instanceof ExponentialDistribution) {
-                ExponentialDistribution expDist = (ExponentialDistribution) dist;
-                double mean = expDist.getMean();
-                desmojDist = new ContDistExponential(model, name, mean, showInReport, showInTrace);
-            }
-            else if (dist instanceof TriangularDistribution) {
-                TriangularDistribution triDist = (TriangularDistribution) dist;
-                double lower = triDist.getLower();
-                double upper = triDist.getUpper();
-                double peak = triDist.getPeak();
-                desmojDist = new ContDistTriangular(model, name, lower, upper, peak, showInReport, showInTrace);
-            }
-            else if (dist instanceof NormalDistribution) {
-                NormalDistribution norDist = (NormalDistribution) dist;
-                double mean = norDist.getMean();
-                double standardDeviation = norDist.getStandardDeviation();
-                desmojDist = new ContDistNormal(model, name, mean, standardDeviation, showInReport, showInTrace);
-            }
-            else if (dist instanceof PoissonDistribution) {
-                PoissonDistribution poiDist = (PoissonDistribution) dist;
-                double mean = poiDist.getMean();
-                desmojDist = new DiscreteDistPoisson(model, name, mean, showInReport, showInTrace);
-            }
-            else if (dist instanceof UniformDistribution) {
-                UniformDistribution uniDist = (UniformDistribution) dist;
-                double lower = uniDist.getLower();
-                double upper = uniDist.getUpper();
-                desmojDist = new ContDistUniform(model, name, lower, upper, showInReport, showInTrace);
-            }
-            else {
-                throw new InstantiationException("Distribution of node " + nodeId + " not supported.");
-            }
+            NumericalDist<?> desmojDist = SimulationUtils.getDistribution(dist, model, name, nodeId, showInReport, showInTrace);
 
             desmojDist.setSeed(randomSeed);
             // XXX no conversion of distribution to target unit smallestTimeUnit during runtime required, desmoj does it

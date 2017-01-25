@@ -13,6 +13,17 @@ import java.util.concurrent.TimeUnit;
 import co.paralleluniverse.fibers.SuspendExecution;
 import de.hpi.bpt.scylla.exception.ScyllaRuntimeException;
 import de.hpi.bpt.scylla.exception.ScyllaValidationException;
+import de.hpi.bpt.scylla.model.configuration.distribution.BinomialDistribution;
+import de.hpi.bpt.scylla.model.configuration.distribution.ConstantDistribution;
+import de.hpi.bpt.scylla.model.configuration.distribution.Distribution;
+import de.hpi.bpt.scylla.model.configuration.distribution.EmpiricalDistribution;
+import de.hpi.bpt.scylla.model.configuration.distribution.EmpiricalStringDistribution;
+import de.hpi.bpt.scylla.model.configuration.distribution.ErlangDistribution;
+import de.hpi.bpt.scylla.model.configuration.distribution.ExponentialDistribution;
+import de.hpi.bpt.scylla.model.configuration.distribution.NormalDistribution;
+import de.hpi.bpt.scylla.model.configuration.distribution.PoissonDistribution;
+import de.hpi.bpt.scylla.model.configuration.distribution.TriangularDistribution;
+import de.hpi.bpt.scylla.model.configuration.distribution.UniformDistribution;
 import de.hpi.bpt.scylla.model.global.resource.TimetableItem;
 import de.hpi.bpt.scylla.model.process.ProcessModel;
 import de.hpi.bpt.scylla.model.process.graph.exception.NodeNotFoundException;
@@ -30,6 +41,16 @@ import de.hpi.bpt.scylla.simulation.event.GatewayEvent;
 import de.hpi.bpt.scylla.simulation.event.ResourceAvailabilityEvent;
 import de.hpi.bpt.scylla.simulation.event.ScyllaEvent;
 import de.hpi.bpt.scylla.simulation.event.TaskEnableEvent;
+import desmoj.core.dist.ContDistErlang;
+import desmoj.core.dist.ContDistExponential;
+import desmoj.core.dist.ContDistNormal;
+import desmoj.core.dist.ContDistTriangular;
+import desmoj.core.dist.ContDistUniform;
+import desmoj.core.dist.DiscreteDistBinomial;
+import desmoj.core.dist.DiscreteDistConstant;
+import desmoj.core.dist.DiscreteDistEmpirical;
+import desmoj.core.dist.DiscreteDistPoisson;
+import desmoj.core.dist.NumericalDist;
 import desmoj.core.simulator.ExternalEventStop;
 import desmoj.core.simulator.Model;
 import desmoj.core.simulator.TimeInstant;
@@ -266,4 +287,78 @@ public class SimulationUtils {
         event.schedule(new TimeSpan(durationToNextResourceAvailableEvent, timeUnit));
     }
 
+    public static NumericalDist<?> getDistribution(Distribution dist, SimulationModel model, String name, 
+    						Integer nodeId, boolean showInReport, boolean showInTrace) throws InstantiationException{
+        if (dist instanceof BinomialDistribution) {
+            BinomialDistribution binDist = (BinomialDistribution) dist;
+            double probability = binDist.getProbability();
+            int amount = binDist.getAmount();
+            return new DiscreteDistBinomial(model, name, probability, amount, showInReport, showInTrace);
+        }
+        else if (dist instanceof ConstantDistribution) {
+            ConstantDistribution conDist = (ConstantDistribution) dist;
+            double constantValue = conDist.getConstantValue();
+            return new DiscreteDistConstant<Number>(model, name, constantValue, showInReport, showInTrace);
+        }
+        else if (dist instanceof EmpiricalDistribution) {
+            EmpiricalDistribution empDist = (EmpiricalDistribution) dist;
+            Map<Double, Double> entries = empDist.getEntries();
+            DiscreteDistEmpirical<Double> cde = new DiscreteDistEmpirical<Double>(model, name, showInReport,
+                    showInTrace);
+            for (Double value : entries.keySet()) {
+                Double frequency = entries.get(value);
+                cde.addEntry(value, frequency);
+            }
+            return cde;
+        }
+        else if (dist instanceof EmpiricalStringDistribution) {
+        	EmpiricalStringDistribution empDist = (EmpiricalStringDistribution) dist;
+            Map<Double, Double> entries = empDist.getEntries();
+            DiscreteDistEmpirical<Double> cde = new DiscreteDistEmpirical<Double>(model, name, showInReport,
+                    showInTrace);
+            for (Double value : entries.keySet()) {
+                Double frequency = entries.get(value);
+                cde.addEntry(value, frequency);
+            }
+            return cde;
+        }
+        else if (dist instanceof ErlangDistribution) {
+            ErlangDistribution erlDist = (ErlangDistribution) dist;
+            double mean = erlDist.getMean();
+            long order = erlDist.getOrder();
+            return new ContDistErlang(model, name, order, mean, showInReport, showInTrace);
+        }
+        else if (dist instanceof ExponentialDistribution) {
+            ExponentialDistribution expDist = (ExponentialDistribution) dist;
+            double mean = expDist.getMean();
+            return new ContDistExponential(model, name, mean, showInReport, showInTrace);
+        }
+        else if (dist instanceof TriangularDistribution) {
+            TriangularDistribution triDist = (TriangularDistribution) dist;
+            double lower = triDist.getLower();
+            double upper = triDist.getUpper();
+            double peak = triDist.getPeak();
+            return new ContDistTriangular(model, name, lower, upper, peak, showInReport, showInTrace);
+        }
+        else if (dist instanceof NormalDistribution) {
+            NormalDistribution norDist = (NormalDistribution) dist;
+            double mean = norDist.getMean();
+            double standardDeviation = norDist.getStandardDeviation();
+            return new ContDistNormal(model, name, mean, standardDeviation, showInReport, showInTrace);
+        }
+        else if (dist instanceof PoissonDistribution) {
+            PoissonDistribution poiDist = (PoissonDistribution) dist;
+            double mean = poiDist.getMean();
+            return new DiscreteDistPoisson(model, name, mean, showInReport, showInTrace);
+        }
+        else if (dist instanceof UniformDistribution) {
+            UniformDistribution uniDist = (UniformDistribution) dist;
+            double lower = uniDist.getLower();
+            double upper = uniDist.getUpper();
+            return new ContDistUniform(model, name, lower, upper, showInReport, showInTrace);
+        }
+        else {
+            throw new InstantiationException("Distribution of node " + nodeId + " not supported.");
+        }
+    }
 }
