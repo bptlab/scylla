@@ -29,7 +29,7 @@
 		</bsim:dynamicResource>
 		<bsim:dynamicResource id="Professor" name="professor abc" defaultQuantity="2" defaultCost="50" defaultTimeUnit="MINUTES">
 			<!-- advanced resource management TODO -->
-			<bsim:instance name="Franz" cost="100"/>
+			<bsim:instance name="Franz" timetableId="Prof_Busy" cost="100"/>
 			<bsim:instance name="Gerd" timetableId="Prof_Busy"/>
 		</bsim:dynamicResource>
 	</bsim:resourceData>

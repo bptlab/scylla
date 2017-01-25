@@ -1,0 +1,238 @@
+package com.signavio.droolsexport._8159e869ba6740428cb3d412511374af._1 
+
+import de.hpi.bpt.drools.model.bahncard.Input;
+import de.hpi.bpt.drools.model.bahncard.DiscountValue_Output;
+
+import java.time.OffsetTime
+import java.util.Arrays
+import org.slf4j.Logger
+import java.text.DecimalFormat
+import org.slf4j.LoggerFactory
+import com.signavio.dmn.formulae.v3.IndexedListElement
+import java.util.ArrayList
+import java.util.HashSet
+import java.math.BigDecimal
+import java.util.List
+import java.time.OffsetDateTime
+import com.signavio.dmn.formulae.v3.DmnHierarchyFormulae
+import java.time.LocalDate
+import com.signavio.dmn.formulae.v3.DmnFormulae
+import java.util.Collections
+import java.math.RoundingMode
+
+global String modelId
+global Integer revisionNumber
+global List $allMessages
+global Logger $logger
+
+declare  DmnFormulae 
+end
+
+declare  DmnFormulaeLocal  extends  DmnFormulae  
+end
+
+declare  DmnHierarchyFormulae 
+end
+
+declare  IndexedListElement 
+end
+
+//declare  Input 
+//    bahnCardType : String  
+//    bahnCardPoints : BigDecimal  
+//end
+
+declare  DiscountValue  extends  IndexedListElement  
+    discountValue : String  
+end
+
+//declare  DiscountValue_Output 
+//    discountValue : String  
+//end
+
+declare  AnnotationItem 
+    decision : String  
+    annotationName : String  
+    ruleName : String  
+    category : AnnotationCategory  
+    message : String  
+    timestamp : OffsetDateTime  
+end
+
+declare enum AnnotationCategory
+	INFO,CRITICAL,REGULATION,POLICY;
+end
+
+rule "initialize_version_info"
+    no-loop true
+    salience 1000
+when
+then
+	drools.getWorkingMemory().setGlobal("modelId", "8159e869ba6740428cb3d412511374af");
+	drools.getWorkingMemory().setGlobal("revisionNumber", 1);
+end
+
+rule "initialize_annotations_list"
+    no-loop true
+    salience 1000
+when
+then
+	drools.getWorkingMemory().setGlobal("$allMessages", new ArrayList());
+end
+
+rule "add_formulae_to_memory"
+    no-loop true
+    salience 1000
+when
+then
+	insert(new DmnFormulaeLocal());
+	insert(new DmnHierarchyFormulae());
+end
+
+rule "init_logger"
+    no-loop true
+    salience 1000
+when
+then
+	drools.getWorkingMemory().setGlobal("$logger", LoggerFactory.getLogger("DroolsExecution"));
+end
+
+rule "log_input_rule"
+    no-loop true
+    salience 999
+when
+    $input : Input(  )  
+then
+	$logger.info($input.toString());
+end
+
+rule "discountValue_rule_1"
+    no-loop true
+    //decision:  discountValue
+    salience 1
+when
+    $F : DmnFormulaeLocal(  )  
+    $H : DmnHierarchyFormulae(  )  
+    not( 
+    DiscountValue_Output(  )   ) 
+    not( 
+    DiscountValue(  )   ) 
+    $input : Input(  )  
+    eval( $F.nullSafeEval($F.equals($input.getBahnCardType(), "25")) ) 
+    eval( $F.nullSafeEval(($F.lessThan($input.getBahnCardPoints(), BigDecimal.valueOf(1000.0)))) ) 
+then
+	DiscountValue $discountValue = new DiscountValue();
+	$discountValue.setDiscountValue("25%");
+	$discountValue.setIndex(0);
+	insert($discountValue);
+end
+
+rule "discountValue_rule_2"
+    no-loop true
+    //decision:  discountValue
+    salience 1
+when
+    $F : DmnFormulaeLocal(  )  
+    $H : DmnHierarchyFormulae(  )  
+    not( 
+    DiscountValue_Output(  )   ) 
+    not( 
+    DiscountValue(  )   ) 
+    $input : Input(  )  
+    eval( $F.nullSafeEval($F.equals($input.getBahnCardType(), "50")) ) 
+    eval( $F.nullSafeEval(($F.lessThan($input.getBahnCardPoints(), BigDecimal.valueOf(1000.0)))) ) 
+then
+	DiscountValue $discountValue = new DiscountValue();
+	$discountValue.setDiscountValue("50%");
+	$discountValue.setIndex(1);
+	insert($discountValue);
+end
+
+rule "discountValue_rule_3"
+    no-loop true
+    //decision:  discountValue
+    salience 1
+when
+    $F : DmnFormulaeLocal(  )  
+    $H : DmnHierarchyFormulae(  )  
+    not( 
+    DiscountValue_Output(  )   ) 
+    not( 
+    DiscountValue(  )   ) 
+    $input : Input(  )  
+    eval( $F.nullSafeEval($F.equals($input.getBahnCardType(), "25")) ) 
+    eval( $F.nullSafeEval(($F.greaterThanOrEqualTo($input.getBahnCardPoints(), BigDecimal.valueOf(1000.0)))) ) 
+then
+	DiscountValue $discountValue = new DiscountValue();
+	$discountValue.setDiscountValue("60%");
+	$discountValue.setIndex(2);
+	insert($discountValue);
+end
+
+rule "discountValue_rule_4"
+    no-loop true
+    //decision:  discountValue
+    salience 1
+when
+    $F : DmnFormulaeLocal(  )  
+    $H : DmnHierarchyFormulae(  )  
+    not( 
+    DiscountValue_Output(  )   ) 
+    not( 
+    DiscountValue(  )   ) 
+    $input : Input(  )  
+    eval( $F.nullSafeEval($F.equals($input.getBahnCardType(), "50")) ) 
+    eval( $F.nullSafeEval(($F.greaterThanOrEqualTo($input.getBahnCardPoints(), BigDecimal.valueOf(1000.0)))) ) 
+then
+	DiscountValue $discountValue = new DiscountValue();
+	$discountValue.setDiscountValue("70%");
+	$discountValue.setIndex(3);
+	insert($discountValue);
+end
+
+rule "discountValue_singleResultOutput"
+    no-loop true
+    //decision:  discountValue
+    salience 0
+when
+    $F : DmnFormulaeLocal(  )  
+    $H : DmnHierarchyFormulae(  )  
+    not( 
+    DiscountValue_Output(  )   ) 
+    $input : Input(  )  
+    $discountValue : DiscountValue(  )  
+then
+	DiscountValue_Output $discountValue_Output = new DiscountValue_Output();
+	$discountValue_Output.setDiscountValue($discountValue.getDiscountValue());
+	retract($discountValue);
+	insert($discountValue_Output);
+end
+
+rule "discountValue_emptyResultFallBack"
+    no-loop true
+    //decision:  discountValue
+    salience -1
+when
+    $F : DmnFormulaeLocal(  )  
+    $H : DmnHierarchyFormulae(  )  
+    not( 
+    DiscountValue_Output(  )   ) 
+    $input : Input(  )  
+then
+	DiscountValue_Output $discountValue_Output = new DiscountValue_Output();
+	$discountValue_Output.setDiscountValue(null);
+	insert($discountValue_Output);
+end
+
+rule "discountValue_cleanup_rule_output"
+    no-loop true
+    //decision:  discountValue
+    salience 1
+when
+    $F : DmnFormulaeLocal(  )  
+    $H : DmnHierarchyFormulae(  )  
+    DiscountValue_Output(  )  
+    $discountValue : DiscountValue(  )  
+then
+	retract($discountValue);
+end
