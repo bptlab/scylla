@@ -165,7 +165,8 @@ public class ProcessModelParser extends Parser<ProcessModel> {
 
         // TODO support more than standard data objects (i.e. support input, output)
         Graph<Integer> dataObjectsGraph = new Graph<Integer>();
-        Map<Integer, DataObjectType> dataObjects = new HashMap<Integer, DataObjectType>();
+        Map<Integer, String> dataObjectReferences = new HashMap<Integer, String>();
+        Map<Integer, DataObjectType> dataObjectTypes = new HashMap<Integer, DataObjectType>();
 
         // TODO parse loop / multi instance elements
 
@@ -377,7 +378,29 @@ public class ProcessModelParser extends Parser<ProcessModel> {
                     }
                 }
                 else if (elementName.equals("dataObjectReference")) {
-                    dataObjects.put(nodeId, DataObjectType.DEFAULT);
+                	String dataObjectRef = el.getAttributeValue("dataObjectRef");
+                    dataObjectReferences.put(nodeId, dataObjectRef);
+                }
+                else if (elementName.equals("ioSpecification")){
+                	Element input = el.getChild("dataInput", bpmnNamespace);
+                	if(input != null){
+                		// remove the ioSpecification element
+                		identifiersToNodeIds.remove(identifier);
+                	
+                		// override the values with the inner input element
+	                	identifier = input.getAttributeValue("id");
+	                    identifiers.put(nodeId, identifier);
+	                    identifiersToNodeIds.put(identifier, nodeId);
+	                    displayName = input.getAttributeValue("name");
+	                    if (displayName != null && !displayName.isEmpty()) {
+	                        displayNames.put(nodeId, displayName);
+	                    }
+	                    
+	                    dataObjectTypes.put(nodeId, DataObjectType.INPUT);
+                	}
+                }
+                else if (elementName.equals("dataObject")) {
+                	dataObjectTypes.put(nodeId, DataObjectType.DEFAULT);
                 }
                 else {
                     DebugLogger.log("Element " + el.getName()
@@ -466,7 +489,8 @@ public class ProcessModelParser extends Parser<ProcessModel> {
         processModel.setReferencesToBoundaryEvents(referencesToBoundaryEvents);
 
         processModel.setDataObjectsGraph(dataObjectsGraph);
-        processModel.setDataObjects(dataObjects);
+        processModel.setDataObjectTypes(dataObjectTypes);
+        processModel.setDataObjectReferences(dataObjectReferences);
 
         for (Integer subProcessId : subProcesses.keySet()) {
             ProcessModel subProcessModel = subProcesses.get(subProcessId);
@@ -480,7 +504,8 @@ public class ProcessModelParser extends Parser<ProcessModel> {
     private boolean isKnownElement(String name) {
         return name.equals("sequenceFlow") || name.equals("task") || name.endsWith("Task") || name.endsWith("Event")
                 || name.endsWith("Gateway") || name.equals("subProcess") || name.equals("callActivity")
-                || name.equals("laneSet") || name.equals("dataObjectReference");
+                || name.equals("laneSet") || name.equals("dataObjectReference") || name.equals("ioSpecification")
+                || name.equals("dataObject");
     }
 
     public void setCommonProcessElements(CommonProcessElements commonProcessElements) {

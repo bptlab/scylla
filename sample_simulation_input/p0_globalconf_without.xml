@@ -8,5 +8,11 @@
 		</bsim:dynamicResource>
 		<bsim:dynamicResource id="Professor" name="professor abc" defaultQuantity="2" defaultCost="50" defaultTimeUnit="MINUTES">
 		</bsim:dynamicResource>
+		<bsim:dynamicResource id="System" name="system abc" defaultQuantity="5" defaultCost="10" defaultTimeUnit="MINUTES" >
+		</bsim:dynamicResource>
+		<bsim:dynamicResource id="Ordering" name="ordering abc" defaultQuantity="5" defaultCost="10" defaultTimeUnit="MINUTES" >
+		</bsim:dynamicResource>
+		<bsim:dynamicResource id="Warehouse" name="warehouse abc" defaultQuantity="2" defaultCost="50" defaultTimeUnit="MINUTES">
+		</bsim:dynamicResource>
 	</bsim:resourceData>
 </bsim:globalConfiguration>

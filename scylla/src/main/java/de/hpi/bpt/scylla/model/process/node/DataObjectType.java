@@ -7,7 +7,7 @@ package de.hpi.bpt.scylla.model.process.node;
  *
  */
 public enum DataObjectType {
-    DEFAULT("dataObject"); // , INPUT("dataInput"), OUTPUT("dataOutput");
+    DEFAULT("dataObject"), INPUT("dataInput"); //, OUTPUT("dataOutput");
 
     String xmlElementName;
 

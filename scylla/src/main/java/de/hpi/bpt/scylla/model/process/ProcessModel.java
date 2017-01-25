@@ -53,7 +53,8 @@ public class ProcessModel extends SimulationInput {
     private Map<Integer, List<Integer>> referencesToBoundaryEvents;
 
     private Graph<Integer> dataObjectsGraph;
-    private Map<Integer, DataObjectType> dataObjects;
+    private Map<Integer, DataObjectType> dataObjectTypes;
+    private Map<Integer, String> dataObjectReferences;
 
     private String participant;
     private Set<ProcessModel> processModelsInCollaboration;
@@ -234,14 +235,22 @@ public class ProcessModel extends SimulationInput {
         this.dataObjectsGraph = dataObjectsGraph;
     }
 
-    public Map<Integer, DataObjectType> getDataObjects() {
-        return dataObjects;
+    public Map<Integer, DataObjectType> getDataObjectTypes() {
+        return dataObjectTypes;
     }
 
-    public void setDataObjects(Map<Integer, DataObjectType> dataObjects) {
-        this.dataObjects = dataObjects;
+    public void setDataObjectTypes(Map<Integer, DataObjectType> dataObjectTypes) {
+        this.dataObjectTypes = dataObjectTypes;
     }
-
+    
+    public Map<Integer, String> getDataObjectReferences() {
+    	return dataObjectReferences;
+    }
+    
+    public void setDataObjectReferences(Map<Integer, String> dataObjectReferences) {
+    	this.dataObjectReferences = dataObjectReferences;
+    }
+    
     public String getParticipant() {
         return participant;
     }
