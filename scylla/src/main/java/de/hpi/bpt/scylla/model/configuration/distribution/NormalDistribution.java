@@ -1,8 +1,7 @@
 package de.hpi.bpt.scylla.model.configuration.distribution;
 
-import java.util.concurrent.TimeUnit;
+public class NormalDistribution implements Distribution {
 
-public class NormalDistribution extends Distribution {
 
     private double mean;
     private double standardDeviation;
@@ -10,14 +9,12 @@ public class NormalDistribution extends Distribution {
     /**
      * Constructor.
      * 
-     * @param timeUnit
      * @param mean
      *            mean of the normal distribution
      * @param standardDeviation
      *            standard deviation of the normal distribution
      */
-    public NormalDistribution(TimeUnit timeUnit, double mean, double standardDeviation) {
-        super(timeUnit);
+    public NormalDistribution(double mean, double standardDeviation) {
         this.mean = mean;
         this.standardDeviation = standardDeviation;
     }

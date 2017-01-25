@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.hpi.bpt.scylla.model.SimulationInput;
-import de.hpi.bpt.scylla.model.configuration.distribution.Distribution;
+import de.hpi.bpt.scylla.model.configuration.distribution.TimeDistributionWrapper;
 import de.hpi.bpt.scylla.model.process.ProcessModel;
 
 /**
@@ -22,8 +22,10 @@ public class SimulationConfiguration extends SimulationInput {
     private ZonedDateTime startDateTime;
     private ZonedDateTime endDateTime;
     private Long randomSeed;
-    private Map<Integer, Distribution> arrivalRates;
-    private Map<Integer, Distribution> durations;
+
+    private Map<Integer, TimeDistributionWrapper> arrivalRates;
+    private Map<Integer, TimeDistributionWrapper> durations;
+
     private Map<Integer, Set<ResourceReference>> resourceReferences;
     private Map<Integer, SimulationConfiguration> configurationsOfSubProcesses;
 
@@ -53,7 +55,7 @@ public class SimulationConfiguration extends SimulationInput {
      */
     public SimulationConfiguration(String id, ProcessModel processModel, Integer numberOfProcessInstances,
             ZonedDateTime startDateTime, ZonedDateTime endDateTime, Long randomSeed,
-            Map<Integer, Distribution> arrivalRates, Map<Integer, Distribution> durations,
+            Map<Integer, TimeDistributionWrapper> arrivalRates, Map<Integer, TimeDistributionWrapper> durations,
             Map<Integer, Set<ResourceReference>> resourceReferences,
             Map<Integer, SimulationConfiguration> configurationsOfSubProcesses) {
         super(id);
@@ -88,11 +90,11 @@ public class SimulationConfiguration extends SimulationInput {
         return randomSeed;
     }
 
-    public Map<Integer, Distribution> getArrivalRates() {
+    public Map<Integer, TimeDistributionWrapper> getArrivalRates() {
         return arrivalRates;
     }
 
-    public Map<Integer, Distribution> getDurations() {
+    public Map<Integer, TimeDistributionWrapper> getDurations() {
         return durations;
     }
 
