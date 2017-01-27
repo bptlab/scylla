@@ -20,10 +20,12 @@ import de.hpi.bpt.scylla.model.configuration.distribution.BinomialDistribution;
 import de.hpi.bpt.scylla.model.configuration.distribution.ConstantDistribution;
 import de.hpi.bpt.scylla.model.configuration.distribution.Distribution;
 import de.hpi.bpt.scylla.model.configuration.distribution.EmpiricalDistribution;
+import de.hpi.bpt.scylla.model.configuration.distribution.EmpiricalStringDistribution;
 import de.hpi.bpt.scylla.model.configuration.distribution.ErlangDistribution;
 import de.hpi.bpt.scylla.model.configuration.distribution.ExponentialDistribution;
 import de.hpi.bpt.scylla.model.configuration.distribution.NormalDistribution;
 import de.hpi.bpt.scylla.model.configuration.distribution.PoissonDistribution;
+import de.hpi.bpt.scylla.model.configuration.distribution.TimeDistributionWrapper;
 import de.hpi.bpt.scylla.model.configuration.distribution.TriangularDistribution;
 import de.hpi.bpt.scylla.model.configuration.distribution.UniformDistribution;
 import de.hpi.bpt.scylla.model.global.resource.Resource;
@@ -125,8 +127,8 @@ public class SimulationConfigurationParser extends Parser<SimulationConfiguratio
             }
         }
 
-        Map<Integer, Distribution> arrivalRates = new HashMap<Integer, Distribution>();
-        Map<Integer, Distribution> durations = new HashMap<Integer, Distribution>();
+        Map<Integer, TimeDistributionWrapper> arrivalRates = new HashMap<Integer, TimeDistributionWrapper>();
+        Map<Integer, TimeDistributionWrapper> durations = new HashMap<Integer, TimeDistributionWrapper>();
         Map<Integer, Set<ResourceReference>> resourceReferences = new HashMap<Integer, Set<ResourceReference>>();
         // gateways and events
         // Map<Integer, BranchingBehavior> branchingBehaviors = new HashMap<Integer, BranchingBehavior>();
@@ -173,7 +175,7 @@ public class SimulationConfigurationParser extends Parser<SimulationConfiguratio
                 if (elementName.equals("startEvent")) {
                     Element elem = el.getChild("arrivalRate", simNamespace);
                     if (elem != null) {
-                        Distribution distribution = getDistribution(elem, simNamespace);
+                        TimeDistributionWrapper distribution = getTimeDistributionWrapper(elem, simNamespace);
                         arrivalRates.put(nodeId, distribution);
                     }
                 }
@@ -181,7 +183,7 @@ public class SimulationConfigurationParser extends Parser<SimulationConfiguratio
                         || elementName.equals("subProcess")) {
                     Element durationElem = el.getChild("duration", simNamespace);
                     if (durationElem != null) {
-                        Distribution distribution = getDistribution(durationElem, simNamespace);
+                    	TimeDistributionWrapper distribution = getTimeDistributionWrapper(durationElem, simNamespace);
                         durations.put(nodeId, distribution);
                     }
                     Element resourcesElem = el.getChild("resources", simNamespace);
@@ -253,25 +255,34 @@ public class SimulationConfigurationParser extends Parser<SimulationConfiguratio
     private boolean isKnownElement(String name) {
         return name.equals("task") || name.endsWith("Task") || name.equals("startEvent") || name.equals("subProcess")
                 || name.equals("resources");
+    }    
+    
+	public static TimeDistributionWrapper getTimeDistributionWrapper(Element element, Namespace simNamespace) 
+			throws ScyllaValidationException {
+    	Distribution distribution = getDistribution(element, simNamespace);
+    	TimeUnit timeUnit = TimeUnit.valueOf(element.getAttributeValue("timeUnit"));
+    	TimeDistributionWrapper distWrapper = new TimeDistributionWrapper(timeUnit);
+    	distWrapper.setDistribution(distribution);
+    	return distWrapper;
     }
-
+    
     public static Distribution getDistribution(Element element, Namespace simNamespace)
             throws ScyllaValidationException {
-        TimeUnit timeUnit = TimeUnit.valueOf(element.getAttributeValue("timeUnit"));
+    	Distribution distribution;
         if (element.getChild("binomialDistribution", simNamespace) != null) {
             Element el = element.getChild("binomialDistribution", simNamespace);
             double probability = Double.valueOf(el.getChildText("probability", simNamespace));
             int amount = Integer.valueOf(el.getChildText("amount", simNamespace));
-            return new BinomialDistribution(timeUnit, probability, amount);
+            distribution = new BinomialDistribution(probability, amount);
         }
         else if (element.getChild("constantDistribution", simNamespace) != null) {
             Element el = element.getChild("constantDistribution", simNamespace);
             double constantValue = Double.valueOf(el.getChildText("constantValue", simNamespace));
-            return new ConstantDistribution(timeUnit, constantValue);
+            distribution = new ConstantDistribution(constantValue);
         }
         else if (element.getChild("empiricalDistribution", simNamespace) != null) {
             Element el = element.getChild("empiricalDistribution", simNamespace);
-            EmpiricalDistribution distribution = new EmpiricalDistribution(timeUnit);
+            EmpiricalDistribution dist = new EmpiricalDistribution();
             List<Element> entries = el.getChildren("entry", simNamespace);
             if (entries.isEmpty()) {
                 throw new ScyllaValidationException("No entries in empirical distribution.");
@@ -281,48 +292,66 @@ public class SimulationConfigurationParser extends Parser<SimulationConfiguratio
                 sum += Double.valueOf(entry.getAttributeValue("frequency"));
             }
             for (Element entry : entries) {
-                distribution.addEntry(Double.valueOf(entry.getAttributeValue("value")),
+                dist.addEntry(Double.valueOf(entry.getAttributeValue("value")),
                         Double.valueOf(entry.getAttributeValue("frequency")) / sum);
             }
-            return distribution;
+            distribution = dist;
+        }
+        else if (element.getChild("empiricalStringDistribution", simNamespace) != null) {
+            Element el = element.getChild("empiricalStringDistribution", simNamespace);
+            EmpiricalStringDistribution dist = new EmpiricalStringDistribution();
+            List<Element> entries = el.getChildren("entry", simNamespace);
+            if (entries.isEmpty()) {
+                throw new ScyllaValidationException("No entries in empirical distribution.");
+            }
+            double sum = 0;
+            for (Element entry : entries) { // normalize frequency to 1.0
+                sum += Double.valueOf(entry.getAttributeValue("frequency"));
+            }
+            for (Element entry : entries) {
+                dist.addEntry(entry.getAttributeValue("value"),
+                        Double.valueOf(entry.getAttributeValue("frequency")) / sum);
+            }
+            distribution = dist;
         }
         else if (element.getChild("erlangDistribution", simNamespace) != null) {
             Element el = element.getChild("erlangDistribution", simNamespace);
             long order = Long.valueOf(el.getChildText("order", simNamespace));
             double mean = Double.valueOf(el.getChildText("mean", simNamespace));
-            return new ErlangDistribution(timeUnit, order, mean);
+            distribution = new ErlangDistribution(order, mean);
         }
         else if (element.getChild("exponentialDistribution", simNamespace) != null) {
             Element el = element.getChild("exponentialDistribution", simNamespace);
             double mean = Double.valueOf(el.getChildText("mean", simNamespace));
-            return new ExponentialDistribution(timeUnit, mean);
+            distribution = new ExponentialDistribution(mean);
         }
         else if (element.getChild("triangularDistribution", simNamespace) != null) {
             Element el = element.getChild("triangularDistribution", simNamespace);
             double lower = Double.valueOf(el.getChildText("lower", simNamespace));
             double upper = Double.valueOf(el.getChildText("upper", simNamespace));
             double peak = Double.valueOf(el.getChildText("peak", simNamespace));
-            return new TriangularDistribution(timeUnit, lower, upper, peak);
+            distribution = new TriangularDistribution(lower, upper, peak);
         }
         else if (element.getChild("normalDistribution", simNamespace) != null) {
             Element el = element.getChild("normalDistribution", simNamespace);
             double mean = Double.valueOf(el.getChildText("mean", simNamespace));
             double standardDeviation = Double.valueOf(el.getChildText("standardDeviation", simNamespace));
-            return new NormalDistribution(timeUnit, mean, standardDeviation);
+            distribution = new NormalDistribution(mean, standardDeviation);
         }
         else if (element.getChild("poissonDistribution", simNamespace) != null) {
             Element el = element.getChild("poissonDistribution", simNamespace);
             double mean = Double.valueOf(el.getChildText("mean", simNamespace));
-            return new PoissonDistribution(timeUnit, mean);
+            distribution = new PoissonDistribution(mean);
         }
         else if (element.getChild("uniformDistribution", simNamespace) != null) {
             Element el = element.getChild("uniformDistribution", simNamespace);
             double lower = Double.valueOf(el.getChildText("lower", simNamespace));
             double upper = Double.valueOf(el.getChildText("upper", simNamespace));
-            return new UniformDistribution(timeUnit, lower, upper);
+            distribution = new UniformDistribution(lower, upper);
         }
         else {
             throw new ScyllaValidationException("Distribution definition not found or not supported.");
         }
+        return distribution;
     }
 }

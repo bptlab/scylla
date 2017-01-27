@@ -1,20 +1,16 @@
 package de.hpi.bpt.scylla.model.configuration.distribution;
 
-import java.util.concurrent.TimeUnit;
-
-public class PoissonDistribution extends Distribution {
+public class PoissonDistribution implements Distribution {
 
     private double mean;
 
     /**
      * Constructor.
      * 
-     * @param timeUnit
      * @param mean
      *            mean value of the negative-exponential distribution
      */
-    public PoissonDistribution(TimeUnit timeUnit, double mean) {
-        super(timeUnit);
+    public PoissonDistribution(double mean) {
         this.mean = mean;
     }
 

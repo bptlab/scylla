@@ -11,7 +11,7 @@ import de.hpi.bpt.scylla.exception.ScyllaValidationException;
 import de.hpi.bpt.scylla.logger.DebugLogger;
 import de.hpi.bpt.scylla.model.configuration.BranchingBehavior;
 import de.hpi.bpt.scylla.model.configuration.SimulationConfiguration;
-import de.hpi.bpt.scylla.model.configuration.distribution.Distribution;
+import de.hpi.bpt.scylla.model.configuration.distribution.TimeDistributionWrapper;
 import de.hpi.bpt.scylla.model.process.ProcessModel;
 import de.hpi.bpt.scylla.parser.SimulationConfigurationParser;
 import de.hpi.bpt.scylla.plugin_type.parser.SimulationConfigurationParserPluggable;
@@ -78,8 +78,8 @@ public class BoundarySCParserPlugin extends SimulationConfigurationParserPluggab
                             // add arrival rate (= which is here the time at which the boundary event shall occur)
                             Element arrivalRateElement = elem.getChild("arrivalRate", simNamespace);
                             if (arrivalRateElement != null) {
-                                Distribution distribution = SimulationConfigurationParser
-                                        .getDistribution(arrivalRateElement, simNamespace);
+                                TimeDistributionWrapper distribution = SimulationConfigurationParser
+                                        .getTimeDistributionWrapper(arrivalRateElement, simNamespace);
                                 // TODO: should be put into an extension attribute
                                 simulationInput.getArrivalRates().put(nodeIdOfBoundaryEvent, distribution);
                             }
