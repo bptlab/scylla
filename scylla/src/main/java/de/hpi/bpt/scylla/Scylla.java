@@ -57,18 +57,24 @@ public class Scylla {
         /**
          * Simulation scenarios to test plug-ins.
          */
-    	
-    	// -p p1_boundary.bpmn p2_normal.bpmn p3_subproc.bpmn -s p1_boundary_sim.xml p2_normal_sim.xml p3_subproc_sim.xml -g p0_globalconf_without.xml
-    	
-    	// -p p4_parallelx.bpmn -s p4_parallel_sim.xml -g p0_globalconf_without.xml
-    	
-    	// -p p5_batch.bpmn p6_return.bpmn -s p5_batch_sim.xml p6_return_sim.xml -g p56_conf_thesis.xml
+
+        // -p p1_boundary.bpmn p2_normal.bpmn p3_subproc.bpmn -s p1_boundary_sim.xml p2_normal_sim.xml p3_subproc_sim.xml -g p0_globalconf_without.xml
+
+        // -p p4_parallelx.bpmn -s p4_parallel_sim.xml -g p0_globalconf_without.xml
 
         /**
          * Simulation scenarios to test batch processes. May be used for regular simulation.
          */
-        
+
+        // -p p5_batch.bpmn p6_return.bpmn -s p5_batch_sim.xml p6_return_sim.xml -g p56_conf_thesis.xml
+
         // -p p61_return_batch.bpmn -s p61_return_batch_sim.xml -g p61_conf_batch.xml
+
+        /**
+         * Simulation scenarios to test dmn simulation.
+         */
+
+        // -p p7_dmn.bpmn -s p7_dmn_sim.xml -g p0_globalconf_without.xml
 
         /**
          * END of simulation scenarios

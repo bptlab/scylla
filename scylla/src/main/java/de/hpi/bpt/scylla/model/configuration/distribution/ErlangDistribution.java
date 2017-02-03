@@ -1,8 +1,6 @@
 package de.hpi.bpt.scylla.model.configuration.distribution;
 
-import java.util.concurrent.TimeUnit;
-
-public class ErlangDistribution extends Distribution {
+public class ErlangDistribution implements Distribution {
 
     private long order;
     private double mean;
@@ -10,14 +8,12 @@ public class ErlangDistribution extends Distribution {
     /**
      * Constructor.
      * 
-     * @param timeUnit
      * @param order
      *            order of the Erlang distribution
      * @param mean
      *            mean value of this Erlang distribution
      */
-    public ErlangDistribution(TimeUnit timeUnit, long order, double mean) {
-        super(timeUnit);
+    public ErlangDistribution(long order, double mean) {
         this.order = order;
         this.mean = mean;
     }

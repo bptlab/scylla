@@ -1,20 +1,17 @@
 package de.hpi.bpt.scylla.model.configuration.distribution;
 
-import java.util.concurrent.TimeUnit;
+public class ConstantDistribution implements Distribution {
 
-public class ConstantDistribution extends Distribution {
 
     private double constantValue;
 
     /**
      * Constructor.
      * 
-     * @param timeUnit
      * @param constantValue
      *            constant value
      */
-    public ConstantDistribution(TimeUnit timeUnit, double constantValue) {
-        super(timeUnit);
+    public ConstantDistribution(double constantValue) {
         this.constantValue = constantValue;
     }
 

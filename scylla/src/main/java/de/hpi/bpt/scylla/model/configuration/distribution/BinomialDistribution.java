@@ -1,8 +1,6 @@
 package de.hpi.bpt.scylla.model.configuration.distribution;
 
-import java.util.concurrent.TimeUnit;
-
-public class BinomialDistribution extends Distribution {
+public class BinomialDistribution implements Distribution {
 
     private double probability;
     private int amount;
@@ -10,14 +8,12 @@ public class BinomialDistribution extends Distribution {
     /**
      * Constructor.
      * 
-     * @param timeUnit
      * @param probability
      *            probability of success in each separate Bernoulli experiment
      * @param amount
      *            amount of separate Bernoulli experiments that lead to the result
      */
-    public BinomialDistribution(TimeUnit timeUnit, double probability, int amount) {
-        super(timeUnit);
+    public BinomialDistribution(double probability, int amount) {
         this.probability = probability;
         this.amount = amount;
     }

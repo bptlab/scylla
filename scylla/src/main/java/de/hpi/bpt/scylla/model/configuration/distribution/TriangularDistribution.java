@@ -1,8 +1,6 @@
 package de.hpi.bpt.scylla.model.configuration.distribution;
 
-import java.util.concurrent.TimeUnit;
-
-public class TriangularDistribution extends Distribution {
+public class TriangularDistribution implements Distribution {
 
     private double lower;
     private double upper;
@@ -11,7 +9,6 @@ public class TriangularDistribution extends Distribution {
     /**
      * Constructor.
      * 
-     * @param timeUnit
      * @param lower
      *            minimum value of the triangular distribution
      * @param upper
@@ -19,8 +16,7 @@ public class TriangularDistribution extends Distribution {
      * @param peak
      *            most likely value of the triangular distribution
      */
-    public TriangularDistribution(TimeUnit timeUnit, double lower, double upper, double peak) {
-        super(timeUnit);
+    public TriangularDistribution(double lower, double upper, double peak) {
         this.lower = lower;
         this.upper = upper;
         this.peak = peak;
