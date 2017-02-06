@@ -68,7 +68,7 @@ public class Scylla {
 
         // -p p5_batch.bpmn p6_return.bpmn -s p5_batch_sim.xml p6_return_sim.xml -g p56_conf_thesis.xml
 
-        // -p p61_return_batch.bpmn -s p61_return_batch_sim.xml -g p61_conf_batch.xml
+        // -p p61_return_batch.bpmn -s p61_return_batch_sim.xml -g p61_conf_batch.xml -g p56_conf_thesis.xml
 
         /**
          * Simulation scenarios to test dmn simulation.

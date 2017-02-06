@@ -30,10 +30,9 @@ public class BatchTBPlugin extends TaskBeginEventPluggable {
         // SimulationModel model = (SimulationModel) desmojEvent.getModel();
         int nodeId = event.getNodeId();
         ProcessModel processModel = processInstance.getProcessModel();
-        SimulationConfiguration simulationConfiguration = desmojObjects.getSimulationConfiguration();
-        Map<Integer, BatchRegion> batchRegions = (Map<Integer, BatchRegion>) simulationConfiguration
+        Map<Integer, BatchRegion> batchRegions = (Map<Integer, BatchRegion>) processModel
                 .getExtensionValue(getName(), "batchRegions");
-        if (batchRegions.containsKey(nodeId) && processModel.getSubProcesses().containsKey(nodeId)) {
+        if (batchRegions != null && batchRegions.containsKey(nodeId) && processModel.getSubProcesses().containsKey(nodeId)) {
 
             // subprocess plugin wants to schedule BPMNStartEvents for subprocess
             // we prevent it

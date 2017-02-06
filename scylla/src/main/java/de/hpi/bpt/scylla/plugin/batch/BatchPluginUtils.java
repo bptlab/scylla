@@ -76,7 +76,7 @@ public class BatchPluginUtils {
 
         ProcessModel processModel = processInstance.getProcessModel();
         ProcessSimulationComponents pSimComponents = parentalBeginEvent.getDesmojObjects();
-        Map<Integer, BatchRegion> batchRegions = (Map<Integer, BatchRegion>) pSimComponents.getSimulationConfiguration()
+        Map<Integer, BatchRegion> batchRegions = (Map<Integer, BatchRegion>) processModel
                 .getExtensionValue(PLUGIN_NAME, "batchRegions");
         BatchRegion region = batchRegions.get(nodeId);
 

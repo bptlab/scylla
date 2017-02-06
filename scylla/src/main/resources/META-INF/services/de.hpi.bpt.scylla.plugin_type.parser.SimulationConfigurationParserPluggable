@@ -1,4 +1,3 @@
 de.hpi.bpt.scylla.plugin.boundaryevent.BoundarySCParserPlugin
 de.hpi.bpt.scylla.plugin.gateway_exclusive.ExclusiveGatewaySCParserPlugin
-de.hpi.bpt.scylla.plugin.batch.BatchSCParserPlugin
 de.hpi.bpt.scylla.plugin.dataobject.DataObjectSCParserPlugin

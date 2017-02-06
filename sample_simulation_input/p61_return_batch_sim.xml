@@ -29,16 +29,6 @@
 	    	</scy:resources>
 	    </scy:task>
 	    <scy:subProcess id="SubProcess_1g5l68i" name="Collect return">
-			<scy:batchRegion>
-				<scy:maxBatchSize>5</scy:maxBatchSize>
-				<scy:activationRule>
-					<scy:minMaxRule minInstances="2" minTimeout="PT3M" maxInstances="5" maxTimeout="PT8M"/>
-				</scy:activationRule>
-				<scy:groupingCharacteristic>
-					<scy:processVariable>customerStatus</scy:processVariable>
-					<scy:processVariable>deliveryHour</scy:processVariable>
-				</scy:groupingCharacteristic>
- 			</scy:batchRegion>
 	    	<scy:task id="Task_0oiehpw" name="Take parcel from staging area">
 		    	<scy:duration timeUnit="MINUTES">
 		    		<scy:constantDistribution>

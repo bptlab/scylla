@@ -49,6 +49,18 @@
       <bpmn2:messageEventDefinition />
     </bpmn2:startEvent>
     <bpmn2:subProcess id="SubProcess_1g5l68i" name="Collect return">
+    <bpmn2:extensionElements>
+      <bpt:batchRegion id="batch1">
+          <bpt:groupingCharacteristic>
+              <bpt:processVariable id="1">customerStatus</bpt:processVariable>
+              <bpt:processVariable id="2">deliveryHour</bpt:processVariable>
+          </bpt:groupingCharacteristic>
+          <bpt:activationRule>
+              <bpt:minMaxRule minInstances="2" minTimeout="PT3M" maxInstances="5" maxTimeout="PT8M"/>
+          </bpt:activationRule>
+          <bpt:maxBatchSize>3</bpt:maxBatchSize>
+      </bpt:batchRegion>
+      </bpmn2:extensionElements>    
       <bpmn2:incoming>SequenceFlow_1ekhm73</bpmn2:incoming>
       <bpmn2:outgoing>SequenceFlow_026nf44</bpmn2:outgoing>
       <bpmn2:startEvent id="StartEvent_0iwcezy">
