@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.ServiceLoader;
 import java.util.Set;
 
 import org.jdom2.Element;
@@ -12,6 +11,7 @@ import org.jdom2.Element;
 import de.hpi.bpt.scylla.SimulationManager;
 import de.hpi.bpt.scylla.exception.ScyllaValidationException;
 import de.hpi.bpt.scylla.model.SimulationInput;
+import de.hpi.bpt.scylla.plugin_loader.PluginLoader;
 import de.hpi.bpt.scylla.plugin_type.IPluggable;
 import de.hpi.bpt.scylla.plugin_type.PluginUtils;
 
@@ -26,8 +26,9 @@ abstract class ParserPluggable<T extends SimulationInput> implements IPluggable,
 
         Set<String> namesOfExtensions = new HashSet<String>();
 
-        Iterator<? extends ParserPluggable<SimulationInput>> parserExtensions = (Iterator<? extends ParserPluggable<SimulationInput>>) ServiceLoader
-                .load(clazz).iterator();
+        /*Iterator<? extends ParserPluggable<SimulationInput>> parserExtensions = (Iterator<? extends ParserPluggable<SimulationInput>>) ServiceLoader
+                .load(clazz).iterator();*/
+        Iterator<? extends ParserPluggable<SimulationInput>> parserExtensions = (Iterator<? extends ParserPluggable<SimulationInput>>)PluginLoader.dGetPlugins(clazz);
         String smoName = clazz.getName().substring(clazz.getName().lastIndexOf(".") + 1);
         Map<String, Object> smoExtensionAttributes = new HashMap<String, Object>();
         while (parserExtensions.hasNext()) {

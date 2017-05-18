@@ -23,6 +23,7 @@ import de.hpi.bpt.scylla.model.global.resource.DynamicResource;
 import de.hpi.bpt.scylla.model.global.resource.DynamicResourceInstance;
 import de.hpi.bpt.scylla.model.global.resource.Resource;
 import de.hpi.bpt.scylla.model.global.resource.TimetableItem;
+import de.hpi.bpt.scylla.plugin_loader.PluginLoader;
 import de.hpi.bpt.scylla.plugin_type.parser.EventOrderType;
 import de.hpi.bpt.scylla.simulation.utils.DateTimeUtils;
 
@@ -41,7 +42,8 @@ public class GlobalConfigurationParser extends Parser<GlobalConfiguration> {
     @Override
     public GlobalConfiguration parse(Element rootElement) throws ScyllaValidationException {
 
-        Iterator<EventOrderType> eventOrderTypesIterator = ServiceLoader.load(EventOrderType.class).iterator();
+        Iterator<EventOrderType> eventOrderTypesIterator = PluginLoader.dGetPlugins(EventOrderType.class);
+        //ServiceLoader.load(EventOrderType.class).iterator();
         Map<String, EventOrderType> eventOrderTypes = new HashMap<String, EventOrderType>();
         while (eventOrderTypesIterator.hasNext()) {
             EventOrderType eot = eventOrderTypesIterator.next();

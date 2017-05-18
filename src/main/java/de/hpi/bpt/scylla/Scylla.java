@@ -21,7 +21,7 @@ public class Scylla {
 
 
     	String folder = "samples\\";
-    	String resFilename = folder + "p0_globalconf_without.xml" ;
+    	String resFilename = folder + "p0_globalconf_without.xml";
 
 
 //        String[] bpmnFilename = new String[] { folder + "p1_boundary.bpmn", folder + "p2_normal.bpmn",
@@ -34,8 +34,8 @@ public class Scylla {
          * Simulation scenarios to test dmn simulation.
          */
     	
-        String[] bpmnFilename = new String[] { folder + "p3_subproc.bpmn"};
-        String[] simFilenames = new String[] { folder + "p3_subproc_sim.xml"};
+        String[] bpmnFilename = new String[] { folder + "p2_normal.bpmn"};
+        String[] simFilenames = new String[] { folder + "p2_normal_sim.xml"};
 
 
 //         String[] bpmnFilename = new String[] { folder + "p4_parallelx.bpmn" };

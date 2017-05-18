@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ServiceLoader;
 import java.util.Set;
 
 import de.hpi.bpt.scylla.exception.ScyllaRuntimeException;
 import de.hpi.bpt.scylla.exception.ScyllaValidationException;
+import de.hpi.bpt.scylla.plugin_loader.PluginLoader;
 import de.hpi.bpt.scylla.plugin_type.IPluggable;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
 import de.hpi.bpt.scylla.simulation.ProcessSimulationComponents;
@@ -19,9 +19,10 @@ public abstract class EventCreationPluggable implements IPluggable, IEventCreati
     public static List<ScyllaEvent> runPlugins(ScyllaEvent currentEvent, ProcessSimulationComponents desmojObjects,
             ProcessInstance processInstance, int nextNodeId) throws ScyllaRuntimeException {
         Class<EventCreationPluggable> clazz = EventCreationPluggable.class;
-        ServiceLoader<? extends EventCreationPluggable> serviceLoader = (ServiceLoader<? extends EventCreationPluggable>) ServiceLoader
+        /*ServiceLoader<? extends EventCreationPluggable> serviceLoader = (ServiceLoader<? extends EventCreationPluggable>) ServiceLoader
                 .load(clazz);
-        Iterator<? extends EventCreationPluggable> plugins = serviceLoader.iterator();
+        Iterator<? extends EventCreationPluggable> plugins = serviceLoader.iterator();*/
+        Iterator<? extends EventCreationPluggable> plugins = PluginLoader.dGetPlugins(clazz);
         String eName = clazz.getName().substring(clazz.getName().lastIndexOf(".") + 1);
         Set<String> namesOfExtensions = new HashSet<String>();
         List<ScyllaEvent> events = new ArrayList<ScyllaEvent>();

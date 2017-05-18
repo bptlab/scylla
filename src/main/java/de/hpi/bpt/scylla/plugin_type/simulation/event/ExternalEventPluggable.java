@@ -2,11 +2,11 @@ package de.hpi.bpt.scylla.plugin_type.simulation.event;
 
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.ServiceLoader;
 import java.util.Set;
 
 import de.hpi.bpt.scylla.exception.ScyllaRuntimeException;
 import de.hpi.bpt.scylla.exception.ScyllaValidationException;
+import de.hpi.bpt.scylla.plugin_loader.PluginLoader;
 import de.hpi.bpt.scylla.plugin_type.IPluggable;
 import desmoj.core.simulator.ExternalEvent;
 
@@ -18,9 +18,10 @@ abstract class ExternalEventPluggable<T extends ExternalEvent> implements IPlugg
 
         // TODO: invoke serviceloader only once at start of Scylla
 
-        ServiceLoader<? extends ExternalEventPluggable<ExternalEvent>> serviceLoader = (ServiceLoader<? extends ExternalEventPluggable<ExternalEvent>>) ServiceLoader
+        /*ServiceLoader<? extends ExternalEventPluggable<ExternalEvent>> serviceLoader = (ServiceLoader<? extends ExternalEventPluggable<ExternalEvent>>) ServiceLoader
                 .load(clazz);
-        Iterator<? extends ExternalEventPluggable<ExternalEvent>> plugins = serviceLoader.iterator();
+        Iterator<? extends ExternalEventPluggable<ExternalEvent>> plugins = serviceLoader.iterator();*/
+    	Iterator<? extends ExternalEventPluggable<ExternalEvent>> plugins = (Iterator<? extends ExternalEventPluggable<ExternalEvent>>) PluginLoader.dGetPlugins(clazz);
         String eName = clazz.getName().substring(clazz.getName().lastIndexOf(".") + 1);
         Set<String> namesOfExtensions = new HashSet<String>();
         while (plugins.hasNext()) {
