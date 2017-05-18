@@ -6,11 +6,14 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
@@ -24,6 +27,7 @@ import javax.swing.JTextField;
 
 import de.hpi.bpt.scylla.SimulationManager;
 import de.hpi.bpt.scylla.plugin_loader.PluginLoader;
+import javax.swing.ScrollPaneConstants;
 /**
  * @author Leon Bein
  *
@@ -37,6 +41,7 @@ public class ScyllaGUI extends JFrame {
 
 	public static final Color ColorField1 = new Color(240,240,240);
 	public static final Color ColorField2 = new Color(255,255,255);
+	public static final Color ColorBackground = new Color(55,55,55);
 
 	
 	private static GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -127,7 +132,7 @@ public class ScyllaGUI extends JFrame {
 		setBounds(100, 100,WIDTH,HEIGHT);
 	    setExtendedState(JFrame.MAXIMIZED_BOTH);
 		contentPane = new JPanel();
-		contentPane.setBackground(Color.GRAY);
+		contentPane.setBackground(ColorBackground);
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
@@ -327,15 +332,40 @@ public class ScyllaGUI extends JFrame {
 
 		panel_plugins = new Container();
 		panel_plugins.setFont(DEFAULTFONT);
-		panel_plugins.setLayout(new BoxLayout(panel_plugins, BoxLayout.Y_AXIS));
+		panel_plugins.setLayout(new GridBagLayout());
 		
 		PluginLoader p = PluginLoader.getDefaultPluginLoader();
 		
+		TreeMap<String, ArrayList<PluginLoader.PluginWrapper>> plugins = new TreeMap<String, ArrayList<PluginLoader.PluginWrapper>>();
 		for(Entry<Class<?>, ArrayList<PluginLoader.PluginWrapper>> e : p.getExtensions().entrySet()){
-			ListPanel listpanel = new ListPanel(e.getKey().getName(),e.getValue());
-			panel_plugins.add(listpanel);
+			ArrayList<PluginLoader.PluginWrapper> l = e.getValue();
+			for(int i = 0; i < l.size(); i++){
+				PluginLoader.PluginWrapper w = l.get(i);
+				String name = w.getPackage().getName();
+				if(!plugins.containsKey(name))plugins.put(name,new ArrayList<PluginLoader.PluginWrapper>());
+				plugins.get(name).add(w);
+			}
+		}
+		
+		int i = 0;
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.anchor = GridBagConstraints.PAGE_START;
+		gbc.weightx = 1.0;
+		gbc.weighty = 0;
+		gbc.ipady = 0;
+		for(Entry<String, ArrayList<PluginLoader.PluginWrapper>> e : plugins.entrySet()){
+			ListPanel listpanel = new ListPanel(e.getKey(),e.getValue());
+			gbc.gridy = i;
+			if(i == plugins.entrySet().size()-1)gbc.weighty = 1.0;
+			panel_plugins.add(listpanel,gbc);
+			i++;
+			//gbc.anchor = GridBagConstraints.BASELINE;
 		}
 		scrollPane_plugins.setViewportView(panel_plugins);
+		scrollPane_plugins.getViewport().setBackground(ColorField2);
 		
 
 		

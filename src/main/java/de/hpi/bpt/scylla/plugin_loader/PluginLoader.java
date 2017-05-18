@@ -35,9 +35,15 @@ public class PluginLoader {
 		}
 		@Override
 		public String toString(){
-			return plugin.getName();
+			return plugin.getSimpleName();
 		}
 		
+		/**
+		 * @return true if:<br>
+		 * - this == p <br>
+		 * - this.plugin equals p.plugin<br>
+		 * - this.plugin equals p
+		 */
 		@Override
 		public boolean equals(Object p){
 			return p instanceof PluginWrapper ? plugin.equals(((PluginWrapper)p).plugin) : 
@@ -52,6 +58,9 @@ public class PluginLoader {
 		@Override
 		public boolean getState() {
 			return chosen;
+		}
+		public Package getPackage(){
+			return plugin.getPackage();
 		}
 	}
 	
