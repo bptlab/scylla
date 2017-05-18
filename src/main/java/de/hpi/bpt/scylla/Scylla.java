@@ -21,7 +21,7 @@ public class Scylla {
 
 
     	String folder = "samples\\";
-    	String resFilename = folder + "p0_globalconf_without.xml" ;
+    	String resFilename = folder + "p0_globalconf_without.xml";
 
 
 //        String[] bpmnFilename = new String[] { folder + "p1_boundary.bpmn", folder + "p2_normal.bpmn",
