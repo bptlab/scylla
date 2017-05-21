@@ -61,23 +61,24 @@ public class ScyllaGUI extends JFrame {
 	
 	public static final Dimension fileChooserDimension = new Dimension((int)(800.0*SCALE),(int)(500.0*SCALE));
 	public static final Font fileChooserFont = new Font("Arial", Font.PLAIN, (int)(14.0*SCALE));
-	
-	public static final Font DEFAULTFONT = new Font("Arial", Font.PLAIN, (int)(14.0*SCALE));
+
+	public static final Font DEFAULTFONT = new Font("Arial", Font.PLAIN, (int)(16.0*SCALE));
+	public static final Font TITLEFONT = new Font(DEFAULTFONT.getFontName(), Font.PLAIN, (int)(20.0*SCALE));
 
 	private static int STD = HEIGHT/24;
+	private static int STD1 = WIDTH/32;
 	private static int STD2 = WIDTH/48;
 	private static int STD3 = HEIGHT/36;
 	private static int STDHEI = 3*STD;
 	private static int STDHEIH = STDHEI/2;
-	private static int STDGAP = STD;
 	
 	private static int ROW1 = STD3;
 	private static int ROW2 = ROW1+STD;
 //	private static int ROW3 = ROW2+STD;
-	private static int ROW4 = ROW2+STD+STDGAP;
+	private static int ROW4 = ROW2+2*STD;
 	private static int ROW5 = ROW4+STD;
 //	private static int ROW6 = ROW5+STDHEI;
-	private static int ROW7 = ROW5+STDHEI+STDGAP;
+	private static int ROW7 = ROW5+STDHEI+STD;
 	private static int ROW8 = ROW7+STD;
 	private static int ROW9 = ROW8+STDHEI;
 	
@@ -158,7 +159,7 @@ public class ScyllaGUI extends JFrame {
 		
 		textfield_CurrentGlobalConfig_info = new JTextField();
 		textfield_CurrentGlobalConfig_info.setHighlighter(null);
-		textfield_CurrentGlobalConfig_info.setFont(DEFAULTFONT);
+		textfield_CurrentGlobalConfig_info.setFont(TITLEFONT);
 		textfield_CurrentGlobalConfig_info.setBackground(ColorField0);
 		textfield_CurrentGlobalConfig_info.setBounds(COL1, ROW1, WIDTH1, STD);
 		textfield_CurrentGlobalConfig_info.setEditable(false);
@@ -170,7 +171,7 @@ public class ScyllaGUI extends JFrame {
 		button_openglobalconfig.setBackground(ColorField1);
 		button_openglobalconfig.setFont(DEFAULTFONT);
 		button_openglobalconfig.setToolTipText("Choose other file");
-		button_openglobalconfig.setBounds(COL2 - STD, ROW2, STD, STD);
+		button_openglobalconfig.setBounds(COL2 - STD1, ROW2, STD1, STD);
 		button_openglobalconfig.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				ScalingFileChooser chooser = new ScalingFileChooser(DEFAULTFILEPATH);
@@ -190,14 +191,14 @@ public class ScyllaGUI extends JFrame {
 		textfield_CurrentGlobalConfig_chosen.setFont(DEFAULTFONT);
 		textfield_CurrentGlobalConfig_chosen.setBackground(ColorField2);
 		textfield_CurrentGlobalConfig_chosen.setToolTipText("Path for current global configuarition file");
-		textfield_CurrentGlobalConfig_chosen.setBounds(COL1, ROW2, WIDTH1-STD, STD);
+		textfield_CurrentGlobalConfig_chosen.setBounds(COL1, ROW2, WIDTH1-STD1, STD);
 		textfield_CurrentGlobalConfig_chosen.setEditable(false);
 		contentPane.add(textfield_CurrentGlobalConfig_chosen);
 		textfield_CurrentGlobalConfig_chosen.setColumns(10);
 		
 		scrollPane_BpmnFiles = new JScrollPane();
 		scrollPane_BpmnFiles.setFont(DEFAULTFONT);
-		scrollPane_BpmnFiles.setBounds(COL1, ROW5, WIDTH1-STD, STDHEI);
+		scrollPane_BpmnFiles.setBounds(COL1, ROW5, WIDTH1-STD1, STDHEI);
 		scrollPane_BpmnFiles.setToolTipText("");
 		contentPane.add(scrollPane_BpmnFiles);
 		
@@ -211,7 +212,7 @@ public class ScyllaGUI extends JFrame {
 		
 		scrollPane_SimFiles = new JScrollPane();
 		scrollPane_SimFiles.setFont(DEFAULTFONT);
-		scrollPane_SimFiles.setBounds(COL1, ROW8, WIDTH1-STD, STDHEI);
+		scrollPane_SimFiles.setBounds(COL1, ROW8, WIDTH1-STD1, STDHEI);
 		scrollPane_SimFiles.setToolTipText("");
 		contentPane.add(scrollPane_SimFiles);
 		
@@ -226,7 +227,7 @@ public class ScyllaGUI extends JFrame {
 		textfield_CurrentBpmnFiles = new JTextField();
 		textfield_CurrentBpmnFiles.setEditable(false);
 		textfield_CurrentBpmnFiles.setHighlighter(null);
-		textfield_CurrentBpmnFiles.setFont(DEFAULTFONT);
+		textfield_CurrentBpmnFiles.setFont(TITLEFONT);
 		textfield_CurrentBpmnFiles.setBackground(ColorField0);
 		textfield_CurrentBpmnFiles.setBounds(COL1, ROW4, WIDTH1, STD);
 		textfield_CurrentBpmnFiles.setText("Current BPMN Files");
@@ -237,7 +238,7 @@ public class ScyllaGUI extends JFrame {
 		button_addBpmnFile.setFont(DEFAULTFONT);
 		button_addBpmnFile.setBackground(ColorField1);
 		button_addBpmnFile.setToolTipText("Add BPMN file");
-		button_addBpmnFile.setBounds(COL2 - STD, ROW5, STD, STDHEIH);
+		button_addBpmnFile.setBounds(COL2 - STD1, ROW5, STD1, STDHEIH);
 		button_addBpmnFile.setIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/plus.png")));
 		button_addBpmnFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -257,7 +258,7 @@ public class ScyllaGUI extends JFrame {
 		button_removeBpmnFile.setFont(DEFAULTFONT);
 		button_removeBpmnFile.setBackground(ColorField1);
 		button_removeBpmnFile.setToolTipText("Remove selected file(s)");
-		button_removeBpmnFile.setBounds(COL2 - STD, ROW5+STDHEIH, STD, STDHEIH);
+		button_removeBpmnFile.setBounds(COL2 - STD1, ROW5+STDHEIH, STD1, STDHEIH);
 		button_removeBpmnFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				DefaultListModel<String> m = (DefaultListModel<String>) list_CurrentBpmnFiles.getModel();
@@ -271,7 +272,7 @@ public class ScyllaGUI extends JFrame {
 		textfield_CurrentSimulationFiles = new JTextField();
 		textfield_CurrentSimulationFiles.setEditable(false);
 		textfield_CurrentSimulationFiles.setHighlighter(null);
-		textfield_CurrentSimulationFiles.setFont(DEFAULTFONT);
+		textfield_CurrentSimulationFiles.setFont(TITLEFONT);
 		textfield_CurrentSimulationFiles.setBackground(ColorField0);
 		textfield_CurrentSimulationFiles.setBounds(COL1, ROW7, WIDTH1, STD);
 		textfield_CurrentSimulationFiles.setText("Current Simulation Files");
@@ -282,7 +283,7 @@ public class ScyllaGUI extends JFrame {
 		button_addSimfile.setFont(DEFAULTFONT);
 		button_addSimfile.setBackground(ColorField1);
 		button_addSimfile.setToolTipText("Add simulation file");
-		button_addSimfile.setBounds(COL2 - STD, ROW8, STD, STDHEIH);
+		button_addSimfile.setBounds(COL2 - STD1, ROW8, STD1, STDHEIH);
 		button_addSimfile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				ScalingFileChooser chooser = new ScalingFileChooser(DEFAULTFILEPATH);
@@ -301,7 +302,7 @@ public class ScyllaGUI extends JFrame {
 		button_removeSimfile.setFont(DEFAULTFONT);
 		button_removeSimfile.setBackground(ColorField1);
 		button_removeSimfile.setToolTipText("Remove selected file(s)");
-		button_removeSimfile.setBounds(COL2 - STD, ROW8 + STDHEIH, STD, STDHEIH);
+		button_removeSimfile.setBounds(COL2 - STD1, ROW8 + STDHEIH, STD1, STDHEIH);
 		button_removeSimfile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				DefaultListModel<String> m = (DefaultListModel<String>) list_CurrentSimFiles.getModel();
@@ -313,7 +314,7 @@ public class ScyllaGUI extends JFrame {
 		contentPane.add(button_removeSimfile);
 		
 		button_StartSimulation = new JButton("Start Simulation");
-		button_StartSimulation.setFont(DEFAULTFONT);
+		button_StartSimulation.setFont(TITLEFONT);
 		button_StartSimulation.setBackground(ColorField1);
 		button_StartSimulation.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -389,7 +390,7 @@ public class ScyllaGUI extends JFrame {
 		
 		textfield_Plugins = new JTextField();
 		textfield_Plugins.setHighlighter(null);
-		textfield_Plugins.setFont(DEFAULTFONT);
+		textfield_Plugins.setFont(TITLEFONT);
 		textfield_Plugins.setBackground(ColorField0);
 		textfield_Plugins.setText("Plugins");
 		textfield_Plugins.setEditable(false);
@@ -399,7 +400,7 @@ public class ScyllaGUI extends JFrame {
 		
 		textField_Console = new JTextField();
 		textField_Console.setText("Console Output");
-		textField_Console.setFont(DEFAULTFONT);
+		textField_Console.setFont(TITLEFONT);
 		textField_Console.setBackground(ColorField0);
 		textField_Console.setEditable(false);
 		textField_Console.setColumns(10);

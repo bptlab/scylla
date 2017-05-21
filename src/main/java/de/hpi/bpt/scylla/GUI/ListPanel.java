@@ -19,30 +19,35 @@ import de.hpi.bpt.scylla.GUI.CheckBoxList.StateObserver;
 
 
 /**
+ * Panel that can be selected via a checkbox and expanded via a button to show a {@link de.hpi.bpt.scylla.GUI.CheckBoxList<T extends StateObserver>}
  * @author Leon Bein
  *
  */
 @SuppressWarnings("serial")
 public class ListPanel extends JPanel implements StateObserver{
 
+	/**Checkbox to make Panel selectable*/
 	private JCheckBox checkbox_title;
+	/**Margin Textfield*/
 	private JTextField textfield_sub;
+	/**Expansion button*/
 	private JButton button_expand;
+	/**Checkboxlist*/
 	private CheckBoxList<? extends CheckBoxList.StateObserver> list;
 	
+	/**Tells whether the panel is expanded or not*/
 	private boolean expanded;
+	/**GBC for list, to preserve layout when collapsing*/
 	private GridBagConstraints gbc_list;
 	
 	/**
-	 * Create the panel.
+	 * Creates a new Panel
+	 * @param text : Title text
+	 * @param li : Objects for the checkboxlist
 	 */
 	public ListPanel(String text,List<? extends CheckBoxList.StateObserver> li) {
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		setLayout(gridBagLayout);
-
-		
-		CheckBoxList.StateObserver[] a = new CheckBoxList.StateObserver[li.size()];
-		li.toArray(a);
 		
 		checkbox_title = new JCheckBox(text);
 		checkbox_title.setHorizontalAlignment(SwingConstants.LEFT);
@@ -52,6 +57,8 @@ public class ListPanel extends JPanel implements StateObserver{
 			}
 		});
 		checkbox_title.setBackground(ScyllaGUI.ColorField1);
+		checkbox_title.setFont(ScyllaGUI.DEFAULTFONT);
+		checkbox_title.setFocusPainted(false);
 		GridBagConstraints gbc_checkbox_title = new GridBagConstraints();
 		gbc_checkbox_title.weightx = 1.0;
 		gbc_checkbox_title.fill = GridBagConstraints.HORIZONTAL;
@@ -69,13 +76,15 @@ public class ListPanel extends JPanel implements StateObserver{
 		});
 		button_expand.setBackground(ScyllaGUI.ColorField1);
 		button_expand.setFont(ScyllaGUI.DEFAULTFONT);
+		button_expand.setFocusPainted(false);
 		GridBagConstraints gbc_button_expand = new GridBagConstraints();
 		gbc_checkbox_title.weightx = 0.0;
 		gbc_checkbox_title.gridx = 1;
 		gbc_checkbox_title.gridy = 0;
 		add(button_expand, gbc_button_expand);
 		
-		checkbox_title.setFont(ScyllaGUI.DEFAULTFONT);
+		CheckBoxList.StateObserver[] a = new CheckBoxList.StateObserver[li.size()];
+		li.toArray(a);
 		list = new CheckBoxList<>(a);
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list.setBackground(ScyllaGUI.ColorField2);
@@ -110,6 +119,9 @@ public class ListPanel extends JPanel implements StateObserver{
 
 	}
 	
+	/**
+	 * Expands the panel
+	 */
 	public void expand(){
 		if(!expanded){
 			button_expand.setText("-");
@@ -121,6 +133,9 @@ public class ListPanel extends JPanel implements StateObserver{
 	}
 	
 	
+	/**
+	 * Collapses the panel
+	 */
 	public void collapse(){
 		if(expanded){
 			button_expand.setText("+");
@@ -131,11 +146,17 @@ public class ListPanel extends JPanel implements StateObserver{
 		expanded = false;
 	}
 
+	/**
+	 * Sets general checkbox based on if there are any selected checkboxes in the checkboxlist
+	 */
 	@Override
 	public void stateChanged(boolean b) {
 		checkbox_title.setSelected(b);
 	}
 
+	/**
+	 * @return the state of the general checkbox
+	 */
 	@Override
 	public boolean getState() {
 		return checkbox_title.isSelected();
