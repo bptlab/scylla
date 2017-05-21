@@ -5,8 +5,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -70,6 +68,7 @@ public class ListPanel extends JPanel implements StateObserver{
 			}
 		});
 		button_expand.setBackground(ScyllaGUI.ColorField1);
+		button_expand.setFont(ScyllaGUI.DEFAULTFONT);
 		GridBagConstraints gbc_button_expand = new GridBagConstraints();
 		gbc_checkbox_title.weightx = 0.0;
 		gbc_checkbox_title.gridx = 1;
@@ -120,6 +119,7 @@ public class ListPanel extends JPanel implements StateObserver{
 		}
 		expanded = true;
 	}
+	
 	
 	public void collapse(){
 		if(expanded){

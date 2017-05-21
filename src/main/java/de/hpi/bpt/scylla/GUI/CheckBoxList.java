@@ -6,6 +6,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -19,6 +20,7 @@ public class CheckBoxList<T extends CheckBoxList.StateObserver> extends JList<T>
 	public CheckBoxList(T[] o) {
 		super(o);
 		setFont(ScyllaGUI.DEFAULTFONT);
+		setBorder(new EmptyBorder(ScyllaGUI.LEFTMARGIN));
 		setCellRenderer(new CheckBoxCellRenderer<T>());
 		boxes = new JCheckBox[o.length];
 		for(int i = 0; i < o.length; i++){

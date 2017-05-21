@@ -8,14 +8,17 @@ import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -23,11 +26,12 @@ import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
 
 import de.hpi.bpt.scylla.SimulationManager;
 import de.hpi.bpt.scylla.plugin_loader.PluginLoader;
-import javax.swing.ScrollPaneConstants;
 /**
  * @author Leon Bein
  *
@@ -51,22 +55,23 @@ public class ScyllaGUI extends JFrame {
 	private static int HEIGHT = r.height;//900
 	private static double SCALE = HEIGHT/900;
 
-//	private static double SCALE = 2;
-//	private static int WIDTH = (int)(1200.0 * SCALE);
-//	private static int HEIGHT = (int)(900 * SCALE);
+//	private static double SCALE = 1;
+//	private static int WIDTH = 1200;//(int)(1200.0 * SCALE);
+//	private static int HEIGHT = 900;//(int)(900 * SCALE);
 	
 	public static final Dimension fileChooserDimension = new Dimension((int)(800.0*SCALE),(int)(500.0*SCALE));
 	public static final Font fileChooserFont = new Font("Arial", Font.PLAIN, (int)(14.0*SCALE));
 	
 	public static final Font DEFAULTFONT = new Font("Arial", Font.PLAIN, (int)(14.0*SCALE));
 
-	private static int STD = WIDTH/30;
+	private static int STD = HEIGHT/24;
 	private static int STD2 = WIDTH/48;
+	private static int STD3 = HEIGHT/36;
 	private static int STDHEI = 3*STD;
 	private static int STDHEIH = STDHEI/2;
 	private static int STDGAP = STD;
 	
-	private static int ROW1 = STD2;
+	private static int ROW1 = STD3;
 	private static int ROW2 = ROW1+STD;
 //	private static int ROW3 = ROW2+STD;
 	private static int ROW4 = ROW2+STD+STDGAP;
@@ -80,7 +85,9 @@ public class ScyllaGUI extends JFrame {
 	
 	private static int COL1 = STD2;
 	private static int COL2 = COL1 + WIDTH1;
-	private static int COL3 = COL2 + WIDTH/48;
+	private static int COL3 = COL2 + STD2;
+	
+	public static final Insets LEFTMARGIN = new Insets(0, STD2, 0, 0);
 	
 	
 
@@ -107,6 +114,11 @@ public class ScyllaGUI extends JFrame {
 
 	private JButton button_StartSimulation;
 	private Container panel_plugins;
+	private JTextField textField_Console;
+	private JTextArea console;
+
+
+	private JScrollPane scrollPane_Console;
 
 	/**
 	 * Launch the application.
@@ -131,7 +143,9 @@ public class ScyllaGUI extends JFrame {
 		setTitle("Skylla GUI");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100,WIDTH,HEIGHT);
+		
 	    setExtendedState(JFrame.MAXIMIZED_BOTH);
+		
 		contentPane = new JPanel();
 		contentPane.setBackground(ColorBackground);
 		setContentPane(contentPane);
@@ -172,6 +186,7 @@ public class ScyllaGUI extends JFrame {
 		contentPane.add(button_openglobalconfig);
 		
 		textfield_CurrentGlobalConfig_chosen = new JTextField();
+		textfield_CurrentGlobalConfig_chosen.setMargin(LEFTMARGIN);
 		textfield_CurrentGlobalConfig_chosen.setFont(DEFAULTFONT);
 		textfield_CurrentGlobalConfig_chosen.setBackground(ColorField2);
 		textfield_CurrentGlobalConfig_chosen.setToolTipText("Path for current global configuarition file");
@@ -187,6 +202,7 @@ public class ScyllaGUI extends JFrame {
 		contentPane.add(scrollPane_BpmnFiles);
 		
 		list_CurrentBpmnFiles = new JList<String>();
+		list_CurrentBpmnFiles.setBorder(new EmptyBorder(LEFTMARGIN));
 		list_CurrentBpmnFiles.setBackground(ColorField2);
 		list_CurrentBpmnFiles.setFont(DEFAULTFONT);
 		list_CurrentBpmnFiles.setModel(new DefaultListModel<>());
@@ -200,6 +216,7 @@ public class ScyllaGUI extends JFrame {
 		contentPane.add(scrollPane_SimFiles);
 		
 		list_CurrentSimFiles = new JList<String>();
+		list_CurrentSimFiles.setBorder(new EmptyBorder(LEFTMARGIN));
 		list_CurrentSimFiles.setBackground(ColorField2);
 		list_CurrentSimFiles.setFont(DEFAULTFONT);
 		list_CurrentSimFiles.setModel(new DefaultListModel<>());
@@ -319,7 +336,7 @@ public class ScyllaGUI extends JFrame {
 						);
 			}
 		});
-		button_StartSimulation.setBounds(WIDTH/2-WIDTH/10,HEIGHT-HEIGHT/6-STD2, WIDTH/5, STDHEIH);
+		button_StartSimulation.setBounds(WIDTH/2-WIDTH/10,HEIGHT-HEIGHT/8-STD3, WIDTH/5, STDHEIH);
 		contentPane.add(button_StartSimulation);
 		
 		scrollPane_plugins = new JScrollPane();
@@ -379,6 +396,39 @@ public class ScyllaGUI extends JFrame {
 		textfield_Plugins.setColumns(10);
 		textfield_Plugins.setBounds(COL3, ROW1, WIDTH1, STD);
 		contentPane.add(textfield_Plugins);
+		
+		textField_Console = new JTextField();
+		textField_Console.setText("Console Output");
+		textField_Console.setFont(DEFAULTFONT);
+		textField_Console.setBackground(ColorField0);
+		textField_Console.setEditable(false);
+		textField_Console.setColumns(10);
+		textField_Console.setBounds(COL1, ROW9+STD, COL3+WIDTH1-COL1, STD);
+		contentPane.add(textField_Console);
+		
+		scrollPane_Console = new JScrollPane();
+		scrollPane_Console.setBounds(COL1, ROW9+2*STD, COL3+WIDTH1-COL1, HEIGHT-HEIGHT/8-STD3 - (ROW9+3*STD));
+		contentPane.add(scrollPane_Console);
+		
+		console = new JTextArea();
+		console.setHighlighter(null);
+		console.setFont(DEFAULTFONT);
+		console.setBackground(ColorField1);
+		console.setEditable(false);
+		scrollPane_Console.setViewportView(console);
+		console.setColumns(10);
+		console.setMargin(LEFTMARGIN);
+		
+		System.setOut(
+				new PrintStream(new OutputStream(){
+					@Override
+					public void write(int c) throws IOException {
+						console.append(String.valueOf((char)c));
+						console.setCaretPosition(console.getText().length());
+					}
+					
+				})
+		);
 		
 
 		
