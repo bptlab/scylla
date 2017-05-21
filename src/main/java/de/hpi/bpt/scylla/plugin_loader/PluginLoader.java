@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import de.hpi.bpt.scylla.GUI.CheckBoxList.CheckBoxObserver;
+import de.hpi.bpt.scylla.GUI.CheckBoxList.StateObserver;
 import de.hpi.bpt.scylla.plugin_type.IPluggable;
 
 /**
@@ -26,7 +26,7 @@ public class PluginLoader {
 	private static PluginLoader defaultPluginLoader;
 	
 	
-	public class PluginWrapper implements EventListener,CheckBoxObserver{
+	public class PluginWrapper implements EventListener,StateObserver{
 		private Class<?> plugin;
 		private boolean chosen;
 		private PluginWrapper(Class<?> p, boolean b){

@@ -1,23 +1,23 @@
 package de.hpi.bpt.scylla.GUI;
 
-import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
-import java.awt.Color;
-import java.awt.Dimension;
-
-import javax.swing.border.EmptyBorder;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import javax.swing.SwingConstants;
-import javax.swing.BoxLayout;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
+import javax.swing.border.EmptyBorder;
+
+import de.hpi.bpt.scylla.GUI.CheckBoxList.StateObserver;
 
 
 /**
@@ -25,11 +25,12 @@ import java.awt.Insets;
  *
  */
 @SuppressWarnings("serial")
-public class ListPanel extends JPanel {
+public class ListPanel extends JPanel implements StateObserver{
 
-	private JButton button_title;
+	private JCheckBox checkbox_title;
 	private JTextField textfield_sub;
-	private CheckBoxList<? extends CheckBoxList.CheckBoxObserver> list;
+	private JButton button_expand;
+	private CheckBoxList<? extends CheckBoxList.StateObserver> list;
 	
 	private boolean expanded;
 	private GridBagConstraints gbc_list;
@@ -37,31 +38,45 @@ public class ListPanel extends JPanel {
 	/**
 	 * Create the panel.
 	 */
-	public ListPanel(String text,List<? extends CheckBoxList.CheckBoxObserver> li) {
+	public ListPanel(String text,List<? extends CheckBoxList.StateObserver> li) {
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		setLayout(gridBagLayout);
 
 		
-		CheckBoxList.CheckBoxObserver[] a = new CheckBoxList.CheckBoxObserver[li.size()];
+		CheckBoxList.StateObserver[] a = new CheckBoxList.StateObserver[li.size()];
 		li.toArray(a);
 		
-		button_title = new JButton(text);
-		button_title.setToolTipText("Show components of "+text);
-		button_title.setHorizontalAlignment(SwingConstants.LEFT);
-		button_title.addActionListener(new ActionListener() {
+		checkbox_title = new JCheckBox(text);
+		checkbox_title.setHorizontalAlignment(SwingConstants.LEFT);
+		checkbox_title.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				list.setAll(checkbox_title.isSelected());
+			}
+		});
+		checkbox_title.setBackground(ScyllaGUI.ColorField1);
+		GridBagConstraints gbc_checkbox_title = new GridBagConstraints();
+		gbc_checkbox_title.weightx = 1.0;
+		gbc_checkbox_title.fill = GridBagConstraints.HORIZONTAL;
+		gbc_checkbox_title.gridx = 0;
+		gbc_checkbox_title.gridy = 0;
+		add(checkbox_title, gbc_checkbox_title);
+		
+		button_expand = new JButton("+");
+		button_expand.setToolTipText("Expand");
+		button_expand.setHorizontalAlignment(SwingConstants.CENTER);
+		button_expand.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if(expanded)collapse(); else expand();
 			}
 		});
-		button_title.setBackground(ScyllaGUI.ColorField1);
-		GridBagConstraints gbc_button_title = new GridBagConstraints();
-		gbc_button_title.weightx = 1.0;
-		gbc_button_title.fill = GridBagConstraints.HORIZONTAL;
-		gbc_button_title.gridx = 0;
-		gbc_button_title.gridy = 0;
-		add(button_title, gbc_button_title);
+		button_expand.setBackground(ScyllaGUI.ColorField1);
+		GridBagConstraints gbc_button_expand = new GridBagConstraints();
+		gbc_checkbox_title.weightx = 0.0;
+		gbc_checkbox_title.gridx = 1;
+		gbc_checkbox_title.gridy = 0;
+		add(button_expand, gbc_button_expand);
 		
-		button_title.setFont(ScyllaGUI.DEFAULTFONT);
+		checkbox_title.setFont(ScyllaGUI.DEFAULTFONT);
 		list = new CheckBoxList<>(a);
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list.setBackground(ScyllaGUI.ColorField2);
@@ -70,8 +85,12 @@ public class ListPanel extends JPanel {
 		gbc_list.fill = GridBagConstraints.HORIZONTAL;
 		gbc_list.gridx = 0;
 		gbc_list.gridy = 1;
+		gbc_list.gridwidth = 2;
 		add(list, gbc_list);
 		list.setFont(ScyllaGUI.DEFAULTFONT);
+		
+		list.setObserver(this);
+		checkbox_title.setSelected(list.anythingSelected());
 		
 		textfield_sub = new JTextField(" ");
 		textfield_sub.setHorizontalAlignment(SwingConstants.LEFT);
@@ -84,6 +103,7 @@ public class ListPanel extends JPanel {
 		gbc_textfield_sub.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textfield_sub.gridx = 0;
 		gbc_textfield_sub.gridy = 2;
+		gbc_textfield_sub.gridwidth = 2;
 		add(textfield_sub, gbc_textfield_sub);
 		
 		expanded = true;
@@ -93,6 +113,8 @@ public class ListPanel extends JPanel {
 	
 	public void expand(){
 		if(!expanded){
+			button_expand.setText("-");
+			button_expand.setToolTipText("Collapse");
 			add(list,gbc_list);
 			revalidate();
 		}
@@ -101,10 +123,22 @@ public class ListPanel extends JPanel {
 	
 	public void collapse(){
 		if(expanded){
+			button_expand.setText("+");
+			button_expand.setToolTipText("Expand");
 			remove(list);
 			revalidate();
 		}
 		expanded = false;
+	}
+
+	@Override
+	public void stateChanged(boolean b) {
+		checkbox_title.setSelected(b);
+	}
+
+	@Override
+	public boolean getState() {
+		return checkbox_title.isSelected();
 	}
 	
 }

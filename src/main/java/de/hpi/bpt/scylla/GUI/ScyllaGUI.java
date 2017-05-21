@@ -39,9 +39,10 @@ public class ScyllaGUI extends JFrame {
 	private static final String DEFAULTFILEPATH = "./samples/";
 	
 
+	public static final Color ColorField0 = new Color(200,200,200);
 	public static final Color ColorField1 = new Color(240,240,240);
 	public static final Color ColorField2 = new Color(255,255,255);
-	public static final Color ColorBackground = new Color(55,55,55);
+	public static final Color ColorBackground = new Color(75,75,75);
 
 	
 	private static GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -144,7 +145,7 @@ public class ScyllaGUI extends JFrame {
 		textfield_CurrentGlobalConfig_info = new JTextField();
 		textfield_CurrentGlobalConfig_info.setHighlighter(null);
 		textfield_CurrentGlobalConfig_info.setFont(DEFAULTFONT);
-		textfield_CurrentGlobalConfig_info.setBackground(ColorField1);
+		textfield_CurrentGlobalConfig_info.setBackground(ColorField0);
 		textfield_CurrentGlobalConfig_info.setBounds(COL1, ROW1, WIDTH1, STD);
 		textfield_CurrentGlobalConfig_info.setEditable(false);
 		textfield_CurrentGlobalConfig_info.setText("Current Global Config ");
@@ -209,7 +210,7 @@ public class ScyllaGUI extends JFrame {
 		textfield_CurrentBpmnFiles.setEditable(false);
 		textfield_CurrentBpmnFiles.setHighlighter(null);
 		textfield_CurrentBpmnFiles.setFont(DEFAULTFONT);
-		textfield_CurrentBpmnFiles.setBackground(ColorField1);
+		textfield_CurrentBpmnFiles.setBackground(ColorField0);
 		textfield_CurrentBpmnFiles.setBounds(COL1, ROW4, WIDTH1, STD);
 		textfield_CurrentBpmnFiles.setText("Current BPMN Files");
 		contentPane.add(textfield_CurrentBpmnFiles);
@@ -254,7 +255,7 @@ public class ScyllaGUI extends JFrame {
 		textfield_CurrentSimulationFiles.setEditable(false);
 		textfield_CurrentSimulationFiles.setHighlighter(null);
 		textfield_CurrentSimulationFiles.setFont(DEFAULTFONT);
-		textfield_CurrentSimulationFiles.setBackground(ColorField1);
+		textfield_CurrentSimulationFiles.setBackground(ColorField0);
 		textfield_CurrentSimulationFiles.setBounds(COL1, ROW7, WIDTH1, STD);
 		textfield_CurrentSimulationFiles.setText("Current Simulation Files");
 		textfield_CurrentSimulationFiles.setColumns(10);
@@ -372,7 +373,7 @@ public class ScyllaGUI extends JFrame {
 		textfield_Plugins = new JTextField();
 		textfield_Plugins.setHighlighter(null);
 		textfield_Plugins.setFont(DEFAULTFONT);
-		textfield_Plugins.setBackground(ColorField1);
+		textfield_Plugins.setBackground(ColorField0);
 		textfield_Plugins.setText("Plugins");
 		textfield_Plugins.setEditable(false);
 		textfield_Plugins.setColumns(10);

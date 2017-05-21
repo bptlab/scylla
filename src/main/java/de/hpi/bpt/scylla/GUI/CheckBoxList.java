@@ -11,9 +11,10 @@ import javax.swing.event.ListSelectionListener;
 
 
 @SuppressWarnings("serial")
-public class CheckBoxList<T extends CheckBoxList.CheckBoxObserver> extends JList<T>{
+public class CheckBoxList<T extends CheckBoxList.StateObserver> extends JList<T>{
 	
 	private JCheckBox[] boxes;
+	private StateObserver observer;
 	
 	public CheckBoxList(T[] o) {
 		super(o);
@@ -32,6 +33,7 @@ public class CheckBoxList<T extends CheckBoxList.CheckBoxObserver> extends JList
 					if(i == -1)return;
 					boxes[i].setSelected(!boxes[i].isSelected());
 					source.clearSelection();
+					if(observer != null)observer.stateChanged(anythingSelected());
 				}
 			}
 		});
@@ -45,6 +47,24 @@ public class CheckBoxList<T extends CheckBoxList.CheckBoxObserver> extends JList
 		}
 	}
 	
+	public void setAll(boolean b){
+		for(int i = 0; i < boxes.length; i++){
+			boxes[i].setSelected(b);
+		}
+		repaint();
+	}
+	
+	public void setObserver(StateObserver o){
+		observer = o;
+	}
+	
+	public boolean anythingSelected(){
+		for(int i = 0; i < boxes.length; i++){
+			if(boxes[i].isSelected())return true;
+		}
+		return false;
+	}
+	
 	private class CheckBoxCellRenderer<V> implements ListCellRenderer<V>{
 
 		@Override
@@ -56,15 +76,15 @@ public class CheckBoxList<T extends CheckBoxList.CheckBoxObserver> extends JList
 		
 	}
 	
-	public interface CheckBoxObserver{
+	public interface StateObserver{
 		public void stateChanged(boolean b);
 		public boolean getState();
 	}
 
 	private class ObserverCheckBox extends JCheckBox{
 		
-		private CheckBoxObserver observer;
-		private ObserverCheckBox(CheckBoxObserver o) {
+		private StateObserver observer;
+		private ObserverCheckBox(StateObserver o) {
 			super();
 			observer = o;
 			setSelected(o.getState());
