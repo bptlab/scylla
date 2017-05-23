@@ -40,13 +40,14 @@ import de.hpi.bpt.scylla.plugin_loader.PluginLoader;
 public class ScyllaGUI extends JFrame {
 	
 	
-	private static final String DEFAULTFILEPATH = "./samples/";
+	private static final String DEFAULTFILEPATH = "samples\\";
+	private static final String OUTPUTFILEPATH = "desmoj_output\\";
 	
 
 	public static final Color ColorField0 = new Color(200,200,200);
 	public static final Color ColorField1 = new Color(240,240,240);
 	public static final Color ColorField2 = new Color(255,255,255);
-	public static final Color ColorBackground = new Color(75,75,75);
+	public static final Color ColorBackground = new Color(100,100,100);
 
 	
 	private static GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -436,12 +437,12 @@ public class ScyllaGUI extends JFrame {
 	}
 
 	private void startSimulation(String resFilename, String[] bpmnFilename, String[] simFilenames) {
-    	String folder = "output\\";
+ 
     	
         boolean enableBpsLogging = true;
         boolean enableDesmojLogging = true;
 
-        SimulationManager manager = new SimulationManager(folder, bpmnFilename, simFilenames, resFilename,
+        SimulationManager manager = new SimulationManager(OUTPUTFILEPATH, bpmnFilename, simFilenames, resFilename,
                 enableBpsLogging, enableDesmojLogging);
         manager.run();
 

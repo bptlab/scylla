@@ -90,7 +90,7 @@ public class BatchLogger extends OutputLoggerPluggable {
             System.out.println(sb.toString());
         }
         else {
-            String resourceUtilizationFileName = outputPathWithoutExtension + "_batchregionstats.txt";
+            String resourceUtilizationFileName = outputPathWithoutExtension + model.getGlobalConfiguration().getFileNameWithoutExtension() + "_batchregionstats.txt";
 
             PrintWriter writer = new PrintWriter(resourceUtilizationFileName, "UTF-8");
             writer.println(sb.toString());

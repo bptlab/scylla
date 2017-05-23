@@ -1,6 +1,8 @@
 package de.hpi.bpt.scylla;
 
+import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -89,7 +91,7 @@ public class SimulationManager {
 
         try {
             SAXBuilder builder = new SAXBuilder();
-
+            
             if (globalConfigurationFilename == null) {
                 throw new ScyllaValidationException("No global configuration provided.");
             }
@@ -101,7 +103,7 @@ public class SimulationManager {
                 globalConfiguration = globalConfigurationParser.parse(gcDoc.getRootElement());
                 String fileNameWithoutExtension = globalConfigurationFilename.substring(// filename.lastIndexOf("\\") +
                                                                                         // 1,
-                        0, globalConfigurationFilename.lastIndexOf(".xml"));
+                		globalConfigurationFilename.lastIndexOf("\\")+1, globalConfigurationFilename.lastIndexOf(".xml"));
                 globalConfiguration.setFileNameWithoutExtension(fileNameWithoutExtension);
                 // plugins to parse global configuration
                 GlobalConfigurationParserPluggable.runPlugins(this, globalConfiguration, gcRootElement);
@@ -117,7 +119,7 @@ public class SimulationManager {
                 // parse common process elements from XML (BPMN)
                 CommonProcessElements commonProcessElementsFromFile = cpeParser.parse(pmRootElement);
                 String fileNameWithoutExtension = filename.substring(// filename.lastIndexOf("\\") + 1,
-                        0, filename.lastIndexOf(".bpmn"));
+                        filename.lastIndexOf("\\")+1, filename.lastIndexOf(".bpmn"));
                 commonProcessElementsFromFile.setBpmnFileNameWithoutExtension(fileNameWithoutExtension);
 
                 // plugins to parse common process elements
@@ -214,7 +216,10 @@ public class SimulationManager {
             // log process execution
             // log resources, process, tasks
 
-            String outputPathWithoutExtension = globalConfiguration.getFileNameWithoutExtension();
+            StringBuilder strb = new StringBuilder(globalConfigurationFilename.substring(0,globalConfigurationFilename.lastIndexOf("\\")+1));
+            String outputPathWithoutExtension = strb.substring(0,strb.lastIndexOf("\\")+1)+"output_"+new SimpleDateFormat("yy_MM_dd_HH_mm_ss").format(new Date())+"\\";
+            File outputPathFolder = new File(outputPathWithoutExtension);
+            if(!outputPathFolder.exists())outputPathFolder.mkdir();
             OutputLoggerPluggable.runPlugins(sm, outputPathWithoutExtension);
 
         }

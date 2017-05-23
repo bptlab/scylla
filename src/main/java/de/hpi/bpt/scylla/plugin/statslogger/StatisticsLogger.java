@@ -365,7 +365,7 @@ public class StatisticsLogger extends OutputLoggerPluggable {
             System.out.println(sb.toString());
         }
         else {
-            String resourceUtilizationFileName = outputPathWithoutExtension + "_resourceutilization.txt";
+            String resourceUtilizationFileName = outputPathWithoutExtension + model.getGlobalConfiguration().getFileNameWithoutExtension()+"_resourceutilization.txt";
 
             PrintWriter writer = new PrintWriter(resourceUtilizationFileName, "UTF-8");
             writer.println(sb.toString());

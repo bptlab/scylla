@@ -150,11 +150,11 @@ public class XESLogger extends OutputLoggerPluggable {
             FileOutputStream fos;
             if (gzipOn) {
                 serializer = new XesXmlGZIPSerializer();
-                fos = new FileOutputStream(fileNameWithoutExtension + ".tar");
+                fos = new FileOutputStream(outputPathWithoutExtension + fileNameWithoutExtension +  ".tar");
             }
             else {
                 serializer = new XesXmlSerializer();
-                fos = new FileOutputStream(fileNameWithoutExtension + ".xes");
+                fos = new FileOutputStream(outputPathWithoutExtension + fileNameWithoutExtension + ".xes");
             }
             serializer.serialize(log, fos);
         }
