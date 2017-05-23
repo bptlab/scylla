@@ -14,6 +14,7 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 
+import de.hpi.bpt.scylla.GUI.ScyllaGUI;
 import de.hpi.bpt.scylla.exception.ScyllaValidationException;
 import de.hpi.bpt.scylla.logger.DebugLogger;
 import de.hpi.bpt.scylla.model.configuration.SimulationConfiguration;
@@ -55,6 +56,8 @@ public class SimulationManager {
     private String[] processModelFilenames;
     private String[] simulationConfigurationFilenames;
     private String globalConfigurationFilename;
+    
+	private String outputPath;
 
     /**
      * Constructor.
@@ -71,6 +74,8 @@ public class SimulationManager {
      *            log {@link de.hpi.bpt.scylla.logger.ProcessNodeInfo} objects if true
      * @param enableDesLogging
      *            log DesmoJ traces and write HTML trace file if true
+     * @param gui
+     * 			a gui reference for feedback
      */
     public SimulationManager(String folder, String[] processModelFilenames, String[] simulationConfigurationFilenames,
             String globalConfigurationFilename, boolean enableBpsLogging, boolean enableDesLogging) {
@@ -81,7 +86,6 @@ public class SimulationManager {
         this.globalConfigurationFilename = globalConfigurationFilename;
         this.enableBpsLogging = enableBpsLogging;
         this.enableDesLogging = enableDesLogging;
-
     }
 
     /**
@@ -217,10 +221,10 @@ public class SimulationManager {
             // log resources, process, tasks
 
             StringBuilder strb = new StringBuilder(globalConfigurationFilename.substring(0,globalConfigurationFilename.lastIndexOf("\\")+1));
-            String outputPathWithoutExtension = strb.substring(0,strb.lastIndexOf("\\")+1)+"output_"+new SimpleDateFormat("yy_MM_dd_HH_mm_ss").format(new Date())+"\\";
-            File outputPathFolder = new File(outputPathWithoutExtension);
+            outputPath = strb.substring(0,strb.lastIndexOf("\\")+1)+"output_"+new SimpleDateFormat("yy_MM_dd_HH_mm_ss").format(new Date())+"\\";
+            File outputPathFolder = new File(outputPath);
             if(!outputPathFolder.exists())outputPathFolder.mkdir();
-            OutputLoggerPluggable.runPlugins(sm, outputPathWithoutExtension);
+            OutputLoggerPluggable.runPlugins(sm, outputPath);
 
         }
         catch (IOException e) {
@@ -235,4 +239,20 @@ public class SimulationManager {
     public Map<String, ProcessModel> getProcessModels() {
         return processModels;
     }
+
+    /**
+     * Returns default output path if set
+     * @return
+     */
+	public String getOutputPath() {
+		return outputPath;
+	}
+
+	/**
+	 * Methode to manually override default output path
+	 * @param outputPath : A String path to a folder
+	 */
+	public void setOutputPath(String outputPath) {
+		this.outputPath = outputPath;
+	}
 }

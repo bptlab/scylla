@@ -2,6 +2,7 @@ package de.hpi.bpt.scylla.GUI;
 
 import java.awt.Color;
 import java.awt.Container;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
@@ -11,6 +12,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -30,8 +32,11 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import co.paralleluniverse.common.monitoring.LatencyStatsReservoir;
 import de.hpi.bpt.scylla.SimulationManager;
 import de.hpi.bpt.scylla.plugin_loader.PluginLoader;
+import java.awt.SystemColor;
+import javax.swing.SwingConstants;
 /**
  * @author Leon Bein
  *
@@ -121,6 +126,8 @@ public class ScyllaGUI extends JFrame {
 
 
 	private JScrollPane scrollPane_Console;
+	private JButton button_OpenLastOutput;
+	private String lastOutPutFolder;
 
 	/**
 	 * Launch the application.
@@ -341,6 +348,24 @@ public class ScyllaGUI extends JFrame {
 		button_StartSimulation.setBounds(WIDTH/2-WIDTH/10,HEIGHT-HEIGHT/8-STD3, WIDTH/5, STDHEIH);
 		contentPane.add(button_StartSimulation);
 		
+		
+		lastOutPutFolder = "";
+		button_OpenLastOutput = new JButton("Open Last Output Path");
+		button_OpenLastOutput.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					Desktop.getDesktop().open(new File(lastOutPutFolder));
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
+		button_OpenLastOutput.setFont(DEFAULTFONT);
+		button_OpenLastOutput.setBackground(ColorField1);
+		button_OpenLastOutput.setBounds(WIDTH/2-WIDTH/10,HEIGHT-HEIGHT/8-STD3+STDHEIH, WIDTH/5, STD/2);
+    	button_OpenLastOutput.setEnabled(false);
+		contentPane.add(button_OpenLastOutput);
+		
 		scrollPane_plugins = new JScrollPane();
 		scrollPane_plugins.getVerticalScrollBar().setUnitIncrement(16);
 		scrollPane_plugins.setToolTipText("Plugin List");
@@ -421,6 +446,8 @@ public class ScyllaGUI extends JFrame {
 		console.setColumns(10);
 		console.setMargin(LEFTMARGIN);
 		
+
+		
 		System.setOut(
 				new PrintStream(new OutputStream(){
 					@Override
@@ -441,10 +468,23 @@ public class ScyllaGUI extends JFrame {
     	
         boolean enableBpsLogging = true;
         boolean enableDesmojLogging = true;
+        
+        boolean success = true;
 
         SimulationManager manager = new SimulationManager(OUTPUTFILEPATH, bpmnFilename, simFilenames, resFilename,
                 enableBpsLogging, enableDesmojLogging);
-        manager.run();
-
+        button_StartSimulation.setEnabled(false);
+        try{
+            manager.run();
+        }catch(Exception e){
+        	e.printStackTrace();
+        	System.out.println("Fatal error, simulation has been canceled");
+        	success = false;
+        }
+        if(success){
+        	lastOutPutFolder = manager.getOutputPath();
+        	button_OpenLastOutput.setEnabled(true);
+        }
+        button_StartSimulation.setEnabled(true);
 	}
 }
