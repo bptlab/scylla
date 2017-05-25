@@ -152,6 +152,7 @@ public class CheckBoxList<T extends CheckBoxList.StateObserver> extends JList<T>
 			super();
 			observer = o;
 			setSelected(o.getState());
+			setIcon(new ScalingCheckBoxIcon(ScyllaGUI.DEFAULTFONT.getSize()));
 		}
 		
 

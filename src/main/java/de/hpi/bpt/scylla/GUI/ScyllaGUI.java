@@ -9,6 +9,7 @@ import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -37,12 +38,14 @@ import de.hpi.bpt.scylla.SimulationManager;
 import de.hpi.bpt.scylla.plugin_loader.PluginLoader;
 import java.awt.SystemColor;
 import javax.swing.SwingConstants;
+import javax.swing.ScrollPaneConstants;
 /**
  * @author Leon Bein
  *
  */
 @SuppressWarnings("serial")
 public class ScyllaGUI extends JFrame {
+	
 	
 	
 	private static final String DEFAULTFILEPATH = "samples\\";
@@ -57,6 +60,7 @@ public class ScyllaGUI extends JFrame {
 	
 	private static GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
 	private static java.awt.Rectangle r = env.getMaximumWindowBounds();
+	
 	private static int WIDTH = r.width;//1200
 	private static int HEIGHT = r.height;//900
 	private static double SCALE = HEIGHT/900;
@@ -95,6 +99,13 @@ public class ScyllaGUI extends JFrame {
 	private static int COL3 = COL2 + STD2;
 	
 	public static final Insets LEFTMARGIN = new Insets(0, STD2, 0, 0);
+	
+	public static final ImageIcon ICON_PLUS = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/plus.png")),STD1/2,STDHEIH/2);
+	public static final ImageIcon ICON_X = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/remove.png")),STD1/2,STDHEIH/2);
+	public static final ImageIcon ICON_MORE = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/more.png")),STD1/2,STD1/2);
+	
+	public static final ImageIcon ICON_EXPAND = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/expand.png")),DEFAULTFONT.getSize(),DEFAULTFONT.getSize());
+	public static final ImageIcon ICON_COLLAPSE = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/collapse.png")),DEFAULTFONT.getSize(),DEFAULTFONT.getSize());
 	
 	
 
@@ -145,6 +156,7 @@ public class ScyllaGUI extends JFrame {
 		});
 	}
 
+
 	/**
 	 * Create the frame.
 	 */
@@ -175,7 +187,8 @@ public class ScyllaGUI extends JFrame {
 		contentPane.add(textfield_CurrentGlobalConfig_info);
 		textfield_CurrentGlobalConfig_info.setColumns(10);
 		
-		button_openglobalconfig = new JButton("...");
+		button_openglobalconfig = new JButton();
+		button_openglobalconfig.setIcon(ICON_MORE);
 		button_openglobalconfig.setBackground(ColorField1);
 		button_openglobalconfig.setFont(DEFAULTFONT);
 		button_openglobalconfig.setToolTipText("Choose other file");
@@ -247,7 +260,7 @@ public class ScyllaGUI extends JFrame {
 		button_addBpmnFile.setBackground(ColorField1);
 		button_addBpmnFile.setToolTipText("Add BPMN file");
 		button_addBpmnFile.setBounds(COL2 - STD1, ROW5, STD1, STDHEIH);
-		button_addBpmnFile.setIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/plus.png")));
+		button_addBpmnFile.setIcon(ICON_PLUS);
 		button_addBpmnFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				ScalingFileChooser chooser = new ScalingFileChooser(DEFAULTFILEPATH);
@@ -274,7 +287,7 @@ public class ScyllaGUI extends JFrame {
 				for(int i = 0; i < remove.size(); i++)m.removeElement(remove.get(i));
 			}
 		});
-		button_removeBpmnFile.setIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/remove.png")));
+		button_removeBpmnFile.setIcon(ICON_X);
 		contentPane.add(button_removeBpmnFile);
 		
 		textfield_CurrentSimulationFiles = new JTextField();
@@ -303,7 +316,7 @@ public class ScyllaGUI extends JFrame {
 				
 			}
 		});
-		button_addSimfile.setIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/plus.png")));
+		button_addSimfile.setIcon(ICON_PLUS);
 		contentPane.add(button_addSimfile);
 		
 		button_removeSimfile = new JButton("");
@@ -318,7 +331,7 @@ public class ScyllaGUI extends JFrame {
 				for(int i = 0; i < remove.size(); i++)m.removeElement(remove.get(i));
 			}
 		});
-		button_removeSimfile.setIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/remove.png")));
+		button_removeSimfile.setIcon(ICON_X);
 		contentPane.add(button_removeSimfile);
 		
 		button_StartSimulation = new JButton("Start Simulation");
@@ -367,6 +380,7 @@ public class ScyllaGUI extends JFrame {
 		contentPane.add(button_OpenLastOutput);
 		
 		scrollPane_plugins = new JScrollPane();
+		scrollPane_plugins.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		scrollPane_plugins.getVerticalScrollBar().setUnitIncrement(16);
 		scrollPane_plugins.setToolTipText("Plugin List");
 		scrollPane_plugins.setFont(DEFAULTFONT);
@@ -486,5 +500,12 @@ public class ScyllaGUI extends JFrame {
         	button_OpenLastOutput.setEnabled(true);
         }
         button_StartSimulation.setEnabled(true);
+	}
+	
+
+	public static ImageIcon resizeIcon(ImageIcon imageIcon,int w, int h) {
+		Image img = imageIcon.getImage();
+		Image scaled = img.getScaledInstance(w, h, Image.SCALE_SMOOTH);
+		return new ImageIcon(scaled);
 	}
 }

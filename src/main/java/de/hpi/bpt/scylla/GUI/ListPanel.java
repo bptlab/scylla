@@ -50,6 +50,7 @@ public class ListPanel extends JPanel implements StateObserver{
 		setLayout(gridBagLayout);
 		
 		checkbox_title = new JCheckBox(text);
+		checkbox_title.setIcon(new ScalingCheckBoxIcon(ScyllaGUI.DEFAULTFONT.getSize()));
 		checkbox_title.setHorizontalAlignment(SwingConstants.LEFT);
 		checkbox_title.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
@@ -66,7 +67,8 @@ public class ListPanel extends JPanel implements StateObserver{
 		gbc_checkbox_title.gridy = 0;
 		add(checkbox_title, gbc_checkbox_title);
 		
-		button_expand = new JButton("+");
+		button_expand = new JButton();
+		button_expand.setIcon(ScyllaGUI.ICON_EXPAND);
 		button_expand.setToolTipText("Expand");
 		button_expand.setHorizontalAlignment(SwingConstants.CENTER);
 		button_expand.addActionListener(new ActionListener() {
@@ -78,9 +80,9 @@ public class ListPanel extends JPanel implements StateObserver{
 		button_expand.setFont(ScyllaGUI.DEFAULTFONT);
 		button_expand.setFocusPainted(false);
 		GridBagConstraints gbc_button_expand = new GridBagConstraints();
-		gbc_checkbox_title.weightx = 0.0;
-		gbc_checkbox_title.gridx = 1;
-		gbc_checkbox_title.gridy = 0;
+		gbc_button_expand.weightx = 0.0;
+		gbc_button_expand.gridx = 1;
+		gbc_button_expand.gridy = 0;
 		add(button_expand, gbc_button_expand);
 		
 		CheckBoxList.StateObserver[] a = new CheckBoxList.StateObserver[li.size()];
@@ -124,7 +126,7 @@ public class ListPanel extends JPanel implements StateObserver{
 	 */
 	public void expand(){
 		if(!expanded){
-			button_expand.setText("-");
+			button_expand.setIcon(ScyllaGUI.ICON_COLLAPSE);
 			button_expand.setToolTipText("Collapse");
 			add(list,gbc_list);
 			revalidate();
@@ -138,7 +140,7 @@ public class ListPanel extends JPanel implements StateObserver{
 	 */
 	public void collapse(){
 		if(expanded){
-			button_expand.setText("+");
+			button_expand.setIcon(ScyllaGUI.ICON_EXPAND);
 			button_expand.setToolTipText("Expand");
 			remove(list);
 			revalidate();
