@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -32,12 +34,16 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.ButtonUI;
+import javax.swing.plaf.ColorUIResource;
 
 import co.paralleluniverse.common.monitoring.LatencyStatsReservoir;
 import de.hpi.bpt.scylla.SimulationManager;
 import de.hpi.bpt.scylla.plugin_loader.PluginLoader;
 import java.awt.SystemColor;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.ScrollPaneConstants;
 /**
  * @author Leon Bein
@@ -161,6 +167,32 @@ public class ScyllaGUI extends JFrame {
 	 * Create the frame.
 	 */
 	public ScyllaGUI() {
+		
+		try {
+			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+				| UnsupportedLookAndFeelException e2) {
+			e2.printStackTrace();
+		}
+
+		UIManager.put("ToolTip.background", ScyllaGUI.ColorField1);
+		UIManager.put("ToolTip.border", 5);
+		UIManager.put("ToolTip.font", ScyllaGUI.DEFAULTFONT);
+
+
+		UIManager.put("Button.background",ScyllaGUI.ColorField1);
+		UIManager.put("Button.select",ScyllaGUI.ColorField0);
+		UIManager.put("Button.focus", new ColorUIResource(new Color(0, 0, 0, 0)));
+
+		UIManager.put("Button.rollover",false);
+
+		
+		UIManager.put("TextField.background", ScyllaGUI.ColorField0);
+		
+		UIManager.put("List.selectionBackground", ScyllaGUI.ColorField1);
+		
+		
+		
 		setTitle("Skylla GUI");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100,WIDTH,HEIGHT);
@@ -180,7 +212,6 @@ public class ScyllaGUI extends JFrame {
 		textfield_CurrentGlobalConfig_info = new JTextField();
 		textfield_CurrentGlobalConfig_info.setHighlighter(null);
 		textfield_CurrentGlobalConfig_info.setFont(TITLEFONT);
-		textfield_CurrentGlobalConfig_info.setBackground(ColorField0);
 		textfield_CurrentGlobalConfig_info.setBounds(COL1, ROW1, WIDTH1, STD);
 		textfield_CurrentGlobalConfig_info.setEditable(false);
 		textfield_CurrentGlobalConfig_info.setText("Current Global Config ");
@@ -189,7 +220,6 @@ public class ScyllaGUI extends JFrame {
 		
 		button_openglobalconfig = new JButton();
 		button_openglobalconfig.setIcon(ICON_MORE);
-		button_openglobalconfig.setBackground(ColorField1);
 		button_openglobalconfig.setFont(DEFAULTFONT);
 		button_openglobalconfig.setToolTipText("Choose other file");
 		button_openglobalconfig.setBounds(COL2 - STD1, ROW2, STD1, STD);
@@ -249,7 +279,6 @@ public class ScyllaGUI extends JFrame {
 		textfield_CurrentBpmnFiles.setEditable(false);
 		textfield_CurrentBpmnFiles.setHighlighter(null);
 		textfield_CurrentBpmnFiles.setFont(TITLEFONT);
-		textfield_CurrentBpmnFiles.setBackground(ColorField0);
 		textfield_CurrentBpmnFiles.setBounds(COL1, ROW4, WIDTH1, STD);
 		textfield_CurrentBpmnFiles.setText("Current BPMN Files");
 		contentPane.add(textfield_CurrentBpmnFiles);
@@ -257,7 +286,6 @@ public class ScyllaGUI extends JFrame {
 		
 		button_addBpmnFile = new JButton("");
 		button_addBpmnFile.setFont(DEFAULTFONT);
-		button_addBpmnFile.setBackground(ColorField1);
 		button_addBpmnFile.setToolTipText("Add BPMN file");
 		button_addBpmnFile.setBounds(COL2 - STD1, ROW5, STD1, STDHEIH);
 		button_addBpmnFile.setIcon(ICON_PLUS);
@@ -277,7 +305,6 @@ public class ScyllaGUI extends JFrame {
 		
 		button_removeBpmnFile = new JButton("");
 		button_removeBpmnFile.setFont(DEFAULTFONT);
-		button_removeBpmnFile.setBackground(ColorField1);
 		button_removeBpmnFile.setToolTipText("Remove selected file(s)");
 		button_removeBpmnFile.setBounds(COL2 - STD1, ROW5+STDHEIH, STD1, STDHEIH);
 		button_removeBpmnFile.addActionListener(new ActionListener() {
@@ -294,7 +321,6 @@ public class ScyllaGUI extends JFrame {
 		textfield_CurrentSimulationFiles.setEditable(false);
 		textfield_CurrentSimulationFiles.setHighlighter(null);
 		textfield_CurrentSimulationFiles.setFont(TITLEFONT);
-		textfield_CurrentSimulationFiles.setBackground(ColorField0);
 		textfield_CurrentSimulationFiles.setBounds(COL1, ROW7, WIDTH1, STD);
 		textfield_CurrentSimulationFiles.setText("Current Simulation Files");
 		textfield_CurrentSimulationFiles.setColumns(10);
@@ -302,7 +328,6 @@ public class ScyllaGUI extends JFrame {
 
 		button_addSimfile = new JButton("");
 		button_addSimfile.setFont(DEFAULTFONT);
-		button_addSimfile.setBackground(ColorField1);
 		button_addSimfile.setToolTipText("Add simulation file");
 		button_addSimfile.setBounds(COL2 - STD1, ROW8, STD1, STDHEIH);
 		button_addSimfile.addActionListener(new ActionListener() {
@@ -321,7 +346,6 @@ public class ScyllaGUI extends JFrame {
 		
 		button_removeSimfile = new JButton("");
 		button_removeSimfile.setFont(DEFAULTFONT);
-		button_removeSimfile.setBackground(ColorField1);
 		button_removeSimfile.setToolTipText("Remove selected file(s)");
 		button_removeSimfile.setBounds(COL2 - STD1, ROW8 + STDHEIH, STD1, STDHEIH);
 		button_removeSimfile.addActionListener(new ActionListener() {
@@ -336,7 +360,6 @@ public class ScyllaGUI extends JFrame {
 		
 		button_StartSimulation = new JButton("Start Simulation");
 		button_StartSimulation.setFont(TITLEFONT);
-		button_StartSimulation.setBackground(ColorField1);
 		button_StartSimulation.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
@@ -374,7 +397,6 @@ public class ScyllaGUI extends JFrame {
 			}
 		});
 		button_OpenLastOutput.setFont(DEFAULTFONT);
-		button_OpenLastOutput.setBackground(ColorField1);
 		button_OpenLastOutput.setBounds(WIDTH/2-WIDTH/10,HEIGHT-HEIGHT/8-STD3+STDHEIH, WIDTH/5, STD/2);
     	button_OpenLastOutput.setEnabled(false);
 		contentPane.add(button_OpenLastOutput);
@@ -431,7 +453,6 @@ public class ScyllaGUI extends JFrame {
 		textfield_Plugins = new JTextField();
 		textfield_Plugins.setHighlighter(null);
 		textfield_Plugins.setFont(TITLEFONT);
-		textfield_Plugins.setBackground(ColorField0);
 		textfield_Plugins.setText("Plugins");
 		textfield_Plugins.setEditable(false);
 		textfield_Plugins.setColumns(10);
@@ -441,7 +462,6 @@ public class ScyllaGUI extends JFrame {
 		textField_Console = new JTextField();
 		textField_Console.setText("Console Output");
 		textField_Console.setFont(TITLEFONT);
-		textField_Console.setBackground(ColorField0);
 		textField_Console.setEditable(false);
 		textField_Console.setColumns(10);
 		textField_Console.setBounds(COL1, ROW9+STD, COL3+WIDTH1-COL1, STD);
@@ -454,7 +474,7 @@ public class ScyllaGUI extends JFrame {
 		console = new JTextArea();
 		console.setHighlighter(null);
 		console.setFont(DEFAULTFONT);
-		console.setBackground(ColorField1);
+		console.setBackground(ColorField2);
 		console.setEditable(false);
 		scrollPane_Console.setViewportView(console);
 		console.setColumns(10);

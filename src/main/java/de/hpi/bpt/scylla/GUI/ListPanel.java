@@ -76,7 +76,6 @@ public class ListPanel extends JPanel implements StateObserver{
 				if(expanded)collapse(); else expand();
 			}
 		});
-		button_expand.setBackground(ScyllaGUI.ColorField1);
 		button_expand.setFont(ScyllaGUI.DEFAULTFONT);
 		button_expand.setFocusPainted(false);
 		GridBagConstraints gbc_button_expand = new GridBagConstraints();
