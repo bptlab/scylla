@@ -480,6 +480,7 @@ public class ScyllaGUI extends JFrame {
 		console = new JTextArea();
 		console.setHighlighter(null);
 		console.setFont(DEFAULTFONT);
+		console.setBackground(ColorField1);
 		console.setEditable(false);
 		scrollPane_Console.setViewportView(console);
 		console.setColumns(10);
