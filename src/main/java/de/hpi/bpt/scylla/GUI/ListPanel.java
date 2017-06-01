@@ -1,6 +1,5 @@
 package de.hpi.bpt.scylla.GUI;
 
-import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -97,13 +96,14 @@ public class ListPanel extends JPanel implements StateObserver{
 		gbc_list.gridwidth = 2;
 		add(list, gbc_list);
 		list.setFont(ScyllaGUI.DEFAULTFONT);
+		list.setForeground(ScyllaGUI.DEFAULTFONT_COLOR);
 		
 		list.setObserver(this);
 		checkbox_title.setSelected(list.anythingSelected());
 		
 		textfield_sub = new JTextField(" ");
 		textfield_sub.setHorizontalAlignment(SwingConstants.LEFT);
-		textfield_sub.setForeground(Color.WHITE);
+		textfield_sub.setForeground(ScyllaGUI.ColorField2);
 		textfield_sub.setBorder(new EmptyBorder(0, 0, 0, 0));
 		textfield_sub.setHighlighter(null);
 		textfield_sub.setEditable(false);

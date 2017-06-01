@@ -95,7 +95,7 @@ public class SimulationManager {
         try {
             SAXBuilder builder = new SAXBuilder();
             
-            if (globalConfigurationFilename == null) {
+            if (globalConfigurationFilename == null || globalConfigurationFilename.isEmpty()) {
                 throw new ScyllaValidationException("No global configuration provided.");
             }
             else {

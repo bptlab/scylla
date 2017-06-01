@@ -1,6 +1,5 @@
 package de.hpi.bpt.scylla.GUI;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 
@@ -43,7 +42,7 @@ public class ScalingCheckBoxIcon implements Icon{
 			g.setColor(ScyllaGUI.ColorField1);
 			g.fillRect(border+xoff,border+yoff, size-2*border+1, size-2*border+1);
 		}else if(checkBoxModel.isSelected()){
-			g.setColor(ScyllaGUI.ColorField0);
+			g.setColor(ScyllaGUI.ColorBackground);
 			g.fillRect(border+xoff,border+yoff, size-2*border+1, size-2*border+1);
 		}
 		

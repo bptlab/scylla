@@ -21,5 +21,6 @@ public class ScalingFileChooser extends JFileChooser{
 			try{c[i].setFont(f);}catch(Exception e){};
 		}
 	}
+	
 
 }
