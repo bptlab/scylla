@@ -1,6 +1,7 @@
 package de.hpi.bpt.scylla.GUI;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Desktop;
 import java.awt.Dimension;
@@ -15,29 +16,33 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.ColorUIResource;
 
 import de.hpi.bpt.scylla.SimulationManager;
+import de.hpi.bpt.scylla.logger.DebugLogger;
 import de.hpi.bpt.scylla.plugin_loader.PluginLoader;
 /**
  * @author Leon Bein
@@ -76,6 +81,7 @@ public class ScyllaGUI extends JFrame {
 	public static final Color DEFAULTFONT_COLOR = new Color(0,0,0);
 	public static final Font TITLEFONT = new Font(DEFAULTFONT.getFontName(), Font.PLAIN, (int)(20.0*SCALE));
 	public static final Color TITLEFONT_COLOR = new Color(255,255,255);
+	public static final Font CONSOLEFONT = new Font("Consolas",Font.PLAIN,(int)(14.0*SCALE));
 
 	private static int STD = HEIGHT/24;
 	private static int STD1 = WIDTH/32;
@@ -109,6 +115,8 @@ public class ScyllaGUI extends JFrame {
 	public static final ImageIcon ICON_EXPAND = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/expand.png")),DEFAULTFONT.getSize(),DEFAULTFONT.getSize());
 	public static final ImageIcon ICON_COLLAPSE = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/collapse.png")),DEFAULTFONT.getSize(),DEFAULTFONT.getSize());
 	
+	public static final ImageIcon ICON_OPTIONS = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/options.png")),STD1/2,STD1/2);
+	
 	
 
 	private JPanel contentPane;
@@ -134,13 +142,19 @@ public class ScyllaGUI extends JFrame {
 
 	private JButton button_StartSimulation;
 	private Container panel_plugins;
+	
 	private JTextField textField_Console;
-	private JTextArea console;
-
-
+	private Console console;
 	private JScrollPane scrollPane_Console;
+	private PrintStream stdErr;
+	
 	private JButton button_OpenLastOutput;
 	private String lastOutPutFolder;
+	private JButton button_AdvancedOptions;
+	private JPanel panel_AdvancedOptions;
+	private JCheckBox checkbox_debug;
+	private JCheckBox checkbox_desmoj;
+	private JButton button_allplugins;
 
 	/**
 	 * Launch the application.
@@ -383,7 +397,7 @@ public class ScyllaGUI extends JFrame {
 						);
 			}
 		});
-		button_StartSimulation.setBounds(WIDTH/2-WIDTH/10,HEIGHT-HEIGHT/8-STD3, WIDTH/5, STDHEIH);
+		button_StartSimulation.setBounds(WIDTH/2-WIDTH/10,HEIGHT-HEIGHT/8-STD3, WIDTH/5-STD1, STDHEIH);
 		contentPane.add(button_StartSimulation);
 		
 		
@@ -399,9 +413,46 @@ public class ScyllaGUI extends JFrame {
 			}
 		});
 		button_OpenLastOutput.setFont(DEFAULTFONT);
-		button_OpenLastOutput.setBounds(WIDTH/2-WIDTH/10,HEIGHT-HEIGHT/8-STD3+STDHEIH, WIDTH/5, STD/2);
+		button_OpenLastOutput.setBounds(WIDTH/2-WIDTH/10,HEIGHT-HEIGHT/8-STD3+STDHEIH, WIDTH/5-STD1, STD/2);
     	button_OpenLastOutput.setEnabled(false);
 		contentPane.add(button_OpenLastOutput);
+		
+		
+		button_AdvancedOptions = new JButton("");
+		button_AdvancedOptions.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				panel_AdvancedOptions.setVisible(!panel_AdvancedOptions.isVisible());
+			}
+		});
+		button_AdvancedOptions.setToolTipText("Show Advanced Simulation Options");
+		button_AdvancedOptions.setIcon(ICON_OPTIONS);
+		button_AdvancedOptions.setBounds(WIDTH/2+WIDTH/10-STD1,HEIGHT-HEIGHT/8-STD3, STD1, STDHEIH+STD/2);
+		contentPane.add(button_AdvancedOptions);
+		
+		panel_AdvancedOptions = new JPanel();
+		panel_AdvancedOptions.setBounds(WIDTH/2+WIDTH/10, HEIGHT-HEIGHT/8-STD3, WIDTH/10, STDHEIH+STD/2);
+		
+		
+		
+		contentPane.add(panel_AdvancedOptions);
+		panel_AdvancedOptions.setLayout(new BoxLayout(panel_AdvancedOptions, BoxLayout.Y_AXIS));
+		panel_AdvancedOptions.setVisible(false);
+		
+		checkbox_debug = new JCheckBox("Debug Mode");
+		checkbox_debug.setHorizontalAlignment(SwingConstants.LEFT);
+		checkbox_debug.setToolTipText("Runs simulation in Debug Mode. Additional output is shown.");
+		checkbox_debug.setFont(DEFAULTFONT);
+		checkbox_debug.setIcon(new ScalingCheckBoxIcon(DEFAULTFONT.getSize()));
+		panel_AdvancedOptions.add(checkbox_debug);
+		
+		checkbox_desmoj = new JCheckBox("Desmoj Output");
+		checkbox_desmoj.setToolTipText("Create Desmoj output files.");
+		checkbox_desmoj.setHorizontalAlignment(SwingConstants.LEFT);
+		checkbox_desmoj.setFont(DEFAULTFONT);
+		checkbox_desmoj.setIcon(new ScalingCheckBoxIcon(DEFAULTFONT.getSize()));
+		panel_AdvancedOptions.add(checkbox_desmoj);
+		
+		
 		
 		scrollPane_plugins = new JScrollPane();
 		scrollPane_plugins.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -450,6 +501,21 @@ public class ScyllaGUI extends JFrame {
 		scrollPane_plugins.setViewportView(panel_plugins);
 		scrollPane_plugins.getViewport().setBackground(ColorField2);
 		
+		
+		button_allplugins = new JButton("Select/Deselect all");
+		button_allplugins.addActionListener(new ActionListener() {
+			boolean b = false;
+			public void actionPerformed(ActionEvent arg0) {
+				for(Component c : panel_plugins.getComponents()){
+					if(c instanceof ListPanel)((ListPanel)c).setSelected(b);
+				}
+				b = !b;
+			}
+		});
+		button_allplugins.setToolTipText("Select/Deselect all plugins");
+		button_allplugins.setFont(DEFAULTFONT);
+		scrollPane_plugins.setColumnHeaderView(button_allplugins);
+		
 
 		
 		textfield_Plugins = new JTextField();
@@ -477,55 +543,57 @@ public class ScyllaGUI extends JFrame {
 		scrollPane_Console.setBounds(COL1, ROW9+2*STD, COL3+WIDTH1-COL1, HEIGHT-HEIGHT/8-STD3 - (ROW9+3*STD));
 		contentPane.add(scrollPane_Console);
 		
-		console = new JTextArea();
+		console = new Console();
 		console.setHighlighter(null);
-		console.setFont(DEFAULTFONT);
+		console.setFont(CONSOLEFONT);
 		console.setBackground(ColorField1);
 		console.setEditable(false);
 		scrollPane_Console.setViewportView(console);
-		console.setColumns(10);
 		console.setMargin(LEFTMARGIN);
 		
 
+
 		
-		System.setOut(
-				new PrintStream(new OutputStream(){
-					@Override
-					public void write(int c) throws IOException {
-						console.append(String.valueOf((char)c));
-						console.setCaretPosition(console.getText().length());
-					}
-					
-				})
-		);
+
+		System.setOut(console.getOut());
+    	stdErr = System.err;
 		
 
 		
 	}
 
 	private void startSimulation(String resFilename, String[] bpmnFilename, String[] simFilenames) {
- 
-    	
+
+        button_StartSimulation.setEnabled(false);
+        
+    	boolean enableDebugLogging = checkbox_debug.isSelected();
+        boolean redirectErrors = checkbox_debug.isSelected();
+        boolean enableDesmojLogging = checkbox_desmoj.isSelected();
+        
+        DebugLogger.allowDebugLogging = enableDebugLogging;
+        if(redirectErrors) System.setErr(console.getErr());
+        else System.setErr(stdErr);
+        
         boolean enableBpsLogging = true;
-        boolean enableDesmojLogging = true;
         
         boolean success = true;
 
         SimulationManager manager = new SimulationManager(OUTPUTFILEPATH, bpmnFilename, simFilenames, resFilename,
                 enableBpsLogging, enableDesmojLogging);
-        button_StartSimulation.setEnabled(false);
         try{
+        	System.out.println("Starting simulation at "+new SimpleDateFormat("HH:mm:ss").format(new Date()));
             manager.run();
         }catch(Exception e){
         	e.printStackTrace();
         	System.out.println("Fatal error, simulation has been canceled");
         	success = false;
         }
-        System.out.println();
         if(success){
-        	lastOutPutFolder = manager.getOutputPath();
+        	System.out.println("Finished simulation at "+new SimpleDateFormat("HH:mm:ss").format(new Date()));
+            lastOutPutFolder = manager.getOutputPath();
         	button_OpenLastOutput.setEnabled(true);
         }
+        System.out.println();
         button_StartSimulation.setEnabled(true);
 	}
 	

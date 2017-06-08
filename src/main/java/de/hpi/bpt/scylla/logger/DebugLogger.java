@@ -7,6 +7,8 @@ package de.hpi.bpt.scylla.logger;
  *
  */
 public class DebugLogger {
+	
+	public static boolean allowDebugLogging = true;
 
     /**
      * Logs general messages.
@@ -15,7 +17,7 @@ public class DebugLogger {
      *            the message
      */
     public static void log(String message) {
-        System.out.println(message);
+       if(allowDebugLogging)System.out.println("[DEBUG] "+message);
     }
 
     /**

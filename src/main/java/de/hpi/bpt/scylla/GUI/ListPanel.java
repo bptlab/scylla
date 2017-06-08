@@ -163,4 +163,9 @@ public class ListPanel extends JPanel implements StateObserver{
 		return checkbox_title.isSelected();
 	}
 	
+	public void setSelected(boolean b){
+		checkbox_title.setSelected(b);
+		list.setAll(checkbox_title.isSelected());
+	}
+	
 }

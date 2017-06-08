@@ -116,7 +116,6 @@ public class ProcessSimulationComponents {
             desmojDist.setSeed(randomSeed);
             // XXX no conversion of distribution to target unit smallestTimeUnit during runtime required, desmoj does it
             // all
-            System.out.println(this+" puts in a distribution with id "+nodeId);
             distributions.put(nodeId, desmojDist);
         }
     }
