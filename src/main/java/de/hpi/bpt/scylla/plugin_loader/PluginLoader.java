@@ -4,20 +4,30 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.JarURLConnection;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import de.hpi.bpt.scylla.GUI.CheckBoxList.StateObserver;
+import de.hpi.bpt.scylla.logger.DebugLogger;
 import de.hpi.bpt.scylla.plugin_type.IPluggable;
+
 
 /**
  * @author Leon Bein
  */
 public class PluginLoader {
+	
+	
+
 	
 	/**Saves all entry point classes and their plugins*/
 	private HashMap<Class<?>,ArrayList<PluginWrapper>> extensions;
@@ -67,7 +77,7 @@ public class PluginLoader {
 	
 	
 	/**
-	 * Loads all plugins from META-INF/plugins/plugins_list,
+	 * Loads all plugins from all packages from META-INF/plugins/plugins_list,
 	 * gets the corresponding classes 
 	 * and sorts them by their entry point superclasses
 	 * Saves the data to {@link de.hpi.bpt.scylla.plugin_loader.PluginLoader.extensions}
@@ -81,11 +91,11 @@ public class PluginLoader {
 			FileReader fr = new FileReader(plugins_list);
 			BufferedReader br = new BufferedReader(fr);
 
-			ArrayList<String> plugin_classpaths = new ArrayList<String>();
+			ArrayList<String> packages = new ArrayList<String>();
 			
 			String line = null;
 			while ((line = br.readLine()) != null) {
-				plugin_classpaths.add(line);
+				packages.add(line);
 			}
 			
 			br.close();
@@ -94,24 +104,84 @@ public class PluginLoader {
 			//Finding superclasses of plugins and sorting by them
 			extensions = new HashMap<Class<?>,ArrayList<PluginWrapper>>();
 			
-			for(String s : plugin_classpaths){
-				Class<?> plugin = Class.forName(s);
-				if(plugin == null){
-					try{throw new Exception(plugin+" not found");}catch(Exception e){e.printStackTrace();continue;}
+			for(String pack : packages){
+				try{
+					String pack_slash  = pack.replace('.','/')+"/"; 
+					URL packURL = PluginLoader.class.getClassLoader().getResource(pack_slash);
+					if(packURL == null){
+						DebugLogger.error("Error loading plugins: Could not find package "+pack);
+						continue;
+					}
+					String[] classPaths = getFilePaths(packURL, pack);
+					for(int i = 0; i < classPaths.length; i++){
+						String c = classPaths[i];
+						if(!c.endsWith(".class"))continue;
+						c = c.substring(0,c.lastIndexOf(".class"));
+						
+						try{
+							Class<?> plugin = Class.forName(c);
+							if(plugin == null){
+								try{throw new Exception(plugin+" not found");}catch(Exception e){e.printStackTrace();continue;}
+							}
+							Class<?> entry_point = plugin.getSuperclass();
+							if(entry_point == null || !IPluggable.class.isAssignableFrom(entry_point)){
+								//try{throw new Exception(plugin+" is not a valid extension of an entry point");}catch(Exception e){e.printStackTrace();continue;}
+							}else{
+								if(!extensions.containsKey(entry_point))extensions.put(entry_point, new ArrayList<PluginWrapper>());
+								if(!extensions.get(entry_point).contains(plugin))extensions.get(entry_point).add(new PluginWrapper(plugin,true));
+							}
+						}catch(ClassNotFoundException e){
+							e.printStackTrace();
+							continue;
+						}
+	
+					}
+				}catch (IllegalArgumentException e){
+					e.printStackTrace();
+					continue;
 				}
-				Class<?> entry_point = plugin.getSuperclass();
-				if(entry_point == null || !IPluggable.class.isAssignableFrom(entry_point)){
-					try{throw new Exception(plugin+" is not a valid extension of an entry point");}catch(Exception e){e.printStackTrace();continue;}
-				}
-				if(!extensions.containsKey(entry_point))extensions.put(entry_point, new ArrayList<PluginWrapper>());
-				if(!extensions.get(entry_point).contains(plugin))extensions.get(entry_point).add(new PluginWrapper(plugin,true));
 			}
 			
-		} catch (URISyntaxException | IOException | ClassNotFoundException e) {
+		} catch (URISyntaxException | IOException e) {
 			e.printStackTrace();
 		}
 		
 		
+	}
+	
+	private String[] getFilePaths(URL packURL, String packname){
+		String[] paths = null;
+		if(packURL.getProtocol().equals("jar")){
+			JarURLConnection connection;
+			try {
+				connection = (JarURLConnection) packURL.openConnection();
+				JarFile file = connection.getJarFile();
+				Enumeration<JarEntry> en = file.entries();
+				ArrayList<String> filePaths = new ArrayList<String>();
+				while (en.hasMoreElements()) {
+					JarEntry entry = en.nextElement();
+					String c = entry.toString();
+					if(!c.startsWith(packname) || entry.isDirectory())continue;
+					c = c.replace("/",".");
+					filePaths.add(c);
+				}
+				paths = new String[filePaths.size()];
+				return filePaths.toArray(paths);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}else{
+			try {
+				File[] files = new File(packURL.toURI()).listFiles();
+				paths = new String[files.length];
+				for(int i = 0; i < files.length; i++){
+					paths[i] = packname+"."+files[i].getName();
+				}
+			} catch (URISyntaxException e) {
+				e.printStackTrace();
+			}
+		}
+		return paths;
 	}
 	
 

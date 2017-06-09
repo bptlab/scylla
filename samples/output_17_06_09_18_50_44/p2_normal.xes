@@ -1,0 +1,1800 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- This file has been generated with the OpenXES library. It conforms -->
+<!-- to the XML serialization of the XES standard for log storage and -->
+<!-- management. -->
+<!-- XES standard version: 1.0 -->
+<!-- OpenXES library version: 1.0RC7 -->
+<!-- OpenXES is available from http://www.openxes.org/ -->
+<log xes.version="1.0" xes.features="nested-attributes" openxes.version="1.0RC7">
+	<extension name="Organizational" prefix="org" uri="http://www.xes-standard.org/org.xesext"/>
+	<extension name="Time" prefix="time" uri="http://www.xes-standard.org/time.xesext"/>
+	<extension name="Lifecycle" prefix="lifecycle" uri="http://www.xes-standard.org/lifecycle.xesext"/>
+	<extension name="Concept" prefix="concept" uri="http://www.xes-standard.org/concept.xesext"/>
+	<global scope="trace">
+		<string key="concept:name" value="__INVALID__"/>
+	</global>
+	<global scope="event">
+		<string key="concept:name" value="__INVALID__"/>
+		<string key="lifecycle:transition" value="complete"/>
+	</global>
+	<classifier name="MXML Legacy Classifier" keys="concept:name lifecycle:transition"/>
+	<classifier name="Event Name" keys="concept:name"/>
+	<classifier name="Resource" keys="org:resource"/>
+	<classifier name="Event Name AND Resource" keys="concept:name org:resource"/>
+	<string key="description" value="Log file created in Scylla"/>
+	<string key="lifecycle:model" value="standard"/>
+	<string key="source" value="Scylla"/>
+	<string key="concept:name" value="Process_2"/>
+	<trace>
+		<string key="concept:name" value="1"/>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-01T11:00:00.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-01T11:00:00.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Student_Dieter"/>
+			<date key="time:timestamp" value="2016-08-01T11:00:00.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Student_Dieter"/>
+			<date key="time:timestamp" value="2016-08-01T14:57:46.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Christian"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-01T14:57:46.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Christian"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-01T15:30:29.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be so sad"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-01T15:30:29.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be so sad"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-01T17:10:29.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0pagive"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-01T17:10:29.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0pagive"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-01T17:10:29.000+02:00"/>
+		</event>
+	</trace>
+	<trace>
+		<string key="concept:name" value="2"/>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-01T11:29:14.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-01T11:29:14.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Anna"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-01T11:29:14.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Anna"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-01T15:15:22.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Bernd"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-01T15:15:22.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Bernd"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-01T15:38:06.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-01T15:38:06.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-01T16:07:06.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-01T16:07:06.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-01T16:07:06.000+02:00"/>
+		</event>
+	</trace>
+	<trace>
+		<string key="concept:name" value="3"/>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-01T14:45:53.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-01T14:45:53.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Student_Eva"/>
+			<date key="time:timestamp" value="2016-08-01T14:45:53.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Student_Eva"/>
+			<date key="time:timestamp" value="2016-08-01T18:32:59.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Student_Dieter"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-01T18:32:59.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Student_Dieter"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-01T18:50:21.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-01T18:50:21.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-01T19:12:21.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-01T19:12:21.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-01T19:12:21.000+02:00"/>
+		</event>
+	</trace>
+	<trace>
+		<string key="concept:name" value="4"/>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-01T20:47:28.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-01T20:47:28.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Anna"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-01T20:47:28.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Anna"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-02T01:25:57.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Bernd"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-02T01:25:57.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Bernd"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-02T01:47:53.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-02T01:47:53.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-02T02:06:53.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-02T02:06:53.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-02T02:06:53.000+02:00"/>
+		</event>
+	</trace>
+	<trace>
+		<string key="concept:name" value="5"/>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-02T00:23:51.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-02T00:23:51.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Christian"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-02T00:23:51.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Christian"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-02T04:57:33.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Bernd"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-02T04:57:33.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Bernd"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-02T05:25:33.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-02T05:25:33.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-02T05:47:33.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-02T05:47:33.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-02T05:47:33.000+02:00"/>
+		</event>
+	</trace>
+	<trace>
+		<string key="concept:name" value="6"/>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-02T01:56:32.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-02T01:56:32.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Student_Eva"/>
+			<date key="time:timestamp" value="2016-08-02T01:56:32.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Student_Eva"/>
+			<date key="time:timestamp" value="2016-08-02T06:00:05.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Bernd"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-02T06:00:05.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Bernd"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-02T06:24:43.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be so sad"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-02T06:24:43.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be so sad"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-02T08:04:43.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0pagive"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-02T08:04:43.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0pagive"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-02T08:04:43.000+02:00"/>
+		</event>
+	</trace>
+	<trace>
+		<string key="concept:name" value="7"/>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-02T02:12:06.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-02T02:12:06.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Student_Dieter"/>
+			<date key="time:timestamp" value="2016-08-02T02:12:06.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Student_Dieter"/>
+			<date key="time:timestamp" value="2016-08-02T05:58:03.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Christian"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-02T05:58:03.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Christian"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-02T06:32:37.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-02T06:32:37.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-02T06:57:37.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-02T06:57:37.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-02T06:57:37.000+02:00"/>
+		</event>
+	</trace>
+	<trace>
+		<string key="concept:name" value="8"/>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-02T04:47:05.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-02T04:47:05.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Anna"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-02T04:47:05.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Anna"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-02T08:49:55.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Bernd"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-02T08:49:55.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Bernd"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-02T09:15:24.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-02T09:15:24.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-02T09:46:24.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-02T09:46:24.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-02T09:46:24.000+02:00"/>
+		</event>
+	</trace>
+	<trace>
+		<string key="concept:name" value="9"/>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-02T07:04:54.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-02T07:04:54.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Student_Dieter"/>
+			<date key="time:timestamp" value="2016-08-02T07:04:54.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Student_Dieter"/>
+			<date key="time:timestamp" value="2016-08-02T11:40:37.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Anna"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-02T11:40:37.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Anna"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-02T12:10:58.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-02T12:10:58.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-02T12:33:58.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-02T12:33:58.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-02T12:33:58.000+02:00"/>
+		</event>
+	</trace>
+	<trace>
+		<string key="concept:name" value="10"/>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-02T08:00:39.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-02T08:00:39.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Student_Eva"/>
+			<date key="time:timestamp" value="2016-08-02T08:00:39.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Student_Eva"/>
+			<date key="time:timestamp" value="2016-08-02T11:57:51.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Bernd"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-02T11:57:51.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Bernd"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-02T12:19:53.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-02T12:19:53.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-02T12:43:53.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-02T12:43:53.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-02T12:43:53.000+02:00"/>
+		</event>
+	</trace>
+	<trace>
+		<string key="concept:name" value="11"/>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-02T11:34:24.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-02T11:34:24.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Christian"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-02T11:34:24.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Christian"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-02T16:08:41.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Student_Dieter"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-02T16:08:41.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Student_Dieter"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-02T16:27:57.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-02T16:27:57.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-02T16:54:57.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-02T16:54:57.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-02T16:54:57.000+02:00"/>
+		</event>
+	</trace>
+	<trace>
+		<string key="concept:name" value="12"/>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-02T16:26:32.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-02T16:26:32.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Student_Eva"/>
+			<date key="time:timestamp" value="2016-08-02T16:26:32.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Student_Eva"/>
+			<date key="time:timestamp" value="2016-08-02T20:23:11.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Christian"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-02T20:23:11.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Christian"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-02T20:50:42.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-02T20:50:42.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-02T21:12:42.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-02T21:12:42.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-02T21:12:42.000+02:00"/>
+		</event>
+	</trace>
+	<trace>
+		<string key="concept:name" value="13"/>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-02T18:07:14.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-02T18:07:14.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Anna"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-02T18:07:14.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Anna"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-02T21:48:33.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<string key="org:resource" value="Student_Eva"/>
+			<date key="time:timestamp" value="2016-08-02T21:48:33.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<string key="org:resource" value="Student_Eva"/>
+			<date key="time:timestamp" value="2016-08-02T22:25:41.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be so sad"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-02T22:25:41.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be so sad"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-03T03:25:41.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0pagive"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-03T03:25:41.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0pagive"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-03T03:25:41.000+02:00"/>
+		</event>
+	</trace>
+	<trace>
+		<string key="concept:name" value="14"/>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-02T18:11:24.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-02T18:11:24.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Bernd"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-02T18:11:24.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Bernd"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-02T22:06:24.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Christian"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-02T22:06:24.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Christian"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-02T22:30:07.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-02T22:30:07.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-02T22:50:07.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-02T22:50:07.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-02T22:50:07.000+02:00"/>
+		</event>
+	</trace>
+	<trace>
+		<string key="concept:name" value="15"/>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-02T21:05:47.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-02T21:05:47.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Student_Dieter"/>
+			<date key="time:timestamp" value="2016-08-02T21:05:47.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Student_Dieter"/>
+			<date key="time:timestamp" value="2016-08-03T00:33:41.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Anna"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-03T00:33:41.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Anna"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-03T00:51:35.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-03T00:51:35.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-03T01:16:35.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-03T01:16:35.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-03T01:16:35.000+02:00"/>
+		</event>
+	</trace>
+	<trace>
+		<string key="concept:name" value="16"/>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-03T02:46:13.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-03T02:46:13.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Bernd"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-03T02:46:13.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Bernd"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-03T06:59:04.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<string key="org:resource" value="Student_Eva"/>
+			<date key="time:timestamp" value="2016-08-03T06:59:04.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<string key="org:resource" value="Student_Eva"/>
+			<date key="time:timestamp" value="2016-08-03T07:17:37.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-03T07:17:37.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-03T07:51:37.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-03T07:51:37.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-03T07:51:37.000+02:00"/>
+		</event>
+	</trace>
+	<trace>
+		<string key="concept:name" value="17"/>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-03T08:02:57.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-03T08:02:57.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Christian"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-03T08:02:57.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Christian"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-03T11:51:47.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Anna"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-03T11:51:47.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Anna"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-03T12:27:11.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-03T12:27:11.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-03T12:50:11.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-03T12:50:11.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-03T12:50:11.000+02:00"/>
+		</event>
+	</trace>
+	<trace>
+		<string key="concept:name" value="18"/>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-03T08:13:56.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-03T08:13:56.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Student_Dieter"/>
+			<date key="time:timestamp" value="2016-08-03T08:13:56.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Student_Dieter"/>
+			<date key="time:timestamp" value="2016-08-03T12:04:53.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Bernd"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-03T12:04:53.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Bernd"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-03T12:17:43.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be so sad"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-03T12:17:43.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be so sad"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-03T13:57:43.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0pagive"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-03T13:57:43.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0pagive"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-03T13:57:43.000+02:00"/>
+		</event>
+	</trace>
+	<trace>
+		<string key="concept:name" value="19"/>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-03T19:02:46.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-03T19:02:46.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Christian"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-03T19:02:46.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Christian"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-03T22:52:21.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Bernd"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-03T22:52:21.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Bernd"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-03T23:07:42.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-03T23:07:42.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-03T23:26:42.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-03T23:26:42.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-03T23:26:42.000+02:00"/>
+		</event>
+	</trace>
+	<trace>
+		<string key="concept:name" value="20"/>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-04T02:39:50.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-04T02:39:50.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Anna"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-04T02:39:50.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Anna"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-04T06:42:03.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Bernd"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-04T06:42:03.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Bernd"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-04T07:12:29.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-04T07:12:29.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-04T07:32:29.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-04T07:32:29.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-04T07:32:29.000+02:00"/>
+		</event>
+	</trace>
+	<trace>
+		<string key="concept:name" value="21"/>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-04T03:34:28.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-04T03:34:28.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Christian"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-04T03:34:28.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Christian"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-04T07:24:21.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Bernd"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-04T07:24:21.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Bernd"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-04T07:46:06.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-04T07:46:06.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-04T08:18:06.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-04T08:18:06.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-04T08:18:06.000+02:00"/>
+		</event>
+	</trace>
+	<trace>
+		<string key="concept:name" value="22"/>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-04T07:15:26.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-04T07:15:26.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Anna"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-04T07:15:26.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Anna"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-04T11:28:35.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Anna"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-04T11:28:35.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Anna"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-04T11:52:21.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-04T11:52:21.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-04T12:07:21.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-04T12:07:21.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-04T12:07:21.000+02:00"/>
+		</event>
+	</trace>
+	<trace>
+		<string key="concept:name" value="23"/>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-04T10:08:35.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-04T10:08:35.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Christian"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-04T10:08:35.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Christian"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-04T13:59:49.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Christian"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-04T13:59:49.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Christian"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-04T14:30:02.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-04T14:30:02.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-04T14:47:02.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-04T14:47:02.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-04T14:47:02.000+02:00"/>
+		</event>
+	</trace>
+	<trace>
+		<string key="concept:name" value="24"/>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-04T11:06:19.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-04T11:06:19.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Bernd"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-04T11:06:19.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Bernd"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-04T14:50:41.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Christian"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-04T14:50:41.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Christian"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-04T15:17:29.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-04T15:17:29.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-04T15:44:29.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-04T15:44:29.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-04T15:44:29.000+02:00"/>
+		</event>
+	</trace>
+	<trace>
+		<string key="concept:name" value="25"/>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-04T12:59:45.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-04T12:59:45.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Anna"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-04T12:59:45.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Anna"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-04T16:30:01.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Christian"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-04T16:30:01.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Christian"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-04T16:56:54.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-04T16:56:54.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-04T17:17:54.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-04T17:17:54.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-04T17:17:54.000+02:00"/>
+		</event>
+	</trace>
+	<trace>
+		<string key="concept:name" value="26"/>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-04T14:51:30.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-04T14:51:30.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Bernd"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-04T14:51:30.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Bernd"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-04T19:38:45.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<string key="org:resource" value="Student_Eva"/>
+			<date key="time:timestamp" value="2016-08-04T19:38:45.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<string key="org:resource" value="Student_Eva"/>
+			<date key="time:timestamp" value="2016-08-04T19:50:41.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-04T19:50:41.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-04T20:13:41.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-04T20:13:41.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-04T20:13:41.000+02:00"/>
+		</event>
+	</trace>
+	<trace>
+		<string key="concept:name" value="27"/>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-05T03:34:10.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-05T03:34:10.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Student_Dieter"/>
+			<date key="time:timestamp" value="2016-08-05T03:34:10.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Student_Dieter"/>
+			<date key="time:timestamp" value="2016-08-05T08:16:58.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Bernd"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-05T08:16:58.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Bernd"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-05T08:31:22.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-05T08:31:22.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be happy"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-05T08:58:22.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-05T08:58:22.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0t2v6ec"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-05T08:58:22.000+02:00"/>
+		</event>
+	</trace>
+	<trace>
+		<string key="concept:name" value="28"/>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-05T03:43:58.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-05T03:43:58.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Anna"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-05T03:43:58.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Anna"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-05T07:47:47.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Christian"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-05T07:47:47.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Christian"/>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-05T08:23:25.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be so sad"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-05T08:23:25.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="be so sad"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Professor_Gerd"/>
+			<date key="time:timestamp" value="2016-08-05T10:03:25.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0pagive"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-05T10:03:25.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="EndEvent_0pagive"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-05T10:03:25.000+02:00"/>
+		</event>
+	</trace>
+	<trace>
+		<string key="concept:name" value="29"/>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-05T12:19:40.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-05T12:19:40.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Student_Eva"/>
+			<date key="time:timestamp" value="2016-08-05T12:19:40.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<string key="org:resource" value="Student_Eva"/>
+			<date key="time:timestamp" value="2016-08-05T16:30:36.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="start"/>
+			<string key="org:resource" value="Student_Dieter"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-05T16:30:36.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="write thesis"/>
+			<string key="lifecycle:transition" value="ate_abort"/>
+			<string key="org:resource" value="Student_Dieter"/>
+			<string key="org:resource" value="Professor_Franz"/>
+			<date key="time:timestamp" value="2016-08-05T17:00:00.000+02:00"/>
+		</event>
+	</trace>
+	<trace>
+		<string key="concept:name" value="30"/>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-05T12:54:41.000+02:00"/>
+		</event>
+		<event>
+			<string key="concept:name" value="StartEvent_1"/>
+			<string key="lifecycle:transition" value="complete"/>
+			<date key="time:timestamp" value="2016-08-05T12:54:41.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Anna"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="start"/>
+			<date key="time:timestamp" value="2016-08-05T12:54:41.000+02:00"/>
+		</event>
+		<event>
+			<string key="org:resource" value="Student_Anna"/>
+			<string key="concept:name" value="write paper"/>
+			<string key="lifecycle:transition" value="ate_abort"/>
+			<date key="time:timestamp" value="2016-08-05T17:00:00.000+02:00"/>
+		</event>
+	</trace>
+</log>

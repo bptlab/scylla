@@ -20,4 +20,11 @@
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>org.eclipse.m2e.core.maven2Nature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>testsrc</name>
+			<type>2</type>
+			<location>C:/Users/Leon Bein/programming/HIWI/InterfaceTesting/src</location>
+		</link>
+	</linkedResources>
 </projectDescription>
