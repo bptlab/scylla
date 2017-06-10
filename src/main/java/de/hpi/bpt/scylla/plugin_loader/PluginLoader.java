@@ -112,7 +112,10 @@ public class PluginLoader {
 						DebugLogger.error("Error loading plugins: Could not find package "+pack);
 						continue;
 					}
-					String[] classPaths = getFilePaths(packURL, pack);
+					String[] classPaths = 
+							packURL.getProtocol().equals("jar") ?
+							getJarClassPaths(packURL, pack_slash) :
+							getFilePaths(packURL, pack);
 					for(int i = 0; i < classPaths.length; i++){
 						String c = classPaths[i];
 						if(!c.endsWith(".class"))continue;
@@ -149,9 +152,14 @@ public class PluginLoader {
 		
 	}
 	
-	private String[] getFilePaths(URL packURL, String packname){
+	/**
+	 * Gets paths to all classes inside given package inside jar file
+	 * @param packURL URL to package
+	 * @param packname name of package in form superpackage/package/subpackage/
+	 * @return String array of file path in form packname.filename.fileending
+	 */
+	private String[] getJarClassPaths(URL packURL, String pack_slash){
 		String[] paths = null;
-		if(packURL.getProtocol().equals("jar")){
 			JarURLConnection connection;
 			try {
 				connection = (JarURLConnection) packURL.openConnection();
@@ -161,7 +169,7 @@ public class PluginLoader {
 				while (en.hasMoreElements()) {
 					JarEntry entry = en.nextElement();
 					String c = entry.toString();
-					if(!c.startsWith(packname) || entry.isDirectory())continue;
+					if(!c.startsWith(pack_slash) || entry.isDirectory() || !c.endsWith(".class"))continue;
 					c = c.replace("/",".");
 					filePaths.add(c);
 				}
@@ -170,16 +178,25 @@ public class PluginLoader {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}else{
-			try {
-				File[] files = new File(packURL.toURI()).listFiles();
-				paths = new String[files.length];
-				for(int i = 0; i < files.length; i++){
-					paths[i] = packname+"."+files[i].getName();
-				}
-			} catch (URISyntaxException e) {
-				e.printStackTrace();
+		return paths;
+	}
+	
+	/**
+	 * Gets paths to all filenames inside given package 
+	 * @param packURL URL to package
+	 * @param packname name of package in form superpackage.package.subpackage
+	 * @return String array of file path in form packname.filename.fileending
+	 */
+	private String[] getFilePaths(URL packURL, String packname){
+		String[] paths = null;
+		try {
+			File[] files = new File(packURL.toURI()).listFiles();
+			paths = new String[files.length];
+			for(int i = 0; i < files.length; i++){
+				paths[i] = packname+"."+files[i].getName();
 			}
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
 		}
 		return paths;
 	}

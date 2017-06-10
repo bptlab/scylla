@@ -19,7 +19,7 @@ import de.hpi.bpt.scylla.plugin_type.IPluggable;
 public class Crawler {
 	
 	public static void main(String[] args){
-		String p = "org.jdom2.adapters";
+		String p = "de.screencast";
 		String s = p.replace('.','/')+"/";
 		
 		try {

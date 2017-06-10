@@ -241,6 +241,7 @@ public class ScyllaGUI extends JFrame {
 		button_openglobalconfig.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				ScalingFileChooser chooser = new ScalingFileChooser(DEFAULTFILEPATH);
+				chooser.setDialogTitle("Choose global config");
 				chooser.setFont(fileChooserFont);
 				chooser.setPreferredSize(fileChooserDimension);
 				int c = chooser.showDialog(null,"Open");
@@ -306,6 +307,7 @@ public class ScyllaGUI extends JFrame {
 		button_addBpmnFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				ScalingFileChooser chooser = new ScalingFileChooser(DEFAULTFILEPATH);
+				chooser.setDialogTitle("Add business process diagram");
 				int c = chooser.showDialog(null,"Open");
 				if(c == ScalingFileChooser.APPROVE_OPTION){
 					DefaultListModel<String> m = (DefaultListModel<String>) list_CurrentBpmnFiles.getModel();
@@ -349,6 +351,7 @@ public class ScyllaGUI extends JFrame {
 		button_addSimfile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				ScalingFileChooser chooser = new ScalingFileChooser(DEFAULTFILEPATH);
+				chooser.setDialogTitle("Add simulation file");
 				int c = chooser.showDialog(null,"Open");
 				if(c == ScalingFileChooser.APPROVE_OPTION){
 					DefaultListModel<String> m = (DefaultListModel<String>) list_CurrentSimFiles.getModel();
