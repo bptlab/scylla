@@ -1,4 +1,4 @@
-package de.hpi.bpt.scylla.plugin.statslogger;
+package de.hpi.bpt.scylla.plugin.statslogger_nojar;
 
 class StatisticsResourceObject {
 
