@@ -157,6 +157,7 @@ public class XESLogger extends OutputLoggerPluggable {
                 fos = new FileOutputStream(outputPathWithoutExtension + fileNameWithoutExtension + ".xes");
             }
             serializer.serialize(log, fos);
+            fos.close();
         }
     }
 

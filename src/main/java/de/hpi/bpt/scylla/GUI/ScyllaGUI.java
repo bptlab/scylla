@@ -54,7 +54,7 @@ public class ScyllaGUI extends JFrame {
 	
 	
 	private static final String DEFAULTFILEPATH = "samples\\";
-	private static final String OUTPUTFILEPATH = "desmoj_output\\";
+	private static final String DESMOJOUTPUTPATH = "desmoj_output\\";
 	
 
 	public static final Color ColorField0 = new Color(45,112,145);
@@ -62,10 +62,8 @@ public class ScyllaGUI extends JFrame {
 	public static final Color ColorField2 = new Color(255,255,255);
 	public static final Color ColorBackground = new Color(0,142,185);
 
-	
 	private static GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
 	private static java.awt.Rectangle r = env.getMaximumWindowBounds();
-	
 	private static int WIDTH = r.width;//1200
 	private static int HEIGHT = r.height;//900
 	private static double SCALE = HEIGHT/900;
@@ -73,6 +71,7 @@ public class ScyllaGUI extends JFrame {
 //	private static double SCALE = 1;
 //	private static int WIDTH = 1200;//(int)(1200.0 * SCALE);
 //	private static int HEIGHT = 900;//(int)(900 * SCALE);
+	
 	
 	public static final Dimension fileChooserDimension = new Dimension((int)(800.0*SCALE),(int)(500.0*SCALE));
 	public static final Font fileChooserFont = new Font("Arial", Font.PLAIN, (int)(14.0*SCALE));
@@ -206,7 +205,7 @@ public class ScyllaGUI extends JFrame {
 		
 		
 		
-		setTitle("Skylla GUI");
+		setTitle("Scylla GUI");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100,WIDTH,HEIGHT);
 		
@@ -471,36 +470,6 @@ public class ScyllaGUI extends JFrame {
 		panel_plugins.setFont(DEFAULTFONT);
 		panel_plugins.setLayout(new GridBagLayout());
 		
-		PluginLoader p = PluginLoader.getDefaultPluginLoader();
-		
-		TreeMap<String, ArrayList<PluginLoader.PluginWrapper>> plugins = new TreeMap<String, ArrayList<PluginLoader.PluginWrapper>>();
-		for(Entry<Class<?>, ArrayList<PluginLoader.PluginWrapper>> e : p.getExtensions().entrySet()){
-			ArrayList<PluginLoader.PluginWrapper> l = e.getValue();
-			for(int i = 0; i < l.size(); i++){
-				PluginLoader.PluginWrapper w = l.get(i);
-				String name = w.getPackage().getName();
-				if(!plugins.containsKey(name))plugins.put(name,new ArrayList<PluginLoader.PluginWrapper>());
-				plugins.get(name).add(w);
-			}
-		}
-		
-		int i = 0;
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.anchor = GridBagConstraints.PAGE_START;
-		gbc.weightx = 1.0;
-		gbc.weighty = 0;
-		gbc.ipady = 0;
-		for(Entry<String, ArrayList<PluginLoader.PluginWrapper>> e : plugins.entrySet()){
-			ListPanel listpanel = new ListPanel(e.getKey(),e.getValue());
-			gbc.gridy = i;
-			if(i == plugins.entrySet().size()-1)gbc.weighty = 1.0;
-			panel_plugins.add(listpanel,gbc);
-			i++;
-			//gbc.anchor = GridBagConstraints.BASELINE;
-		}
 		scrollPane_plugins.setViewportView(panel_plugins);
 		scrollPane_plugins.getViewport().setBackground(ColorField2);
 		
@@ -554,16 +523,48 @@ public class ScyllaGUI extends JFrame {
 		scrollPane_Console.setViewportView(console);
 		console.setMargin(LEFTMARGIN);
 		
-
-
-		
-
 		System.setOut(console.getOut());
     	stdErr = System.err;
 		
 
+		loadPlugins();
 		
 	}
+
+	private void loadPlugins() {
+		System.setErr(console.getErr());
+		PluginLoader p = PluginLoader.getDefaultPluginLoader();
+		
+		TreeMap<String, ArrayList<PluginLoader.PluginWrapper>> plugins = new TreeMap<String, ArrayList<PluginLoader.PluginWrapper>>();
+		for(Entry<Class<?>, ArrayList<PluginLoader.PluginWrapper>> e : p.getExtensions().entrySet()){
+			ArrayList<PluginLoader.PluginWrapper> l = e.getValue();
+			for(int i = 0; i < l.size(); i++){
+				PluginLoader.PluginWrapper w = l.get(i);
+				String name = w.getPackage().getName();
+				if(!plugins.containsKey(name))plugins.put(name,new ArrayList<PluginLoader.PluginWrapper>());
+				plugins.get(name).add(w);
+			}
+		}
+		
+		int i = 0;
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.anchor = GridBagConstraints.PAGE_START;
+		gbc.weightx = 1.0;
+		gbc.weighty = 0;
+		gbc.ipady = 0;
+		for(Entry<String, ArrayList<PluginLoader.PluginWrapper>> e : plugins.entrySet()){
+			ListPanel listpanel = new ListPanel(e.getKey(),e.getValue());
+			gbc.gridy = i;
+			if(i == plugins.entrySet().size()-1)gbc.weighty = 1.0;
+			panel_plugins.add(listpanel,gbc);
+			i++;
+			//gbc.anchor = GridBagConstraints.BASELINE;
+		}
+	}
+
 
 	private void startSimulation(String resFilename, String[] bpmnFilename, String[] simFilenames) {
 
@@ -581,7 +582,7 @@ public class ScyllaGUI extends JFrame {
         
         boolean success = true;
 
-        SimulationManager manager = new SimulationManager(OUTPUTFILEPATH, bpmnFilename, simFilenames, resFilename,
+        SimulationManager manager = new SimulationManager(DESMOJOUTPUTPATH, bpmnFilename, simFilenames, resFilename,
                 enableBpsLogging, enableDesmojLogging);
         try{
         	System.out.println("Starting simulation at "+new SimpleDateFormat("HH:mm:ss").format(new Date()));

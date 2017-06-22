@@ -260,6 +260,7 @@ public class PluginLoader {
 	
 	
 	/**
+	 * Will load plugins if not loaded!
 	 * @return Default Plugin_loader Object
 	 */
 	public static PluginLoader getDefaultPluginLoader(){
