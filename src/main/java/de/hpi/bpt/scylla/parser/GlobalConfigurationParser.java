@@ -40,9 +40,11 @@ public class GlobalConfigurationParser extends Parser<GlobalConfiguration> {
 
     @Override
     public GlobalConfiguration parse(Element rootElement) throws ScyllaValidationException {
+    	System.out.println(rootElement.getNamespace());
 
         Iterator<EventOrderType> eventOrderTypesIterator = PluginLoader.dGetPlugins(EventOrderType.class);
         //ServiceLoader.load(EventOrderType.class).iterator();
+        //Get all event order type plugins and store them in eventOrderTypes
         Map<String, EventOrderType> eventOrderTypes = new HashMap<String, EventOrderType>();
         while (eventOrderTypesIterator.hasNext()) {
             EventOrderType eot = eventOrderTypesIterator.next();
