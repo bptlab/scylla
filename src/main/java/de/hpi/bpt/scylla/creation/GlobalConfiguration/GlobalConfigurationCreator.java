@@ -29,8 +29,6 @@ public class GlobalConfigurationCreator extends ElementLink{
 	private Document doc;
 	/**Root object of document*/
 	private Element root;
-	/**Scylla namespace TODO remove?*/
-	private Namespace nsp;
 
 	/**List of all resource types*/
 	private List<ResourceType> resourceTypes;

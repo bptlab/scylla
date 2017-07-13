@@ -1,9 +1,8 @@
 package de.hpi.bpt.scylla.creation.SimulationConfiguration;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,8 +19,6 @@ public class SimulationConfigurationCreator extends ElementLink{
 	private Document doc;
 	/**Root object of document*/
 	private Element root;
-	/**Scylla namespace*/
-	private Namespace nsp;
 	
 	/**Start event element*/
 	private StartEvent startEvent;
@@ -39,7 +36,7 @@ public class SimulationConfigurationCreator extends ElementLink{
 		doc = new Document(superroot);
 		root = el;
 		superroot.addContent(root);
-		tasks = new HashMap<String,Task>();
+		tasks = new TreeMap<String,Task>();
 	}
 	
 	/**

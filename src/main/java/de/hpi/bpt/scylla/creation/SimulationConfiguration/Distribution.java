@@ -18,7 +18,7 @@ public class Distribution extends ElementLink{
 		empiricalString("empiricalString", 	"Empirical String", new String[]{"entry"}, 					new AttributeType[]{AttributeType.ENTRYSET}),
 		erlang(			"erlang", 			"Erlang", 			new String[]{"order","mean"}, 			new AttributeType[]{AttributeType.INT,AttributeType.DOUBLE}),
 		exponential(	"exponential", 		"Exponential", 		new String[]{"mean"}, 					new AttributeType[]{AttributeType.DOUBLE}),
-		triangular(		"triangular", 		"Triangluar", 		new String[]{"lower","upper","peek"}, 	new AttributeType[]{AttributeType.DOUBLE,AttributeType.DOUBLE,AttributeType.DOUBLE}),
+		triangular(		"triangular", 		"Triangluar", 		new String[]{"lower","peak","upper"}, 	new AttributeType[]{AttributeType.DOUBLE,AttributeType.DOUBLE,AttributeType.DOUBLE}),
 		normal(			"normal", 			"Normal", 			new String[]{"mean","standardDeviation"}, new AttributeType[]{AttributeType.DOUBLE,AttributeType.DOUBLE}),
 		poisson(		"poisson", 			"Poisson", 			new String[]{"mean"}, 					new AttributeType[]{AttributeType.DOUBLE}),
 		uniform(		"uniform", 			"Uniform", 			new String[]{"lower","upper"}, 			new AttributeType[]{AttributeType.DOUBLE,AttributeType.DOUBLE})

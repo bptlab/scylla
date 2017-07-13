@@ -11,7 +11,6 @@ import java.util.concurrent.TimeUnit;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
-import org.jdom2.Namespace;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
@@ -24,6 +23,7 @@ import de.hpi.bpt.scylla.creation.SimulationConfiguration.Distribution;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.Distribution.DistributionType;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.SimulationConfigurationCreator;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.Task;
+import de.hpi.bpt.scylla.model.configuration.distribution.TriangularDistribution;
 
 //TODO delete
 public class JDomTestClass {
@@ -34,7 +34,8 @@ public class JDomTestClass {
 	
 	public static void createEmpty(){
 		
-		
+
+	      FileWriter writer;
 		
 //		Namespace nsp = Namespace.getNamespace("bsim","http://bsim.hpi.uni-potsdam.de/scylla/simModel");
 //		
@@ -92,17 +93,16 @@ public class JDomTestClass {
 //		
 //		c.validate();
 //		
-//		FileWriter writer;
-//		try {
-//			writer = new FileWriter("testFile.xml");
-//	        XMLOutputter outputter = new XMLOutputter();
-//	        outputter.setFormat(Format.getPrettyFormat());
-//	        outputter.output(c.getDoc(), writer);
-//	        outputter.output(c.getDoc(), System.out);
-//	        //writer.close();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
+		try {
+			writer = new FileWriter("testFile.xml");
+	        XMLOutputter outputter = new XMLOutputter();
+	        outputter.setFormat(Format.getPrettyFormat());
+	        outputter.output(c.getDoc(), writer);
+	        outputter.output(c.getDoc(), System.out);
+	        //writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
 
 		
@@ -128,17 +128,34 @@ public class JDomTestClass {
         
 		Distribution testDistribution = new Distribution(DistributionType.binomial);
 		testDistribution.setAttribute("amount",5);
-		testDistribution.setAttribute(0, 2.3);
+		testDistribution.setAttribute(0, 0.2);
 		s.getStartEvent().setArrivalRateDistribution(testDistribution);
 		
 		Task t = s.getTask("Task_1tvvo6w");
 		t.setDurationDistribution(new Distribution(DistributionType.constant));
 		t.getDurationDistribution().setAttribute("constantValue", 100);
 		t.assignResource(student).setAmount(5);
+		t.assignResource(prof).setAmount(5);
+		
+		t.getResource("Student").setAmount(13);
+		t.deassignResource(prof.getId());
+		t.getResource(student.getId()).setAssignmentPriority(5);
+
+		t.assignResource(prof).setAmount(5);
+		t.getResource("Professor").setAssignmentPriority(0);
+		t.getResource(prof.getId()).removeAssignmentDefinition();
+		t.deassignResource(prof.getId());
+		
+		for(Task task : s.getTasks()){
+			Distribution d = new Distribution(DistributionType.triangular);
+			d.setAttribute(0,11);
+			d.setAttribute(2,33);
+			d.setAttribute("peak",22);
+			task.setDurationDistribution(d);
+			task.assignResource(prof).setAmount(3);
+		}
 		
 		
-		
-      FileWriter writer;
 		try {
 			writer = new FileWriter("testFile2.xml");
 	        XMLOutputter outputter = new XMLOutputter();

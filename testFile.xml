@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bsim:globalConfiguration xmlns:bsim="http://bsim.hpi.uni-potsdam.de/scylla/simModel" targetNamespace="http://www.hpi.de" id="This is an ID">
-  <resourceAssignmentOrder>priority,</resourceAssignmentOrder>
-  <randomSeed>1337</randomSeed>
-  <zoneOffset>+13:37:42</zoneOffset>
-  <timetables>
-    <timetable id="Lazy">
+  <bsim:resourceAssignmentOrder>priority,</bsim:resourceAssignmentOrder>
+  <bsim:randomSeed>1337</bsim:randomSeed>
+  <bsim:zoneOffset>+13:37:42</bsim:zoneOffset>
+  <bsim:timetables>
+    <bsim:timetable id="Lazy">
       <bsim:timetableItem from="THURSDAY" to="FRIDAY" beginTime="13:37" endTime="20:35:37" />
-    </timetable>
-  </timetables>
-  <resourceData>
-    <dynamicResource id="Professor" defaultQuantity="1" defaultCost="41.14" defaultTimeUnit="HOURS" />
-    <dynamicResource id="Student" name="True Hero" defaultTimeUnit="MINUTES" defaultQuantity="100" defaultCost="12.5">
-      <instance name="Anton" cost="50.0" />
-    </dynamicResource>
-  </resourceData>
+    </bsim:timetable>
+  </bsim:timetables>
+  <bsim:resourceData>
+    <bsim:dynamicResource id="Professor" defaultQuantity="1" defaultCost="41.14" defaultTimeUnit="HOURS" />
+    <bsim:dynamicResource id="Student" name="True Hero" defaultTimeUnit="MINUTES" defaultQuantity="100" defaultCost="12.5">
+      <bsim:instance name="Anton" cost="50.0" />
+    </bsim:dynamicResource>
+  </bsim:resourceData>
 </bsim:globalConfiguration>

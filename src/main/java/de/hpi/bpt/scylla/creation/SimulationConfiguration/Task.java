@@ -1,8 +1,6 @@
 package de.hpi.bpt.scylla.creation.SimulationConfiguration;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.TreeMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -37,7 +35,7 @@ public class Task extends ElementLink{
 		
 		resourcesElement = new Element("resources", nsp);
 		el.addContent(resourcesElement);
-		resources = new HashMap<String, Resource>();
+		resources = new TreeMap<String, Resource>();
 	}
 
 
@@ -80,8 +78,8 @@ public class Task extends ElementLink{
 	}
 	
 	public void deassignResource(String id){
-		resources.remove(id);
 		Resource r = resources.get(id);
+		resources.remove(id);
 		if(r != null)r.removeFrom(resourcesElement);
 	}
 
