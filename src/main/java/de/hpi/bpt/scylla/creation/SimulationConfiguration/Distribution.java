@@ -38,6 +38,10 @@ public class Distribution extends ElementLink{
 	
 	private DistributionType type;
 	
+	/**
+	 * Link constructor
+	 * @param toLink
+	 */
 	private Distribution(Element toLink) {
 		super(toLink);
 		try{

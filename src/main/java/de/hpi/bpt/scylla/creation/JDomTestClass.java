@@ -23,6 +23,7 @@ import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.Distribution;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.Distribution.DistributionType;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.SimulationConfigurationCreator;
+import de.hpi.bpt.scylla.creation.SimulationConfiguration.Task;
 
 //TODO delete
 public class JDomTestClass {
@@ -91,16 +92,29 @@ public class JDomTestClass {
 //		
 //		c.validate();
 //		
-        FileWriter writer;
+//		FileWriter writer;
+//		try {
+//			writer = new FileWriter("testFile.xml");
+//	        XMLOutputter outputter = new XMLOutputter();
+//	        outputter.setFormat(Format.getPrettyFormat());
+//	        outputter.output(c.getDoc(), writer);
+//	        outputter.output(c.getDoc(), System.out);
+//	        //writer.close();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+		
+
+		
+        Element r = null;
 		try {
-			writer = new FileWriter("testFile.xml");
-	        XMLOutputter outputter = new XMLOutputter();
-	        outputter.setFormat(Format.getPrettyFormat());
-	        outputter.output(c.getDoc(), writer);
-	        outputter.output(c.getDoc(), System.out);
-	        //writer.close();
-		} catch (IOException e) {
-			e.printStackTrace();
+	        Document doc;
+	        SAXBuilder builder = new SAXBuilder();
+			doc = builder.build("./samples/p2_normal.bpmn");
+	        r = doc.getRootElement();
+		} catch (JDOMException | IOException e1){
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
 		
 		SimulationConfigurationCreator s = new SimulationConfigurationCreator();
@@ -110,24 +124,21 @@ public class JDomTestClass {
 		s.setStartDateTime(ZonedDateTime.parse("2017-07-06T09:00:00.000+02:00"));
 		s.setEndDateTime(ZonedDateTime.parse("2017-07-12T09:00:00.000+02:00"));
 		s.setRandomSeed(1337);
-		
+        s.setModel(r);
+        
 		Distribution testDistribution = new Distribution(DistributionType.binomial);
-		s.el.addContent(testDistribution.el);
 		testDistribution.setAttribute("amount",5);
 		testDistribution.setAttribute(0, 2.3);
+		s.getStartEvent().setArrivalRateDistribution(testDistribution);
 		
-        Document doc;
-		try {
-	        SAXBuilder builder = new SAXBuilder();
-			doc = builder.build("./samples/p2_normal.bpmn");
-	        Element r = doc.getRootElement();
-	        s.setModel(r);
-		} catch (JDOMException | IOException e1){
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		Task t = s.getTask("Task_1tvvo6w");
+		t.setDurationDistribution(new Distribution(DistributionType.constant));
+		t.getDurationDistribution().setAttribute("constantValue", 100);
+		t.assignResource(student).setAmount(5);
 		
-      //FileWriter writer;
+		
+		
+      FileWriter writer;
 		try {
 			writer = new FileWriter("testFile2.xml");
 	        XMLOutputter outputter = new XMLOutputter();

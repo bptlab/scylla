@@ -15,6 +15,7 @@ import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
 import org.jdom2.input.SAXBuilder;
 
+import de.hpi.bpt.scylla.creation.ElementLink;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.ResourceType.ResourceInstance;
 
 /**
@@ -22,7 +23,7 @@ import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator
  * @author Leon Bein
  *
  */
-public class GlobalConfigurationCreator extends GCElementLink{
+public class GlobalConfigurationCreator extends ElementLink{
 	
 	/**jdom2 XML document object of the global configuration*/
 	private Document doc;
@@ -67,7 +68,7 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 	 * @param id
 	 */
 	public void setId(String id){
-		root.setAttribute("id",id);
+		setAttribute("id",id);
 	}
 	
 	/**
@@ -128,7 +129,7 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 	 * @author Leon Bein
 	 *
 	 */
-	public class ResourceType extends GCElementLink{
+	public class ResourceType extends ElementLink{
 		
 		/**Parent object*/
 		public final GlobalConfigurationCreator globalConfigurationCreator = GlobalConfigurationCreator.this;
@@ -146,7 +147,7 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 		private ResourceType(String i){
 			super(new Element("dynamicResource",GlobalConfigurationCreator.this.nsp));
 			id = i;
-			el.setAttribute("id",id);
+			setAttribute("id",id);
 			getResourceData().addContent(el);
 			resourceInstances = new ArrayList<ResourceInstance>();
 		};
@@ -161,14 +162,7 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 			resourceInstances = new ArrayList<ResourceInstance>();
 		}
 		
-		/**
-		 * Sets an attribute with given name to a value object, that is converted by its toString() method
-		 * @param name attribute name
-		 * @param value attribute value
-		 */
-		private void setAttribute(String name, Object value){
-			el.setAttribute(name, value.toString());
-		}
+
 
 		/**Resets the id to a new value, can cause invalidity by duplicate*/
 		public void setId(String id) {
@@ -202,7 +196,7 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 		public String getDefaultTimetableId(){return el.getAttributeValue("defaultTimetableId");}
 		
 		/**Handler class for resource instances*/
-		public class ResourceInstance extends GCElementLink{
+		public class ResourceInstance extends ElementLink{
 			
 			/**Reference to parent resourcetype object*/
 			public final ResourceType resourceType = ResourceType.this;
@@ -228,15 +222,6 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 			private ResourceInstance(Element e){
 				super(e);
 				name = getName();
-			}
-			
-			/**
-			 * Sets a specific attribute to a specific value
-			 * @param name identifying name of the attribute
-			 * @param value value object; will be parsed to string by toString() method
-			 */
-			private void setAttribute(String name, Object value){
-				el.setAttribute(name, value.toString());
 			}
 
 			/**Sets instances unique name, can cause invalidity if not unique*/
@@ -300,7 +285,8 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 		public void removeInstance(String name){
 			ResourceInstance toRem = getInstance(name);
 			if(toRem == null)return;
-			el.removeContent(toRem.getEl());
+			toRem.removeFrom(el);
+			//el.removeContent(toRem.getEl());
 			resourceInstances.remove(toRem);
 		}
 		
@@ -354,7 +340,8 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 		Element resourceData = getResourceData();
 		ResourceType toRem = getResourceType(id);
 		if(toRem == null)return;
-		resourceData.removeContent(toRem.getEl());
+		//resourceData.removeContent(toRem.getEl());
+		toRem.removeFrom(resourceData);
 		resourceTypes.remove(toRem);
 	}
 	
@@ -364,7 +351,7 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 	 * @author Leon Bein
 	 *
 	 */
-	public class Timetable extends GCElementLink{
+	public class Timetable extends ElementLink{
 		/**Reference to parent GCCreator object*/
 		public final GlobalConfigurationCreator globalConfigurationCreator = GlobalConfigurationCreator.this;
 		/**Unique identifier String*/
@@ -383,7 +370,7 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 		private Timetable(String i){
 			super(new Element("timetable",GlobalConfigurationCreator.this.nsp));
 			id = i;
-			el.setAttribute("id",id);
+			setAttribute("id",id);
 			getTimetables().addContent(el);
 			items = new ArrayList<TimetableItem>();
 		}
@@ -399,12 +386,10 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 		}
 		
 		/**Handler class for timetable items*/
-		public class TimetableItem{
+		public class TimetableItem extends ElementLink{
 			
 			/**Reference to parent timetable object*/
 			public final Timetable timetable = Timetable.this;
-			/**Corresponding jdom2 xml element*/
-			private Element el;
 			
 			/**
 			 * Constructor for creating new timetable items or new GCs in general
@@ -414,7 +399,7 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 			 * @param endTime daily end time
 			 */
 			private TimetableItem(DayOfWeek from, DayOfWeek to, LocalTime beginTime, LocalTime endTime){
-				el = new Element("timetableItem",nsp);
+				super(new Element("timetableItem",stdNsp));
 				setAttribute("from", from);
 				setAttribute("to", to);
 				setAttribute("beginTime", beginTime);
@@ -428,16 +413,7 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 			 * @param e xml element to be linked with
 			 */
 			private TimetableItem(Element e){
-				el = e;
-			}
-			
-			/**
-			 * Sets a specific attribute to a specific value
-			 * @param name identifying name of the attribute
-			 * @param value value object; will be parsed to string by toString() method
-			 */
-			private void setAttribute(String name, Object value){
-				el.setAttribute(name, value.toString());
+				super(e);
 			}
 			
 			/**Sets items start day*/
@@ -528,7 +504,8 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 		 * @param i item to be removed
 		 */
 		public void removeItem(TimetableItem i){
-			el.removeContent(i.el);
+			//el.removeContent(i.getEl());
+			i.removeFrom(el);
 			items.remove(i);
 		}
 		
@@ -612,7 +589,8 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 		Element ts = getTimetables();
 		Timetable toRem = getTimetable(id);
 		if(toRem == null)return;
-		ts.removeContent(toRem.getEl());
+		//ts.removeContent(toRem.getEl());
+		toRem.removeFrom(ts);
 		timetables.remove(toRem);
 	}
 	

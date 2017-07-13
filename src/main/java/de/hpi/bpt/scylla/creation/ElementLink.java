@@ -20,4 +20,21 @@ public abstract class ElementLink {
 		nsp = el.getNamespace();
 	}
 	
+	public void addTo(Element e){
+		e.addContent(el);
+	}
+	
+	public void removeFrom(Element e){
+		e.removeContent(el);
+	}
+	
+	/**
+	 * Sets an attribute with given name to a value object, that is converted by its toString() method
+	 * @param name attribute name
+	 * @param value attribute value
+	 */
+	protected void setAttribute(String name, Object value){
+		el.setAttribute(name, value.toString());
+	}
+	
 }

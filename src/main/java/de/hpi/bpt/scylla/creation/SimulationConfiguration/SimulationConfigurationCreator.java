@@ -1,7 +1,11 @@
 package de.hpi.bpt.scylla.creation.SimulationConfiguration;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -18,18 +22,24 @@ public class SimulationConfigurationCreator extends ElementLink{
 	private Element root;
 	/**Scylla namespace*/
 	private Namespace nsp;
-
+	
+	/**Start event element*/
+	private StartEvent startEvent;
+	/**Task list*/
+	private Map<String,Task> tasks;
+	
 	/**
 	 * Public constructor,
-	 * generates new empty SimulationConfiguration
+	 * generates new empty SimulationConfiguration, linked with simulationConfiguration element
 	 */
 	public SimulationConfigurationCreator(){
-		super(new Element("simulationConfiguration",stdNsp));
+		super(new Element("simulationConfiguration", stdNsp));
 		Element superroot = new Element("definitions",nsp);
 		superroot.setAttribute("targetNamespace", "http://www.hpi.de");
 		doc = new Document(superroot);
 		root = el;
 		superroot.addContent(root);
+		tasks = new HashMap<String,Task>();
 	}
 	
 	/**
@@ -38,15 +48,6 @@ public class SimulationConfigurationCreator extends ElementLink{
 	 */
 	public Document getDoc() {
 		return doc;
-	}
-	
-	/**
-	 * Sets an attribute with given name to a value object, that is converted by its toString() method
-	 * @param name attribute name
-	 * @param value attribute value
-	 */
-	private void setAttribute(String name, Object value){
-		root.setAttribute(name, value.toString());
 	}
 
 	public void setId(String id){setAttribute("id", id);}
@@ -61,7 +62,11 @@ public class SimulationConfigurationCreator extends ElementLink{
 	public String getEndDateTime(){return root.getAttributeValue("endDateTime");}
 	//TODO public void setResourceAssignmentOrder(String id){setAttribute("resourceAssignmentOrder", id);}
 	public void setRandomSeed(int seed){setAttribute("randomSeed", seed);}
+	public void removeRandomSeed(){root.removeAttribute("randomSeed");}
 	public String getRandomSeed(){return root.getAttributeValue("randomSeed");}
+	
+	public StartEvent getStartEvent(){return startEvent;}
+	
 	
 	
 	public void setModel(Element modelRoot){
@@ -80,7 +85,7 @@ public class SimulationConfigurationCreator extends ElementLink{
 		for(Element child : process.getChildren()){
 			if(isKnownModelElement(child.getName()))
 				createModelElement(child);
-				System.out.println(child.getQualifiedName());
+				//System.out.println(child.getQualifiedName());
 		}
 	}
 	
@@ -88,7 +93,16 @@ public class SimulationConfigurationCreator extends ElementLink{
     private void createModelElement(Element child) {
 		String name = child.getName();
 		switch(name){
-		//TODO
+		case "startEvent" :
+			startEvent = new StartEvent(child.getAttributeValue("id"));
+			startEvent.addTo(root);
+			break;
+		default :
+			if(name.equals("task") || name.endsWith("Task")){
+				Task t = new Task(child.getAttributeValue("id"),child.getAttributeValue("name"));
+				t.addTo(root);
+				tasks.put(t.getId(),t);
+			}
 		}
 	}
 
@@ -98,6 +112,14 @@ public class SimulationConfigurationCreator extends ElementLink{
                 || name.equals("laneSet") || name.equals("dataObjectReference") || name.equals("ioSpecification")
                 || name.equals("dataObject");
     }
+	
+	public Task getTask(String id){
+		return tasks.get(id);
+	}
+	
+	public Collection<Task> getTasks(){
+		return tasks.values();
+	}
 	
 	
 }
