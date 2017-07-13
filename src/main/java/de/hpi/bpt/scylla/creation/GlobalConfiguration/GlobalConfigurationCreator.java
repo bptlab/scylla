@@ -22,28 +22,28 @@ import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator
  * @author Leon Bein
  *
  */
-public class GlobalConfigurationCreator {
+public class GlobalConfigurationCreator extends GCElementLink{
 	
 	/**jdom2 XML document object of the global configuration*/
 	private Document doc;
 	/**Root object of document*/
 	private Element root;
-	/**Scylla namespace*/
+	/**Scylla namespace TODO remove?*/
 	private Namespace nsp;
 
 	/**List of all resource types*/
 	private List<ResourceType> resourceTypes;
 	/**List of all timetables*/
 	private List<Timetable> timetables;
-	
+
 
 	/**
 	 * Public constructor,
 	 * generates new empty GlobalConfiguration
 	 */
 	public GlobalConfigurationCreator(){
-		nsp = Namespace.getNamespace("bsim","http://bsim.hpi.uni-potsdam.de/scylla/simModel");
-		root = new Element("globalConfiguration",nsp);
+		super(new Element("globalConfiguration",stdNsp));
+		root = el;
 		doc = new Document(root);
 		root.setAttribute("targetNamespace", "http://www.hpi.de");
 
@@ -128,15 +128,13 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 	 * @author Leon Bein
 	 *
 	 */
-	public class ResourceType{
+	public class ResourceType extends GCElementLink{
 		
 		/**Parent object*/
 		public final GlobalConfigurationCreator globalConfigurationCreator = GlobalConfigurationCreator.this;
 		
 		/**Unique identifier*/
 		private String id;
-		/**Corresponding jdom2 XML element*/
-		private Element el;
 		
 		/**List of instance handler objects*/
 		private List<ResourceInstance> resourceInstances;
@@ -146,8 +144,8 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 		 * @param i Unique identifier string
 		 */
 		private ResourceType(String i){
+			super(new Element("dynamicResource",GlobalConfigurationCreator.this.nsp));
 			id = i;
-			el = new Element("dynamicResource",nsp);
 			el.setAttribute("id",id);
 			getResourceData().addContent(el);
 			resourceInstances = new ArrayList<ResourceInstance>();
@@ -158,7 +156,7 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 		 * @param e xml element to be linked with
 		 */
 		private ResourceType(Element e){
-			el = e;
+			super(e);
 			id = el.getAttributeValue("id");
 			resourceInstances = new ArrayList<ResourceInstance>();
 		}
@@ -204,13 +202,11 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 		public String getDefaultTimetableId(){return el.getAttributeValue("defaultTimetableId");}
 		
 		/**Handler class for resource instances*/
-		public class ResourceInstance{
+		public class ResourceInstance extends GCElementLink{
 			
 			/**Reference to parent resourcetype object*/
 			public final ResourceType resourceType = ResourceType.this;
 			
-			/**corresponding jdom2 xml element*/
-			private Element el;
 			/**Instance name, unique identifier*///TODO will #1 crash the system?
 			private String name;
 			
@@ -219,8 +215,8 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 			 * @param n Unique name string
 			 */
 			private ResourceInstance(String n){
+				super(new Element("instance",ResourceType.this.nsp));
 				name = n;
-				el = new Element("instance",nsp);
 				setName(name);
 				resourceType.el.addContent(el);
 			}
@@ -230,7 +226,7 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 			 * @param e xml element to be linked with
 			 */
 			private ResourceInstance(Element e){
-				el = e;
+				super(e);
 				name = getName();
 			}
 			
@@ -304,7 +300,7 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 		public void removeInstance(String name){
 			ResourceInstance toRem = getInstance(name);
 			if(toRem == null)return;
-			el.removeContent(toRem.el);
+			el.removeContent(toRem.getEl());
 			resourceInstances.remove(toRem);
 		}
 		
@@ -358,7 +354,7 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 		Element resourceData = getResourceData();
 		ResourceType toRem = getResourceType(id);
 		if(toRem == null)return;
-		resourceData.removeContent(toRem.el);
+		resourceData.removeContent(toRem.getEl());
 		resourceTypes.remove(toRem);
 	}
 	
@@ -368,11 +364,9 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 	 * @author Leon Bein
 	 *
 	 */
-	public class Timetable{
+	public class Timetable extends GCElementLink{
 		/**Reference to parent GCCreator object*/
 		public final GlobalConfigurationCreator globalConfigurationCreator = GlobalConfigurationCreator.this;
-		/**Corresponding jdom2 xml element*/
-		private Element el;
 		/**Unique identifier String*/
 		private String id;
 
@@ -387,8 +381,8 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 		 * @param i Unique identifier string
 		 */
 		private Timetable(String i){
+			super(new Element("timetable",GlobalConfigurationCreator.this.nsp));
 			id = i;
-			el = new Element("timetable",nsp);
 			el.setAttribute("id",id);
 			getTimetables().addContent(el);
 			items = new ArrayList<TimetableItem>();
@@ -399,7 +393,7 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 		 * @param e xml element to be linked with
 		 */
 		private Timetable(Element e){
-			el = e;
+			super(e);
 			id = el.getAttributeValue("id");
 			items = new ArrayList<TimetableItem>();
 		}
@@ -618,7 +612,7 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 		Element ts = getTimetables();
 		Timetable toRem = getTimetable(id);
 		if(toRem == null)return;
-		ts.removeContent(toRem.el);
+		ts.removeContent(toRem.getEl());
 		timetables.remove(toRem);
 	}
 	
@@ -740,8 +734,9 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 	 * @param d xml document
 	 */
 	private GlobalConfigurationCreator(Element r,Document d){
+		super(r);
 		nsp = Namespace.getNamespace("bsim","http://bsim.hpi.uni-potsdam.de/scylla/simModel");
-		root = r;
+		root = el;
 		doc = d;
 		root.setAttribute("targetNamespace", "http://www.hpi.de");
 

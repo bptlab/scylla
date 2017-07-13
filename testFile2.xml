@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions targetNamespace="http://www.hpi.de">
+  <bsim:simulationConfiguration xmlns:bsim="http://bsim.hpi.uni-potsdam.de/scylla/simModel" id="This is the id" processRef="Process_2" processInstances="10" startDateTime="2017-07-06T09:00+02:00" endDateTime="2017-07-12T09:00+02:00" randomSeed="1337">
+    <bsim:binomialDistribution>
+      <bsim:probability>2.3</bsim:probability>
+      <bsim:amount>5</bsim:amount>
+    </bsim:binomialDistribution>
+  </bsim:simulationConfiguration>
+</definitions>
