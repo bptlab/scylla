@@ -560,6 +560,17 @@ public class DateTimeUtils {
      *            the time instant from which the end datetime is calculated
      * @return the duration of availability
      */
+    /**
+     * Calculates the duration of availability from the start datetime of simulation to the given end datetime (which is
+     * calculated from the provided time instant which describes the time relative to simulation start). The calculation
+     * considers the timetable.
+     * 
+     * @param timetable
+     *            the timetable
+     * @param timeInstant
+     *            the time instant from which the end datetime is calculated
+     * @return the duration of availability
+     */
     public static long getAvailabilityTime(List<TimetableItem> timetable, TimeInstant timeInstant) {
         long availabilityTime = 0;
         ZonedDateTime endDateTime = getDateTime(timeInstant);
@@ -579,10 +590,24 @@ public class DateTimeUtils {
 
             DayOfWeek untilWeekday = item.getWeekdayTo();
             LocalTime untilTime = item.getEndTime();
+            
+            
+            if(isWithin(dateTime, item)){
+            	untilWeekday = endDateTime.getDayOfWeek();
+            	untilTime = endDateTime.toLocalTime();
+            }
+            
             ZonedDateTime dateTimeUntilEnd = getNextOrSameZonedDateTime(dateTime, untilWeekday, untilTime);
 
             DayOfWeek startWeekday = item.getWeekdayFrom();
             LocalTime startTime = item.getBeginTime();
+
+            
+            if(isWithin(dateTime, item)){
+            	startWeekday = dateTime.getDayOfWeek();
+            	startTime = dateTime.toLocalTime();
+            }
+
             ZonedDateTime dateTimeOfStart = getNextOrSameZonedDateTime(dateTime, startWeekday, startTime);
             if (dateTime.compareTo(dateTimeOfStart) < 0) { // i.e. dateTime is before dateTimeOfStart
                 dateTime = dateTimeOfStart;
