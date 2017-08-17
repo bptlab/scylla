@@ -92,9 +92,11 @@ public class BatchLogger extends OutputLoggerPluggable {
         }
         else {
             String resourceUtilizationFileName = outputPathWithoutExtension + model.getGlobalConfiguration().getFileNameWithoutExtension() + "_batchregionstats.txt";
-            File f = new File(resourceUtilizationFileName);
-            f.getParentFile().mkdirs();
-            f.createNewFile();
+            if (System.getProperty("os.name").contains("Linux")) {
+            	File f = new File(resourceUtilizationFileName);
+            	f.getParentFile().mkdirs();
+            	f.createNewFile();
+            }
             PrintWriter writer = new PrintWriter(resourceUtilizationFileName, "UTF-8");
             writer.println(sb.toString());
             writer.close();
