@@ -219,8 +219,8 @@ public class SimulationManager {
             // log process execution
             // log resources, process, tasks
 
-            StringBuilder strb = new StringBuilder(globalConfigurationFilename.substring(0,globalConfigurationFilename.lastIndexOf("\\")+1));
-            outputPath = strb.substring(0,strb.lastIndexOf("\\")+1)+"output_"+new SimpleDateFormat("yy_MM_dd_HH_mm_ss").format(new Date())+"\\";
+            StringBuilder strb = new StringBuilder(globalConfigurationFilename.substring(0,globalConfigurationFilename.lastIndexOf(Scylla.FILEDELIM)+1));
+            outputPath = strb.substring(0,strb.lastIndexOf(Scylla.FILEDELIM)+1)+"output_"+new SimpleDateFormat("yy_MM_dd_HH_mm_ss").format(new Date())+ Scylla.FILEDELIM;
             File outputPathFolder = new File(outputPath);
             if(!outputPathFolder.exists())outputPathFolder.mkdir();
             OutputLoggerPluggable.runPlugins(sm, outputPath);
