@@ -20,7 +20,7 @@ public class Scylla {
          */
 
 
-    	String folder = "samples\\";
+    	String folder = "samples/";
     	String resFilename = folder + "p0_globalconf_without.xml";
 
 
