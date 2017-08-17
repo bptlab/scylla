@@ -10,7 +10,7 @@ package de.hpi.bpt.scylla;
 public class Scylla {
 
     public static void main(String[] args) {
- 
+
         /**
          * BEGIN of simulation scenarios
          */
