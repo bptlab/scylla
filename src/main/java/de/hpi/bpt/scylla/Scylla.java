@@ -9,6 +9,9 @@ package de.hpi.bpt.scylla;
  */
 public class Scylla {
 
+	
+	public static final String FILEDELIM = System.getProperty("os.name").contains("Linux") ? "/" : "\\";
+	
     public static void main(String[] args) {
         /**
          * BEGIN of simulation scenarios
@@ -18,8 +21,7 @@ public class Scylla {
          * Simulation scenarios to test plug-ins.
          */
 
-
-    	String folder = "samples/";
+    	String folder = "samples" + FILEDELIM;
     	String resFilename = folder + "p0_globalconf_without.xml";
 
 
