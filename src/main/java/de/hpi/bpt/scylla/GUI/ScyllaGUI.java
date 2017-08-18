@@ -53,7 +53,7 @@ public class ScyllaGUI extends JFrame {
 	
 	
 	
-	private static final String DEFAULTFILEPATH = "samples\\";
+	private static String DEFAULTFILEPATH = "samples\\";
 	private static final String DESMOJOUTPUTPATH = "desmoj_output\\";
 	
 
@@ -246,6 +246,7 @@ public class ScyllaGUI extends JFrame {
 				int c = chooser.showDialog(null,"Open");
 				if(c == ScalingFileChooser.APPROVE_OPTION){
 					textfield_CurrentGlobalConfig_chosen.setText(chooser.getSelectedFile().getPath());
+					DEFAULTFILEPATH = chooser.getSelectedFile().getPath();
 				}
 			}
 		});
@@ -312,6 +313,7 @@ public class ScyllaGUI extends JFrame {
 					DefaultListModel<String> m = (DefaultListModel<String>) list_CurrentBpmnFiles.getModel();
 					chooser.getSelectedFile();
 					m.addElement(chooser.getSelectedFile().getPath());
+					DEFAULTFILEPATH = chooser.getSelectedFile().getPath();
 				}
 				
 			}
@@ -355,6 +357,7 @@ public class ScyllaGUI extends JFrame {
 				if(c == ScalingFileChooser.APPROVE_OPTION){
 					DefaultListModel<String> m = (DefaultListModel<String>) list_CurrentSimFiles.getModel();
 					m.addElement(chooser.getSelectedFile().getPath());
+					DEFAULTFILEPATH = chooser.getSelectedFile().getPath();
 				}
 				
 			}
