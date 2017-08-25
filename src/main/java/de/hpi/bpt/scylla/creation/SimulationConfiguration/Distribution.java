@@ -14,14 +14,14 @@ public class Distribution extends ElementLink{
 	public enum DistributionType{
 		binomial(		"binomial",			"Binomial", 		new String[]{"probability","amount"}, 	new AttributeType[]{AttributeType.DOUBLE,AttributeType.INT}),
 		constant(		"constant", 		"Constant", 		new String[]{"constantValue"}, 			new AttributeType[]{AttributeType.DOUBLE}),
-		empirical(		"empirical",		"Empirical", 		new String[]{"entry"}, 					new AttributeType[]{AttributeType.ENTRYSET}),
-		empiricalString("empiricalString", 	"Empirical String", new String[]{"entry"}, 					new AttributeType[]{AttributeType.ENTRYSET}),
 		erlang(			"erlang", 			"Erlang", 			new String[]{"order","mean"}, 			new AttributeType[]{AttributeType.INT,AttributeType.DOUBLE}),
 		exponential(	"exponential", 		"Exponential", 		new String[]{"mean"}, 					new AttributeType[]{AttributeType.DOUBLE}),
 		triangular(		"triangular", 		"Triangluar", 		new String[]{"lower","peak","upper"}, 	new AttributeType[]{AttributeType.DOUBLE,AttributeType.DOUBLE,AttributeType.DOUBLE}),
 		normal(			"normal", 			"Normal", 			new String[]{"mean","standardDeviation"}, new AttributeType[]{AttributeType.DOUBLE,AttributeType.DOUBLE}),
 		poisson(		"poisson", 			"Poisson", 			new String[]{"mean"}, 					new AttributeType[]{AttributeType.DOUBLE}),
-		uniform(		"uniform", 			"Uniform", 			new String[]{"lower","upper"}, 			new AttributeType[]{AttributeType.DOUBLE,AttributeType.DOUBLE})
+		uniform(		"uniform", 			"Uniform", 			new String[]{"lower","upper"}, 			new AttributeType[]{AttributeType.DOUBLE,AttributeType.DOUBLE}),
+		empirical(		"empirical",		"Empirical", 		new String[]{"entry"}, 					new AttributeType[]{AttributeType.ENTRYSET}),
+		empiricalString("empiricalString", 	"Empirical String", new String[]{"entry"}, 					new AttributeType[]{AttributeType.ENTRYSET}),
 		;
 		public final String id;
 		public final String displayName;
@@ -57,6 +57,7 @@ public class Distribution extends ElementLink{
 		for(String attribute : type.attributes){
 			el.addContent(new Element(attribute,nsp));
 		}
+		
 	}
 	
 	public void setAttribute(int index, Object value){

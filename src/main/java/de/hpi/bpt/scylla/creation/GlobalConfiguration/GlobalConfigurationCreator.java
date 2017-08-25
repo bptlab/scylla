@@ -757,7 +757,7 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 	/**
 	 * Creates a new GCCreator from an existing GC xml file
 	 * @param path to xml file
-	 * @return new GCCreater
+	 * @return new GCCreator
 	 * @throws JDOMException when errors occur in parsing
 	 * @throws IOException when an I/O error prevents a document from being fully parsed
 	 */
