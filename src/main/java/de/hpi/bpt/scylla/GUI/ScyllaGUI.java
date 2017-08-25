@@ -24,8 +24,10 @@ import javax.swing.plaf.ColorUIResource;
 @SuppressWarnings("serial")
 public class ScyllaGUI extends JFrame {
 	
-	public static final String DEFAULTFILEPATH = "samples\\";
+	
+	public static String DEFAULTFILEPATH = "samples\\";
 	public static final String DESMOJOUTPUTPATH = "desmoj_output\\";
+
 	
 
 	public static final Color ColorField0 = new Color(45,112,145);
@@ -159,8 +161,6 @@ public class ScyllaGUI extends JFrame {
 //		JSeparator separator = new JSeparator();
 //		separator.setBounds(600, 0, 1, 812);
 //		contentPane.add(separator);
-		
-
 		
 		//TODO System.setOut(simulationPane.getConsole().getOut());
     	stdErr = System.err;

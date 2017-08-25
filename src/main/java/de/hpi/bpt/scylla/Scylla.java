@@ -75,7 +75,7 @@ public class Scylla {
 
 
         boolean enableBpsLogging = true;
-        boolean enableDesmojLogging = true;
+        boolean enableDesmojLogging = false;
 
         SimulationManager manager = new SimulationManager(folder, bpmnFilename, simFilenames, resFilename,
                 enableBpsLogging, enableDesmojLogging);
