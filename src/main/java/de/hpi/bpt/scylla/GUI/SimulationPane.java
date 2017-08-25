@@ -126,6 +126,7 @@ public class SimulationPane extends JPanel{
 				int c = chooser.showDialog(null,"Open");
 				if(c == ScalingFileChooser.APPROVE_OPTION){
 					textfield_CurrentGlobalConfig_chosen.setText(chooser.getSelectedFile().getPath());
+					ScyllaGUI.DEFAULTFILEPATH = chooser.getSelectedFile().getPath();
 				}
 			}
 		});
@@ -192,6 +193,7 @@ public class SimulationPane extends JPanel{
 					DefaultListModel<String> m = (DefaultListModel<String>) list_CurrentBpmnFiles.getModel();
 					chooser.getSelectedFile();
 					m.addElement(chooser.getSelectedFile().getPath());
+					ScyllaGUI.DEFAULTFILEPATH = chooser.getSelectedFile().getPath();
 				}
 				
 			}
@@ -235,6 +237,7 @@ public class SimulationPane extends JPanel{
 				if(c == ScalingFileChooser.APPROVE_OPTION){
 					DefaultListModel<String> m = (DefaultListModel<String>) list_CurrentSimFiles.getModel();
 					m.addElement(chooser.getSelectedFile().getPath());
+					ScyllaGUI.DEFAULTFILEPATH = chooser.getSelectedFile().getPath();
 				}
 				
 			}
