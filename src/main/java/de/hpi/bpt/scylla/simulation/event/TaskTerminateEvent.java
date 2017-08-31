@@ -1,7 +1,9 @@
 package de.hpi.bpt.scylla.simulation.event;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import co.paralleluniverse.fibers.SuspendExecution;
@@ -13,6 +15,7 @@ import de.hpi.bpt.scylla.logger.ProcessNodeTransitionType;
 import de.hpi.bpt.scylla.model.process.ProcessModel;
 import de.hpi.bpt.scylla.model.process.graph.exception.NodeNotFoundException;
 import de.hpi.bpt.scylla.model.process.node.TaskType;
+import de.hpi.bpt.scylla.plugin.dataobject.DataObjectField;
 import de.hpi.bpt.scylla.plugin_type.simulation.event.TaskTerminateEventPluggable;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
 import de.hpi.bpt.scylla.simulation.ProcessSimulationComponents;
@@ -38,14 +41,35 @@ public class TaskTerminateEvent extends TaskEvent {
         super(owner, source, simulationTimeOfSource, desmojObjects, processInstance, nodeId);
     }
 
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public void eventRoutine(ProcessInstance processInstance) throws SuspendExecution {
         super.eventRoutine(processInstance);
         SimulationModel model = (SimulationModel) getModel();
         ProcessModel processModel = processInstance.getProcessModel();
         // int processInstanceId = processInstance.getId();
-
-        try {
+       /*try {
+			try {
+				Set<Integer> refferingObjects = processInstance.getProcessModel().getDataObjectsGraph().getTargetObjects(this.getNodeId());
+					Collection<Object> allFields = this.pSimComponents.getExtensionDistributions().get("dataobject").values();
+					for (Object fields : allFields) {
+						Integer i = 0;
+						while (((Map<String, Map<Integer, DataObjectField>>) fields).values().toArray().length - i != 0) {
+							DataObjectField field = (DataObjectField) ((Map<String, Map<Integer, DataObjectField>>) fields).values().toArray()[i];
+							if (refferingObjects.contains(field.getNodeId())){
+								System.out.println(processInstance.getId() + " " + field + " " + field.getDataDistributionWrapper().getSample());
+							}
+							i++;
+						}
+					}
+			} catch (NodeNotFoundException e) {
+				e.printStackTrace();
+			}
+		} catch (ScyllaRuntimeException | ScyllaValidationException e1) {
+			e1.printStackTrace();
+		}*/
+        
+      try {
             ProcessModel subProcess = processModel.getSubProcesses().get(nodeId);
             TaskType type = processModel.getTasks().get(nodeId);
 

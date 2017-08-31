@@ -4,11 +4,18 @@ public class DataObjectField {
 
 	private DataDistributionWrapper distributionWrapper;
 	
-	public DataObjectField(DataDistributionWrapper wrapper) {
+	private Integer NodeId; //DataObject it contains to
+	
+	public DataObjectField(DataDistributionWrapper wrapper, Integer NodeId) {
 		this.distributionWrapper = wrapper;
+		this.NodeId = NodeId;
 	}
 
 	public DataDistributionWrapper getDataDistributionWrapper() {
 		return distributionWrapper;
+	}
+	
+	public Integer getNodeId() {
+		return NodeId;
 	}
 }

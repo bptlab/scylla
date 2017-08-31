@@ -17,6 +17,7 @@ import de.hpi.bpt.scylla.logger.DebugLogger;
 import de.hpi.bpt.scylla.model.process.CommonProcessElements;
 import de.hpi.bpt.scylla.model.process.ProcessModel;
 import de.hpi.bpt.scylla.model.process.graph.Graph;
+import de.hpi.bpt.scylla.model.process.graph.Node;
 import de.hpi.bpt.scylla.model.process.graph.exception.MultipleStartNodesException;
 import de.hpi.bpt.scylla.model.process.graph.exception.NoStartNodeException;
 import de.hpi.bpt.scylla.model.process.graph.exception.NodeNotFoundException;
@@ -444,6 +445,7 @@ public class ProcessModelParser extends Parser<ProcessModel> {
             referencesToBoundaryEvents.get(nodeIdOfAttachedTo).add(nId);
         }
 
+        //System.out.println("-----------NORMALFLOW-------------");
         for (Integer nId : sequenceFlows.keySet()) {
             Element sequenceFlow = sequenceFlows.get(nId);
             String sourceRef = sequenceFlow.getAttributeValue("sourceRef");
@@ -451,21 +453,29 @@ public class ProcessModelParser extends Parser<ProcessModel> {
             int sourceId = identifiersToNodeIds.get(sourceRef);
             int targetId = identifiersToNodeIds.get(targetRef);
             graph.addEdge(sourceId, nId);
+            //System.out.println(identifiers.get(sourceId)+" -> "+identifiers.get(nId)+" -> "+identifiers.get(targetId));
             graph.addEdge(nId, targetId);
         }
-
+        //System.out.println("-----------DATAFLOWOUT-------------");
         for (Integer nId : tasksWithDataInputAssociations.keySet()) {
             List<Element> dataInputAssociations = tasksWithDataInputAssociations.get(nId);
             for (Element elem : dataInputAssociations) {
                 String sourceRef = elem.getChild("sourceRef", bpmnNamespace).getText();
                 if (identifiersToNodeIds.containsKey(sourceRef)) {
                     int dataObjectNodeId = identifiersToNodeIds.get(sourceRef);
+                    //System.out.println(identifiers.get(dataObjectNodeId)+" -> "+identifiers.get(nId));
                     dataObjectsGraph.addEdge(dataObjectNodeId, nId);
+                    Map<Integer, Node<Integer>> nodes = dataObjectsGraph.getNodes();
+                    Node<Integer> currentNode = nodes.get(nId);
+                    currentNode.setId(identifiers.get(nId));   
+                    currentNode = nodes.get(dataObjectNodeId);
+                    currentNode.setId(identifiers.get(dataObjectNodeId));
                 }
                 // String targetRef = elem.getChild("targetRef", bpmnNamespace).getText();
             }
         }
-
+        
+        //System.out.println("-----------DATAFLOWIN-------------");
         for (Integer nId : tasksWithDataOutputAssociations.keySet()) {
             List<Element> dataOutputAssociations = tasksWithDataOutputAssociations.get(nId);
             for (Element elem : dataOutputAssociations) {
@@ -473,7 +483,13 @@ public class ProcessModelParser extends Parser<ProcessModel> {
                 String targetRef = elem.getChild("targetRef", bpmnNamespace).getText();
                 if (identifiersToNodeIds.containsKey(targetRef)) {
                     int dataObjectNodeId = identifiersToNodeIds.get(targetRef);
+                    //System.out.println(identifiers.get(nId)+" -> "+identifiers.get(dataObjectNodeId));
                     dataObjectsGraph.addEdge(nId, dataObjectNodeId);
+                    Map<Integer, Node<Integer>> nodes = dataObjectsGraph.getNodes();
+                    Node<Integer> currentNode = nodes.get(nId);
+                    currentNode.setId(identifiers.get(nId));   
+                    currentNode = nodes.get(dataObjectNodeId);
+                    currentNode.setId(identifiers.get(dataObjectNodeId));
                 }
             }
         }

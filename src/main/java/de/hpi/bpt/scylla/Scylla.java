@@ -35,14 +35,15 @@ public class Scylla {
          * Simulation scenarios to test dmn simulation.
          */
     	
-        String[] bpmnFilename = new String[] { folder + "p2_normal.bpmn"};
-        String[] simFilenames = new String[] { folder + "p2_normal_sim.xml"};
+//        String[] bpmnFilename = new String[] { folder + "p2_normal.bpmn"};
+//        String[] simFilenames = new String[] { folder + "p2_normal_sim.xml"};
 
 
-//         String[] bpmnFilename = new String[] { folder + "p4_parallelx.bpmn" };
+//         String[] bpmnFilename = new String[] { folder + "p4_parallel.bpmn" };
 //         String[] simFilenames = new String[] { folder + "p4_parallel_sim.xml" };
 
-
+      String[] bpmnFilename = new String[] { folder + "p8_normalbpmn_with_dataobject.bpmn"};
+      String[] simFilenames = new String[] { folder + "p8_normalbpmn_with_dataobject_sim.xml"};
 
 
 //        String[] bpmnFilename = new String[] { folder + "p5_batch.bpmn", folder + "p6_return.bpmn" };

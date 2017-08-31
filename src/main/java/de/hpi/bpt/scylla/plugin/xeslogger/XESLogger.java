@@ -50,7 +50,7 @@ public class XESLogger extends OutputLoggerPluggable {
                     .getBpmnFileNameWithoutExtension();
             ZonedDateTime baseDateTime = model.getStartDateTime();
             Map<Integer, List<ProcessNodeInfo>> nodeInfos = model.getProcessNodeInfos().get(processId);
-
+            
             XFactory factory = XFactoryRegistry.instance().currentDefault();
             XLog log = factory.createLog();
 
@@ -105,17 +105,24 @@ public class XESLogger extends OutputLoggerPluggable {
                         attributeMap.put(res, factory.createAttributeLiteral(XOrganizationalExtension.KEY_RESOURCE, res,
                                 organizationalExt));
                     }
+                    
+                   /* Set<String> dataObjects = info.getDataObejcts();
+                    for (String dO : dataObjects) {
+                        attributeMap.put(dO, factory.createAttributeLiteral(XOrganizationalExtension.KEY_RESOURCE, dO,
+                                organizationalExt));
+                    }*/
 
                     ZonedDateTime zonedDateTime = baseDateTime.plus(info.getTimestamp(),
                             DateTimeUtils.getReferenceChronoUnit());
                     Date timestamp = new Date(zonedDateTime.toInstant().toEpochMilli());
                     attributeMap.put(XTimeExtension.KEY_TIMESTAMP,
                             factory.createAttributeTimestamp(XTimeExtension.KEY_TIMESTAMP, timestamp, timeExt));
-
+                    
                     String taskName = info.getTaskName();
                     attributeMap.put(XConceptExtension.KEY_NAME,
                             factory.createAttributeLiteral(XConceptExtension.KEY_NAME, taskName, conceptExt));
-
+                    
+                    
                     ProcessNodeTransitionType transition = info.getTransition();
                     if (transition == ProcessNodeTransitionType.BEGIN
                             || transition == ProcessNodeTransitionType.EVENT_BEGIN) {
