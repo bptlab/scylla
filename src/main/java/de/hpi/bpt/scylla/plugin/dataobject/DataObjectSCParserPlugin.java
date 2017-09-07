@@ -10,7 +10,6 @@ import de.hpi.bpt.scylla.exception.ScyllaValidationException;
 import de.hpi.bpt.scylla.logger.DebugLogger;
 import de.hpi.bpt.scylla.model.configuration.SimulationConfiguration;
 import de.hpi.bpt.scylla.model.configuration.distribution.Distribution;
-import de.hpi.bpt.scylla.model.configuration.distribution.UniformDistribution;
 import de.hpi.bpt.scylla.model.process.ProcessModel;
 import de.hpi.bpt.scylla.parser.SimulationConfigurationParser;
 import de.hpi.bpt.scylla.plugin_type.parser.SimulationConfigurationParserPluggable;
@@ -23,6 +22,7 @@ public class DataObjectSCParserPlugin extends SimulationConfigurationParserPlugg
     }
 
     @Override
+    /* pasrses the datobjects and creates the distWrapper*/
     public Map<String, Object> parse(SimulationConfiguration simulationInput, Element sim)
             throws ScyllaValidationException {
 
@@ -75,7 +75,7 @@ public class DataObjectSCParserPlugin extends SimulationConfigurationParserPlugg
                 		if(fieldElement.getName().endsWith("Distribution")) {
                 			Distribution distribution = SimulationConfigurationParser.getDistribution(field, simNamespace);
                 			distWrapper.setDistribution(distribution);
-                		} else if (fieldElement.getName().equals("range")) {
+                		} /*else if (fieldElement.getName().equals("range")) {
                 			try{
                 				double min = Double.parseDouble(fieldElement.getAttributeValue("min"));
                 				distWrapper.setMin(min);
@@ -91,14 +91,14 @@ public class DataObjectSCParserPlugin extends SimulationConfigurationParserPlugg
                 			}
                 			Distribution distribution = new UniformDistribution(distWrapper.getMin(), distWrapper.getMax());
                 			distWrapper.setDistribution(distribution);
-                		}
+                		}*/
                 	}
-                	dataObjectFields.put(fieldName, new DataObjectField(distWrapper, nodeId));
+                	dataObjectFields.put(fieldName, new DataObjectField(distWrapper, nodeId, fieldName));
             	}
             	dataObjects.put(nodeId, dataObjectFields);
             }
         }
-        System.out.println(processModel.getDataObjectsGraph().print());
+        //System.out.println(processModel.getDataObjectsGraph().print());
         HashMap<String, Object> extensionAttributes = new HashMap<String, Object>();
         extensionAttributes.put("dataObjects", dataObjects);
         

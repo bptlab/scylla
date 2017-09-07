@@ -17,7 +17,7 @@ import de.hpi.bpt.scylla.logger.DebugLogger;
 import de.hpi.bpt.scylla.model.process.CommonProcessElements;
 import de.hpi.bpt.scylla.model.process.ProcessModel;
 import de.hpi.bpt.scylla.model.process.graph.Graph;
-import de.hpi.bpt.scylla.model.process.graph.Node;
+//import de.hpi.bpt.scylla.model.process.graph.Node;
 import de.hpi.bpt.scylla.model.process.graph.exception.MultipleStartNodesException;
 import de.hpi.bpt.scylla.model.process.graph.exception.NoStartNodeException;
 import de.hpi.bpt.scylla.model.process.graph.exception.NodeNotFoundException;
@@ -465,11 +465,11 @@ public class ProcessModelParser extends Parser<ProcessModel> {
                     int dataObjectNodeId = identifiersToNodeIds.get(sourceRef);
                     //System.out.println(identifiers.get(dataObjectNodeId)+" -> "+identifiers.get(nId));
                     dataObjectsGraph.addEdge(dataObjectNodeId, nId);
-                    Map<Integer, Node<Integer>> nodes = dataObjectsGraph.getNodes();
+                    /*Map<Integer, Node<Integer>> nodes = dataObjectsGraph.getNodes();
                     Node<Integer> currentNode = nodes.get(nId);
                     currentNode.setId(identifiers.get(nId));   
                     currentNode = nodes.get(dataObjectNodeId);
-                    currentNode.setId(identifiers.get(dataObjectNodeId));
+                    currentNode.setId(identifiers.get(dataObjectNodeId));*/
                 }
                 // String targetRef = elem.getChild("targetRef", bpmnNamespace).getText();
             }
@@ -485,11 +485,11 @@ public class ProcessModelParser extends Parser<ProcessModel> {
                     int dataObjectNodeId = identifiersToNodeIds.get(targetRef);
                     //System.out.println(identifiers.get(nId)+" -> "+identifiers.get(dataObjectNodeId));
                     dataObjectsGraph.addEdge(nId, dataObjectNodeId);
-                    Map<Integer, Node<Integer>> nodes = dataObjectsGraph.getNodes();
+                    /*Map<Integer, Node<Integer>> nodes = dataObjectsGraph.getNodes();
                     Node<Integer> currentNode = nodes.get(nId);
                     currentNode.setId(identifiers.get(nId));   
                     currentNode = nodes.get(dataObjectNodeId);
-                    currentNode.setId(identifiers.get(dataObjectNodeId));
+                    currentNode.setId(identifiers.get(dataObjectNodeId));*/
                 }
             }
         }

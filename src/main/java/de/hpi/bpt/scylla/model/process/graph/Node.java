@@ -15,7 +15,7 @@ public class Node<V> {
     private V object;
     private Set<V> sourceObjects;
     private Set<V> targetObjects;
-    private String id;
+    //private String id;
 
     Node(V obj) {
         object = obj;
@@ -27,13 +27,13 @@ public class Node<V> {
         sourceObjects.add(obj);
     }
     
-    public void setId(String identifier) {
+    /*public void setId(String identifier) {
     	this.id = identifier;
     }
     
     public String getNodeId() {
     	return this.id;
-    }
+    }*/
     
     void addTarget(V obj) {
         targetObjects.add(obj);

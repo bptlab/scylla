@@ -24,21 +24,21 @@
 	    	</bsim:resources>
 	    </bsim:task>
 	    <bsim:dataObject id="DataObjectReference_01imo1t" name="thesis">
-			<bsim:field name="Type" type="string">
+			<bsim:field name="ty" type="string">
 				<bsim:empiricalStringDistribution>
 					<bsim:entry value="A" frequency="20"></bsim:entry>
 					<bsim:entry value="B" frequency="5"></bsim:entry>
 					<bsim:entry value="C" frequency="2"></bsim:entry>
 				</bsim:empiricalStringDistribution> 
 			</bsim:field>
-		</bsim:dataObject>
-		<bsim:dataObject id="DataObjectReference_04kcxof" name="anotherobject">
-			<bsim:field name="Points" type="long">
+			<bsim:field name="ao" type="long">
 				<bsim:empiricalDistribution>
 					<bsim:entry value="10" frequency="20"></bsim:entry>
 					<bsim:entry value="25" frequency="5"></bsim:entry>
 				</bsim:empiricalDistribution> 
 			</bsim:field>
+		</bsim:dataObject>
+		<bsim:dataObject id="DataObjectReference_04kcxof" name="anotherobject">			
 		</bsim:dataObject>
 	    <bsim:task id="Task_0f1si4k" name="write thesis">
 			<bsim:duration timeUnit="SECONDS">

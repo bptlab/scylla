@@ -42,6 +42,10 @@ public class Scylla {
 //         String[] bpmnFilename = new String[] { folder + "p4_parallel.bpmn" };
 //         String[] simFilenames = new String[] { folder + "p4_parallel_sim.xml" };
 
+//      String[] bpmnFilename = new String[] { folder + "p7_dmn.bpmn" };
+//      String[] simFilenames = new String[] { folder + "p7_dmn_sim.xml" };
+    	
+    	
       String[] bpmnFilename = new String[] { folder + "p8_normalbpmn_with_dataobject.bpmn"};
       String[] simFilenames = new String[] { folder + "p8_normalbpmn_with_dataobject_sim.xml"};
 

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.deckfour.xes.classification.XEventAttributeClassifier;
@@ -133,6 +134,16 @@ public class XESLogger extends OutputLoggerPluggable {
                             || transition == ProcessNodeTransitionType.EVENT_TERMINATE) {
                         attributeMap.put(XLifecycleExtension.KEY_TRANSITION, factory
                                 .createAttributeLiteral(XLifecycleExtension.KEY_TRANSITION, "complete", lifecycleExt));
+                        if (!info.getDataObjectField().isEmpty()) {
+                        	Integer size = info.getDataObjectField().size();
+                        	Object[] test = info.getDataObjectField().keySet().toArray();
+                        	Object[] test2 = info.getDataObjectField().values().toArray();
+                        	for (int i= 0; i < size; i++) {
+                        	attributeMap.put(Integer.toString(i), factory
+                                    .createAttributeLiteral(Objects.toString(test[i]), Objects.toString(test2[i], null), lifecycleExt));
+                        	}
+                        }
+                        
                     }
                     else if (transition == ProcessNodeTransitionType.CANCEL) {
                         attributeMap.put(XLifecycleExtension.KEY_TRANSITION, factory

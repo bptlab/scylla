@@ -115,7 +115,7 @@ public class Graph<V> {
         return sb.toString();
     }
     
-    public String print() {
+    /*public String print() {
     	StringBuffer sb = new StringBuffer();
         for (V n : nodes.keySet()) {
         	if (!getNode(n).getNodeId().contains("DataObject")){
@@ -156,5 +156,5 @@ public class Graph<V> {
         	}
         }
         return sb.toString();
-    }
+    }*/
 }

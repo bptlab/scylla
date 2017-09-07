@@ -133,5 +133,4 @@ public class TaskBeginEvent extends TaskEvent {
                 transition);
         model.addNodeInfo(processModel, processInstance, info);
     }
-
 }
