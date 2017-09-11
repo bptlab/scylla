@@ -16,7 +16,6 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
@@ -32,6 +31,7 @@ public abstract class ListChooserPanel extends JSplitPane{
 	public interface ComponentHolder{
 		public Component getComponent();
 		public default void setName(String s){};
+		public default void delete(){};
 	}
 
 	private DefaultTableModel model;
@@ -63,7 +63,8 @@ public abstract class ListChooserPanel extends JSplitPane{
 		GridBagLayout gbl_panelListHeader = new GridBagLayout();
 		panelListHeader.setLayout(gbl_panelListHeader);
 		
-		JButton buttonAdd = new JButton("A");
+		JButton buttonAdd = new JButton();
+		buttonAdd.setIcon(ScyllaGUI.ICON_PLUS);
 		buttonAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				int index = model.getRowCount();
@@ -84,7 +85,8 @@ public abstract class ListChooserPanel extends JSplitPane{
 		gbc_buttonAdd.weightx = 1;
 		panelListHeader.add(buttonAdd, gbc_buttonAdd);
 		
-		JButton buttonRemove = new JButton("R");
+		JButton buttonRemove = new JButton();
+		buttonRemove.setIcon(ScyllaGUI.ICON_X);
 		buttonRemove.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int sel = list.getSelectedRow();
@@ -137,10 +139,10 @@ public abstract class ListChooserPanel extends JSplitPane{
 					int i = source.getMinSelectionIndex();
 					if(i == -1 || !(model.getValueAt(i,0) instanceof ComponentHolder))setRightComponent(panelRight);
 					else setRightComponent(((ComponentHolder) model.getValueAt(i,0)).getComponent());
-					SwingUtilities.invokeLater(()->{
-						revalidate();
-						repaint();
-					});
+					getParent().revalidate();
+					getParent().repaint();
+					revalidate();
+					repaint();
 				}
 			}
 		});
@@ -157,6 +159,13 @@ public abstract class ListChooserPanel extends JSplitPane{
 
 	public void add(ComponentHolder item) {
 		model.addRow(new Object[]{item});
+	}
+	
+	public void clear(){
+		while(model.getRowCount() > 0){
+			((ComponentHolder)model.getValueAt(0,0)).delete();
+			model.removeRow(0);
+		}
 	}
 	
 	private class ComponentHolderCellEditor extends DefaultCellEditor{

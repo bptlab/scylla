@@ -1,4 +1,4 @@
-package de.hpi.bpt.scylla.GUI;
+package de.hpi.bpt.scylla.GUI.GlobalConfigurationPane;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -6,14 +6,28 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.text.NumberFormat;
+import java.time.ZoneId;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JFormattedTextField;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
+
+import de.hpi.bpt.scylla.GUI.ExpandPanel;
+import de.hpi.bpt.scylla.GUI.ListChooserPanel;
+import de.hpi.bpt.scylla.GUI.ScyllaGUI;
+import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator;
+import de.hpi.bpt.scylla.GUI.ListChooserPanel.ComponentHolder;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 /**
  * 
@@ -23,11 +37,18 @@ import javax.swing.ScrollPaneConstants;
 @SuppressWarnings("serial")
 public class GlobalConfigurationPane extends JPanel {
 	private JLabel labelFiletitle;
-	private JLabel labelId;
+	//private JLabel labelId;
 	private JTextField textfieldId;
-	private JLabel labelSeed;
-	private JTextField textfieldSeed;
-	private JLabel labelTimezone;
+	//private JLabel labelSeed;
+	private JFormattedTextField textfieldSeed;
+	//private JLabel labelTimezone;
+	private JComboBox<ZoneId> comboboxTimezone;
+
+	private ListChooserPanel panelTimetables;
+	private ListChooserPanel panelResources;
+	
+	private GlobalConfigurationCreator creator;
+	private boolean saved;
 
 	/**
 	 * Create the panel.
@@ -41,19 +62,37 @@ public class GlobalConfigurationPane extends JPanel {
 		GridBagLayout gbl_panelHeader = new GridBagLayout();
 		panelHeader.setLayout(gbl_panelHeader);
 		
-		JButton buttonNewfile = new JButton("N");
+		JButton buttonNewfile = new JButton();
+		buttonNewfile.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				be_create();
+			}
+		});
+		buttonNewfile.setIcon(ScyllaGUI.ICON_NEW);
 		GridBagConstraints gbc_buttonNewfile = new GridBagConstraints();
 		gbc_buttonNewfile.weightx = 0;
 		gbc_buttonNewfile.fill = GridBagConstraints.BOTH;
 		panelHeader.add(buttonNewfile, gbc_buttonNewfile);
 		
-		JButton buttonSavefile = new JButton("S");
+		JButton buttonSavefile = new JButton();
+		buttonSavefile.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				be_save();
+			}
+		});
+		buttonSavefile.setIcon(ScyllaGUI.ICON_SAVE);
 		GridBagConstraints gbc_buttonSavefile = new GridBagConstraints();
 		gbc_buttonSavefile.weightx = 0;
 		gbc_buttonSavefile.fill = GridBagConstraints.BOTH;
 		panelHeader.add(buttonSavefile, gbc_buttonSavefile);
 		
-		JButton buttonOpenfile = new JButton("O");
+		JButton buttonOpenfile = new JButton();
+		buttonOpenfile.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				be_open();
+			}
+		});
+		buttonOpenfile.setIcon(ScyllaGUI.ICON_OPEN);
 		GridBagConstraints gbc_buttonOpenfile = new GridBagConstraints();
 		gbc_buttonOpenfile.weightx = 0;
 		gbc_buttonOpenfile.fill = GridBagConstraints.BOTH;
@@ -65,7 +104,13 @@ public class GlobalConfigurationPane extends JPanel {
 		gbc_textfieldFiletitle.fill = GridBagConstraints.BOTH;
 		panelHeader.add(labelFiletitle, gbc_textfieldFiletitle);
 		
-		JButton buttonClosefile = new JButton("C");
+		JButton buttonClosefile = new JButton();
+		buttonClosefile.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				be_close();
+			}
+		});
+		buttonClosefile.setIcon(ScyllaGUI.resizeIcon(ScyllaGUI.ICON_X,ScyllaGUI.TITLEFONT.getSize(),ScyllaGUI.TITLEFONT.getSize()));
 		GridBagConstraints gbc_buttonClosefile = new GridBagConstraints();
 		gbc_buttonClosefile.weightx = 0;
 		gbc_buttonClosefile.fill = GridBagConstraints.BOTH;
@@ -89,8 +134,9 @@ public class GlobalConfigurationPane extends JPanel {
 		JPanel panelGeneral = new JPanel();
 		GridBagConstraints gbc_panelGeneral = new GridBagConstraints();
 		gbc_panelGeneral.anchor = GridBagConstraints.PAGE_START;
-		int inset = (int)(5.0*ScyllaGUI.SCALE);
-		gbc_panelGeneral.insets = new Insets(inset,inset,inset*2,inset);
+		int inset_b = 25;//(int)(25.0*ScyllaGUI.SCALE);
+		int inset_s = 5;//(int)(2.5*ScyllaGUI.SCALE);TODO
+		gbc_panelGeneral.insets = new Insets(inset_b,inset_b,inset_b,inset_b);
 		gbc_panelGeneral.gridx = 0;
 		gbc_panelGeneral.gridy = 0;
 		gbc_panelGeneral.fill = GridBagConstraints.HORIZONTAL;
@@ -100,10 +146,10 @@ public class GlobalConfigurationPane extends JPanel {
 		gbl_panelGeneral.columnWeights = new double[]{1.0,3.0};
 		panelGeneral.setLayout(gbl_panelGeneral);
 		
-		labelId = new JLabel();
+		JLabel labelId = new JLabel();
 		labelId.setText("ID");
 		GridBagConstraints gbc_textfieldId = new GridBagConstraints();
-		gbc_textfieldId.insets = new Insets(0, 0, 5, 5);
+		gbc_textfieldId.insets = new Insets(inset_s, inset_s, inset_s, inset_s);
 		gbc_textfieldId.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textfieldId.gridx = 0;
 		gbc_textfieldId.gridy = 0;
@@ -111,50 +157,50 @@ public class GlobalConfigurationPane extends JPanel {
 		
 		textfieldId = new JTextField();
 		GridBagConstraints gbc_textfieldIdEdit = new GridBagConstraints();
-		gbc_textfieldIdEdit.insets = new Insets(0, 0, 5, 0);
+		gbc_textfieldIdEdit.insets = new Insets(inset_s, inset_s, inset_s, inset_b);
 		gbc_textfieldIdEdit.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textfieldIdEdit.gridx = 1;
 		gbc_textfieldIdEdit.gridy = 0;
 		panelGeneral.add(textfieldId, gbc_textfieldIdEdit);
 		textfieldId.setColumns(10);
 		
-		labelSeed = new JLabel();
+		JLabel labelSeed = new JLabel();
 		labelSeed.setText("Seed");
 		GridBagConstraints gbc_textfieldSeed = new GridBagConstraints();
-		gbc_textfieldSeed.insets = new Insets(0, 0, 5, 5);
+		gbc_textfieldSeed.insets = new Insets(inset_s, inset_s, inset_s, inset_s);
 		gbc_textfieldSeed.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textfieldSeed.gridx = 0;
 		gbc_textfieldSeed.gridy = 1;
 		panelGeneral.add(labelSeed, gbc_textfieldSeed);
 		
-		textfieldSeed = new JTextField();
+		textfieldSeed = new JFormattedTextField(NumberFormat.getNumberInstance());
 		GridBagConstraints gbc_textfieldSeedEdit = new GridBagConstraints();
-		gbc_textfieldSeedEdit.insets = new Insets(0, 0, 5, 0);
+		gbc_textfieldSeedEdit.insets = new Insets(inset_s, inset_s, inset_s, inset_b);
 		gbc_textfieldSeedEdit.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textfieldSeedEdit.gridx = 1;
 		gbc_textfieldSeedEdit.gridy = 1;
 		panelGeneral.add(textfieldSeed, gbc_textfieldSeedEdit);
 		textfieldSeed.setColumns(10);
 		
-		labelTimezone = new JLabel();
+		JLabel labelTimezone = new JLabel();
 		labelTimezone.setText("Timezone");
 		GridBagConstraints gbc_textfieldTimezone = new GridBagConstraints();
-		gbc_textfieldTimezone.insets = new Insets(0, 0, 5, 5);
+		gbc_textfieldTimezone.insets = new Insets(inset_s, inset_s, inset_s, inset_s);
 		gbc_textfieldTimezone.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textfieldTimezone.gridx = 0;
 		gbc_textfieldTimezone.gridy = 2;
 		panelGeneral.add(labelTimezone, gbc_textfieldTimezone);
 		
-		JComboBox comboboxTimezone = new JComboBox();
+		comboboxTimezone = new JComboBox<ZoneId>();
 		GridBagConstraints gbc_comboboxTimezone = new GridBagConstraints();
-		gbc_comboboxTimezone.insets = new Insets(0, 0, 0, 5);
+		gbc_comboboxTimezone.insets = new Insets(inset_s, inset_s, inset_s, inset_b);
 		gbc_comboboxTimezone.fill = GridBagConstraints.HORIZONTAL;
 		gbc_comboboxTimezone.gridx = 1;
 		gbc_comboboxTimezone.gridy = 2;
 		panelGeneral.add(comboboxTimezone, gbc_comboboxTimezone);
 		
 		//---Resource Panel---
-		ListChooserPanel panelResources = new ListChooserPanel(){
+		panelResources = new ListChooserPanel(){
 
 			@Override
 			public void onDelete(ComponentHolder toDel) {
@@ -188,7 +234,7 @@ public class GlobalConfigurationPane extends JPanel {
 		gbc_panelResources.fill = GridBagConstraints.HORIZONTAL;
 		gbc_panelResources.weightx = 1.0;
 		gbc_panelResources.weighty = 1.0;
-		gbc_panelResources.insets = new Insets(inset, inset, inset*2, inset);
+		gbc_panelResources.insets = new Insets(0, inset_b, inset_b, inset_b);
 		gbc_panelResources.gridx = 0;
 		gbc_panelResources.gridy = 1;
 
@@ -235,7 +281,7 @@ public class GlobalConfigurationPane extends JPanel {
 		);
 		
 		
-		ListChooserPanel panelTimetables = new ListChooserPanel(){
+		panelTimetables = new ListChooserPanel(){
 
 			@Override
 			public void onDelete(ComponentHolder toDel) {
@@ -255,7 +301,7 @@ public class GlobalConfigurationPane extends JPanel {
 		gbc_panelTimetables.fill = GridBagConstraints.HORIZONTAL;
 		gbc_panelTimetables.weightx = 1.0;
 		gbc_panelTimetables.weighty = 1.0;
-		gbc_panelTimetables.insets = new Insets(inset, inset, inset, inset);
+		gbc_panelTimetables.insets = new Insets(0, inset_b, inset_b, inset_b);
 		gbc_panelTimetables.gridx = 0;
 		gbc_panelTimetables.gridy = 2;
 		
@@ -281,14 +327,72 @@ public class GlobalConfigurationPane extends JPanel {
 				});
 		
 		JPanel panelBuffer = new JPanel();
+		panelBuffer.setBackground(panelMain.getBackground());
 		GridBagConstraints gbc_panelBuffer = new GridBagConstraints();
 		gbc_panelBuffer.anchor = GridBagConstraints.PAGE_START;
 		gbc_panelBuffer.fill = GridBagConstraints.BOTH;
-		gbc_panelBuffer.weighty = 1;
+		gbc_panelBuffer.weighty = 100;
 		gbc_panelBuffer.weightx = 1;
 		gbc_panelBuffer.gridx = 0;
 		gbc_panelBuffer.gridy = 3;
 		panelMain.add(panelBuffer,gbc_panelBuffer);
 		
 	}
+	
+	private void be_create(){
+		
+	}
+	private void createGC(){
+		
+	}
+
+	private void be_open(){
+		
+	}	
+	private void openGC(){
+		
+	}
+
+	
+	private void be_save(){
+		
+	}
+	private void saveGC(){
+		
+	}
+	
+	private void be_close(){
+		if(!saved){
+			int i = JOptionPane.showOptionDialog(
+					this,
+					"has unsaved changes. Would you like to save them?",
+					"Unsaved Changes",
+					JOptionPane.YES_NO_CANCEL_OPTION,
+					JOptionPane.PLAIN_MESSAGE,
+					ScyllaGUI.ICON_SAVE,
+					new Object[]{new JButton("Save Changes"){{
+						setIcon(ScyllaGUI.ICON_SAVE);
+						addActionListener(new ActionListener() {
+							public void actionPerformed(ActionEvent arg0) {
+								((JDialog)getTopLevelAncestor()).dispose();
+								be_save();
+								closeGC();
+							}
+						});
+					}},"Discard Changes","Cancel"}, 0);
+			if(i != 1)return;
+		}
+		closeGC();
+	}
+	private void closeGC(){
+		creator = null;
+		labelFiletitle.setText("");
+		textfieldId.setText("");
+		textfieldSeed.setValue(null);
+		
+		panelResources.clear();
+		panelTimetables.clear();
+	}
+	
+	
 }

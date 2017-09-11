@@ -1,4 +1,4 @@
-package de.hpi.bpt.scylla.GUI;
+package de.hpi.bpt.scylla.GUI.GlobalConfigurationPane;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -28,6 +28,9 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
+
+import de.hpi.bpt.scylla.GUI.ScyllaGUI;
+
 import java.awt.Insets;
 import javax.swing.JComboBox;
 import javax.swing.JButton;
@@ -69,6 +72,7 @@ public class TimetablePanel extends JSplitPane {
 		
 		tableRowHeader = new JTable();
 		tableRowHeader.setRowHeight(tableRowHeader.getFont().getSize());
+		tableRowHeader.setFont(ScyllaGUI.DEFAULTFONT);
 		tableRowHeader.setModel(new DefaultTableModel(times,new String[] {""}));
 		tableRowHeader.setRowSelectionAllowed(false);
 		tableRowHeader.setEnabled(false);

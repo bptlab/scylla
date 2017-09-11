@@ -1,4 +1,4 @@
-package de.hpi.bpt.scylla.GUI;
+package de.hpi.bpt.scylla.GUI.GlobalConfigurationPane;
 
 import java.awt.Component;
 import java.awt.GridBagConstraints;
@@ -15,6 +15,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
+import de.hpi.bpt.scylla.GUI.ListChooserPanel;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel.ComponentHolder;
 
 @SuppressWarnings("serial")
@@ -57,14 +58,14 @@ public class ResourcePanel extends JSplitPane{
 		gbc_textfieldCost.gridy = 1;
 		topPanel.add(labelCost, gbc_textfieldCost);
 		
-		JTextField testfieldCostEdit = new JFormattedTextField(NumberFormat.getNumberInstance());
+		JFormattedTextField textfieldCostEdit = new JFormattedTextField(NumberFormat.getNumberInstance());
 		GridBagConstraints gbc_textfieldCostEdit = new GridBagConstraints();
 		gbc_textfieldCostEdit.insets = new Insets(0, 0, 5, 5);
 		gbc_textfieldCostEdit.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textfieldCostEdit.gridx = 1;
 		gbc_textfieldCostEdit.gridy = 1;
-		topPanel.add(testfieldCostEdit, gbc_textfieldCostEdit);
-		testfieldCostEdit.setColumns(10);
+		topPanel.add(textfieldCostEdit, gbc_textfieldCostEdit);
+		textfieldCostEdit.setColumns(10);
 		
 		JTextField textFieldTimeunit = new JTextField();
 		textFieldTimeunit.setText("per");

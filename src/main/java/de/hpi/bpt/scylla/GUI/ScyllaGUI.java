@@ -17,6 +17,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.ColorUIResource;
+
+import de.hpi.bpt.scylla.GUI.GlobalConfigurationPane.GlobalConfigurationPane;
 /**
  * @author Leon Bein
  *
@@ -75,6 +77,9 @@ public class ScyllaGUI extends JFrame {
 	
 	public static final ImageIcon ICON_OPTIONS = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/options.png")),STD1/2,STD1/2);
 	
+	public static final ImageIcon ICON_NEW = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/newfile.png")),TITLEFONT.getSize(),TITLEFONT.getSize());
+	public static final ImageIcon ICON_SAVE = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/save.png")),TITLEFONT.getSize(),TITLEFONT.getSize());
+	public static final ImageIcon ICON_OPEN = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/open.png")),TITLEFONT.getSize(),TITLEFONT.getSize());
 	
 
 	private SimulationPane simulationPane;
@@ -180,7 +185,7 @@ public class ScyllaGUI extends JFrame {
 		return stdErr;
 	}
 	
-	public static void setDefaultFont (Font font){
+	public static void setDefaultFont(Font font){
 		Enumeration<Object> keys = UIManager.getDefaults().keys();
 		for(Object key : Collections.list(keys)){
 	    	if (key.toString().endsWith(".font"))UIManager.put (key, font);

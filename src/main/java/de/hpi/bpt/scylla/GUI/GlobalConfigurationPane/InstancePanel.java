@@ -1,4 +1,4 @@
-package de.hpi.bpt.scylla.GUI;
+package de.hpi.bpt.scylla.GUI.GlobalConfigurationPane;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -10,6 +10,10 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+
+import de.hpi.bpt.scylla.GUI.ScalingCheckBoxIcon;
+import de.hpi.bpt.scylla.GUI.ScyllaGUI;
+
 import javax.swing.JCheckBox;
 
 @SuppressWarnings("serial")
