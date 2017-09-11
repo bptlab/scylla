@@ -66,7 +66,7 @@ public class ScyllaGUI extends JFrame {
 	private static java.awt.Rectangle r = env.getMaximumWindowBounds();
 	private static int WIDTH = r.width;//1200
 	private static int HEIGHT = r.height;//900
-	private static double SCALE = HEIGHT/900;
+	private static double SCALE = ((double)HEIGHT)/900.0;
 
 //	private static double SCALE = 1;
 //	private static int WIDTH = 1200;//(int)(1200.0 * SCALE);
