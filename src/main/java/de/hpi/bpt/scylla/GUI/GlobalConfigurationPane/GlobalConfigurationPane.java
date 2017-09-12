@@ -6,8 +6,13 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -20,13 +25,26 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
+import org.jdom2.JDOMException;
+
+import com.jgoodies.forms.builder.ButtonStackBuilder;
 
 import de.hpi.bpt.scylla.GUI.ExpandPanel;
+import de.hpi.bpt.scylla.GUI.InsertRemoveListener;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel;
+import de.hpi.bpt.scylla.GUI.ScalingFileChooser;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator;
+import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.ResourceType;
+import de.hpi.bpt.scylla.creation.SimulationConfiguration.SimulationConfigurationCreator;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel.ComponentHolder;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.io.File;
+import java.io.IOException;
 import java.awt.event.ActionEvent;
 
 /**
@@ -42,13 +60,17 @@ public class GlobalConfigurationPane extends JPanel {
 	//private JLabel labelSeed;
 	private JFormattedTextField textfieldSeed;
 	//private JLabel labelTimezone;
-	private JComboBox<ZoneId> comboboxTimezone;
+	private JComboBox<ZoneOffset> comboboxTimezone;
 
 	private ListChooserPanel panelTimetables;
 	private ListChooserPanel panelResources;
 	
 	private GlobalConfigurationCreator creator;
+	private File file;
 	private boolean saved;
+	private JButton buttonSavefile;
+	private JButton buttonClosefile;
+	private boolean changeFlag;
 
 	/**
 	 * Create the panel.
@@ -63,6 +85,7 @@ public class GlobalConfigurationPane extends JPanel {
 		panelHeader.setLayout(gbl_panelHeader);
 		
 		JButton buttonNewfile = new JButton();
+		buttonNewfile.setToolTipText("New File");
 		buttonNewfile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				be_create();
@@ -74,7 +97,9 @@ public class GlobalConfigurationPane extends JPanel {
 		gbc_buttonNewfile.fill = GridBagConstraints.BOTH;
 		panelHeader.add(buttonNewfile, gbc_buttonNewfile);
 		
-		JButton buttonSavefile = new JButton();
+		buttonSavefile = new JButton();
+		buttonSavefile.setToolTipText("Save");
+		setSaved(true);
 		buttonSavefile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				be_save();
@@ -87,6 +112,7 @@ public class GlobalConfigurationPane extends JPanel {
 		panelHeader.add(buttonSavefile, gbc_buttonSavefile);
 		
 		JButton buttonOpenfile = new JButton();
+		buttonOpenfile.setToolTipText("Open");
 		buttonOpenfile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				be_open();
@@ -99,12 +125,15 @@ public class GlobalConfigurationPane extends JPanel {
 		panelHeader.add(buttonOpenfile, gbc_buttonOpenfile);
 		
 		labelFiletitle = new JLabel();
+		labelFiletitle.setForeground(Color.WHITE);
 		GridBagConstraints gbc_textfieldFiletitle = new GridBagConstraints();
 		gbc_textfieldFiletitle.weightx = 37;
+		gbc_textfieldFiletitle.insets = new Insets(0,ScyllaGUI.TITLEFONT.getSize(),  0, 0);
 		gbc_textfieldFiletitle.fill = GridBagConstraints.BOTH;
 		panelHeader.add(labelFiletitle, gbc_textfieldFiletitle);
 		
-		JButton buttonClosefile = new JButton();
+		buttonClosefile = new JButton();
+		buttonClosefile.setToolTipText("Close current");
 		buttonClosefile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				be_close();
@@ -156,6 +185,11 @@ public class GlobalConfigurationPane extends JPanel {
 		panelGeneral.add(labelId, gbc_textfieldId);
 		
 		textfieldId = new JTextField();
+		textfieldId.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
+			if(changeFlag)return;
+			creator.setId(textfieldId.getText());
+			setSaved(false);
+		}));
 		GridBagConstraints gbc_textfieldIdEdit = new GridBagConstraints();
 		gbc_textfieldIdEdit.insets = new Insets(inset_s, inset_s, inset_s, inset_b);
 		gbc_textfieldIdEdit.fill = GridBagConstraints.HORIZONTAL;
@@ -173,7 +207,20 @@ public class GlobalConfigurationPane extends JPanel {
 		gbc_textfieldSeed.gridy = 1;
 		panelGeneral.add(labelSeed, gbc_textfieldSeed);
 		
-		textfieldSeed = new JFormattedTextField(NumberFormat.getNumberInstance());
+		NumberFormat format = NumberFormat.getInstance();
+		format.setGroupingUsed(false);
+		textfieldSeed = new JFormattedTextField(format);
+		textfieldSeed.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
+			if(changeFlag)return;
+			try{
+				long s = creator.getSeed();
+				long n = Long.parseLong(textfieldSeed.getText());
+				if(s != n){
+					creator.setSeed(n);
+					setSaved(false);
+				}
+			}catch(Exception exc){}
+		}));
 		GridBagConstraints gbc_textfieldSeedEdit = new GridBagConstraints();
 		gbc_textfieldSeedEdit.insets = new Insets(inset_s, inset_s, inset_s, inset_b);
 		gbc_textfieldSeedEdit.fill = GridBagConstraints.HORIZONTAL;
@@ -191,7 +238,18 @@ public class GlobalConfigurationPane extends JPanel {
 		gbc_textfieldTimezone.gridy = 2;
 		panelGeneral.add(labelTimezone, gbc_textfieldTimezone);
 		
-		comboboxTimezone = new JComboBox<ZoneId>();
+		ZoneOffset[] timeZones = new ZoneOffset[25];
+		for(int i = -12; i <= 12; i++){
+			timeZones[i+12] = ZoneOffset.ofHours(i);
+		}
+		comboboxTimezone = new JComboBox<ZoneOffset>(timeZones);
+		comboboxTimezone.addItemListener((ItemEvent e)->{
+			if(e.getStateChange() == ItemEvent.SELECTED){
+				if(changeFlag)return;
+				creator.setTimeOffset((ZoneOffset)comboboxTimezone.getSelectedItem());
+				setSaved(false);
+			}
+		});
 		GridBagConstraints gbc_comboboxTimezone = new GridBagConstraints();
 		gbc_comboboxTimezone.insets = new Insets(inset_s, inset_s, inset_s, inset_b);
 		gbc_comboboxTimezone.fill = GridBagConstraints.HORIZONTAL;
@@ -337,62 +395,183 @@ public class GlobalConfigurationPane extends JPanel {
 		gbc_panelBuffer.gridy = 3;
 		panelMain.add(panelBuffer,gbc_panelBuffer);
 		
+		setEnabled(false);
 	}
 	
 	private void be_create(){
-		
+		changeFlag = true;
+		labelFiletitle.setText("<unsaved file>");
+		createGC();
+		textfieldId.setText("NewGlobalConfiguration");
+		textfieldId.requestFocusInWindow();
+		textfieldId.selectAll();
+		changeFlag = false;
 	}
+	
 	private void createGC(){
-		
+		creator = new GlobalConfigurationCreator();
+		setSaved(false);
+		setEnabled(true);
 	}
 
 	private void be_open(){
+		be_close();
+		ScalingFileChooser chooser = new ScalingFileChooser(ScyllaGUI.DEFAULTFILEPATH);
+		chooser.setDialogTitle("Open");
+		int c = chooser.showDialog(this,"Open");
+		if(c == ScalingFileChooser.APPROVE_OPTION){
+			file = chooser.getSelectedFile();
+			if(file != null){
+				ScyllaGUI.DEFAULTFILEPATH = chooser.getSelectedFile().getPath();
+				try {
+					creator = GlobalConfigurationCreator.createFromFile(file.getPath());
+					labelFiletitle.setText(chooser.getSelectedFile().getPath());
+				} catch (JDOMException | IOException e) {
+					e.printStackTrace();
+				}
+				openGC();
+			}else{
+				System.err.println("Could not find file");//TODO
+			}
+		}
 		
 	}	
+	
 	private void openGC(){
+		//TODO
+		changeFlag = true;
+		textfieldId.setText(creator.getId());
+		textfieldSeed.setValue(creator.getSeed());
+		comboboxTimezone.setSelectedItem(creator.getTimeOffset());
 		
+		for(ResourceType res : creator.getResourceTypes()){
+			importResource(res);
+		}
+		
+		changeFlag = false;
+		setEnabled(true);
 	}
 
 	
 	private void be_save(){
-		
+		ScalingFileChooser chooser = new ScalingFileChooser(ScyllaGUI.DEFAULTFILEPATH);
+		if(file != null)chooser.setSelectedFile(file);
+		else if(!creator.getId().equals("")) chooser.setSelectedFile(new File(ScyllaGUI.DEFAULTFILEPATH+"\\"+creator.getId()+".xml"));
+		chooser.setDialogTitle("Save");
+		chooser.setFont(ScyllaGUI.fileChooserFont);
+		chooser.setPreferredSize(ScyllaGUI.fileChooserDimension);
+		int c = chooser.showDialog(null,"Save");
+		if(c == ScalingFileChooser.APPROVE_OPTION){
+			file = chooser.getSelectedFile();
+			if(file != null){
+				labelFiletitle.setText(chooser.getSelectedFile().getPath());
+				ScyllaGUI.DEFAULTFILEPATH = chooser.getSelectedFile().getPath();
+				saveGC();
+			}else{
+				System.err.println("Could not find file");//TODO
+			}
+		}
 	}
+	
 	private void saveGC(){
-		
+		try {
+			setSaved(true);
+			creator.save(file.getPath());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private void be_close(){
 		if(!saved){
-			int i = JOptionPane.showOptionDialog(
-					this,
-					"has unsaved changes. Would you like to save them?",
-					"Unsaved Changes",
-					JOptionPane.YES_NO_CANCEL_OPTION,
-					JOptionPane.PLAIN_MESSAGE,
-					ScyllaGUI.ICON_SAVE,
-					new Object[]{new JButton("Save Changes"){{
-						setIcon(ScyllaGUI.ICON_SAVE);
-						addActionListener(new ActionListener() {
-							public void actionPerformed(ActionEvent arg0) {
-								((JDialog)getTopLevelAncestor()).dispose();
-								be_save();
-								closeGC();
-							}
-						});
-					}},"Discard Changes","Cancel"}, 0);
-			if(i != 1)return;
+			int i = showUnsavedChangesDialog();
+			if(i == 1)closeGC();
 		}
-		closeGC();
+		else closeGC();
 	}
 	private void closeGC(){
+		changeFlag = true;
 		creator = null;
 		labelFiletitle.setText("");
 		textfieldId.setText("");
 		textfieldSeed.setValue(null);
+		comboboxTimezone.setSelectedItem(null);
 		
 		panelResources.clear();
 		panelTimetables.clear();
+		changeFlag = false;
+		setSaved(true);
+		setEnabled(false);
 	}
+	
+	private int showUnsavedChangesDialog(){
+		int i = JOptionPane.showOptionDialog(
+				this,
+				getFileName()+"has unsaved changes. Would you like to save them?",
+				"Unsaved Changes",
+				JOptionPane.YES_NO_CANCEL_OPTION,
+				JOptionPane.PLAIN_MESSAGE,
+				ScyllaGUI.ICON_SAVE,
+				new Object[]{new JButton("Save Changes"){{
+					setIcon(ScyllaGUI.ICON_SAVE);
+					addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent arg0) {
+							((JDialog)getTopLevelAncestor()).dispose();
+							be_save();
+							//closeGC();
+						}
+					});
+				}},"Discard Changes","Cancel"}, 0);
+		if(saved)i = 1;
+		return i;
+	}
+	
+	public void setSaved(boolean b){
+		saved = b;
+		buttonSavefile.setEnabled(!b);
+	}
+	
+	private String getFileName(){
+		if(file != null)return file.getName();
+		else return labelFiletitle.getText();
+	}
+	
+	@Override
+	public void setEnabled(boolean b){
+		buttonClosefile.setEnabled(b);
+		textfieldId.setEnabled(b);
+		textfieldSeed.setEnabled(b);
+		comboboxTimezone.setEnabled(b);
+		panelTimetables.setEnabled(b);
+		panelResources.setEnabled(b);
+		super.setEnabled(b);
+	}
+	
+	public void importResource(GlobalConfigurationCreator.ResourceType res){
+		panelResources.add(
+				new ListChooserPanel.ComponentHolder() {
+					ResourcePanel p = new ResourcePanel();
+					{
+						p.setResourceType(res);
+					}
+					@Override
+					public Component getComponent() {
+						return p;
+					}
+					@Override
+					public String toString(){
+						return res.getName();
+					}
+					@Override
+					public void setName(String s){
+						res.setName(s);
+						setSaved(false);
+					}
+				}
+		);
+	}
+	
+	
 	
 	
 }

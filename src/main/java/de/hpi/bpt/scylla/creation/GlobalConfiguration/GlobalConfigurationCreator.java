@@ -1,5 +1,6 @@
 package de.hpi.bpt.scylla.creation.GlobalConfiguration;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -14,6 +15,8 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
 import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 
 import de.hpi.bpt.scylla.creation.ElementLink;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.ResourceType.ResourceInstance;
@@ -32,6 +35,7 @@ public class GlobalConfigurationCreator extends ElementLink{
 
 	/**List of all resource types*/
 	private List<ResourceType> resourceTypes;
+
 	/**List of all timetables*/
 	private List<Timetable> timetables;
 
@@ -62,11 +66,17 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 
 	/**
 	 * Sets the id of the global configuration
-	 * TODO replace with setting filename? 
 	 * @param id
 	 */
 	public void setId(String id){
 		setAttribute("id",id);
+	}
+	
+	/**
+	 * Gets the id of the global configuration
+	 */
+	public String getId(){
+		return el.getAttribute("id").getValue();
 	}
 	
 	/**
@@ -102,7 +112,7 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 		resourceAssignmentOrder.setText(resourceAssignmentOrder.getText().replace(ao+",",""));
 	}
 	
-	/**
+/**
 	 * Sets the GCs seed to a given value
 	 * @param seed seed as long value
 	 */
@@ -112,12 +122,25 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 	}
 	
 	/**
+	 * Gets the GCs seed to a given value
+	 */
+	public Integer getSeed(){
+		if(root.getChild("randomSeed",nsp) == null)return null;
+		return Integer.parseInt(root.getChild("randomSeed",nsp).getText());
+	}
+	
+	/**
 	 * Sets the GCs time offset 
 	 * @param timezone TimeZone, given as zoneoffset to greenwich mean time
 	 */
 	public void setTimeOffset(ZoneOffset timezone){
 		if(root.getChild("zoneOffset",nsp) == null)root.addContent(new Element("zoneOffset",nsp));
 		root.getChild("zoneOffset",nsp).setText(timezone+"");
+	}
+	
+	public ZoneOffset getTimeOffset(){
+		if(root.getChild("zoneOffset",nsp) == null)return null;
+		return ZoneOffset.of(root.getChild("zoneOffset",nsp).getText());
 	}
 	
 	
@@ -305,6 +328,14 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 	}
 	
 	/**
+	 * Getter for all resource types
+	 * @return
+	 */
+	public List<ResourceType> getResourceTypes() {
+		return resourceTypes;
+	}
+	
+	/**
 	 * Finds the corresponding resource type handler object to given id
 	 * @param id unique identifier string for resource type
 	 * @return the handler if exitsting, otherwise null
@@ -369,7 +400,7 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 			super(new Element("timetable",GlobalConfigurationCreator.this.nsp));
 			id = i;
 			setAttribute("id",id);
-			getTimetables().addContent(el);
+			getTimetableData().addContent(el);
 			items = new ArrayList<TimetableItem>();
 		}
 		
@@ -543,16 +574,24 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 	 * Creates, if not existing, and returns the GCs timetables element
 	 * @return the jdom2 xml element corresponding to the timetables item of the GC
 	 */
-	private Element getTimetables() {
+	private Element getTimetableData() {
 		if(root.getChild("timetables",nsp) == null){
-			Element resourceData = new Element("timetables",nsp);
-			root.addContent(resourceData);
-			return resourceData;
+			Element timetableData = new Element("timetables",nsp);
+			root.addContent(timetableData);
+			return timetableData;
 		}else{
 			return root.getChild("timetables",nsp);
 		}
 	}
 	
+	/**
+	 * Getter for all timetables
+	 * @return
+	 */
+	public List<Timetable> getTimetables() {
+		return timetables;
+	}
+
 	/**
 	 * Finds the timetable with given id
 	 * @param id unique identifier string of timetable
@@ -584,7 +623,7 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 	 * @param id unique timetable identifier string
 	 */
 	public void deleteTimetable(String id){
-		Element ts = getTimetables();
+		Element ts = getTimetableData();
 		Timetable toRem = getTimetable(id);
 		if(toRem == null)return;
 		//ts.removeContent(toRem.getEl());
@@ -769,6 +808,23 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 //        	System.err.println("Error creating GlobalconfigurationCreator from path "+path+" - invalid namespace");
 //        }
        	return new GlobalConfigurationCreator(r,doc);
+	}
+	
+	/**
+	 * Saves the document to a given path
+	 * @param path
+	 * @throws IOException
+	 */
+	public void save(String path) throws IOException{
+		FileWriter writer = null;
+		try{
+			writer = new FileWriter(path);
+	        XMLOutputter outputter = new XMLOutputter();
+	        outputter.setFormat(Format.getPrettyFormat());
+	        outputter.output(doc, writer);
+		}finally{
+	        writer.close();
+		}
 	}
 	
 	

@@ -37,6 +37,8 @@ public abstract class ListChooserPanel extends JSplitPane{
 	private DefaultTableModel model;
 	private JTable list;
 	private JPanel panelRight;
+	private JButton buttonAdd;
+	private JButton buttonRemove;
 	
 	
 	public ListChooserPanel(){
@@ -46,7 +48,7 @@ public abstract class ListChooserPanel extends JSplitPane{
 	public ListChooserPanel(List<ComponentHolder> data) {
 		
 
-		setEnabled(false);
+		//setEnabled(false);
 		JPanel panelLeft = new JPanel();
 		setLeftComponent(panelLeft);
 		GridBagLayout gbl_panelLeft = new GridBagLayout();
@@ -63,7 +65,7 @@ public abstract class ListChooserPanel extends JSplitPane{
 		GridBagLayout gbl_panelListHeader = new GridBagLayout();
 		panelListHeader.setLayout(gbl_panelListHeader);
 		
-		JButton buttonAdd = new JButton();
+		buttonAdd = new JButton();
 		buttonAdd.setIcon(ScyllaGUI.ICON_PLUS);
 		buttonAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -85,7 +87,7 @@ public abstract class ListChooserPanel extends JSplitPane{
 		gbc_buttonAdd.weightx = 1;
 		panelListHeader.add(buttonAdd, gbc_buttonAdd);
 		
-		JButton buttonRemove = new JButton();
+		buttonRemove = new JButton();
 		buttonRemove.setIcon(ScyllaGUI.ICON_X);
 		buttonRemove.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -166,6 +168,15 @@ public abstract class ListChooserPanel extends JSplitPane{
 			((ComponentHolder)model.getValueAt(0,0)).delete();
 			model.removeRow(0);
 		}
+	}
+	
+	@Override
+	public void setEnabled(boolean b){
+		list.setEnabled(b);
+		buttonAdd.setEnabled(b);
+		buttonRemove.setEnabled(b);
+		panelRight.setEnabled(b);
+		super.setEnabled(b);
 	}
 	
 	private class ComponentHolderCellEditor extends DefaultCellEditor{

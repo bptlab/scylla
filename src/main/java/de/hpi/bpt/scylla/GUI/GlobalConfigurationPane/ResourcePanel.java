@@ -5,6 +5,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.text.NumberFormat;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
@@ -17,9 +18,15 @@ import javax.swing.SpinnerNumberModel;
 
 import de.hpi.bpt.scylla.GUI.ListChooserPanel;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel.ComponentHolder;
+import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.ResourceType;
 
 @SuppressWarnings("serial")
 public class ResourcePanel extends JSplitPane{
+	private JSpinner spinnerQuantity;
+	private JFormattedTextField textfieldCost;
+	private JComboBox<TimeUnit> comboboxTimeunit;
+	private JComboBox<String> comboboxTimetable;
+
 	public ResourcePanel() {
 		setEnabled(false);
 		setOrientation(JSplitPane.VERTICAL_SPLIT);
@@ -39,7 +46,7 @@ public class ResourcePanel extends JSplitPane{
 		gbc_textfieldQuantity.gridy = 0;
 		topPanel.add(labelQuantity, gbc_textfieldQuantity);
 		
-		JSpinner spinnerQuantity = new JSpinner();
+		spinnerQuantity = new JSpinner();
 		spinnerQuantity.setModel(new SpinnerNumberModel(new Integer(0), new Integer(0), null, new Integer(1)));
 		((JSpinner.DefaultEditor) spinnerQuantity.getEditor()).getTextField().setColumns(2);
 		GridBagConstraints gbc_spinnerQuantity = new GridBagConstraints();
@@ -58,14 +65,14 @@ public class ResourcePanel extends JSplitPane{
 		gbc_textfieldCost.gridy = 1;
 		topPanel.add(labelCost, gbc_textfieldCost);
 		
-		JFormattedTextField textfieldCostEdit = new JFormattedTextField(NumberFormat.getNumberInstance());
+		textfieldCost = new JFormattedTextField(NumberFormat.getNumberInstance());
 		GridBagConstraints gbc_textfieldCostEdit = new GridBagConstraints();
 		gbc_textfieldCostEdit.insets = new Insets(0, 0, 5, 5);
 		gbc_textfieldCostEdit.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textfieldCostEdit.gridx = 1;
 		gbc_textfieldCostEdit.gridy = 1;
-		topPanel.add(textfieldCostEdit, gbc_textfieldCostEdit);
-		textfieldCostEdit.setColumns(10);
+		topPanel.add(textfieldCost, gbc_textfieldCostEdit);
+		textfieldCost.setColumns(10);
 		
 		JTextField textFieldTimeunit = new JTextField();
 		textFieldTimeunit.setText("per");
@@ -78,7 +85,7 @@ public class ResourcePanel extends JSplitPane{
 		topPanel.add(textFieldTimeunit, gbc_textFieldTimeunit);
 		textFieldTimeunit.setColumns(10);
 		
-		JComboBox comboboxTimeunit = new JComboBox();
+		comboboxTimeunit = new JComboBox<TimeUnit>(TimeUnit.values());
 		GridBagConstraints gbc_comboboxTimeunit = new GridBagConstraints();
 		gbc_comboboxTimeunit.insets = new Insets(0, 0, 5, 5);
 		gbc_comboboxTimeunit.fill = GridBagConstraints.HORIZONTAL;
@@ -95,7 +102,7 @@ public class ResourcePanel extends JSplitPane{
 		gbc_textfieldTimetable.gridy = 2;
 		topPanel.add(labelTimetable, gbc_textfieldTimetable);
 		
-		JComboBox comboboxTimetable = new JComboBox();
+		comboboxTimetable = new JComboBox<String>();
 		GridBagConstraints gbc_comboboxTimetable = new GridBagConstraints();
 		gbc_comboboxTimetable.gridwidth = 3;
 		gbc_comboboxTimetable.insets = new Insets(0, 0, 5, 5);
@@ -155,6 +162,14 @@ public class ResourcePanel extends JSplitPane{
 				return "An Instance";
 			}
 		});
+		
+	}
+	
+	public void setResourceType(ResourceType res){
+		spinnerQuantity.setValue(Integer.parseInt(res.getDefaultQuantity()));
+		textfieldCost.setValue(Integer.parseInt(res.getDefaultCost()));
+		comboboxTimeunit.setSelectedItem(TimeUnit.valueOf(res.getDefaultTimeUnit()));
+		comboboxTimetable.setSelectedItem(res.getDefaultTimetableId());
 		
 	}
 
