@@ -6,46 +6,40 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.text.DecimalFormat;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.io.File;
+import java.io.IOException;
 import java.text.NumberFormat;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.ListModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
 import org.jdom2.JDOMException;
 
-import com.jgoodies.forms.builder.ButtonStackBuilder;
-
 import de.hpi.bpt.scylla.GUI.ExpandPanel;
+import de.hpi.bpt.scylla.GUI.FormulaManager;
 import de.hpi.bpt.scylla.GUI.InsertRemoveListener;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel;
+import de.hpi.bpt.scylla.GUI.ListChooserPanel.ComponentHolder;
 import de.hpi.bpt.scylla.GUI.ScalingFileChooser;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.ResourceType;
-import de.hpi.bpt.scylla.creation.SimulationConfiguration.SimulationConfigurationCreator;
-import de.hpi.bpt.scylla.GUI.ListChooserPanel.ComponentHolder;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.io.File;
-import java.io.IOException;
-import java.awt.event.ActionEvent;
 
 /**
  * 
@@ -53,16 +47,14 @@ import java.awt.event.ActionEvent;
  *
  */
 @SuppressWarnings("serial")
-public class GlobalConfigurationPane extends JPanel {
+public class GlobalConfigurationPane extends JPanel implements FormulaManager{
 	private JLabel labelFiletitle;
-	//private JLabel labelId;
 	private JTextField textfieldId;
-	//private JLabel labelSeed;
 	private JFormattedTextField textfieldSeed;
-	//private JLabel labelTimezone;
 	private JComboBox<ZoneOffset> comboboxTimezone;
 
 	private ListChooserPanel panelTimetables;
+	private List<ListModel<String>> timetableObserverList;
 	private ListChooserPanel panelResources;
 	
 	private GlobalConfigurationCreator creator;
@@ -70,7 +62,7 @@ public class GlobalConfigurationPane extends JPanel {
 	private boolean saved;
 	private JButton buttonSavefile;
 	private JButton buttonClosefile;
-	private boolean changeFlag;
+	private int changeFlag;
 
 	/**
 	 * Create the panel.
@@ -186,7 +178,7 @@ public class GlobalConfigurationPane extends JPanel {
 		
 		textfieldId = new JTextField();
 		textfieldId.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
-			if(changeFlag)return;
+			if(isChangeFlag())return;
 			creator.setId(textfieldId.getText());
 			setSaved(false);
 		}));
@@ -211,7 +203,7 @@ public class GlobalConfigurationPane extends JPanel {
 		format.setGroupingUsed(false);
 		textfieldSeed = new JFormattedTextField(format);
 		textfieldSeed.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
-			if(changeFlag)return;
+			if(isChangeFlag())return;
 			try{
 				long s = creator.getSeed();
 				long n = Long.parseLong(textfieldSeed.getText());
@@ -245,7 +237,7 @@ public class GlobalConfigurationPane extends JPanel {
 		comboboxTimezone = new JComboBox<ZoneOffset>(timeZones);
 		comboboxTimezone.addItemListener((ItemEvent e)->{
 			if(e.getStateChange() == ItemEvent.SELECTED){
-				if(changeFlag)return;
+				if(isChangeFlag())return;
 				creator.setTimeOffset((ZoneOffset)comboboxTimezone.getSelectedItem());
 				setSaved(false);
 			}
@@ -262,28 +254,16 @@ public class GlobalConfigurationPane extends JPanel {
 
 			@Override
 			public void onDelete(ComponentHolder toDel) {
-				System.out.println("Deleted "+toDel);//TODO
+				creator.removeResourceType(toDel.toString());
+				setSaved(false);
 			}
 
 			@Override
 			public ComponentHolder onCreate() {
-				// TODO Auto-generated method stub
-				return 	new ListChooserPanel.ComponentHolder() {
-					ResourcePanel p = new ResourcePanel();
-					String name = "Resource #"+(int)(Math.random()*10000);
-					@Override
-					public Component getComponent() {
-						return p;
-					}
-					@Override
-					public String toString(){
-						return name;
-					}
-					@Override
-					public void setName(String s){
-						name = s;
-					}
-				};
+				setSaved(false);
+				return newResource(
+						creator.addResourceType("<enter name>")
+				);
 			}
 			
 		};
@@ -300,45 +280,8 @@ public class GlobalConfigurationPane extends JPanel {
 		panelResourcesExpand.expand();
 		panelMain.add(panelResourcesExpand, gbc_panelResources);
 		
-		panelResources.add(						
-				new ListChooserPanel.ComponentHolder() {
-					ResourcePanel p = new ResourcePanel();
-					String name = "A Resource";
-					@Override
-					public Component getComponent() {
-						return p;
-					}
-					@Override
-					public String toString(){
-						return name;
-					}
-					@Override
-					public void setName(String s){
-						name = s;
-					}
-				}
-		);
 		
-		panelResources.add(						
-				new ListChooserPanel.ComponentHolder() {
-					ResourcePanel p = new ResourcePanel();
-					String name = "Another Resource";
-					@Override
-					public Component getComponent() {
-						return p;
-					}
-					@Override
-					public String toString(){
-						return name;
-					}
-					@Override
-					public void setName(String s){
-						name = s;
-					}
-				}
-		);
-		
-		
+		timetableObserverList = new ArrayList<ListModel<String>>();
 		panelTimetables = new ListChooserPanel(){
 
 			@Override
@@ -399,13 +342,13 @@ public class GlobalConfigurationPane extends JPanel {
 	}
 	
 	private void be_create(){
-		changeFlag = true;
+		setChangeFlag(true);
 		labelFiletitle.setText("<unsaved file>");
 		createGC();
+		setChangeFlag(false);
 		textfieldId.setText("NewGlobalConfiguration");
 		textfieldId.requestFocusInWindow();
 		textfieldId.selectAll();
-		changeFlag = false;
 	}
 	
 	private void createGC(){
@@ -439,7 +382,7 @@ public class GlobalConfigurationPane extends JPanel {
 	
 	private void openGC(){
 		//TODO
-		changeFlag = true;
+		setChangeFlag(true);
 		textfieldId.setText(creator.getId());
 		textfieldSeed.setValue(creator.getSeed());
 		comboboxTimezone.setSelectedItem(creator.getTimeOffset());
@@ -448,7 +391,7 @@ public class GlobalConfigurationPane extends JPanel {
 			importResource(res);
 		}
 		
-		changeFlag = false;
+		setChangeFlag(false);
 		setEnabled(true);
 	}
 
@@ -490,7 +433,7 @@ public class GlobalConfigurationPane extends JPanel {
 		else closeGC();
 	}
 	private void closeGC(){
-		changeFlag = true;
+		setChangeFlag(true);
 		creator = null;
 		labelFiletitle.setText("");
 		textfieldId.setText("");
@@ -499,7 +442,7 @@ public class GlobalConfigurationPane extends JPanel {
 		
 		panelResources.clear();
 		panelTimetables.clear();
-		changeFlag = false;
+		setChangeFlag(false);
 		setSaved(true);
 		setEnabled(false);
 	}
@@ -531,6 +474,24 @@ public class GlobalConfigurationPane extends JPanel {
 		buttonSavefile.setEnabled(!b);
 	}
 	
+	@Override
+	public boolean isChangeFlag() {
+		return changeFlag > 0;
+	}
+	
+	@Override
+	public void setChangeFlag(boolean b) {
+		if(b)changeFlag++;
+		else changeFlag--;
+		System.out.println("Changeflag to: "+changeFlag);
+		if(changeFlag < 0)throw new java.lang.NegativeArraySizeException();
+	}
+	
+	@Override
+	public List<ListModel<String>> getTimetableObserverList() {
+		return timetableObserverList;
+	}
+
 	private String getFileName(){
 		if(file != null)return file.getName();
 		else return labelFiletitle.getText();
@@ -547,29 +508,34 @@ public class GlobalConfigurationPane extends JPanel {
 		super.setEnabled(b);
 	}
 	
-	public void importResource(GlobalConfigurationCreator.ResourceType res){
+	public void importResource(ResourceType res){
 		panelResources.add(
-				new ListChooserPanel.ComponentHolder() {
-					ResourcePanel p = new ResourcePanel();
-					{
-						p.setResourceType(res);
-					}
-					@Override
-					public Component getComponent() {
-						return p;
-					}
-					@Override
-					public String toString(){
-						return res.getName();
-					}
-					@Override
-					public void setName(String s){
-						res.setName(s);
-						setSaved(false);
-					}
-				}
+				newResource(res)
 		);
 	}
+	
+	private ComponentHolder newResource(ResourceType res){
+		return new ListChooserPanel.ComponentHolder() {
+			ResourcePanel p = new ResourcePanel(GlobalConfigurationPane.this);
+			{
+				p.setResourceType(res);
+			}
+			@Override
+			public Component getComponent() {
+				return p;
+			}
+			@Override
+			public String toString(){
+				return res.getId();
+			}
+			@Override
+			public void setName(String s){
+				res.setId(s);
+				setSaved(false);
+			}
+		};
+	}
+
 	
 	
 	

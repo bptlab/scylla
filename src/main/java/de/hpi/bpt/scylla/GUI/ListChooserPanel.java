@@ -69,6 +69,7 @@ public abstract class ListChooserPanel extends JSplitPane{
 		buttonAdd.setIcon(ScyllaGUI.ICON_PLUS);
 		buttonAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				if(list.getCellEditor() != null)list.getCellEditor().cancelCellEditing();
 				int index = model.getRowCount();
 				model.addRow(new ComponentHolder[]{onCreate()});
 				list.editCellAt(index, 0);
@@ -91,9 +92,12 @@ public abstract class ListChooserPanel extends JSplitPane{
 		buttonRemove.setIcon(ScyllaGUI.ICON_X);
 		buttonRemove.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				if(list.getCellEditor() != null)list.getCellEditor().cancelCellEditing();
 				int sel = list.getSelectedRow();
 				if(sel != -1){
-					onDelete((ComponentHolder) model.getValueAt(sel, 0));
+					ComponentHolder toDel = (ComponentHolder) model.getValueAt(sel, 0);
+					toDel.delete();
+					onDelete(toDel);
 					model.removeRow(sel);
 				}
 			}
@@ -113,6 +117,7 @@ public abstract class ListChooserPanel extends JSplitPane{
 				add(item);
 			}
 		}
+		
 		
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -149,7 +154,6 @@ public abstract class ListChooserPanel extends JSplitPane{
 			}
 		});
 		list.setDefaultEditor(Object.class, new ComponentHolderCellEditor());
-		
 		scrollPane.setViewportView(list);
 		
 		
@@ -164,6 +168,7 @@ public abstract class ListChooserPanel extends JSplitPane{
 	}
 	
 	public void clear(){
+		if(list.getCellEditor() != null)list.getCellEditor().cancelCellEditing();
 		while(model.getRowCount() > 0){
 			((ComponentHolder)model.getValueAt(0,0)).delete();
 			model.removeRow(0);

@@ -169,6 +169,9 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 			super(new Element("dynamicResource",GlobalConfigurationCreator.this.nsp));
 			id = i;
 			setAttribute("id",id);
+			setDefaultQuantity(0);
+			setDefaultCost(0);
+			setDefaultTimeUnit(TimeUnit.SECONDS);
 			getResourceData().addContent(el);
 			resourceInstances = new ArrayList<ResourceInstance>();
 		};
@@ -246,7 +249,10 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 			}
 
 			/**Sets instances unique name, can cause invalidity if not unique*/
-			public void setName(String name){setAttribute("name", name);}
+			public void setName(String name){
+				this.name = name;
+				setAttribute("name", name);
+			}
 			/**Sets instances cost*/
 			public void setCost(double dk){setAttribute("cost", dk);}
 			/**Removes instances cost, if not specified, default resource type cost will be used*/
@@ -271,6 +277,15 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 
 		}
 		
+		
+		/**
+		 * Getter for all instances of this type
+		 * @return
+		 */
+		public List<ResourceInstance> getResourceInstances() {
+			return resourceInstances;
+		}
+
 		/**
 		 * Returns instance object for given name
 		 * @param name instance name
