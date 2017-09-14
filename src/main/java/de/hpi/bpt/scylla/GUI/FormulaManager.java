@@ -2,7 +2,7 @@ package de.hpi.bpt.scylla.GUI;
 
 import java.util.List;
 
-import javax.swing.ListModel;
+import javax.swing.JComboBox;
 
 public interface FormulaManager {
 	
@@ -10,6 +10,7 @@ public interface FormulaManager {
 	public boolean isChangeFlag();
 	public void setChangeFlag(boolean b);
 	
-	public List<ListModel<String>> getTimetableObserverList();
+	public List<JComboBox<String>> getTimetableObserverList();
+	public List<String> getTimetables();
 
 }

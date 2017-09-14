@@ -116,13 +116,14 @@ public class InstancePanel extends JPanel{
 		gbc_textfieldTimetable.gridy = 1;
 		add(labelTimetable, gbc_textfieldTimetable);
 		
-		comboboxTimetable = new JComboBox<String>();
+		comboboxTimetable = new JComboBox<String>(formulaManager.getTimetables().toArray(new String[formulaManager.getTimetables().size()]));
 		comboboxTimetable.addItemListener((ItemEvent e)->{
 			if(formulaManager.isChangeFlag())return;
-			instance.setTimetableId((String) comboboxTimetable.getSelectedItem());
+			if(comboboxTimetable.getSelectedItem() == null)instance.removeTimetableId();
+			else instance.setTimetableId((String) comboboxTimetable.getSelectedItem());
 			formulaManager.setSaved(false);
 		});
-		formulaManager.getTimetableObserverList().add(comboboxTimetable.getModel());
+		formulaManager.getTimetableObserverList().add(comboboxTimetable);
 		GridBagConstraints gbc_comboboxTimetable = new GridBagConstraints();
 		gbc_comboboxTimetable.gridwidth = 3;
 		gbc_comboboxTimetable.insets = new Insets(0, 0, 0, 5);

@@ -92,7 +92,6 @@ public class ResourcePanel extends JSplitPane{
 			if(formulaManager.isChangeFlag())return;
 			try{
 				resourceType.setDefaultCost(Double.parseDouble(textfieldCost.getText()));
-				System.out.println(textfieldCost.getText());
 				formulaManager.setSaved(false);
 			}catch(NumberFormatException exc){}
 		}));
@@ -115,6 +114,7 @@ public class ResourcePanel extends JSplitPane{
 		
 		comboboxTimeunit = new JComboBox<TimeUnit>(TimeUnit.values());
 		comboboxTimeunit.addItemListener((ItemEvent e)->{
+			if(e.getStateChange() != ItemEvent.SELECTED)return;
 			notifyDefaultChanges();
 			if(formulaManager.isChangeFlag())return;
 			resourceType.setDefaultTimeUnit((TimeUnit) comboboxTimeunit.getSelectedItem());
@@ -136,9 +136,10 @@ public class ResourcePanel extends JSplitPane{
 		gbc_textfieldTimetable.gridy = 2;
 		topPanel.add(labelTimetable, gbc_textfieldTimetable);
 		
-		comboboxTimetable = new JComboBox<String>();
-		fm.getTimetableObserverList().add(comboboxTimetable.getModel());
+		comboboxTimetable = new JComboBox<String>(formulaManager.getTimetables().toArray(new String[formulaManager.getTimetables().size()]));
+		fm.getTimetableObserverList().add(comboboxTimetable);
 		comboboxTimetable.addItemListener((ItemEvent e)->{
+			if(e.getStateChange() != ItemEvent.SELECTED)return;
 			notifyDefaultChanges();
 			if(formulaManager.isChangeFlag())return;
 			resourceType.setDefaultTimetableId((String) comboboxTimetable.getSelectedItem());

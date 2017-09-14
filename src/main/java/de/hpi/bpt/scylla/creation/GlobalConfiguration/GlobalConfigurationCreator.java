@@ -463,19 +463,19 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 			/**Sets items start day*/
 			public void setFrom(DayOfWeek d){setAttribute("from", d);}
 			/**Returns items start day as string*/
-			public String getFrom(){return el.getAttributeValue("from");}
+			public DayOfWeek getFrom(){return DayOfWeek.valueOf(el.getAttributeValue("from"));}
 			/**Sets items end day*/			
 			public void setTo(DayOfWeek d){setAttribute("to", d);}
 			/**Returns items end day as string*/			
-			public String getTo(){return el.getAttributeValue("to");}
+			public DayOfWeek getTo(){return DayOfWeek.valueOf(el.getAttributeValue("to"));}
 			/**Sets items daily start time*/
 			public void setBeginTime(LocalTime l){setAttribute("beginTime", l);}
 			/**Returns items daily start time as string*/
-			public String getBeginTime(){return el.getAttributeValue("beginTime");}
+			public LocalTime getBeginTime(){return LocalTime.parse(el.getAttributeValue("beginTime"));}
 			/**Sets items daily end time*/
 			public void setEndTime(LocalTime l){setAttribute("endTime", l);}
 			/**Returns items daily end time as string*/
-			public String getEndTime(){return el.getAttributeValue("endTime");}
+			public LocalTime getEndTime(){return LocalTime.parse(el.getAttributeValue("endTime"));}
 
 			/**
 			 * Validates the timetableitem; checks if all data attributes are specified and if all data types are correct
@@ -486,25 +486,25 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 			public void validate(List<String> errors, List<String> warnings, int index) {
 				if(getFrom() == null)errors.add("Start day of item "+index+" from table "+timetable.id+" not specified");
 				else try{ 
-					DayOfWeek.valueOf(getFrom());
+					getFrom();
 				}catch(IllegalArgumentException e){
 					errors.add("Start day of item "+index+" from table "+timetable.id+" not a valid day of week");
 				}
 				if(getTo() == null)errors.add("End day of item "+index+" from table "+timetable.id+" not specified");
 				else try{ 
-					DayOfWeek.valueOf(getTo());
+					getTo();
 				}catch(IllegalArgumentException e){
 					errors.add("End day of item "+index+" from table "+timetable.id+" not a valid day of week");
 				}
 				if(getBeginTime() == null)errors.add("Start time of item "+index+" from table "+timetable.id+" not specified");
 				else try{
-					LocalTime.parse(getBeginTime());
+					getBeginTime();
 				}catch(DateTimeParseException e){
 					errors.add("Start time of item "+index+" from table "+timetable.id+" is not a time.");
 				}
 				if(getEndTime() == null)errors.add("End time of item "+index+" from table "+timetable.id+" not specified");
 				else try{
-					LocalTime.parse(getEndTime());
+					getEndTime();
 				}catch(DateTimeParseException e){
 					errors.add("End time of item "+index+" from table "+timetable.id+" is not a time.");
 				}
@@ -567,6 +567,11 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 		public String getId() {
 			return id;
 		}
+		
+		public void setId(String s) {
+			id = s;
+			setAttribute("id",id);
+		}
 
 		/**
 		 * Validates this timetable and its items; logs errors and warnings in lists
@@ -580,8 +585,7 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 				items.get(j).validate(errors,warnings,j);
 			}
 			
-		}
-		
+		}	
 		
 	}
 	

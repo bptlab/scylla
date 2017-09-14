@@ -25,7 +25,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.ListModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.event.DocumentEvent;
 
@@ -40,6 +39,7 @@ import de.hpi.bpt.scylla.GUI.ScalingFileChooser;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.ResourceType;
+import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.Timetable;
 
 /**
  * 
@@ -54,7 +54,8 @@ public class GlobalConfigurationPane extends JPanel implements FormulaManager{
 	private JComboBox<ZoneOffset> comboboxTimezone;
 
 	private ListChooserPanel panelTimetables;
-	private List<ListModel<String>> timetableObserverList;
+	private List<JComboBox<String>> timetableObserverList;
+	private List<String> timetables;
 	private ListChooserPanel panelResources;
 	
 	private GlobalConfigurationCreator creator;
@@ -280,20 +281,31 @@ public class GlobalConfigurationPane extends JPanel implements FormulaManager{
 		panelResourcesExpand.expand();
 		panelMain.add(panelResourcesExpand, gbc_panelResources);
 		
-		
-		timetableObserverList = new ArrayList<ListModel<String>>();
+
+		timetableObserverList = new ArrayList<JComboBox<String>>();
+		timetables = new ArrayList<String>();
 		panelTimetables = new ListChooserPanel(){
 
 			@Override
 			public void onDelete(ComponentHolder toDel) {
-				// TODO Auto-generated method stub
-				
+				for(JComboBox<String> cbm : getTimetableObserverList()){
+					cbm.removeItem(toDel.toString());
+				}
+				timetables.remove(toDel.toString());
+				creator.deleteTimetable(toDel.toString());
+				setSaved(false);
 			}
 
 			@Override
 			public ComponentHolder onCreate() {
-				// TODO Auto-generated method stub
-				return null;
+				setSaved(false);
+//				for(JComboBox<String> cbm : getTimetableObserverList()){
+//					cbm.addItem("<enter name>");
+//				}
+//				timetables.add("<enter name>");
+				return newTimetable(
+						creator.createTimetable("<enter name>")
+				);
 			}
 			
 		};
@@ -309,23 +321,6 @@ public class GlobalConfigurationPane extends JPanel implements FormulaManager{
 		ExpandPanel panelTimetablesExpand = new ExpandPanel(new JLabel("Timetables"), panelTimetables);
 		panelTimetablesExpand.expand();
 		panelMain.add(panelTimetablesExpand, gbc_panelTimetables);
-		
-		panelTimetables.add(new ListChooserPanel.ComponentHolder() {
-					TimetablePanel p = new TimetablePanel();
-					String name = "A Timetable";
-					@Override
-					public Component getComponent() {
-						return p;
-					}
-					@Override
-					public String toString(){
-						return name;
-					}
-					@Override
-					public void setName(String s){
-						name = s;
-					}
-				});
 		
 		JPanel panelBuffer = new JPanel();
 		panelBuffer.setBackground(panelMain.getBackground());
@@ -381,16 +376,17 @@ public class GlobalConfigurationPane extends JPanel implements FormulaManager{
 	}	
 	
 	private void openGC(){
-		//TODO
 		setChangeFlag(true);
 		textfieldId.setText(creator.getId());
 		textfieldSeed.setValue(creator.getSeed());
 		comboboxTimezone.setSelectedItem(creator.getTimeOffset());
 		
+		for(Timetable t : creator.getTimetables()){
+			importTimetable(t);
+		}
 		for(ResourceType res : creator.getResourceTypes()){
 			importResource(res);
 		}
-		
 		setChangeFlag(false);
 		setEnabled(true);
 	}
@@ -442,6 +438,8 @@ public class GlobalConfigurationPane extends JPanel implements FormulaManager{
 		
 		panelResources.clear();
 		panelTimetables.clear();
+		timetableObserverList.clear();
+		timetables.clear();
 		setChangeFlag(false);
 		setSaved(true);
 		setEnabled(false);
@@ -483,13 +481,17 @@ public class GlobalConfigurationPane extends JPanel implements FormulaManager{
 	public void setChangeFlag(boolean b) {
 		if(b)changeFlag++;
 		else changeFlag--;
-		System.out.println("Changeflag to: "+changeFlag);
 		if(changeFlag < 0)throw new java.lang.NegativeArraySizeException();
 	}
 	
 	@Override
-	public List<ListModel<String>> getTimetableObserverList() {
+	public List<JComboBox<String>> getTimetableObserverList() {
 		return timetableObserverList;
+	}
+
+	@Override
+	public List<String> getTimetables() {
+		return timetables;
 	}
 
 	private String getFileName(){
@@ -531,6 +533,44 @@ public class GlobalConfigurationPane extends JPanel implements FormulaManager{
 			@Override
 			public void setName(String s){
 				res.setId(s);
+				setSaved(false);
+			}
+		};
+	}
+	
+	public void importTimetable(Timetable t){
+		panelTimetables.add(newTimetable(t));
+		for(JComboBox<String> cbm : getTimetableObserverList()){
+			cbm.addItem(t.getId());
+		}
+		timetables.add(t.getId());
+	}
+	
+	private ComponentHolder newTimetable(Timetable t){
+		return new ListChooserPanel.ComponentHolder() {
+			TimetablePanel p = new TimetablePanel(GlobalConfigurationPane.this);
+			{
+				p.setTimetable(t);
+			}
+			@Override
+			public Component getComponent() {
+				return p;
+			}
+			@Override
+			public String toString(){
+				return t.getId();
+			}
+			@Override
+			public void setName(String s){
+				for(JComboBox<String> cbm : getTimetableObserverList()){
+					String sel = (String) cbm.getSelectedItem();
+					cbm.addItem(s);
+					if(sel != null && sel.equals(t.getId()))cbm.setSelectedItem(s);
+					cbm.removeItem(t.getId());
+				}
+				timetables.remove(t.getId());
+				timetables.add(s);
+				t.setId(s);
 				setSaved(false);
 			}
 		};
