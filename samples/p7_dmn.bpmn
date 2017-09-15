@@ -30,7 +30,7 @@
         <targetRef>sid-239741B7-E442-40BD-A153-739033002E0F</targetRef>
       </dataOutputAssociation>
     </businessRuleTask>
-    <exclusiveGateway id="sid-85254ABC-6ACE-4339-8A83-C839287B173A" name="Discount.Type" gatewayDirection="Diverging">
+    <exclusiveGateway id="sid-85254ABC-6ACE-4339-8A83-C839287B173A" name="Discount.Points" gatewayDirection="Diverging">
       <extensionElements>
         <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff" />
       </extensionElements>
@@ -135,10 +135,10 @@
     </startEvent>
     <sequenceFlow id="sid-A1837DFC-CAB5-4270-95B4-68DDD4E5882F" name="" sourceRef="StartEvent_1" targetRef="sid-7CDF7B0A-4A19-4181-B09E-B1ED1E10A3A7" />
     <sequenceFlow id="sid-5A00C490-999F-4134-BDEA-2BD737527824" name="" sourceRef="sid-7CDF7B0A-4A19-4181-B09E-B1ED1E10A3A7" targetRef="sid-85254ABC-6ACE-4339-8A83-C839287B173A" />
-    <sequenceFlow id="sid-CE13CF6E-33D7-4AE3-AE90-725238F8E297" name="25" sourceRef="sid-85254ABC-6ACE-4339-8A83-C839287B173A" targetRef="sid-9156D59A-DF79-4C05-8EEE-1541C5DA5E40">
+    <sequenceFlow id="sid-CE13CF6E-33D7-4AE3-AE90-725238F8E297" name="&#60;1110" sourceRef="sid-85254ABC-6ACE-4339-8A83-C839287B173A" targetRef="sid-9156D59A-DF79-4C05-8EEE-1541C5DA5E40">
       <conditionExpression xsi:type="tFormalExpression">25%</conditionExpression>
     </sequenceFlow>
-    <sequenceFlow id="sid-1790765E-B558-40A9-9A6E-28B22385DB30" name="50" sourceRef="sid-85254ABC-6ACE-4339-8A83-C839287B173A" targetRef="sid-5B535DD8-20F2-4E40-B636-9733D2E936E1">
+    <sequenceFlow id="sid-1790765E-B558-40A9-9A6E-28B22385DB30" name="&#62;=1110" sourceRef="sid-85254ABC-6ACE-4339-8A83-C839287B173A" targetRef="sid-5B535DD8-20F2-4E40-B636-9733D2E936E1">
       <conditionExpression xsi:type="tFormalExpression">50%</conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="sid-DE27AC04-1245-4C8C-84E4-34D4D52BCED6" name="" sourceRef="sid-9156D59A-DF79-4C05-8EEE-1541C5DA5E40" targetRef="sid-6CB99342-2F2C-4B9B-9E09-1A1DB9BDF8DC" />
@@ -163,7 +163,7 @@
       <bpmndi:BPMNShape id="sid-85254ABC-6ACE-4339-8A83-C839287B173A_gui" bpmnElement="sid-85254ABC-6ACE-4339-8A83-C839287B173A" isMarkerVisible="true">
         <omgdc:Bounds x="610" y="335" width="40" height="40" />
         <bpmndi:BPMNLabel labelStyle="sid-7d42db9e-59d5-4e12-aa7a-4773cf57b13a">
-          <omgdc:Bounds x="655" y="349" width="72" height="12" />
+          <omgdc:Bounds x="652" y="349" width="79" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="sid-9156D59A-DF79-4C05-8EEE-1541C5DA5E40_gui" bpmnElement="sid-9156D59A-DF79-4C05-8EEE-1541C5DA5E40">
@@ -222,7 +222,7 @@
         <omgdi:waypoint xsi:type="omgdc:Point" x="630.5" y="290" />
         <omgdi:waypoint xsi:type="omgdc:Point" x="695" y="290" />
         <bpmndi:BPMNLabel labelStyle="sid-7d42db9e-59d5-4e12-aa7a-4773cf57b13a">
-          <omgdc:Bounds x="610" y="289" width="15" height="12" />
+          <omgdc:Bounds x="599" y="274" width="31" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="sid-1790765E-B558-40A9-9A6E-28B22385DB30_gui" bpmnElement="sid-1790765E-B558-40A9-9A6E-28B22385DB30">
@@ -230,7 +230,7 @@
         <omgdi:waypoint xsi:type="omgdc:Point" x="630.5" y="430" />
         <omgdi:waypoint xsi:type="omgdc:Point" x="695" y="430" />
         <bpmndi:BPMNLabel labelStyle="sid-7d42db9e-59d5-4e12-aa7a-4773cf57b13a">
-          <omgdc:Bounds x="606" y="383" width="21" height="12" />
+          <omgdc:Bounds x="596" y="434" width="37" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="sid-DE27AC04-1245-4C8C-84E4-34D4D52BCED6_gui" bpmnElement="sid-DE27AC04-1245-4C8C-84E4-34D4D52BCED6">

@@ -91,19 +91,39 @@ public class ExclusiveGatewayEventPlugin extends GatewayEventPluggable {
 	                    }
 	                    scheduleNextEvent(desmojEvent, processInstance, processModel, nextFlowId);
 	
-                    } else if (desmojEvent.getDisplayName() != null){ //to fix
+                    } else if (desmojEvent.getDisplayName() != null){ //does not really work out atm because if now display name is given the id is taken as the display name --> its never null
                     	Object[] outgoingRefs = processModel.getGraph().getTargetObjects(nodeId).toArray();
                     	for (Object or : outgoingRefs) {
-                    		String value = null;
+                    		Object value = null;
+                    		String comparison = null;
                     		
                     		if (processModel.getDisplayNames().get(or).startsWith("==")) {
                     			value = processModel.getDisplayNames().get(or).substring(2, processModel.getDisplayNames().get(or).length());
+                    			comparison = "equal";
                     		}
                     		else if (processModel.getDisplayNames().get(or).startsWith("=")) {
                     			value = processModel.getDisplayNames().get(or).substring(1, processModel.getDisplayNames().get(or).length());
+                    			comparison = "equal";
+                    		}
+                    		else if (processModel.getDisplayNames().get(or).startsWith(">=")) {
+                    			value = Long.parseLong(processModel.getDisplayNames().get(or).substring(2, processModel.getDisplayNames().get(or).length()));
+                    			comparison = "greaterOrEqual";
+                    		}
+                    		else if (processModel.getDisplayNames().get(or).startsWith("<=")) {
+                    			value = Long.parseLong(processModel.getDisplayNames().get(or).substring(2, processModel.getDisplayNames().get(or).length()));
+                    			comparison = "lessOrEqual";
+                    		}
+                    		else if (processModel.getDisplayNames().get(or).startsWith("<")) {
+                    			value = Long.parseLong(processModel.getDisplayNames().get(or).substring(1, processModel.getDisplayNames().get(or).length()));
+                    			comparison = "less";
+                    		}
+                    		else if (processModel.getDisplayNames().get(or).startsWith(">")) {
+                    			value = Long.parseLong(processModel.getDisplayNames().get(or).substring(1, processModel.getDisplayNames().get(or).length()));
+                    			comparison = "greater";
                     		}
                     		else {
                     			value = processModel.getDisplayNames().get(or);
+                    			comparison = "equal";
                     		}
 
                     		Collection<Map<Integer, java.util.List<ProcessNodeInfo>>> allProcesses = model.getProcessNodeInfos().values();
@@ -112,9 +132,27 @@ public class ExclusiveGatewayEventPlugin extends GatewayEventPluggable {
 								for (ProcessNodeInfo task : currentProcess) {
 									Map<String, Object> dataObjectField = task.getDataObjectField();
 									for (Map.Entry<String, Object> dO : dataObjectField.entrySet()){
-									    if (dO.getKey().equals(desmojEvent.getDisplayName()) && dO.getValue().equals(value)) {
-									        Integer nextFlowId = (Integer) or;
-									        scheduleNextEvent(desmojEvent, processInstance, processModel, nextFlowId);
+									    if (dO.getKey().equals(desmojEvent.getDisplayName())) {
+									    	if (comparison.equals("equal") && dO.getValue().equals(value)) {
+									    		Integer nextFlowId = (Integer) or;
+									    		scheduleNextEvent(desmojEvent, processInstance, processModel, nextFlowId);
+									    	}
+									    	else if (comparison.equals("less") && (long) dO.getValue() < (long) value) {
+									    		Integer nextFlowId = (Integer) or;
+									    		scheduleNextEvent(desmojEvent, processInstance, processModel, nextFlowId);
+									    	}
+									    	else if (comparison.equals("greater") && (long) dO.getValue() > (long) value) {
+									    		Integer nextFlowId = (Integer) or;
+									    		scheduleNextEvent(desmojEvent, processInstance, processModel, nextFlowId);
+									    	}
+									    	else if (comparison.equals("greaterOrEqual") && (long) dO.getValue() >= (long) value) {
+									    		Integer nextFlowId = (Integer) or;
+									    		scheduleNextEvent(desmojEvent, processInstance, processModel, nextFlowId);
+									    	}
+									    	else if (comparison.equals("lessOrEqual") && (long) dO.getValue() <= (long) value) {
+									    		Integer nextFlowId = (Integer) or;
+									    		scheduleNextEvent(desmojEvent, processInstance, processModel, nextFlowId);
+									    	}
 									    }
 									}
 								}
