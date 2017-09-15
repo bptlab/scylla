@@ -22,7 +22,8 @@ public class Scylla {
          */
 
     	String folder = "samples" + FILEDELIM;
-    	String resFilename = folder + "p0_globalconf_without.xml";
+//    	String resFilename = folder + "p0_globalconf_without.xml";
+    	String resFilename = folder + "p56_conf.xml";
 
 
 //        String[] bpmnFilename = new String[] { folder + "p1_boundary.bpmn", folder + "p2_normal.bpmn",
@@ -34,6 +35,11 @@ public class Scylla {
     	/**
          * Simulation scenarios to test dmn simulation.
          */
+
+
+//      String[] bpmnFilename = new String[] { folder + "p1_boundary.bpmn"};
+//      String[] simFilenames = new String[] { folder + "p1_boundary_sim.xml"};
+    	
     	
 //        String[] bpmnFilename = new String[] { folder + "p2_normal.bpmn"};
 //        String[] simFilenames = new String[] { folder + "p2_normal_sim.xml"};
@@ -42,12 +48,17 @@ public class Scylla {
 //         String[] bpmnFilename = new String[] { folder + "p4_parallel.bpmn" };
 //         String[] simFilenames = new String[] { folder + "p4_parallel_sim.xml" };
 
+    	
+      String[] bpmnFilename = new String[] { folder + "p6_return.bpmn" };
+      String[] simFilenames = new String[] { folder + "p6_return_sim.xml" };
+    	
+    	
 //      String[] bpmnFilename = new String[] { folder + "p7_dmn.bpmn" };
 //      String[] simFilenames = new String[] { folder + "p7_dmn_sim.xml" };
     	
-    	
-      String[] bpmnFilename = new String[] { folder + "p8_normalbpmn_with_dataobject.bpmn"};
-      String[] simFilenames = new String[] { folder + "p8_normalbpmn_with_dataobject_sim.xml"};
+
+//      String[] bpmnFilename = new String[] { folder + "p8_normalbpmn_with_dataobject.bpmn"};
+//      String[] simFilenames = new String[] { folder + "p8_normalbpmn_with_dataobject_sim.xml"};
 
 
 //        String[] bpmnFilename = new String[] { folder + "p5_batch.bpmn", folder + "p6_return.bpmn" };

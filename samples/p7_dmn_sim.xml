@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bsim:definitions xmlns:bsim="http://bsim.hpi.uni-potsdam.de/scylla/simModel" id="Simulation_5" targetNamespace="http://www.hpi.de">
-	<bsim:simulationConfiguration id="SimulationConfiguration_6" processRef="sid-955358bd-6fa0-488d-966e-02912e79c1e4" processInstances="10" startDateTime="2016-07-02T12:22:57.000" randomSeed="9281" ><!--resourceAssignmentOrder="priority,simulationTime" endDateTime="2016-08-05T15:00:00.000+02:00">-->
+	<bsim:simulationConfiguration id="SimulationConfiguration_6" processRef="sid-955358bd-6fa0-488d-966e-02912e79c1e4" processInstances="10" startDateTime="2016-07-02T12:22:57.000" randomSeed="280" ><!--resourceAssignmentOrder="priority,simulationTime" endDateTime="2016-08-05T15:00:00.000+02:00">-->
 		
 		
 		<bsim:startEvent id="StartEvent_1">
@@ -11,11 +11,7 @@
 	    	</bsim:arrivalRate>
 	    </bsim:startEvent>
 		
-		<bsim:dataObject id="sid-0dc7a51e-1ed3-4cf2-b68a-dabdde362eb4" name="Discount">
-			<bsim:field name="Value" type="string"></bsim:field>
-		</bsim:dataObject>
-		
-		<bsim:dataInput id="sid-BCEED428-482B-4B7D-9A32-AE4AD1F92BCA" name="BahnCard" >
+		<bsim:dataObject id="sid-239741B7-E442-40BD-A153-739033002E0F" name="Discount">
 			<bsim:field name="Type" type="string">
 				<bsim:empiricalStringDistribution>
 					<bsim:entry value="25" frequency="0.8"></bsim:entry>
@@ -27,10 +23,8 @@
 					<bsim:mean>950</bsim:mean>
 					<bsim:standardDeviation>200</bsim:standardDeviation>
 				</bsim:normalDistribution>
-				<bsim:range min="0" max="infinite"></bsim:range>
 			</bsim:field>
-		</bsim:dataInput>
-
+		</bsim:dataObject>
 		
 		<bsim:task id="sid-5B535DD8-20F2-4E40-B636-9733D2E936E1" name="Apply 50% discount">
 			<bsim:duration timeUnit="MINUTES">

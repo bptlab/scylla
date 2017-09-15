@@ -432,7 +432,13 @@ public class ProcessModelParser extends Parser<ProcessModel> {
         for (Integer nId : boundaryEvents.keySet()) {
             Element boundaryEvent = boundaryEvents.get(nId);
             // interrupting or not?
-            boolean cancelActivity = Boolean.valueOf(boundaryEvent.getAttributeValue("cancelActivity"));
+            boolean cancelActivity; //initially true, because at least "Camunda Modeler" does not set the cancelActivity value if it is an interrupting activity
+            if (boundaryEvent.getAttributeValue("cancelActivity") != null) {
+            	cancelActivity = Boolean.valueOf(boundaryEvent.getAttributeValue("cancelActivity"));
+            } else {
+            	cancelActivity = true;
+            }
+            
             cancelActivities.put(nId, cancelActivity);
 
             // attached to?

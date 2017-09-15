@@ -1,12 +1,14 @@
 package de.hpi.bpt.scylla.plugin.gateway_exclusive;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import de.hpi.bpt.scylla.exception.ScyllaRuntimeException;
 import de.hpi.bpt.scylla.exception.ScyllaValidationException;
+import de.hpi.bpt.scylla.logger.ProcessNodeInfo;
 import de.hpi.bpt.scylla.model.process.ProcessModel;
 import de.hpi.bpt.scylla.model.process.graph.exception.NodeNotFoundException;
 import de.hpi.bpt.scylla.model.process.node.GatewayType;
@@ -26,7 +28,40 @@ public class ExclusiveGatewayEventPlugin extends GatewayEventPluggable {
     public String getName() {
         return ExclusiveGatewayPluginUtils.PLUGIN_NAME;
     }
+    
+    private void scheduleNextEvent(GatewayEvent desmojEvent, ProcessInstance processInstance, ProcessModel processModel, Integer nextFlowId) {
+    	Set<Integer> nodeIds = null;
+		try {
+			nodeIds = processModel.getTargetObjectIds(nextFlowId);
+		} catch (NodeNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        if (nodeIds.size() != 1) {
+            try {
+				throw new ScyllaValidationException(
+				        "Flow " + nextFlowId + " does not connect to 1 node, but" + nodeIds.size() + " .");
+			} catch (ScyllaValidationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        }
+        int nextNodeId = nodeIds.iterator().next();
 
+        Map<Integer, ScyllaEvent> nextEventMap = desmojEvent.getNextEventMap();
+        List<Integer> indicesOfEventsToKeep = new ArrayList<Integer>();
+        for (int index : nextEventMap.keySet()) {
+            ScyllaEvent eventCandidate = nextEventMap.get(index);
+            int nodeIdOfCandidate = eventCandidate.getNodeId();
+            if (nodeIdOfCandidate == nextNodeId) {
+                indicesOfEventsToKeep.add(index);
+                break;
+            }
+        }
+        Map<Integer, TimeSpan> timeSpanToNextEventMap = desmojEvent.getTimeSpanToNextEventMap();
+        nextEventMap.keySet().retainAll(indicesOfEventsToKeep);
+        timeSpanToNextEventMap.keySet().retainAll(indicesOfEventsToKeep);
+    }
     @SuppressWarnings("unchecked")
     @Override
     public void eventRoutine(GatewayEvent desmojEvent, ProcessInstance processInstance) throws ScyllaRuntimeException {
@@ -49,32 +84,45 @@ public class ExclusiveGatewayEventPlugin extends GatewayEventPluggable {
                     DiscreteDistEmpirical<Integer> distribution = (DiscreteDistEmpirical<Integer>) branchingDistributions
                             .get(nodeId);
                     // decide on next node
-                    Integer nextFlowId = distribution.sample().intValue();
-                    if (!processModel.getIdentifiers().keySet().contains(nextFlowId)) {
-                        throw new ScyllaValidationException("Flow with id " + nextFlowId + " does not exist.");
-                    }
-                    Set<Integer> nodeIds = processModel.getTargetObjectIds(nextFlowId);
-                    if (nodeIds.size() != 1) {
-                        throw new ScyllaValidationException(
-                                "Flow " + nextFlowId + " does not connect to 1 node, but" + nodeIds.size() + " .");
-                    }
-                    int nextNodeId = nodeIds.iterator().next();
+                    if (distribution != null) {
+	                    Integer nextFlowId = distribution.sample().intValue();
+	                    if (!processModel.getIdentifiers().keySet().contains(nextFlowId)) {
+	                        throw new ScyllaValidationException("Flow with id " + nextFlowId + " does not exist.");
+	                    }
+	                    scheduleNextEvent(desmojEvent, processInstance, processModel, nextFlowId);
+	
+                    } else if (desmojEvent.getDisplayName() != null){ //to fix
+                    	Object[] outgoingRefs = processModel.getGraph().getTargetObjects(nodeId).toArray();
+                    	for (Object or : outgoingRefs) {
+                    		String value = null;
+                    		
+                    		if (processModel.getDisplayNames().get(or).startsWith("==")) {
+                    			value = processModel.getDisplayNames().get(or).substring(2, processModel.getDisplayNames().get(or).length());
+                    		}
+                    		else if (processModel.getDisplayNames().get(or).startsWith("=")) {
+                    			value = processModel.getDisplayNames().get(or).substring(1, processModel.getDisplayNames().get(or).length());
+                    		}
+                    		else {
+                    			value = processModel.getDisplayNames().get(or);
+                    		}
 
-                    Map<Integer, ScyllaEvent> nextEventMap = desmojEvent.getNextEventMap();
-                    List<Integer> indicesOfEventsToKeep = new ArrayList<Integer>();
-                    for (int index : nextEventMap.keySet()) {
-                        ScyllaEvent eventCandidate = nextEventMap.get(index);
-                        int nodeIdOfCandidate = eventCandidate.getNodeId();
-                        if (nodeIdOfCandidate == nextNodeId) {
-                            indicesOfEventsToKeep.add(index);
-                            break;
-                        }
+                    		Collection<Map<Integer, java.util.List<ProcessNodeInfo>>> allProcesses = model.getProcessNodeInfos().values();
+							for (Map<Integer, java.util.List<ProcessNodeInfo>> process : allProcesses) {
+								List<ProcessNodeInfo> currentProcess = process.get(processInstance.getId());
+								for (ProcessNodeInfo task : currentProcess) {
+									Map<String, Object> dataObjectField = task.getDataObjectField();
+									for (Map.Entry<String, Object> dO : dataObjectField.entrySet()){
+									    if (dO.getKey().equals(desmojEvent.getDisplayName()) && dO.getValue().equals(value)) {
+									        Integer nextFlowId = (Integer) or;
+									        scheduleNextEvent(desmojEvent, processInstance, processModel, nextFlowId);
+									    }
+									}
+								}
+							}
+                    	}
+                    } else {
+                    	throw new ScyllaValidationException("No Distribution or reffering DataObject Field for " + desmojEvent.getDisplayName() + " given!");
                     }
-                    Map<Integer, TimeSpan> timeSpanToNextEventMap = desmojEvent.getTimeSpanToNextEventMap();
-                    nextEventMap.keySet().retainAll(indicesOfEventsToKeep);
-                    timeSpanToNextEventMap.keySet().retainAll(indicesOfEventsToKeep);
-
-                    // TODO default flow on data dependencies
                 }
             }
         }
