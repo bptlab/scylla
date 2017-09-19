@@ -93,7 +93,7 @@ public class DataObjectSCParserPlugin extends SimulationConfigurationParserPlugg
                 			distWrapper.setDistribution(distribution);
                 		}*/
                 	}
-                	dataObjectFields.put(fieldName, new DataObjectField(distWrapper, nodeId, fieldName));
+                	dataObjectFields.put(fieldName, new DataObjectField(distWrapper, nodeId, fieldName, fieldType));
             	}
             	dataObjects.put(nodeId, dataObjectFields);
             }

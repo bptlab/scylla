@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 
 import de.hpi.bpt.scylla.exception.ScyllaRuntimeException;
@@ -91,76 +93,122 @@ public class ExclusiveGatewayEventPlugin extends GatewayEventPluggable {
 	                    }
 	                    scheduleNextEvent(desmojEvent, processInstance, processModel, nextFlowId);
 	
-                    } else if (desmojEvent.getDisplayName() != null){ //does not really work out atm because if now display name is given the id is taken as the display name --> its never null
+                    } else { //does not really work out atm because if now display name is given the id is taken as the display name --> its never null
                     	Object[] outgoingRefs = processModel.getGraph().getTargetObjects(nodeId).toArray();
+                    	Integer DefaultPath = null;
+                    	Boolean foundAWay = false;
                     	for (Object or : outgoingRefs) {
-                    		Object value = null;
-                    		String comparison = null;
-                    		
-                    		if (processModel.getDisplayNames().get(or).startsWith("==")) {
-                    			value = processModel.getDisplayNames().get(or).substring(2, processModel.getDisplayNames().get(or).length());
-                    			comparison = "equal";
+                    		if (or.equals(getKeyByValue(processModel.getIdentifiers(),processModel.getNodeAttributes().get(desmojEvent.getNodeId()).get("default"))) == true) {
+                    			DefaultPath = (Integer) or;
+                    			continue;
                     		}
-                    		else if (processModel.getDisplayNames().get(or).startsWith("=")) {
-                    			value = processModel.getDisplayNames().get(or).substring(1, processModel.getDisplayNames().get(or).length());
-                    			comparison = "equal";
-                    		}
-                    		else if (processModel.getDisplayNames().get(or).startsWith(">=")) {
-                    			value = Long.parseLong(processModel.getDisplayNames().get(or).substring(2, processModel.getDisplayNames().get(or).length()));
-                    			comparison = "greaterOrEqual";
-                    		}
-                    		else if (processModel.getDisplayNames().get(or).startsWith("<=")) {
-                    			value = Long.parseLong(processModel.getDisplayNames().get(or).substring(2, processModel.getDisplayNames().get(or).length()));
-                    			comparison = "lessOrEqual";
-                    		}
-                    		else if (processModel.getDisplayNames().get(or).startsWith("<")) {
-                    			value = Long.parseLong(processModel.getDisplayNames().get(or).substring(1, processModel.getDisplayNames().get(or).length()));
-                    			comparison = "less";
-                    		}
-                    		else if (processModel.getDisplayNames().get(or).startsWith(">")) {
-                    			value = Long.parseLong(processModel.getDisplayNames().get(or).substring(1, processModel.getDisplayNames().get(or).length()));
-                    			comparison = "greater";
-                    		}
-                    		else {
-                    			value = processModel.getDisplayNames().get(or);
-                    			comparison = "equal";
-                    		}
-
-                    		Collection<Map<Integer, java.util.List<ProcessNodeInfo>>> allProcesses = model.getProcessNodeInfos().values();
-							for (Map<Integer, java.util.List<ProcessNodeInfo>> process : allProcesses) {
-								List<ProcessNodeInfo> currentProcess = process.get(processInstance.getId());
-								for (ProcessNodeInfo task : currentProcess) {
-									Map<String, Object> dataObjectField = task.getDataObjectField();
-									for (Map.Entry<String, Object> dO : dataObjectField.entrySet()){
-									    if (dO.getKey().equals(desmojEvent.getDisplayName())) {
-									    	if (comparison.equals("equal") && dO.getValue().equals(value)) {
-									    		Integer nextFlowId = (Integer) or;
-									    		scheduleNextEvent(desmojEvent, processInstance, processModel, nextFlowId);
-									    	}
-									    	else if (comparison.equals("less") && (long) dO.getValue() < (long) value) {
-									    		Integer nextFlowId = (Integer) or;
-									    		scheduleNextEvent(desmojEvent, processInstance, processModel, nextFlowId);
-									    	}
-									    	else if (comparison.equals("greater") && (long) dO.getValue() > (long) value) {
-									    		Integer nextFlowId = (Integer) or;
-									    		scheduleNextEvent(desmojEvent, processInstance, processModel, nextFlowId);
-									    	}
-									    	else if (comparison.equals("greaterOrEqual") && (long) dO.getValue() >= (long) value) {
-									    		Integer nextFlowId = (Integer) or;
-									    		scheduleNextEvent(desmojEvent, processInstance, processModel, nextFlowId);
-									    	}
-									    	else if (comparison.equals("lessOrEqual") && (long) dO.getValue() <= (long) value) {
-									    		Integer nextFlowId = (Integer) or;
-									    		scheduleNextEvent(desmojEvent, processInstance, processModel, nextFlowId);
-									    	}
-									    }
+                    		Object[] conditions = processModel.getDisplayNames().get(or).split("&&");
+                    		Integer nextFlowId = (Integer) or;
+                    		List<Boolean> test = new ArrayList<>();
+                    		for (Object condition : conditions) {
+                    			condition = ((String) condition).trim();
+                    			String field = null;
+	                    		String value = null;
+	                    		String comparison = null;
+	                    		
+	                    		if (((String) condition).contains("==")) {
+	                    			field = ((String) condition).split("==")[0];
+	                    			value = ((String) condition).split("==")[1];
+	                    			//value = processModel.getDisplayNames().get(or).substring(2, processModel.getDisplayNames().get(or).length());
+	                    			comparison = "equal";
+	                    		}
+	                    		else if (((String) condition).contains(">=")) {
+	                    			field = ((String) condition).split(">=")[0];
+	                    			value = ((String) condition).split(">=")[1];
+	                    			comparison = "greaterOrEqual";
+	                    		}
+	                    		else if (((String) condition).contains("<=")) {
+	                    			field = ((String) condition).split("<=")[0];
+	                    			value = ((String) condition).split("<=")[1];
+	                    			comparison = "lessOrEqual";
+	                    		}
+	                    		else if (((String) condition).contains("!=")) {
+	                    			field = ((String) condition).split("!=")[0];
+	                    			value = ((String) condition).split("!=")[1];
+	                    			comparison = "notEqual";
+	                    		}
+	                    		else if (((String) condition).contains("=")) {
+	                    			field = ((String) condition).split("=")[0];
+	                    			value = ((String) condition).split("=")[1];
+	                    			comparison = "equal";
+	                    		}
+	                    		else if (((String) condition).contains("<")) {
+	                    			field = ((String) condition).split("<")[0];
+	                    			value = ((String) condition).split("<")[1];
+	                    			comparison = "less";
+	                    		}
+	                    		else if (((String) condition).contains(">")) {
+	                    			field = ((String) condition).split(">")[0];
+	                    			value = ((String) condition).split(">")[1];
+	                    			comparison = "greater";
+	                    		}
+	                    		else {
+	                    			throw new ScyllaValidationException(
+	                                        "Condition " + condition + " does not have a comparison-operator");
+	                            }
+	                    		value = value.trim();
+	                    		field = field.trim();
+	                    		
+	                    		Collection<Map<Integer, java.util.List<ProcessNodeInfo>>> allProcesses = model.getProcessNodeInfos().values();
+								for (Map<Integer, java.util.List<ProcessNodeInfo>> process : allProcesses) {
+									List<ProcessNodeInfo> currentProcess = process.get(processInstance.getId());
+									for (ProcessNodeInfo task : currentProcess) {
+										Map<String, Object> dataObjectField = task.getDataObjectField();
+										for (Map.Entry<String, Object> dO : dataObjectField.entrySet()){
+										    if (dO.getKey().equals(field)) {
+										    	if (!isParsableAsLong(value) || !isParsableAsLong((String.valueOf(dO.getValue())))) {
+										    		Integer comparisonResult = (String.valueOf(dO.getValue())).trim().compareTo(String.valueOf(value));
+										    		if (comparison.equals("equal") && comparisonResult == 0) {
+										    			break;
+											    	} else if (comparison.equals("notEqual") && comparisonResult != 0) {
+											    		break;
+											    	} else {
+											    		test.add(false);
+											    	}
+										    		
+										    	} else if (isParsableAsLong(value)) {
+										    		Long LongValue = Long.valueOf(value);
+										    		Long dOValue = Long.valueOf((String.valueOf(dO.getValue())));
+										    		Integer comparisonResult = (dOValue.compareTo(LongValue));
+											    	
+										    		if (comparison.equals("equal") && comparisonResult == 0) {	
+										    			break;
+										    		}
+											    	else if (comparison.equals("less") &&  comparisonResult < 0) {
+											    		break;
+											    	}
+											    	else if (comparison.equals("greater") &&  comparisonResult > 0) {
+											    		break;
+											    	}
+											    	else if (comparison.equals("greaterOrEqual") && comparisonResult >= 0) {
+											    		break;
+											    	}
+											    	else if (comparison.equals("lessOrEqual") && comparisonResult <= 0) {
+											    		break;
+											    	}
+											    	else {
+											    		test.add(false);
+											    	}
+										    	}
+										    }
+										}
 									}
 								}
-							}
+	                    	}
+                    		if (test.size() == 0) {
+					    		scheduleNextEvent(desmojEvent, processInstance, processModel, nextFlowId);
+					    		foundAWay = true;
+                    		}
+                		}
+                    	if (foundAWay == false) {
+                    		scheduleNextEvent(desmojEvent, processInstance, processModel, DefaultPath);
                     	}
-                    } else {
-                    	throw new ScyllaValidationException("No Distribution or reffering DataObject Field for " + desmojEvent.getDisplayName() + " given!");
-                    }
+                    } 
                 }
             }
         }
@@ -172,4 +220,20 @@ public class ExclusiveGatewayEventPlugin extends GatewayEventPluggable {
         }
     }
 
+	private static boolean isParsableAsLong(final String s) {
+        try {
+            Long.valueOf(s);
+            return true;
+        } catch (NumberFormatException numberFormatException) {
+            return false;
+        }
+    }
+	public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
+	    for (Entry<T, E> entry : map.entrySet()) {
+	        if (Objects.equals(value, entry.getValue())) {
+	            return entry.getKey();
+	        }
+	    }
+	    return null;
+	}
 }
