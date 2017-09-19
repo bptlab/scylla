@@ -14,6 +14,8 @@ import de.hpi.bpt.scylla.logger.ProcessNodeInfo;
 import de.hpi.bpt.scylla.model.process.ProcessModel;
 import de.hpi.bpt.scylla.model.process.graph.exception.NodeNotFoundException;
 import de.hpi.bpt.scylla.model.process.node.GatewayType;
+import de.hpi.bpt.scylla.plugin_loader.PluginLoader;
+import de.hpi.bpt.scylla.plugin_loader.PluginLoader.PluginWrapper;
 import de.hpi.bpt.scylla.plugin_type.simulation.event.GatewayEventPluggable;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
 import de.hpi.bpt.scylla.simulation.ProcessSimulationComponents;
@@ -86,128 +88,157 @@ public class ExclusiveGatewayEventPlugin extends GatewayEventPluggable {
                     DiscreteDistEmpirical<Integer> distribution = (DiscreteDistEmpirical<Integer>) branchingDistributions
                             .get(nodeId);
                     // decide on next node
-                    if (distribution != null) {
+                    if (distribution != null) { //if a distribution is given take this
 	                    Integer nextFlowId = distribution.sample().intValue();
 	                    if (!processModel.getIdentifiers().keySet().contains(nextFlowId)) {
 	                        throw new ScyllaValidationException("Flow with id " + nextFlowId + " does not exist.");
 	                    }
 	                    scheduleNextEvent(desmojEvent, processInstance, processModel, nextFlowId);
 	
-                    } else { //does not really work out atm because if now display name is given the id is taken as the display name --> its never null
-                    	Object[] outgoingRefs = processModel.getGraph().getTargetObjects(nodeId).toArray();
-                    	Integer DefaultPath = null;
-                    	Boolean foundAWay = false;
-                    	for (Object or : outgoingRefs) {
-                    		if (or.equals(getKeyByValue(processModel.getIdentifiers(),processModel.getNodeAttributes().get(desmojEvent.getNodeId()).get("default"))) == true) {
-                    			DefaultPath = (Integer) or;
-                    			continue;
+                    } else { //otherwise try to get information out of the describing branches and branch on the basis of this
+                    	Map<Class<?>, ArrayList<PluginWrapper>> a = PluginLoader.getDefaultPluginLoader().getExtensions();
+                    	Collection<ArrayList<PluginWrapper>> plugins = a.values();
+                    	Boolean dataObjectPluginOn = false;
+                    	for (ArrayList<PluginWrapper> plugin : plugins) {
+                    		for (PluginWrapper p : plugin) {
+                    			if (p.toString().equals("DataObjectSCParserPlugin")) {
+                    				dataObjectPluginOn = true;
+                    			}
                     		}
-                    		Object[] conditions = processModel.getDisplayNames().get(or).split("&&");
-                    		Integer nextFlowId = (Integer) or;
-                    		List<Boolean> test = new ArrayList<>();
-                    		for (Object condition : conditions) {
-                    			condition = ((String) condition).trim();
-                    			String field = null;
-	                    		String value = null;
-	                    		String comparison = null;
-	                    		
-	                    		if (((String) condition).contains("==")) {
-	                    			field = ((String) condition).split("==")[0];
-	                    			value = ((String) condition).split("==")[1];
-	                    			//value = processModel.getDisplayNames().get(or).substring(2, processModel.getDisplayNames().get(or).length());
-	                    			comparison = "equal";
+                    	}
+                    	
+                    	if (dataObjectPluginOn) {
+	                    	Object[] outgoingRefs = processModel.getGraph().getTargetObjects(nodeId).toArray();
+	                    	Integer DefaultPath = null;
+	                    	Boolean foundAWay = false;
+	                    	for (Object or : outgoingRefs) { //go threw all outgoing references
+	                    		if (or.equals(getKeyByValue(processModel.getIdentifiers(),processModel.getNodeAttributes().get(desmojEvent.getNodeId()).get("default"))) == true) { //if it's the default path jump it
+	                    			DefaultPath = (Integer) or;
+	                    			continue;
 	                    		}
-	                    		else if (((String) condition).contains(">=")) {
-	                    			field = ((String) condition).split(">=")[0];
-	                    			value = ((String) condition).split(">=")[1];
-	                    			comparison = "greaterOrEqual";
-	                    		}
-	                    		else if (((String) condition).contains("<=")) {
-	                    			field = ((String) condition).split("<=")[0];
-	                    			value = ((String) condition).split("<=")[1];
-	                    			comparison = "lessOrEqual";
-	                    		}
-	                    		else if (((String) condition).contains("!=")) {
-	                    			field = ((String) condition).split("!=")[0];
-	                    			value = ((String) condition).split("!=")[1];
-	                    			comparison = "notEqual";
-	                    		}
-	                    		else if (((String) condition).contains("=")) {
-	                    			field = ((String) condition).split("=")[0];
-	                    			value = ((String) condition).split("=")[1];
-	                    			comparison = "equal";
-	                    		}
-	                    		else if (((String) condition).contains("<")) {
-	                    			field = ((String) condition).split("<")[0];
-	                    			value = ((String) condition).split("<")[1];
-	                    			comparison = "less";
-	                    		}
-	                    		else if (((String) condition).contains(">")) {
-	                    			field = ((String) condition).split(">")[0];
-	                    			value = ((String) condition).split(">")[1];
-	                    			comparison = "greater";
-	                    		}
-	                    		else {
-	                    			throw new ScyllaValidationException(
-	                                        "Condition " + condition + " does not have a comparison-operator");
-	                            }
-	                    		value = value.trim();
-	                    		field = field.trim();
-	                    		
-	                    		Collection<Map<Integer, java.util.List<ProcessNodeInfo>>> allProcesses = model.getProcessNodeInfos().values();
-								for (Map<Integer, java.util.List<ProcessNodeInfo>> process : allProcesses) {
-									List<ProcessNodeInfo> currentProcess = process.get(processInstance.getId());
-									for (ProcessNodeInfo task : currentProcess) {
-										Map<String, Object> dataObjectField = task.getDataObjectField();
-										for (Map.Entry<String, Object> dO : dataObjectField.entrySet()){
-										    if (dO.getKey().equals(field)) {
-										    	if (!isParsableAsLong(value) || !isParsableAsLong((String.valueOf(dO.getValue())))) {
-										    		Integer comparisonResult = (String.valueOf(dO.getValue())).trim().compareTo(String.valueOf(value));
-										    		if (comparison.equals("equal") && comparisonResult == 0) {
-										    			break;
-											    	} else if (comparison.equals("notEqual") && comparisonResult != 0) {
-											    		break;
-											    	} else {
-											    		test.add(false);
+	                    		Object[] conditions = processModel.getDisplayNames().get(or).split("&&");
+	                    		Integer nextFlowId = (Integer) or;
+	                    		List<Boolean> test = new ArrayList<>();
+	                    		for (Object condition : conditions) {
+	                    			condition = ((String) condition).trim();
+	                    			String field = null;
+		                    		String value = null;
+		                    		String comparison = null;
+		                    		
+		                    		if (((String) condition).contains("==")) {
+		                    			field = ((String) condition).split("==")[0];
+		                    			value = ((String) condition).split("==")[1];
+		                    			//value = processModel.getDisplayNames().get(or).substring(2, processModel.getDisplayNames().get(or).length());
+		                    			comparison = "equal";
+		                    		}
+		                    		else if (((String) condition).contains(">=")) {
+		                    			field = ((String) condition).split(">=")[0];
+		                    			value = ((String) condition).split(">=")[1];
+		                    			comparison = "greaterOrEqual";
+		                    		}
+		                    		else if (((String) condition).contains("<=")) {
+		                    			field = ((String) condition).split("<=")[0];
+		                    			value = ((String) condition).split("<=")[1];
+		                    			comparison = "lessOrEqual";
+		                    		}
+		                    		else if (((String) condition).contains("!=")) {
+		                    			field = ((String) condition).split("!=")[0];
+		                    			value = ((String) condition).split("!=")[1];
+		                    			comparison = "notEqual";
+		                    		}
+		                    		else if (((String) condition).contains("=")) {
+		                    			field = ((String) condition).split("=")[0];
+		                    			value = ((String) condition).split("=")[1];
+		                    			comparison = "equal";
+		                    		}
+		                    		else if (((String) condition).contains("<")) {
+		                    			field = ((String) condition).split("<")[0];
+		                    			value = ((String) condition).split("<")[1];
+		                    			comparison = "less";
+		                    		}
+		                    		else if (((String) condition).contains(">")) {
+		                    			field = ((String) condition).split(">")[0];
+		                    			value = ((String) condition).split(">")[1];
+		                    			comparison = "greater";
+		                    		}
+		                    		else {
+		                    			throw new ScyllaValidationException("Condition " + condition + " does not have a comparison-operator");
+		                            }
+		                    		value = value.trim();
+		                    		field = field.trim();
+		                    		
+		                    		Collection<Map<Integer, java.util.List<ProcessNodeInfo>>> allProcesses = model.getProcessNodeInfos().values();
+									for (Map<Integer, java.util.List<ProcessNodeInfo>> process : allProcesses) {
+										List<ProcessNodeInfo> currentProcess = process.get(processInstance.getId());
+										for (ProcessNodeInfo task : currentProcess) {
+											Map<String, Object> dataObjectField = task.getDataObjectField();
+											for (Map.Entry<String, Object> dO : dataObjectField.entrySet()){
+											    if (dO.getKey().equals(field)) {
+											    	if (!isParsableAsLong(value) || !isParsableAsLong((String.valueOf(dO.getValue())))) { //try a long comparison
+											    		Integer comparisonResult = (String.valueOf(dO.getValue())).trim().compareTo(String.valueOf(value));
+											    		if (comparison.equals("equal") && comparisonResult == 0) {
+											    			break;
+												    	} else if (comparison.equals("notEqual") && comparisonResult != 0) {
+												    		break;
+												    	} else {
+												    		test.add(false);
+												    	}
+											    		
+											    	} else { //otherwise do a string compare
+											    		Long LongValue = Long.valueOf(value);
+											    		Long dOValue = Long.valueOf((String.valueOf(dO.getValue())));
+											    		Integer comparisonResult = (dOValue.compareTo(LongValue));
+												    	
+											    		if (comparison.equals("equal") && comparisonResult == 0) {	
+											    			break;
+											    		}
+												    	else if (comparison.equals("less") &&  comparisonResult < 0) {
+												    		break;
+												    	}
+												    	else if (comparison.equals("greater") &&  comparisonResult > 0) {
+												    		break;
+												    	}
+												    	else if (comparison.equals("greaterOrEqual") && comparisonResult >= 0) {
+												    		break;
+												    	}
+												    	else if (comparison.equals("lessOrEqual") && comparisonResult <= 0) {
+												    		break;
+												    	}
+												    	else {
+												    		test.add(false);
+												    	}
 											    	}
-										    		
-										    	} else if (isParsableAsLong(value)) {
-										    		Long LongValue = Long.valueOf(value);
-										    		Long dOValue = Long.valueOf((String.valueOf(dO.getValue())));
-										    		Integer comparisonResult = (dOValue.compareTo(LongValue));
-											    	
-										    		if (comparison.equals("equal") && comparisonResult == 0) {	
-										    			break;
-										    		}
-											    	else if (comparison.equals("less") &&  comparisonResult < 0) {
-											    		break;
-											    	}
-											    	else if (comparison.equals("greater") &&  comparisonResult > 0) {
-											    		break;
-											    	}
-											    	else if (comparison.equals("greaterOrEqual") && comparisonResult >= 0) {
-											    		break;
-											    	}
-											    	else if (comparison.equals("lessOrEqual") && comparisonResult <= 0) {
-											    		break;
-											    	}
-											    	else {
-											    		test.add(false);
-											    	}
-										    	}
-										    }
+											    }
+											}
 										}
 									}
-								}
+		                    	}
+	                    		if (test.size() == 0) {
+						    		scheduleNextEvent(desmojEvent, processInstance, processModel, nextFlowId);
+						    		foundAWay = true;
+	                    		}
+	                		}
+	                    	if (foundAWay == false && DefaultPath != null) {
+	                    		scheduleNextEvent(desmojEvent, processInstance, processModel, DefaultPath);
+	                    	} else if (foundAWay == false && DefaultPath == null) {
+	                    		//everything will be killed, logical error
+	                    		throw new ScyllaValidationException("No Default Path for " + desmojEvent.getDisplayName() +" given and outgoing branches not complete. No branch matches, abort.");
 	                    	}
-                    		if (test.size() == 0) {
-					    		scheduleNextEvent(desmojEvent, processInstance, processModel, nextFlowId);
-					    		foundAWay = true;
-                    		}
-                		}
-                    	if (foundAWay == false) {
-                    		scheduleNextEvent(desmojEvent, processInstance, processModel, DefaultPath);
-                    	}
+                    	} else {
+                    		Object[] outgoingRefs = processModel.getGraph().getTargetObjects(nodeId).toArray();
+	                    	Integer DefaultPath = null;
+	                    	for (Object or : outgoingRefs) { //go threw all outgoing references
+	                    		if (or.equals(getKeyByValue(processModel.getIdentifiers(),processModel.getNodeAttributes().get(desmojEvent.getNodeId()).get("default"))) == true) { //if it's the default path jump it
+	                    			DefaultPath = (Integer) or;
+	                    			continue;
+	                    		}
+	                    	}
+	                    	if (DefaultPath != null) {
+	                    		scheduleNextEvent(desmojEvent, processInstance, processModel, DefaultPath);
+	                    	} else {
+	                    		throw new ScyllaValidationException("No Distribution for " + desmojEvent.getDisplayName() + " given, no DefaultPath given and DataObject PlugIn not activated.");
+	                    	}
+	                    }
                     } 
                 }
             }
