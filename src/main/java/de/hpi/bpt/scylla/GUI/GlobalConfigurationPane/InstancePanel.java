@@ -1,11 +1,14 @@
 package de.hpi.bpt.scylla.GUI.GlobalConfigurationPane;
 
+import java.awt.AWTKeyStroke;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.ItemEvent;
-import java.text.DecimalFormat;
-import java.util.Locale;
+import java.awt.event.KeyEvent;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.JCheckBox;
@@ -13,9 +16,10 @@ import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 
-import de.hpi.bpt.scylla.GUI.FormulaManager;
+import de.hpi.bpt.scylla.GUI.FormManager;
 import de.hpi.bpt.scylla.GUI.InsertRemoveListener;
 import de.hpi.bpt.scylla.GUI.ScalingCheckBoxIcon;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
@@ -31,9 +35,9 @@ public class InstancePanel extends JPanel{
 	private JCheckBox checkboxDefaultCost;
 	private ResourceInstance instance;
 	
-	private FormulaManager formulaManager;
+	private FormManager formulaManager;
 
-	public InstancePanel(FormulaManager fm) {
+	public InstancePanel(FormManager fm) {
 		formulaManager = fm;
 		GridBagLayout gbl_topPanel = new GridBagLayout();
 		gbl_topPanel.columnWeights = new double[]{0, 1.0, 0, 1.0, 0.0};
@@ -48,7 +52,7 @@ public class InstancePanel extends JPanel{
 		gbc_textfieldCost.gridy = 0;
 		add(labelCost, gbc_textfieldCost);
 		
-		textfieldCost = new JFormattedTextField(DecimalFormat.getInstance(Locale.ENGLISH));
+		textfieldCost = new JFormattedTextField(new NoNegativeDoubleFormat());
 		textfieldCost.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
 			if(formulaManager.isChangeFlag())return;
 			try{
@@ -148,6 +152,10 @@ public class InstancePanel extends JPanel{
 		gbc_checkboxDefaultTimetable.gridx = 4;
 		gbc_checkboxDefaultTimetable.gridy = 1;
 		add(checkboxDefaultTimetable, gbc_checkboxDefaultTimetable);
+		
+		Set<AWTKeyStroke> forwardKeys = new HashSet<AWTKeyStroke>(getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
+		forwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
+		setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, forwardKeys);
 	}
 
 	public void setInstance(ResourceInstance inst) {

@@ -5,7 +5,6 @@ import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -35,7 +34,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
-import de.hpi.bpt.scylla.GUI.FormulaManager;
+import de.hpi.bpt.scylla.GUI.FormManager;
 import de.hpi.bpt.scylla.GUI.InsertRemoveListener;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.Timetable;
@@ -60,15 +59,15 @@ public class TimetablePanel extends JSplitPane {
 	private JLabel labelEndAt;
 
 	
-	private FormulaManager formulaManager;
+	private FormManager formManager;
 	private TimetableItem selected;
 	private Timetable timeTable;
 	/**
 	 * Create the panel.
 	 * @param globalConfigurationPane 
 	 */
-	public TimetablePanel(FormulaManager fm) {
-		formulaManager = fm;
+	public TimetablePanel(FormManager fm) {
+		formManager = fm;
 		setOrientation(JSplitPane.VERTICAL_SPLIT);
 		setEnabled(false);
 		
@@ -145,9 +144,9 @@ public class TimetablePanel extends JSplitPane {
 			@Override
 			public void mouseClicked(MouseEvent e){
 				if(SwingUtilities.isRightMouseButton(e)){
-					Point p = e.getPoint();
-					TimetableItem val = (TimetableItem) tableTime.getValueAt(tableTime.rowAtPoint(p), tableTime.columnAtPoint(p));
-					select(val);
+					//Point p = e.getPoint();
+					//TimetableItem val = (TimetableItem) tableTime.getValueAt(tableTime.rowAtPoint(p), tableTime.columnAtPoint(p));
+					select(null);
 					tableTime.repaint();
 				}
 			}
@@ -199,14 +198,14 @@ public class TimetablePanel extends JSplitPane {
 		
 		textfieldStartTime = new JFormattedTextField(DateTimeFormatter.ISO_LOCAL_TIME.toFormat());
 		textfieldStartTime.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
-			if(formulaManager.isChangeFlag())return;
+			if(formManager.isChangeFlag())return;
 			if(selected == null)return;
 			try{
 				LocalTime l = LocalTime.parse(textfieldStartTime.getText());
 				if(!l.equals(selected.getBeginTime())){
 					selected.setBeginTime(l);
 					selectionModel.alterItem(selected);
-					formulaManager.setSaved(false);
+					formManager.setSaved(false);
 				}
 			}catch(Exception exc){}
 		}));
@@ -229,11 +228,11 @@ public class TimetablePanel extends JSplitPane {
 		comboboxStartDay = new JComboBox<DayOfWeek>(DayOfWeek.values());
 		comboboxStartDay.addItemListener((ItemEvent e)->{
 			if(e.getStateChange() == ItemEvent.SELECTED){
-				if(formulaManager.isChangeFlag())return;
+				if(formManager.isChangeFlag())return;
 				if(selected == null)return;
 				selected.setFrom((DayOfWeek) comboboxStartDay.getSelectedItem());
 				selectionModel.alterItem(selected);
-				formulaManager.setSaved(false);
+				formManager.setSaved(false);
 			}
 		});
 		GridBagConstraints gbc_comboboxStartDay = new GridBagConstraints();
@@ -246,7 +245,7 @@ public class TimetablePanel extends JSplitPane {
 		
 		buttonDelete = new JButton();
 		buttonDelete.setIcon(ScyllaGUI.ICON_X);
-		buttonDelete.setToolTipText("Delete selected item");
+		buttonDelete.setToolTipText("Delete selected item (Delete)");
 		buttonDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				selectionModel.deleteSelected();
@@ -271,14 +270,14 @@ public class TimetablePanel extends JSplitPane {
 		
 		textfieldEndTime = new JFormattedTextField(DateTimeFormatter.ISO_LOCAL_TIME.toFormat());
 		textfieldEndTime.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
-			if(formulaManager.isChangeFlag())return;
+			if(formManager.isChangeFlag())return;
 			if(selected == null)return;
 			try{
 				LocalTime l = LocalTime.parse(textfieldEndTime.getText());
 				if(!l.equals(selected.getEndTime())){
 					selected.setEndTime(l);
 					selectionModel.alterItem(selected);
-					formulaManager.setSaved(false);
+					formManager.setSaved(false);
 				}
 			}catch(Exception exc){}
 		}));
@@ -301,11 +300,11 @@ public class TimetablePanel extends JSplitPane {
 		comboboxEndDay = new JComboBox<DayOfWeek>(DayOfWeek.values());
 		comboboxEndDay.addItemListener((ItemEvent e)->{
 			if(e.getStateChange() == ItemEvent.SELECTED){
-				if(formulaManager.isChangeFlag())return;
+				if(formManager.isChangeFlag())return;
 				if(selected == null)return;
 				selected.setTo((DayOfWeek) comboboxEndDay.getSelectedItem());
 				selectionModel.alterItem(selected);
-				formulaManager.setSaved(false);
+				formManager.setSaved(false);
 			}
 		});
 		GridBagConstraints gbc_comboboxEndDay = new GridBagConstraints();
@@ -352,7 +351,7 @@ public class TimetablePanel extends JSplitPane {
 			comboboxStartDay.setSelectedItem(item.getFrom());
 			comboboxEndDay.setSelectedItem(item.getTo());
 		}else{
-			resetFormula();
+			resetForm();
 		}
 	}
 
@@ -364,7 +363,7 @@ public class TimetablePanel extends JSplitPane {
 		}
 	}
 	
-	private void resetFormula(){
+	private void resetForm(){
 		textfieldStartTime.setValue(LocalTime.of(0, 0, 0));
 		textfieldEndTime.setValue(LocalTime.of(0, 0, 0));
 		comboboxStartDay.setSelectedItem(null);
@@ -435,8 +434,13 @@ public class TimetablePanel extends JSplitPane {
 				TimetableItem iv = null;
 				updateSelection();
 				if(!colChanging && !rowChanging){
+					if(rowMax == 23){
+						rowMax = -1;
+						colMax++;
+						colMax %= 7;
+					}
 					iv = timeTable.addItem(DayOfWeek.values()[colMin],DayOfWeek.values()[colMax],LocalTime.of(rowMin,0,0),LocalTime.of(rowMax+1,0,0));
-					formulaManager.setSaved(false);
+					formManager.setSaved(false);
 					setSelected(iv);
 					tableTime.clearSelection();
 					clearSelection();
@@ -500,6 +504,8 @@ public class TimetablePanel extends JSplitPane {
 		
 		public void deleteSelected() {
 			if(selected == null)return;
+			TimetableItem selected = TimetablePanel.this.selected;
+			select(null);
 			for(int x = selected.getFrom().ordinal(); x <= selected.getTo().ordinal(); x++){
 				for(int y = 0; y < 24; y++){
 					if(x == selected.getTo().ordinal() && y > selected.getEndTime().getHour())return;
@@ -507,10 +513,8 @@ public class TimetablePanel extends JSplitPane {
 					tableTime.setValueAt(null,y,x);
 				}
 			}
-			formulaManager.setSaved(false);
+			formManager.setSaved(false);
 			timeTable.removeItem(selected);
-			setSelected(null);
-			TimetablePanel.this.select(null);
 		}
 		
 		private void clearSelection(){

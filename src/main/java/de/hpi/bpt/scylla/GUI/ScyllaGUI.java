@@ -10,8 +10,10 @@ import java.awt.Insets;
 import java.io.PrintStream;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Locale;
 
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
@@ -79,6 +81,7 @@ public class ScyllaGUI extends JFrame {
 	
 	public static final ImageIcon ICON_NEW = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/newfile.png")),TITLEFONT.getSize(),TITLEFONT.getSize());
 	public static final ImageIcon ICON_SAVE = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/save.png")),TITLEFONT.getSize(),TITLEFONT.getSize());
+	public static final ImageIcon ICON_SAVEAS = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/saveas.png")),TITLEFONT.getSize(),TITLEFONT.getSize());
 	public static final ImageIcon ICON_OPEN = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/open.png")),TITLEFONT.getSize(),TITLEFONT.getSize());
 	
 
@@ -142,6 +145,9 @@ public class ScyllaGUI extends JFrame {
 		UIManager.put("TabbedPane.font", ScyllaGUI.TITLEFONT);
 		
 		UIManager.put("ComboBox.background", ScyllaGUI.ColorField2);
+		
+		Locale.setDefault(Locale.ENGLISH);
+		JComponent.setDefaultLocale(Locale.ENGLISH);
 
 		//UIManager.put("Panel.background", ScyllaGUI.ColorBackground);
 		
@@ -161,6 +167,7 @@ public class ScyllaGUI extends JFrame {
 		contentPane.addTab("Simulation", simulationPane);
 		contentPane.addTab("Global Configuration Editor", globalconfPane);
 		
+		globalconfPane.init();
 		
 		
 //		JSeparator separator = new JSeparator();

@@ -1,14 +1,17 @@
 package de.hpi.bpt.scylla.GUI.GlobalConfigurationPane;
 
+import java.awt.AWTKeyStroke;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.ItemEvent;
-import java.text.DecimalFormat;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.JComboBox;
@@ -17,11 +20,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JSplitPane;
+import javax.swing.KeyStroke;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.DocumentEvent;
 
-import de.hpi.bpt.scylla.GUI.FormulaManager;
+import de.hpi.bpt.scylla.GUI.FormManager;
 import de.hpi.bpt.scylla.GUI.InsertRemoveListener;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel.ComponentHolder;
@@ -38,10 +42,10 @@ public class ResourcePanel extends JSplitPane{
 	private ListChooserPanel listpanelInstances;
 	private ResourceType resourceType;
 	
-	private FormulaManager formulaManager;
+	private FormManager formulaManager;
 	private List<InstancePanel> instances;
 
-	public ResourcePanel(FormulaManager fm) {
+	public ResourcePanel(FormManager fm) {
 		setEnabled(false);
 		setOrientation(JSplitPane.VERTICAL_SPLIT);
 		formulaManager = fm;
@@ -64,14 +68,15 @@ public class ResourcePanel extends JSplitPane{
 		
 		spinnerQuantity = new JSpinner();
 		spinnerQuantity.setModel(new SpinnerNumberModel(new Integer(0), new Integer(0), null, new Integer(1)));
-		((JSpinner.DefaultEditor) spinnerQuantity.getEditor()).getTextField().setColumns(2);
+		//((JSpinner.DefaultEditor) spinnerQuantity.getEditor()).getTextField().setColumns(2);
 		spinnerQuantity.addChangeListener((ChangeEvent e)->{
 			if(formulaManager.isChangeFlag())return;
 			resourceType.setDefaultQuantity((Integer)spinnerQuantity.getValue());
 			formulaManager.setSaved(false);
 		});
 		GridBagConstraints gbc_spinnerQuantity = new GridBagConstraints();
-		gbc_spinnerQuantity.gridwidth = 3;
+		gbc_spinnerQuantity.gridwidth = 1;
+		gbc_spinnerQuantity.fill = GridBagConstraints.BOTH;
 		gbc_spinnerQuantity.insets = new Insets(0, 0, 5, 5);
 		gbc_spinnerQuantity.gridx = 1;
 		gbc_spinnerQuantity.gridy = 0;
@@ -86,7 +91,7 @@ public class ResourcePanel extends JSplitPane{
 		gbc_textfieldCost.gridy = 1;
 		topPanel.add(labelCost, gbc_textfieldCost);
 		
-		textfieldCost = new JFormattedTextField(DecimalFormat.getInstance(Locale.ENGLISH));
+		textfieldCost = new JFormattedTextField(new NoNegativeDoubleFormat());
 		textfieldCost.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
 			notifyDefaultChanges();
 			if(formulaManager.isChangeFlag())return;
@@ -191,10 +196,14 @@ public class ResourcePanel extends JSplitPane{
 		gbc_listpanelInstances.anchor = GridBagConstraints.PAGE_START;
 		gbc_listpanelInstances.gridx = 0;
 		gbc_listpanelInstances.gridy = 1;
-		gbc_listpanelInstances.fill = GridBagConstraints.BOTH;
+		gbc_listpanelInstances.fill = GridBagConstraints.HORIZONTAL;
 		gbc_listpanelInstances.weighty = 1;
 		gbc_listpanelInstances.weightx = 1;
 		bottomPanel.add(listpanelInstances, gbc_listpanelInstances);
+		
+		Set<AWTKeyStroke> forwardKeys = new HashSet<AWTKeyStroke>(getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
+		forwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
+		setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, forwardKeys);
 		
 	}
 	
@@ -234,7 +243,15 @@ public class ResourcePanel extends JSplitPane{
 			}
 			@Override
 			public void setName(String s){
-				inst.setName(s);
+				String t = s;
+				int i = 2;
+				if(!inst.getName().equals(s)){
+					while(resourceType.getInstance(t) != null){
+						t = s+"("+i+")";
+						i++;
+					}
+				}
+				inst.setName(t);
 				formulaManager.setSaved(false);
 			}
 		};

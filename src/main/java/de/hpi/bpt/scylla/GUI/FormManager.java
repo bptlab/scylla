@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.swing.JComboBox;
 
-public interface FormulaManager {
+public interface FormManager {
 	
 	public void setSaved(boolean b);
 	public boolean isChangeFlag();
