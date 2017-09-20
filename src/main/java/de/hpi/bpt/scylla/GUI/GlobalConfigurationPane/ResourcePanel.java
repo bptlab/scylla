@@ -28,6 +28,7 @@ import javax.swing.event.DocumentEvent;
 import de.hpi.bpt.scylla.GUI.FormManager;
 import de.hpi.bpt.scylla.GUI.InsertRemoveListener;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel;
+import de.hpi.bpt.scylla.GUI.ScyllaGUI;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel.ComponentHolder;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.ResourceType;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.ResourceType.ResourceInstance;
@@ -93,10 +94,10 @@ public class ResourcePanel extends JSplitPane{
 		
 		textfieldCost = new JFormattedTextField(new NoNegativeDoubleFormat());
 		textfieldCost.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
-			notifyDefaultChanges();
 			if(formulaManager.isChangeFlag())return;
 			try{
 				resourceType.setDefaultCost(Double.parseDouble(textfieldCost.getText()));
+				notifyDefaultChanges();
 				formulaManager.setSaved(false);
 			}catch(NumberFormatException exc){}
 		}));
@@ -120,9 +121,9 @@ public class ResourcePanel extends JSplitPane{
 		comboboxTimeunit = new JComboBox<TimeUnit>(TimeUnit.values());
 		comboboxTimeunit.addItemListener((ItemEvent e)->{
 			if(e.getStateChange() != ItemEvent.SELECTED)return;
-			notifyDefaultChanges();
 			if(formulaManager.isChangeFlag())return;
 			resourceType.setDefaultTimeUnit((TimeUnit) comboboxTimeunit.getSelectedItem());
+			notifyDefaultChanges();
 			formulaManager.setSaved(false);
 		});
 		GridBagConstraints gbc_comboboxTimeunit = new GridBagConstraints();
@@ -145,9 +146,9 @@ public class ResourcePanel extends JSplitPane{
 		fm.getTimetableObserverList().add(comboboxTimetable);
 		comboboxTimetable.addItemListener((ItemEvent e)->{
 			if(e.getStateChange() != ItemEvent.SELECTED)return;
-			notifyDefaultChanges();
 			if(formulaManager.isChangeFlag())return;
 			resourceType.setDefaultTimetableId((String) comboboxTimetable.getSelectedItem());
+			notifyDefaultChanges();
 			formulaManager.setSaved(false);
 		});
 		GridBagConstraints gbc_comboboxTimetable = new GridBagConstraints();
@@ -165,6 +166,10 @@ public class ResourcePanel extends JSplitPane{
 		
 		JLabel labelInstancesTitle = new JLabel();
 		labelInstancesTitle.setText("Instances");
+		labelInstancesTitle.setBackground(ScyllaGUI.ColorField0);
+		labelInstancesTitle.setForeground(ScyllaGUI.TITLEFONT_COLOR);
+		labelInstancesTitle.setFont(ScyllaGUI.TITLEFONT);
+		labelInstancesTitle.setOpaque(true);
 		GridBagConstraints gbc_textfieldInstancesTitle = new GridBagConstraints();
 		gbc_textfieldInstancesTitle.insets = new Insets(0, 0, 5, 0);
 		gbc_textfieldInstancesTitle.gridx = 0;

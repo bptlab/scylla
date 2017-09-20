@@ -344,6 +344,7 @@ public class TimetablePanel extends JSplitPane {
 		labelStartAt.setEnabled(enabled);
 		labelEnd.setEnabled(enabled);
 		labelEndAt.setEnabled(enabled);
+		buttonDelete.setEnabled(enabled);
 		
 		if(enabled){
 			textfieldStartTime.setValue(item.getBeginTime());
@@ -412,6 +413,7 @@ public class TimetablePanel extends JSplitPane {
 		private boolean colChanging;
 		private boolean block;
 		private boolean[][] selection;
+		private boolean collision;
 		
 		public TimetableSelectionModel(){
 			selection = new boolean[24][7];
@@ -439,9 +441,19 @@ public class TimetablePanel extends JSplitPane {
 						colMax++;
 						colMax %= 7;
 					}
-					iv = timeTable.addItem(DayOfWeek.values()[colMin],DayOfWeek.values()[colMax],LocalTime.of(rowMin,0,0),LocalTime.of(rowMax+1,0,0));
-					formManager.setSaved(false);
-					setSelected(iv);
+					if(!collision){
+						LocalTime startTime = LocalTime.of(rowMin,0,0);
+						LocalTime endTime = LocalTime.of(rowMax+1,0,0);
+						if(getPreceding(rowMin, colMin) != null)startTime = ((TimetableItem)getPreceding(rowMin, colMin)).getEndTime();
+						if(tableTime.getValueAt(rowMax, colMax) != null){
+							endTime = ((TimetableItem)tableTime.getValueAt(rowMax, colMax)).getBeginTime();
+							selection[rowMax][colMax] = false;
+						}
+						iv = timeTable.addItem(DayOfWeek.values()[colMin],DayOfWeek.values()[colMax],startTime,endTime);
+						formManager.setSaved(false);
+						
+						setSelected(iv);
+					}
 					tableTime.clearSelection();
 					clearSelection();
 					setSelected(null);
@@ -455,6 +467,7 @@ public class TimetablePanel extends JSplitPane {
 		}
 		
 		private void updateSelection(){
+			collision = false;
 			for(int y = 0; y < selection.length; y++){
 				for(int x = 0; x < selection[y].length; x++){
 					if(x > colMin && x < colMax)selection[y][x] = true;
@@ -466,6 +479,7 @@ public class TimetablePanel extends JSplitPane {
 						else if(x == colMax && y <= rowMax)selection[y][x] = true;
 						else selection[y][x] = false;
 					}
+					if(selection[y][x] && tableTime.getValueAt(y, x) != null && !(y == rowMax && x == colMax))collision = true;
 				}
 			}
 		}
@@ -579,7 +593,8 @@ public class TimetablePanel extends JSplitPane {
 		}
 
 		public Component getTableCellRendererComponent(JTable table, Object interval, boolean isSelected, boolean hasFocus,int row, int col) {
-			Color emptyColor = selectionModel.selection[row][col] ? Color.WHITE.darker() : Color.WHITE;
+			Color selectionColor = selectionModel.collision ? new Color(210,190,190) : Color.WHITE.darker();
+			Color emptyColor = selectionModel.selection[row][col] ? selectionColor : Color.WHITE;
 			middle.setBackground(emptyColor);
 			upper.setBorder(null);
 			lower.setBorder(null);

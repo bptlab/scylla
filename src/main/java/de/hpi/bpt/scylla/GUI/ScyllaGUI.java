@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Locale;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -124,7 +125,8 @@ public class ScyllaGUI extends JFrame {
 		setDefaultFont(ScyllaGUI.TITLEFONT);
 		
 		UIManager.put("ToolTip.background", ScyllaGUI.ColorField1);
-		UIManager.put("ToolTip.border", 5);
+		int border = (int)(1.5*SCALE);
+		UIManager.put("ToolTip.border", BorderFactory.createMatteBorder(border,border,border,border, ScyllaGUI.ColorField1.darker()));
 		UIManager.put("ToolTip.font", ScyllaGUI.DEFAULTFONT);
 
 

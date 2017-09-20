@@ -69,7 +69,7 @@ public abstract class ListChooserPanel extends JSplitPane{
 		buttonAdd.setIcon(ScyllaGUI.ICON_PLUS);
 		buttonAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if(list.getCellEditor() != null)list.getCellEditor().cancelCellEditing();
+				if(list.getCellEditor() != null)list.getCellEditor().stopCellEditing();
 				int index = model.getRowCount();
 				model.addRow(new ComponentHolder[]{onCreate()});
 				list.editCellAt(index, 0);
@@ -92,7 +92,7 @@ public abstract class ListChooserPanel extends JSplitPane{
 		buttonRemove.setIcon(ScyllaGUI.ICON_X);
 		buttonRemove.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(list.getCellEditor() != null)list.getCellEditor().cancelCellEditing();
+				if(list.getCellEditor() != null)list.getCellEditor().stopCellEditing();
 				int sel = list.getSelectedRow();
 				if(sel != -1){
 					ComponentHolder toDel = (ComponentHolder) model.getValueAt(sel, 0);
@@ -184,6 +184,14 @@ public abstract class ListChooserPanel extends JSplitPane{
 		super.setEnabled(b);
 	}
 	
+	private boolean contains(String s){
+		int h = model.getRowCount();
+		for(int i = 0; i < h; i++){
+			if(model.getValueAt(i, 0).equals(s))return true;
+		}
+		return false;
+	}
+	
 	private class ComponentHolderCellEditor extends DefaultCellEditor{
 		private JTextField textfield;
 		private ComponentHolder current;
@@ -199,6 +207,16 @@ public abstract class ListChooserPanel extends JSplitPane{
 
 		@Override
 		public ComponentHolder getCellEditorValue() {
+			if(textfield.getText().equals("<enter name>")){
+				String s = "Unnamed";
+				String t = s;
+				int i = 2;
+				while(contains(t)){
+					t = s+"("+i+")";
+					i++;
+				}
+				textfield.setText(t);
+			}
 			current.setName(textfield.getText());
 			return current;
 		}

@@ -177,7 +177,7 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 
 		JPanel panelMain = new JPanel();
 		panelMain.setFocusable(true);
-		panelMain.setBackground(new Color(200, 20, 20));
+		panelMain.setBackground(ScyllaGUI.ColorBackground);
 		scrollPane.setViewportView(panelMain);
 		GridBagLayout gbl_panelMain = new GridBagLayout();
 		panelMain.setLayout(gbl_panelMain);
@@ -307,22 +307,31 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 		gbc_panelResources.gridx = 0;
 		gbc_panelResources.gridy = 1;
 
-		ExpandPanel panelResourcesExpand = new ExpandPanel(new JLabel("Resources"), panelResources);
+		JLabel resourceLabel = new JLabel("Resources");
+		resourceLabel.setBackground(ScyllaGUI.ColorField0);
+		resourceLabel.setForeground(ScyllaGUI.TITLEFONT_COLOR);
+		resourceLabel.setFont(ScyllaGUI.TITLEFONT);
+		resourceLabel.setOpaque(true);
+		ExpandPanel panelResourcesExpand = new ExpandPanel(resourceLabel, panelResources);
 		panelResourcesExpand.expand();
 		panelMain.add(panelResourcesExpand, gbc_panelResources);
 		
 
 		timetableObserverList = new ArrayList<JComboBox<String>>();
 		timetables = new ArrayList<String>();
+		timetables.add("");
 		panelTimetables = new ListChooserPanel(){
 
 			@Override
 			public void onDelete(ComponentHolder toDel) {
+				String toDels = toDel.toString();
 				for(JComboBox<String> cbm : getTimetableObserverList()){
-					cbm.removeItem(toDel.toString());
+					String sel = (String)cbm.getSelectedItem();
+					cbm.removeItem(toDels);
+					if(sel != null && sel.equals(toDels))cbm.setSelectedItem("");
 				}
-				timetables.remove(toDel.toString());
-				creator.deleteTimetable(toDel.toString());
+				timetables.remove(toDels);
+				creator.deleteTimetable(toDels);
 				setSaved(false);
 			}
 
@@ -348,7 +357,13 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 		gbc_panelTimetables.gridx = 0;
 		gbc_panelTimetables.gridy = 2;
 		
-		ExpandPanel panelTimetablesExpand = new ExpandPanel(new JLabel("Timetables"), panelTimetables);
+		
+		JLabel timetableLabel = new JLabel("Timetables");
+		timetableLabel.setBackground(ScyllaGUI.ColorField0);
+		timetableLabel.setForeground(ScyllaGUI.TITLEFONT_COLOR);
+		timetableLabel.setFont(ScyllaGUI.TITLEFONT);
+		timetableLabel.setOpaque(true);
+		ExpandPanel panelTimetablesExpand = new ExpandPanel(timetableLabel, panelTimetables);
 		panelTimetablesExpand.expand();
 		panelMain.add(panelTimetablesExpand, gbc_panelTimetables);
 		
@@ -542,6 +557,7 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 		panelTimetables.clear();
 		timetableObserverList.clear();
 		timetables.clear();
+		timetables.add("");
 		setChangeFlag(false);
 		setSaved(true);
 		setEnabled(false);
@@ -683,9 +699,11 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 				}
 				for(JComboBox<String> cbm : getTimetableObserverList()){
 					String sel = (String) cbm.getSelectedItem();
-					cbm.addItem(s);
-					if(sel != null && sel.equals(t.getId()))cbm.setSelectedItem(s);
 					cbm.removeItem(t.getId());
+					cbm.addItem(s);
+					if(sel == null || sel.equals(""))cbm.setSelectedItem("");
+					else if(sel.equals(t.getId()))cbm.setSelectedItem(s);
+					
 				}
 				timetables.remove(t.getId());
 				timetables.add(s);

@@ -53,6 +53,9 @@ public class ExpandPanel extends JPanel{
 		gbc_header.gridx = 0;
 		gbc_header.gridy = 0;
 		add(header, gbc_header);
+		if(header.getBackground() != null){
+			setBackground(header.getBackground());
+		}
 		
 		button_expand = new JButton();
 		button_expand.setIcon(ScyllaGUI.ICON_EXPAND);

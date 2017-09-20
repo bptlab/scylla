@@ -201,8 +201,12 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 		public void setDefaultCost(double dk){setAttribute("defaultCost", dk);}
 		/**Sets the resource types default time unit; only accepts  {@link java.util.concurrent.TimeUnit} objects*/
 		public void setDefaultTimeUnit(TimeUnit tu){setAttribute("defaultTimeUnit", tu);}
-		/**Sets the resource types default timetable identifier, can cause invalidity by setting to a non-existing id*/
-		public void setDefaultTimetableId(String ttid){setAttribute("defaultTimetableId", ttid);}
+		/**Sets the resource types default timetable identifier, can cause invalidity by setting to a non-existing id
+		 * deletes the id if an empty String or null is given as input*/
+		public void setDefaultTimetableId(String ttid){
+			if(ttid == null || ttid.isEmpty())removeDefaultTimetableId();
+			else setAttribute("defaultTimetableId", ttid);
+		}
 		/**Removes the resources types default timetable identifier, possible as it is optional*/
 		public void removeDefaultTimetableId(){el.removeAttribute("defaultTimetableId");}
 		
@@ -261,8 +265,12 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 			public void setTimeUnit(TimeUnit tu){setAttribute("timeUnit", tu);}
 			/**Removes instances time unit, if not specified,resource type default will be used*/
 			public void removeTimetUnit(){el.removeAttribute("timeUnit");}
-			/**Sets instances timetable identifier, can cause invalidity, if timetable is not existing*/
-			public void setTimetableId(String ttid){setAttribute("timetableId", ttid);}
+			/**Sets instances timetable identifier, can cause invalidity, if timetable is not existing;
+			 * deletes the id if an empty String or null is given as input*/
+			public void setTimetableId(String ttid){
+				if(ttid == null || ttid.isEmpty())removeTimetableId();
+				else setAttribute("timetableId", ttid);
+			}
 			/**Removes instances timetableid, if not specified, resource type default will be used (if specified there)*/
 			public void removeTimetableId(){el.removeAttribute("timetableId");}
 			
