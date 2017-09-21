@@ -167,7 +167,7 @@ public class ScyllaGUI extends JFrame {
 		
 	    if(WIDTH == r.getWidth() && HEIGHT == r.getHeight())setExtendedState(JFrame.MAXIMIZED_BOTH);
 
-		simulationPane = new SimulationPane(this);
+		simulationPane = new SimulationPane();
 		globalconfPane = new GlobalConfigurationPane();
 	    contentPane = new JTabbedPane(JTabbedPane.TOP);
 		setContentPane(contentPane);
