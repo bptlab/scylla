@@ -31,7 +31,7 @@
 	    <artifactId>openxes</artifactId>
 	    <version>20160212</version>
 	    <scope>system</scope>
-	    <systemPath>${project.basedir}/lib/OpenXES-20160212.jar</systemPath>
+	    <systemPath>${pom.basedir}/lib/OpenXES-20160212.jar</systemPath>
 	</dependency>
 	<dependency>
 	    <groupId>org.deckfour</groupId>

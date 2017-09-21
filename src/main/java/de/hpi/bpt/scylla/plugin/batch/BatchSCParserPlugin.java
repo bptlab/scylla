@@ -17,7 +17,7 @@ import de.hpi.bpt.scylla.plugin_type.parser.SimulationConfigurationParserPluggab
 
 public class BatchSCParserPlugin extends SimulationConfigurationParserPluggable {
 
-    @Override
+	@Override
     public String getName() {
         return BatchPluginUtils.PLUGIN_NAME;
     }
@@ -58,7 +58,7 @@ public class BatchSCParserPlugin extends SimulationConfigurationParserPluggable 
                         maxBatchSize = Integer.parseInt(maxBatchSizeElement.getText());
                     }
                     // threshold capacity (minimum batch size) & timeout of activation rule
-                    MinMaxRule minMaxRule = null;
+                    ActivationRule activationRule = null;
                     Element activationRuleElement = elem.getChild("activationRule", simNamespace);
                     if (activationRuleElement != null) {
                         List<Element> ruleElements = activationRuleElement.getChildren();
@@ -74,9 +74,39 @@ public class BatchSCParserPlugin extends SimulationConfigurationParserPluggable 
                             Duration minTimeout = Duration.parse(ruleElement.getAttributeValue("minTimeout"));
                             int maxInstances = Integer.parseInt(ruleElement.getAttributeValue("maxInstances"));
                             Duration maxTimeout = Duration.parse(ruleElement.getAttributeValue("maxTimeout"));
-                            minMaxRule = new MinMaxRule(minInstances, minTimeout, maxInstances, maxTimeout);
+                            activationRule = new MinMaxRule(minInstances, minTimeout, maxInstances, maxTimeout);
                         }
-                        else {
+                        else if ("thresholdRule".equals(ruleElementName)){
+                        	
+                        	// parsing threshold, if it is defined
+                        	int threshold = 0;
+                        	String thresholdString = ruleElement.getAttributeValue("threshold");
+                        	if (thresholdString == null || thresholdString.isEmpty()){
+                        	}else{
+                        		threshold = Integer.parseInt(thresholdString);
+                        	}
+                        	
+                        	//parsing timeout, if it is defined
+                        	Duration timeout = null;
+                            String timeoutString = ruleElement.getAttributeValue("timeout");
+                            if (timeoutString != null){
+                            	timeout = Duration.parse(timeoutString);
+                            }
+                            
+                            //parsing dueDate, if it is defined
+                            String dueDate = ruleElement.getAttributeValue("duedate");
+                            
+                            //either timeout or dueDate should not be null --> two different Constructors for the ThresholdRule
+                            if (timeout != null){
+                            	activationRule = new ThresholdRule(threshold, timeout);
+                            }else if (dueDate != null){
+                            	activationRule = new ThresholdRule(threshold, dueDate);
+                            }else{
+                            	throw new ScyllaValidationException("A threshold rule was selected for" + ruleElementName
+                                        + " then either timeout or duedate must be specified.");
+                            }
+                            
+                        }else{
                             throw new ScyllaValidationException("Activation rule type" + ruleElementName
                                     + " for batch region " + identifier + " not supported.");
                         }
@@ -91,7 +121,7 @@ public class BatchSCParserPlugin extends SimulationConfigurationParserPluggable 
                             }
                         };
                     }
-                    BatchRegion br = new BatchRegion(processModel, nodeId, maxBatchSize, minMaxRule,
+                    BatchRegion br = new BatchRegion(processModel, nodeId, maxBatchSize, activationRule,
                             groupingCharacteristic);
                     batchRegions.put(nodeId, br);
                 }

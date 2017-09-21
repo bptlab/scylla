@@ -19,50 +19,57 @@ import de.hpi.bpt.scylla.simulation.event.TaskTerminateEvent;
 
 public class DataObjectTaskTerminate extends TaskTerminateEventPluggable  {
 
-	@Override
-	public String getName() {
-		 return DataObjectPluginUtils.PLUGIN_NAME;
-	}
+    @Override
+    public String getName() {
+        return DataObjectPluginUtils.PLUGIN_NAME;
+    }
 
-	@SuppressWarnings("unchecked")
-	@Override
+    @SuppressWarnings("unchecked")
+    @Override
 	/* collect all fields of all dataobjects and simulate them with the given desmoj distribution. After that, pass them to the XES Logger */
-	public void eventRoutine(TaskTerminateEvent desmojEvent, ProcessInstance processInstance) throws ScyllaRuntimeException {
+    public void eventRoutine(TaskTerminateEvent desmojEvent, ProcessInstance processInstance) throws ScyllaRuntimeException {
         ProcessModel processModel = processInstance.getProcessModel();
         // int processInstanceId = processInstance.getId();
-		try {
-			if (processModel.getDataObjectsGraph().getNodes().containsKey(desmojEvent.getNodeId())) {
-				Set<Integer> refferingObjects = processModel.getDataObjectsGraph().getTargetObjects(desmojEvent.getNodeId());
-				Collection<Object> allFields = desmojEvent.getDesmojObjects().getExtensionDistributions().get("dataobject").values();
-				for (Object fields : allFields) {
-					Integer i = 0;
-					while (((Map<String, Map<Integer, DataObjectField>>) fields).values().toArray().length - i != 0) {
-						DataObjectField field = (DataObjectField) ((Map<String, Map<Integer, DataObjectField>>) fields).values().toArray()[i];
-						if (refferingObjects.contains(field.getNodeId())){
-							//System.out.println(processInstance.getId() + " " + desmojEvent.getDisplayName() + " " + processModel.getDisplayNames().get(field.getNodeId()) + " " + field.getDataDistributionWrapper().getSample());
-							SimulationModel model = (SimulationModel) desmojEvent.getModel();
-							Collection<Map<Integer, java.util.List<ProcessNodeInfo>>> allProcesses = model.getProcessNodeInfos().values();
-							for (Map<Integer, java.util	.List<ProcessNodeInfo>> process : allProcesses) {
-								List<ProcessNodeInfo> currentProcess = process.get(processInstance.getId());
-								for (ProcessNodeInfo task : currentProcess) {
-									//System.out.println(task);
-									//System.out.println(processModel.getDisplayNames().get(processModel.getDataObjectsGraph().getSourceObjects(field.getNodeId()).toArray()[0]) + " " + task.getTaskName());
-									if (task.getTaskName().equals(processModel.getDisplayNames().get(processModel.getDataObjectsGraph().getSourceObjects(field.getNodeId()).toArray()[0])) && task.getTransition() == ProcessNodeTransitionType.TERMINATE) {
-										Map<String, Object> fieldSample = new HashMap<String, Object>();
-										fieldSample.put(processModel.getDisplayNames().get(field.getNodeId()) + "." + field.getFieldName(), field.getDataDistributionWrapper().getSample());
-										task.SetDataObjectField(fieldSample);
-									}
-								}
-							}
-						}
-						i++;
-					}
-				}
-			} else {
-				//do nothing and continue with the next task because Node has no dataobejcts
-			}
-		} catch (ScyllaRuntimeException | ScyllaValidationException | NodeNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
+        try {
+            if (processModel.getDataObjectsGraph().getNodes().containsKey(desmojEvent.getNodeId())) {
+                Set<Integer> refferingObjects = processModel.getDataObjectsGraph().getTargetObjects(desmojEvent.getNodeId());
+                Collection<Object> allFields = desmojEvent.getDesmojObjects().getExtensionDistributions().get("dataobject").values();
+                for (Object fields : allFields) {
+                    Integer i = 0;
+                    while (((Map<String, Map<Integer, DataObjectField>>) fields).values().toArray().length - i != 0) {
+                        DataObjectField field = (DataObjectField) ((Map<String, Map<Integer, DataObjectField>>) fields).values().toArray()[i];
+                        if (refferingObjects.contains(field.getNodeId())){
+                            //System.out.println(processInstance.getId() + " " + desmojEvent.getDisplayName() + " " + processModel.getDisplayNames().get(field.getNodeId()) + " " + field.getDataDistributionWrapper().getSample());
+                            SimulationModel model = (SimulationModel) desmojEvent.getModel();
+                            Collection<Map<Integer, java.util.List<ProcessNodeInfo>>> allProcesses = model.getProcessNodeInfos().values();
+                            for (Map<Integer, java.util	.List<ProcessNodeInfo>> process : allProcesses) {
+                                List<ProcessNodeInfo> currentProcess = process.get(processInstance.getId());
+                                for (ProcessNodeInfo task : currentProcess) {
+                                    //System.out.println(task);
+                                    //System.out.println(processModel.getDisplayNames().get(processModel.getDataObjectsGraph().getSourceObjects(field.getNodeId()).toArray()[0]) + " " + task.getTaskName());
+                                    for (Integer j = 0; j <processModel.getDataObjectsGraph().getSourceObjects(field.getNodeId()).toArray().length; j++) {
+                                        if (task.getTaskName().equals(processModel.getDisplayNames().get(processModel.getDataObjectsGraph().getSourceObjects(field.getNodeId()).toArray()[j])) && task.getTransition() == ProcessNodeTransitionType.TERMINATE) {
+                                            //check all tasks and find the ones that may be looged; already logged ones will get ignored next line
+                                            if (!task.getDataObjectField().containsKey(processModel.getDisplayNames().get(field.getNodeId()) + "." + field.getFieldName())) { //don't log if task already has this field logged
+                                                Map<String, Object> fieldSample = new HashMap<String, Object>();
+                                                Object currentSample = field.getDataDistributionWrapper().getSample();
+                                                fieldSample.put(processModel.getDisplayNames().get(field.getNodeId()) + "." + field.getFieldName(), currentSample); //log Value at TaskTerminate
+                                                task.SetDataObjectField(fieldSample);
+                                                DataObjectField.addDataObjectValue(processInstance.getId(), fieldSample.keySet().toArray()[0].toString(), currentSample); //set current DataObjectFieldValue
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        i++;
+                    }
+                }
+            } else {
+                //do nothing and continue with the next task because Node has no dataobejcts
+            }
+        } catch (ScyllaRuntimeException | ScyllaValidationException | NodeNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 }
