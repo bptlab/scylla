@@ -23,7 +23,6 @@ import de.hpi.bpt.scylla.creation.SimulationConfiguration.Distribution;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.Distribution.DistributionType;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.SimulationConfigurationCreator;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.Task;
-import de.hpi.bpt.scylla.model.configuration.distribution.TriangularDistribution;
 
 //TODO delete
 public class JDomTestClass {

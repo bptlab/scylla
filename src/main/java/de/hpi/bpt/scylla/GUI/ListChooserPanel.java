@@ -21,39 +21,58 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
 /**
- * 
+ * Panel that allows the user to select items on the left side to display their content on the right side.<br>
+ * Items cann be added, removed and renamed by abstract methods.
  * @author Leon Bein
  *
  */
 @SuppressWarnings("serial")
 public abstract class ListChooserPanel extends JSplitPane{
 	
+	/**
+	 * Item interface
+	 * @author Leon Bein
+	 *
+	 */
 	public interface ComponentHolder{
+		/**Returns the Component that is shown when the item is selected*/
 		public Component getComponent();
-		public default void setName(String s){};
+		/**Called when the item is renamed*/
+		public void setName(String s);
+		/**Optional method, called when the item is deleted*/
 		public default void delete(){};
 	}
 
+	/**Model of the list on the left side, as realized by a JTable*/
 	private DefaultTableModel model;
+	/**List realization by a tably*/
 	private JTable list;
+	/**Empty panel if no item is selected*/
 	private JPanel panelRight;
+	/**Button to add new items*/
 	private JButton buttonAdd;
+	/**Button to remove current selected item*/
 	private JButton buttonRemove;
 	
-	
+	/**
+	 * Constructor without initial data
+	 */
 	public ListChooserPanel(){
 		this(null);
 	}
 	
+	/**
+	 * Constructor with initial data
+	 * @param data : intial data
+	 */
 	public ListChooserPanel(List<ComponentHolder> data) {
 		
-
-		//setEnabled(false);
 		JPanel panelLeft = new JPanel();
 		setLeftComponent(panelLeft);
 		GridBagLayout gbl_panelLeft = new GridBagLayout();
 		panelLeft.setLayout(gbl_panelLeft);
 		
+		//Panel for add and remove button
 		JPanel panelListHeader = new JPanel();
 		GridBagConstraints gbc_panelListHeader = new GridBagConstraints();
 		gbc_panelListHeader.gridx = 0;
@@ -72,6 +91,7 @@ public abstract class ListChooserPanel extends JSplitPane{
 				if(list.getCellEditor() != null)list.getCellEditor().stopCellEditing();
 				int index = model.getRowCount();
 				model.addRow(new ComponentHolder[]{onCreate()});
+				//Starts editing the newly added item in order to give it another name
 				list.editCellAt(index, 0);
 				list.getEditorComponent().requestFocus();
 				((JTextField) list.getEditorComponent()).selectAll();
@@ -118,7 +138,7 @@ public abstract class ListChooserPanel extends JSplitPane{
 			}
 		}
 		
-		
+		//Scrollpane to scroll over many items if necessary
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
@@ -163,10 +183,17 @@ public abstract class ListChooserPanel extends JSplitPane{
 		
 	}
 
+	/**
+	 * Adds the item to the list
+	 * @param item : A componentholder item
+	 */
 	public void add(ComponentHolder item) {
 		model.addRow(new Object[]{item});
 	}
 	
+	/**
+	 * Deletes all saved items
+	 */
 	public void clear(){
 		if(list.getCellEditor() != null)list.getCellEditor().cancelCellEditing();
 		while(model.getRowCount() > 0){
@@ -175,6 +202,9 @@ public abstract class ListChooserPanel extends JSplitPane{
 		}
 	}
 	
+	/**
+	 * Enables/disables all necessary components in order to prevent invalid states
+	 */
 	@Override
 	public void setEnabled(boolean b){
 		list.setEnabled(b);
@@ -184,6 +214,11 @@ public abstract class ListChooserPanel extends JSplitPane{
 		super.setEnabled(b);
 	}
 	
+	/**
+	 * Returns whether the list contains an item with the given name
+	 * @param s : The name to check
+	 * @return true if such an item exists, false if not
+	 */
 	private boolean contains(String s){
 		int h = model.getRowCount();
 		for(int i = 0; i < h; i++){
@@ -192,19 +227,38 @@ public abstract class ListChooserPanel extends JSplitPane{
 		return false;
 	}
 	
+	/**
+	 * Editor class for the table/list
+	 * @author Leon Bein
+	 *
+	 */
 	private class ComponentHolderCellEditor extends DefaultCellEditor{
+		/**Editing component*/
 		private JTextField textfield;
+		/**Edited item*/
 		private ComponentHolder current;
 		
+		/**
+		 * Standard Constructor
+		 */
 		public ComponentHolderCellEditor(){
 			this(new JTextField());
 		}
 		
+		/**
+		 * Additional constructor to be able to set the textfield attribute
+		 * @param f
+		 */
 		private ComponentHolderCellEditor(JTextField f){
 			super(f);
 			textfield = f;
 		}
 
+		/**
+		 * Sets the name of the edited item to the textfields value. <br>
+		 * Special behavior: If the items name was "<enter name>", 
+		 * the name is automatically converted to "Unnamed" plus a number if multiple of these instances exist
+		 */
 		@Override
 		public ComponentHolder getCellEditorValue() {
 			if(textfield.getText().equals("<enter name>")){
@@ -221,6 +275,9 @@ public abstract class ListChooserPanel extends JSplitPane{
 			return current;
 		}
 
+		/**
+		 * Sets both the edited item plus the text of the textfield
+		 */
 		@Override
 		public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row,
 				int column) {

@@ -86,10 +86,15 @@ public class ScyllaGUI extends JFrame {
 	public static final ImageIcon ICON_OPEN = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/open.png")),TITLEFONT.getSize(),TITLEFONT.getSize());
 	
 
+	/**Simulation pane for running and configuring simulations*/
 	private SimulationPane simulationPane;
+	/**Pane to create and edit global configurations*/
 	private GlobalConfigurationPane globalconfPane;
+	/**Tabpane to switch between the panes*/
 	private JTabbedPane contentPane;
-	private PrintStream stdErr;
+	
+	/**Reference to the actual error output*/
+	private static final PrintStream stdErr = System.err;
 	
 
 
@@ -168,7 +173,6 @@ public class ScyllaGUI extends JFrame {
 		setContentPane(contentPane);
 		contentPane.addTab("Simulation", simulationPane);
 		contentPane.addTab("Global Configuration Editor", globalconfPane);
-		
 		globalconfPane.init();
 		
 		
@@ -176,13 +180,19 @@ public class ScyllaGUI extends JFrame {
 //		separator.setBounds(600, 0, 1, 812);
 //		contentPane.add(separator);
 		
-		//TODO System.setOut(simulationPane.getConsole().getOut());
-    	stdErr = System.err;
+		System.setOut(simulationPane.getConsole().getOut());
 		
 
 		
 	}
 	
+	/**
+	 * Utility method: Rescales a given imageicon
+	 * @param imageIcon : The icon to rescale
+	 * @param w : The new width
+	 * @param h : The new height
+	 * @return A new ImageIcon with the same image but the new measurements
+	 */
 	public static ImageIcon resizeIcon(ImageIcon imageIcon,int w, int h) {
 		Image img = imageIcon.getImage();
 		Image scaled = img.getScaledInstance(w, h, Image.SCALE_SMOOTH);
@@ -190,10 +200,17 @@ public class ScyllaGUI extends JFrame {
 	}
 
 
-	public PrintStream getStdErr() {
+	/**
+	 * @return the standard error output stream
+	 */
+	public static PrintStream getStdErr() {
 		return stdErr;
 	}
 	
+	/**
+	 * Sets all UIManager font keys to the given font
+	 * @param font : The font to be set as default
+	 */
 	public static void setDefaultFont(Font font){
 		Enumeration<Object> keys = UIManager.getDefaults().keys();
 		for(Object key : Collections.list(keys)){
