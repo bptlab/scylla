@@ -67,10 +67,10 @@
 
 	    <scy:dataObject id="DataObjectReference_1x3envq" name="Letter for customer">
 			<scy:field name="Content" type="string">
-				<scy:empiricalStringDistribution>
+				<scy:discreteProbabilityDistribution>
 					<scy:entry value="ContentA" frequency="0.8"></scy:entry>
 					<scy:entry value="ContentB" frequency="0.2"></scy:entry>
-				</scy:empiricalStringDistribution> 
+				</scy:discreteProbabilityDistribution> 
 			</scy:field>
 		</scy:dataObject>
 	</scy:simulationConfiguration>

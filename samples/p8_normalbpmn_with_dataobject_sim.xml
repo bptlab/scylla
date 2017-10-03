@@ -25,11 +25,11 @@
 	    </bsim:task>
 	    <bsim:dataObject id="DataObjectReference_01imo1t" name="thesis">
 			<bsim:field name="ty" type="string">
-				<bsim:empiricalStringDistribution>
+				<bsim:discreteProbabilityDistribution>
 					<bsim:entry value="A" frequency="20"></bsim:entry>
 					<bsim:entry value="B" frequency="5"></bsim:entry>
 					<bsim:entry value="C" frequency="2"></bsim:entry>
-				</bsim:empiricalStringDistribution> 
+				</bsim:discreteProbabilityDistribution> 
 			</bsim:field>
 			<bsim:field name="ao" type="long">
 				<bsim:empiricalDistribution>

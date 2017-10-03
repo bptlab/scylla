@@ -13,6 +13,7 @@ import java.util.Set;
  */
 public class ProcessNodeInfo {
 
+    private Integer id;
     private String processScopeNodeId;
     private String source;
     private long timestamp;
@@ -37,7 +38,7 @@ public class ProcessNodeInfo {
      * @param transition
      *            transition of node
      */
-    public ProcessNodeInfo(String processScopeNodeId, String source, long timestamp, String nodeName,
+    public ProcessNodeInfo(Integer id, String processScopeNodeId, String source, long timestamp, String nodeName,
             Set<String> resources, ProcessNodeTransitionType transition) {
         this.processScopeNodeId = processScopeNodeId;
         this.source = source;
@@ -46,6 +47,7 @@ public class ProcessNodeInfo {
         this.resources = resources;
         this.transition = transition;
         this.dataObjectField = new HashMap<String, Object>();
+        this.id = id;
     }
     
 
@@ -85,4 +87,7 @@ public class ProcessNodeInfo {
     	}
     }
 
+    public Integer getId(){
+        return id;
+    }
 }

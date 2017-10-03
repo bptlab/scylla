@@ -173,8 +173,8 @@ public class ProcessModelParser extends Parser<ProcessModel> {
 
         Map<Integer, Element> boundaryEvents = new HashMap<Integer, Element>();
         Map<Integer, Element> sequenceFlows = new HashMap<Integer, Element>();
-        Map<Integer, List<Element>> tasksWithDataInputAssociations = new HashMap<Integer, List<Element>>();
-        Map<Integer, List<Element>> tasksWithDataOutputAssociations = new HashMap<Integer, List<Element>>();
+        Map<Integer, List<Element>> tasksWithDataInputAssociations = new HashMap<Integer, List<Element>>(); //not only tasks anymore, also events
+        Map<Integer, List<Element>> tasksWithDataOutputAssociations = new HashMap<Integer, List<Element>>(); //not only tasks anymore, also events
         int nodeId = 1;
         for (Element el : process.getChildren()) {
             String elementName = el.getName();
@@ -377,6 +377,14 @@ public class ProcessModelParser extends Parser<ProcessModel> {
                             boundaryEvents.put(nodeId, el);
                         }
                     }
+                    List<Element> dataInElements = el.getChildren("dataInputAssociation", bpmnNamespace);
+                    if (!dataInElements.isEmpty()) {
+                        tasksWithDataInputAssociations.put(nodeId, dataInElements);
+                    }
+                    List<Element> dataOutElements = el.getChildren("dataOutputAssociation", bpmnNamespace);
+                    if (!dataOutElements.isEmpty()) {
+                        tasksWithDataOutputAssociations.put(nodeId, dataOutElements);
+                    }
                 }
                 else if (elementName.equals("dataObjectReference")) {
                 	String dataObjectRef = el.getAttributeValue("dataObjectRef");
@@ -520,6 +528,7 @@ public class ProcessModelParser extends Parser<ProcessModel> {
             subProcessModel.setParent(processModel);
         }
 
+        //System.out.println(dataObjectsGraph);
         return processModel;
     }
 

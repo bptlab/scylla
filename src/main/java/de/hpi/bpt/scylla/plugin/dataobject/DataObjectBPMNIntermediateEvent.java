@@ -1,33 +1,27 @@
 package de.hpi.bpt.scylla.plugin.dataobject;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import de.hpi.bpt.scylla.exception.ScyllaRuntimeException;
 import de.hpi.bpt.scylla.exception.ScyllaValidationException;
 import de.hpi.bpt.scylla.logger.ProcessNodeInfo;
 import de.hpi.bpt.scylla.logger.ProcessNodeTransitionType;
 import de.hpi.bpt.scylla.model.process.ProcessModel;
 import de.hpi.bpt.scylla.model.process.graph.exception.NodeNotFoundException;
-import de.hpi.bpt.scylla.plugin_type.simulation.event.TaskTerminateEventPluggable;
+import de.hpi.bpt.scylla.plugin_type.simulation.event.BPMNIntermediateEventPluggable;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
 import de.hpi.bpt.scylla.simulation.SimulationModel;
-import de.hpi.bpt.scylla.simulation.event.TaskTerminateEvent;
+import de.hpi.bpt.scylla.simulation.event.BPMNIntermediateEvent;
 
-public class DataObjectTaskTerminate extends TaskTerminateEventPluggable  {
+import java.util.*;
+
+public class DataObjectBPMNIntermediateEvent extends BPMNIntermediateEventPluggable {
 
     @Override
     public String getName() {
         return DataObjectPluginUtils.PLUGIN_NAME;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-	/* collect all fields of all dataobjects and simulate them with the given desmoj distribution. After that, pass them to the XES Logger */
-    public void eventRoutine(TaskTerminateEvent desmojEvent, ProcessInstance processInstance) throws ScyllaRuntimeException {
+    public void eventRoutine(BPMNIntermediateEvent desmojEvent, ProcessInstance processInstance) throws ScyllaRuntimeException {
         ProcessModel processModel = processInstance.getProcessModel();
         // int processInstanceId = processInstance.getId();
         try {
@@ -48,7 +42,7 @@ public class DataObjectTaskTerminate extends TaskTerminateEventPluggable  {
                                     //System.out.println(task);
                                     //System.out.println(processModel.getDisplayNames().get(processModel.getDataObjectsGraph().getSourceObjects(field.getNodeId()).toArray()[0]) + " " + task.getTaskName());
                                     for (Integer j = 0; j <processModel.getDataObjectsGraph().getSourceObjects(field.getNodeId()).toArray().length; j++) {
-                                        if (task.getId().equals(processModel.getDataObjectsGraph().getSourceObjects(field.getNodeId()).toArray()[j]) && task.getTransition() == ProcessNodeTransitionType.TERMINATE) {
+                                        if (task.getId().equals(processModel.getDataObjectsGraph().getSourceObjects(field.getNodeId()).toArray()[j]) && task.getTransition() == ProcessNodeTransitionType.EVENT_TERMINATE) {
                                             //check all tasks and find the ones that may be looged; already logged ones will get ignored next line
                                             if (!task.getDataObjectField().containsKey(processModel.getDisplayNames().get(field.getNodeId()) + "." + field.getFieldName())) { //don't log if task already has this field logged
                                                 Map<String, Object> fieldSample = new HashMap<String, Object>();

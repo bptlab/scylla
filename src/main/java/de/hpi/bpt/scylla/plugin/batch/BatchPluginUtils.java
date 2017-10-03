@@ -408,11 +408,11 @@ public class BatchPluginUtils {
                         String mockSource = source + "##" + ++sourceSuffix;
 
                         ProcessNodeInfo info;
-                        info = new ProcessNodeInfo(processScopeNodeId, mockSource, timestamp, taskName, resources,
+                        info = new ProcessNodeInfo(nodeId, processScopeNodeId, mockSource, timestamp, taskName, resources,
                                 ProcessNodeTransitionType.EVENT_BEGIN);
                         model.addNodeInfo(processModel, pi, info);
 
-                        info = new ProcessNodeInfo(processScopeNodeId, mockSource, timestamp, taskName, resources,
+                        info = new ProcessNodeInfo(nodeId, processScopeNodeId, mockSource, timestamp, taskName, resources,
                                 ProcessNodeTransitionType.EVENT_TERMINATE);
                         model.addNodeInfo(processModel, pi, info);
                     }
@@ -483,7 +483,7 @@ public class BatchPluginUtils {
                         String mockSource = source + "##" + ++sourceSuffix;
 
                         ProcessNodeInfo info;
-                        info = new ProcessNodeInfo(processScopeNodeId, mockSource, timestamp, taskName, resources,
+                        info = new ProcessNodeInfo(nodeId, processScopeNodeId, mockSource, timestamp, taskName, resources,
                                 transition);
                         model.addNodeInfo(processModel, pi, info);
                     }

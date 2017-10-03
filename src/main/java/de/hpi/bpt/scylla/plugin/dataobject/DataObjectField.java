@@ -14,7 +14,7 @@ public class DataObjectField {
 
 	private static HashMap<String, Object> dataObjectValues = new HashMap<String, Object>();
 
-	public DataObjectField(DataDistributionWrapper wrapper, Integer NodeId, String fieldName, String fieldtype) {
+	DataObjectField(DataDistributionWrapper wrapper, Integer NodeId, String fieldName, String fieldtype) {
 		this.distributionWrapper = wrapper;
 		this.NodeId = NodeId;
 		this.fieldName = fieldName;
@@ -37,7 +37,7 @@ public class DataObjectField {
 		return this.fieldType;
 	}
 
-	public static void addDataObjectValue(Integer processId, String fieldName, Object value) {
+	static void addDataObjectValue(Integer processId, String fieldName, Object value) {
 		dataObjectValues.put(fieldName + "_" + String.valueOf(processId), value);
 	}
 
