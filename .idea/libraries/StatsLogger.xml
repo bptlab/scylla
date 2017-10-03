@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="StatsLogger">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/StatsLogger.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
