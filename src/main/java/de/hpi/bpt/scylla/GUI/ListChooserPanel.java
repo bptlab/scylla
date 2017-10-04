@@ -22,7 +22,7 @@ import javax.swing.table.DefaultTableModel;
 
 /**
  * Panel that allows the user to select items on the left side to display their content on the right side.<br>
- * Items cann be added, removed and renamed by abstract methods.
+ * Items can be added, removed and renamed by abstract methods.
  * @author Leon Bein
  *
  */

@@ -1,7 +1,6 @@
 package de.hpi.bpt.scylla.GUI;
 
 import java.awt.Component;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -9,9 +8,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.border.EmptyBorder;
 
 
 /**
@@ -24,8 +21,6 @@ public class ExpandPanel extends JPanel{
 
 	/**Header Component*/
 	protected Component header;
-	/**Margin Textfield*/
-	protected JTextField textfield_sub;
 	/**Expansion button*/
 	protected JButton button_expand;
 	
@@ -81,22 +76,6 @@ public class ExpandPanel extends JPanel{
 		gbc_content.gridy = 1;
 		gbc_content.gridwidth = 2;
 		add(content, gbc_content);
-		
-		
-		textfield_sub = new JTextField(" ");
-		textfield_sub.setFont(new Font("Arial", Font.PLAIN, (int)(5.0*ScyllaGUI.SCALE)));
-		textfield_sub.setHorizontalAlignment(SwingConstants.LEFT);
-		textfield_sub.setForeground(ScyllaGUI.ColorField2);
-		textfield_sub.setBorder(new EmptyBorder(0, 0, 0, 0));
-		textfield_sub.setHighlighter(null);
-		textfield_sub.setEditable(false);
-		textfield_sub.setBackground(ScyllaGUI.ColorField2);
-		GridBagConstraints gbc_textfield_sub = new GridBagConstraints();
-		gbc_textfield_sub.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textfield_sub.gridx = 0;
-		gbc_textfield_sub.gridy = 2;
-		gbc_textfield_sub.gridwidth = 2;
-		add(textfield_sub, gbc_textfield_sub);
 		
 		expanded = true;
 		collapse();

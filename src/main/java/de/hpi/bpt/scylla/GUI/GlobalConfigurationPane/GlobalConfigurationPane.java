@@ -514,8 +514,6 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 		if(file != null)chooser.setSelectedFile(file);
 		else if(!creator.getId().equals("")) chooser.setSelectedFile(new File(ScyllaGUI.DEFAULTFILEPATH+"\\"+creator.getId()+".xml"));
 		chooser.setDialogTitle("Save");
-		chooser.setFont(ScyllaGUI.fileChooserFont);
-		chooser.setPreferredSize(ScyllaGUI.fileChooserDimension);
 		int c = chooser.showDialog(null,"Save");
 		if(c == ScalingFileChooser.APPROVE_OPTION){
 			file = chooser.getSelectedFile();

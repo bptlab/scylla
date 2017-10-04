@@ -3,6 +3,7 @@ package de.hpi.bpt.scylla.GUI;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Desktop;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -35,38 +36,45 @@ import de.hpi.bpt.scylla.logger.DebugLogger;
 import de.hpi.bpt.scylla.plugin_loader.PluginLoader;
 import java.awt.Insets;
 /**
- * 
+ * Pane for configuring and running simulations
  * @author Leon Bein
  *
  */
 @SuppressWarnings("serial")
 public class SimulationPane extends JPanel{
 	
+	//Global config components
 	private JLabel label_CurrentGlobalConfig;
 	private JTextField textfield_CurrentGlobalConfig_chosen;
 	private JButton button_openglobalconfig;
 	
+	//BPMN file components
 	private JLabel label_CurrentBpmnFiles;
 	private JScrollPane scrollPane_BpmnFiles;
 	private JList<String> list_CurrentBpmnFiles;
 	private JButton button_addBpmnFile;
 	private JButton button_removeBpmnFile;
 	
+	//Simulation file components
 	private JLabel label_CurrentSimulationFiles;
 	private JScrollPane scrollPane_SimFiles;
 	private JList<String> list_CurrentSimFiles;
 	private JButton button_addSimfile;
 	private JButton button_removeSimfile;
 	
+	//Plugin components
 	private JLabel label_Plugins;
 	private JScrollPane scrollPane_plugins;
 	private Container panel_plugins;
 	private JButton button_allplugins;
 	
+	//Console components
 	private JLabel label_Console;
 	private JScrollPane scrollPane_Console;
 	private Console console;
 
+	//Simulation components
+	private JPanel panelBottom;
 	private JButton button_StartSimulation;
 	private JButton button_OpenLastOutput;
 	private String lastOutPutFolder;
@@ -74,10 +82,10 @@ public class SimulationPane extends JPanel{
 	private JPanel panel_AdvancedOptions;
 	private JCheckBox checkbox_debug;
 	private JCheckBox checkbox_desmoj;
-
-	private JPanel panelBottom;
 	
-	
+	/**
+	 * Constructor
+	 */
 	public SimulationPane(){
 		
 		setBackground(ScyllaGUI.ColorBackground);
@@ -124,8 +132,6 @@ public class SimulationPane extends JPanel{
 			public void actionPerformed(ActionEvent arg0) {
 				ScalingFileChooser chooser = new ScalingFileChooser(ScyllaGUI.DEFAULTFILEPATH);
 				chooser.setDialogTitle("Choose global config");
-				chooser.setFont(ScyllaGUI.fileChooserFont);
-				chooser.setPreferredSize(ScyllaGUI.fileChooserDimension);
 				int c = chooser.showDialog(null,"Open");
 				if(c == ScalingFileChooser.APPROVE_OPTION){
 					textfield_CurrentGlobalConfig_chosen.setText(chooser.getSelectedFile().getPath());
@@ -355,6 +361,7 @@ public class SimulationPane extends JPanel{
 		
 		scrollPane_Console = new JScrollPane();
 		GridBagConstraints gbc_scrollPane_Console = new GridBagConstraints();
+		gbc_scrollPane_Console.anchor = GridBagConstraints.NORTH;
 		gbc_scrollPane_Console.fill = GridBagConstraints.BOTH;
 		gbc_scrollPane_Console.insets = new Insets(0, COL1, ROW1, COL1);
 		gbc_scrollPane_Console.gridwidth = 3;
@@ -362,7 +369,14 @@ public class SimulationPane extends JPanel{
 		gbc_scrollPane_Console.gridy = 9;
 		this.add(scrollPane_Console, gbc_scrollPane_Console);
 		
-		console = new Console();
+		console = new Console(){
+			@Override
+			public Dimension getPreferredScrollableViewportSize() {
+				Dimension d = super.getPreferredScrollableViewportSize();
+				d.setSize(d.getWidth(), 350.0*ScyllaGUI.SCALE);
+				return d;
+			}
+		};
 		console.setHighlighter(null);
 		console.setFont(ScyllaGUI.CONSOLEFONT);
 		console.setBackground(ScyllaGUI.ColorField1);
@@ -487,6 +501,9 @@ public class SimulationPane extends JPanel{
 		loadPlugins();
 	}
 	
+	/**
+	 * Loads the plugins from PluginLoader class into the plugin panel
+	 */
 	private void loadPlugins() {
 		System.setErr(console.getErr());
 		PluginLoader p = PluginLoader.getDefaultPluginLoader();
@@ -511,6 +528,7 @@ public class SimulationPane extends JPanel{
 		gbc.weightx = 1.0;
 		gbc.weighty = 0;
 		gbc.ipady = 0;
+		gbc.insets = new Insets(0,0,(int)(5.0*ScyllaGUI.SCALE),0);
 		for(Entry<String, ArrayList<PluginLoader.PluginWrapper>> e : plugins.entrySet()){
 			CheckboxListPanel listpanel = new CheckboxListPanel(e.getKey(),e.getValue());
 			gbc.gridy = i;
@@ -521,8 +539,15 @@ public class SimulationPane extends JPanel{
 		}
 	}
 	
-	private void startSimulation(String resFilename, String[] bpmnFilename, String[] simFilenames) {
+	/**
+	 * Starts the simulation
+	 * @param resFilename : Filename of the global configuration
+	 * @param bpmnFilenames : Array of bpmn file names
+	 * @param simFilenames : Array of sim file names
+	 */
+	private void startSimulation(String resFilename, String[] bpmnFilenames, String[] simFilenames) {
 
+		button_StartSimulation.setText("Running ...");
         button_StartSimulation.setEnabled(false);
         
     	boolean enableDebugLogging = checkbox_debug.isSelected();
@@ -537,7 +562,7 @@ public class SimulationPane extends JPanel{
         
         boolean success = true;
 
-        SimulationManager manager = new SimulationManager(ScyllaGUI.DESMOJOUTPUTPATH, bpmnFilename, simFilenames, resFilename,
+        SimulationManager manager = new SimulationManager(ScyllaGUI.DESMOJOUTPUTPATH, bpmnFilenames, simFilenames, resFilename,
                 enableBpsLogging, enableDesmojLogging);
         try{
         	System.out.println("Starting simulation at "+new SimpleDateFormat("HH:mm:ss").format(new Date()));
@@ -554,6 +579,7 @@ public class SimulationPane extends JPanel{
         }
         System.out.println();
         button_StartSimulation.setEnabled(true);
+		button_StartSimulation.setText("Start Simulation");
 	}
 	
 	public Console getConsole() {

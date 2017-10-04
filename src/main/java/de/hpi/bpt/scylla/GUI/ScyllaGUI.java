@@ -1,7 +1,6 @@
 package de.hpi.bpt.scylla.GUI;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
@@ -23,66 +22,83 @@ import javax.swing.plaf.ColorUIResource;
 
 import de.hpi.bpt.scylla.GUI.GlobalConfigurationPane.GlobalConfigurationPane;
 /**
+ * Scylla UI Main class, provides UI constants and starts the UI.
  * @author Leon Bein
- *
  */
 @SuppressWarnings("serial")
 public class ScyllaGUI extends JFrame {
 	
-	
+	/** Default path for input and output files*/
 	public static String DEFAULTFILEPATH = "samples\\";
+	/** Path for desmoj output files*/
 	public static final String DESMOJOUTPUTPATH = "desmoj_output\\";
 
 	
-
+	/**Color for titles and other highlighted bars*/
 	public static final Color ColorField0 = new Color(45,112,145);
+	/**Color mostly for buttons and static contents*/
 	public static final Color ColorField1 = new Color(240,240,240);
+	/**Color mostly for user input (textfields etc.) and dynamic contents; also usable as background color*/
 	public static final Color ColorField2 = new Color(255,255,255);
+	/**Main background Color*/
 	public static final Color ColorBackground = new Color(0,142,185);
 
+	/**Graphics environment in order to determine the screen size*/
 	private static GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+	/**Screen rectangle*/
 	private static java.awt.Rectangle r = env.getMaximumWindowBounds();
+	/**Screen width*/
 	public static final int WIDTH = r.width;//1200
+	/**Screen height*/
 	public static final int HEIGHT = r.height;//900
+	/**General scale; calculated as height scale to a 1200x900 display*/
 	public static final double SCALE = ((double)HEIGHT)/900.0;
 
 //	private static double SCALE = 1;
 //	private static int WIDTH = 1200;//(int)(1200.0 * SCALE);
 //	private static int HEIGHT = 900;//(int)(900 * SCALE);
-	
-	public static int STD = HEIGHT/24;
-	public static int STD1 = WIDTH/32;
-	public static int STD2 = WIDTH/48;
-	public static int STD3 = HEIGHT/36;
-	public static int STDHEI = 3*STD;
-	public static int STDHEIH = STDHEI/2;
-	
-	
-	public static final Dimension fileChooserDimension = new Dimension((int)(800.0*SCALE),(int)(500.0*SCALE));
-	public static final Font fileChooserFont = new Font("Arial", Font.PLAIN, (int)(14.0*SCALE));
 
+	/**Standard size for button etc. icons*/
+	public static int ICONSIZE = WIDTH/64;
+	
+	/**Font for standard small text*/
 	public static final Font DEFAULTFONT = new Font("Arial", Font.PLAIN, (int)(16.0*SCALE));
+	/**Color for standard small text*/
 	public static final Color DEFAULTFONT_COLOR = new Color(0,0,0);
+	/**Font for standard larger text and titles*/
 	public static final Font TITLEFONT = new Font(DEFAULTFONT.getFontName(), Font.PLAIN, (int)(20.0*SCALE));
+	/**Color for standard larger text and titles*/
 	public static final Color TITLEFONT_COLOR = new Color(255,255,255);
+	/**Font used by filechoosers in order to make them scale correctly*/
+	public static final Font FILECHOOSERFONT = new Font("Arial", Font.PLAIN, (int)(14.0*SCALE));
+	/**Font used for the console*/
 	public static final Font CONSOLEFONT = new Font("Consolas",Font.PLAIN,(int)(14.0*SCALE));
 
-
+	/**Padding margin for textfields*/
+	public static final Insets LEFTMARGIN = new Insets(0, WIDTH/48, 0, 0);
 	
-	public static final Insets LEFTMARGIN = new Insets(0, STD2, 0, 0);
+	/**Icon for adding objects*/
+	public static final ImageIcon ICON_PLUS = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/plus.png")),ICONSIZE,ICONSIZE);
+	/**Icon for deleting/removing objects or to exit*/
+	public static final ImageIcon ICON_X = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/remove.png")),ICONSIZE,ICONSIZE);
+	/**Icon for "further options"*/
+	public static final ImageIcon ICON_MORE = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/more.png")),ICONSIZE,ICONSIZE);
 	
-	public static final ImageIcon ICON_PLUS = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/plus.png")),STD1/2,STDHEIH/2);
-	public static final ImageIcon ICON_X = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/remove.png")),STD1/2,STDHEIH/2);
-	public static final ImageIcon ICON_MORE = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/more.png")),STD1/2,STD1/2);
-	
+	/**Icon to expand*/
 	public static final ImageIcon ICON_EXPAND = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/expand.png")),DEFAULTFONT.getSize(),DEFAULTFONT.getSize());
+	/**Icon to collapse*/
 	public static final ImageIcon ICON_COLLAPSE = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/collapse.png")),DEFAULTFONT.getSize(),DEFAULTFONT.getSize());
 	
-	public static final ImageIcon ICON_OPTIONS = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/options.png")),STD1/2,STD1/2);
+	/**Icon for options*/
+	public static final ImageIcon ICON_OPTIONS = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/options.png")),ICONSIZE,ICONSIZE);
 	
+	/**Icon for new file*/
 	public static final ImageIcon ICON_NEW = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/newfile.png")),TITLEFONT.getSize(),TITLEFONT.getSize());
+	/**Icon for save file*/
 	public static final ImageIcon ICON_SAVE = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/save.png")),TITLEFONT.getSize(),TITLEFONT.getSize());
+	/**Icon for save file as*/
 	public static final ImageIcon ICON_SAVEAS = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/saveas.png")),TITLEFONT.getSize(),TITLEFONT.getSize());
+	/**Icon for open file*/
 	public static final ImageIcon ICON_OPEN = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/open.png")),TITLEFONT.getSize(),TITLEFONT.getSize());
 	
 
@@ -127,44 +143,45 @@ public class ScyllaGUI extends JFrame {
 			e2.printStackTrace();
 		}
 
+		//Set all known font keys
 		setDefaultFont(ScyllaGUI.TITLEFONT);
 		
+		//Change tooltip look and feel to match the program and to scale correctly
 		UIManager.put("ToolTip.background", ScyllaGUI.ColorField1);
 		int border = (int)(1.5*SCALE);
 		UIManager.put("ToolTip.border", BorderFactory.createMatteBorder(border,border,border,border, ScyllaGUI.ColorField1.darker()));
 		UIManager.put("ToolTip.font", ScyllaGUI.DEFAULTFONT);
 
-
+		//Set button look and feel to remove focus and rollover effects
 		UIManager.put("Button.background",ScyllaGUI.ColorField1);
 		UIManager.put("Button.select",ScyllaGUI.ColorField1.darker());
 		UIManager.put("Button.focus", new ColorUIResource(new Color(0, 0, 0, 0)));
-
 		UIManager.put("Button.rollover",false);
 
-
+		//Set textfield colors
 		UIManager.put("TextField.background", ScyllaGUI.ColorField2);
 		UIManager.put("TextField.foreground", ScyllaGUI.DEFAULTFONT_COLOR);
-		
-		UIManager.put("List.selectionBackground", ScyllaGUI.ColorField1);
-		
-		UIManager.put("ScrollBar.width", (int) ((int)UIManager.get("ScrollBar.width") * SCALE));
-		
-		UIManager.put("TabbedPane.font", ScyllaGUI.TITLEFONT);
-		
+		//Set Combobox background
 		UIManager.put("ComboBox.background", ScyllaGUI.ColorField2);
 		
+		//Set list and table selection background
+		UIManager.put("List.selectionBackground", ScyllaGUI.ColorField1);
+		UIManager.put("Table.selectionBackground", ScyllaGUI.ColorField1);
+		
+		//Scale ScrollBar widths
+		UIManager.put("ScrollBar.width", (int) ((int)UIManager.get("ScrollBar.width") * SCALE));
+		
+		//Set tabpane font
+		UIManager.put("TabbedPane.font", ScyllaGUI.TITLEFONT);
+		
+		//Set Locale to english in order to get one consistent language, unit system, etc.
 		Locale.setDefault(Locale.ENGLISH);
 		JComponent.setDefaultLocale(Locale.ENGLISH);
-
-		//UIManager.put("Panel.background", ScyllaGUI.ColorBackground);
-		
-		
-		
-		
+	
+		//Init frame
 		setTitle("Scylla GUI");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100,WIDTH,HEIGHT);
-		
 	    if(WIDTH == r.getWidth() && HEIGHT == r.getHeight())setExtendedState(JFrame.MAXIMIZED_BOTH);
 
 		simulationPane = new SimulationPane();
@@ -175,15 +192,7 @@ public class ScyllaGUI extends JFrame {
 		contentPane.addTab("Global Configuration Editor", globalconfPane);
 		globalconfPane.init();
 		
-		
-//		JSeparator separator = new JSeparator();
-//		separator.setBounds(600, 0, 1, 812);
-//		contentPane.add(separator);
-		
 		System.setOut(simulationPane.getConsole().getOut());
-		
-
-		
 	}
 	
 	/**

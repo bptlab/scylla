@@ -2,6 +2,7 @@ package de.hpi.bpt.scylla.GUI;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Font;
 
 import javax.swing.JFileChooser;
@@ -20,8 +21,8 @@ public class ScalingFileChooser extends JFileChooser{
 	 */
 	public ScalingFileChooser(String s){
 		super(s);
-		setPreferredSize(ScyllaGUI.fileChooserDimension);
-		setFont(getComponents(),ScyllaGUI.fileChooserFont);
+		setPreferredSize(new Dimension((int)(800.0*ScyllaGUI.SCALE),(int)(500.0*ScyllaGUI.SCALE)));
+		setFont(getComponents(),ScyllaGUI.FILECHOOSERFONT);
 	}
 	
 	/**
