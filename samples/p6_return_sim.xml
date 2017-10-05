@@ -33,11 +33,11 @@
 
 	    <scy:task id="Task_1g5l68i" name="Collect return">
 	    	<scy:duration timeUnit="MINUTES">
-	    		<scy:empiricalDistribution>
+	    		<scy:arbitraryFiniteProbabilityDistribution>
 	    			<scy:entry value="8" frequency="1"/>
 	    			<scy:entry value="12" frequency="1"/>
 	    			<scy:entry value="160" frequency="1"/>
-	    		</scy:empiricalDistribution>
+	    		</scy:arbitraryFiniteProbabilityDistribution>
 	    	</scy:duration>
 	    	<scy:resources>
 	    		<scy:resource id="Warehouse" amount="1"/>
@@ -67,10 +67,10 @@
 
 	    <scy:dataObject id="DataObjectReference_1x3envq" name="Letter for customer">
 			<scy:field name="Content" type="string">
-				<scy:discreteProbabilityDistribution>
+				<scy:arbitraryFiniteProbabilityDistribution>
 					<scy:entry value="ContentA" frequency="0.8"></scy:entry>
 					<scy:entry value="ContentB" frequency="0.2"></scy:entry>
-				</scy:discreteProbabilityDistribution> 
+				</scy:arbitraryFiniteProbabilityDistribution> 
 			</scy:field>
 		</scy:dataObject>
 	</scy:simulationConfiguration>

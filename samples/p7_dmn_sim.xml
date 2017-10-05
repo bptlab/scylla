@@ -13,10 +13,10 @@
 		
 		<bsim:dataObject id="sid-239741B7-E442-40BD-A153-739033002E0F" name="Discount">
 			<bsim:field name="Type" type="string">
-				<bsim:empiricalStringDistribution>
-					<bsim:entry value="25" frequency="0.8"></bsim:entry>
+				<bsim:arbitraryFiniteProbabilityDistribution>
+					<bsim:entry value="25a" frequency="0.8"></bsim:entry>
 					<bsim:entry value="50" frequency="0.2"></bsim:entry>
-				</bsim:empiricalStringDistribution> 
+				</bsim:arbitraryFiniteProbabilityDistribution>
 			</bsim:field>
 			<bsim:field name="Points" type="long">
 				<bsim:normalDistribution>
@@ -40,10 +40,10 @@
 		
 		<bsim:task id="sid-9156D59A-DF79-4C05-8EEE-1541C5DA5E40" name="Apply 25% discount">
 			<bsim:duration timeUnit="MINUTES">
-				<bsim:exponentialDistribution>
-					<bsim:mean>2</bsim:mean>
-					<bsim:standardDeviation>0.5</bsim:standardDeviation>
-				</bsim:exponentialDistribution>
+				<bsim:arbitraryFiniteProbabilityDistribution>
+					<bsim:entry value="25" frequency="0.8"></bsim:entry>
+					<bsim:entry value="50" frequency="0.2"></bsim:entry>
+				</bsim:arbitraryFiniteProbabilityDistribution> 
 			</bsim:duration>
 			<bsim:resources>
 				<bsim:resource id="System" amount="1"/>

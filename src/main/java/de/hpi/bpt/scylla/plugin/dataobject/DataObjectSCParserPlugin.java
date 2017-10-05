@@ -73,7 +73,7 @@ public class DataObjectSCParserPlugin extends SimulationConfigurationParserPlugg
                 	for(Element fieldElement : field.getChildren()){
                 		
                 		if(fieldElement.getName().endsWith("Distribution")) {
-                			Distribution distribution = SimulationConfigurationParser.getDistribution(field, simNamespace);
+                			Distribution distribution = SimulationConfigurationParser.getDistribution(field, simNamespace, fieldType);
                 			distWrapper.setDistribution(distribution);
                 		} /*else if (fieldElement.getName().equals("range")) {
                 			try{
