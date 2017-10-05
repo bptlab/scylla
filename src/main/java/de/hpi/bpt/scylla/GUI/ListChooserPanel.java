@@ -67,6 +67,8 @@ public abstract class ListChooserPanel extends JSplitPane{
 	 */
 	public ListChooserPanel(List<ComponentHolder> data) {
 		
+		super.setEnabled(false);
+		
 		JPanel panelLeft = new JPanel();
 		setLeftComponent(panelLeft);
 		GridBagLayout gbl_panelLeft = new GridBagLayout();
@@ -211,7 +213,6 @@ public abstract class ListChooserPanel extends JSplitPane{
 		buttonAdd.setEnabled(b);
 		buttonRemove.setEnabled(b);
 		panelRight.setEnabled(b);
-		super.setEnabled(b);
 	}
 	
 	/**

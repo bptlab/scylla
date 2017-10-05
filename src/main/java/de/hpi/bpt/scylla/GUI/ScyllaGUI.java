@@ -59,7 +59,9 @@ public class ScyllaGUI extends JFrame {
 //	private static int HEIGHT = 900;//(int)(900 * SCALE);
 
 	/**Standard size for button etc. icons*/
-	public static int ICONSIZE = WIDTH/64;
+	public static final int ICONSIZE = WIDTH/64;
+	/**Standard inset width*/
+	public static final int STDINSET = (int)(2.5*SCALE);
 	
 	/**Font for standard small text*/
 	public static final Font DEFAULTFONT = new Font("Arial", Font.PLAIN, (int)(16.0*SCALE));

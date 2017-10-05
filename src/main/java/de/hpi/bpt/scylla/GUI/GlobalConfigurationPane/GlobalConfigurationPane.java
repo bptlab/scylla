@@ -24,11 +24,13 @@ import java.util.List;
 import java.util.Set;
 
 import javax.swing.AbstractAction;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -65,16 +67,25 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 	private JComboBox<ZoneId> comboboxTimezone;
 
 	private ListChooserPanel panelTimetables;
+	/**List of all JComboboxes, that display timetables, in order to update their entries*/
 	private List<JComboBox<String>> timetableObserverList;
+	/**List of all known timetable ids, in order to pass them to newly created displays (e.g. Comboboxes)*/
 	private List<String> timetables;
 	private ListChooserPanel panelResources;
 	
+	/**Central XML-Link object*/
 	private GlobalConfigurationCreator creator;
+	/**File reference to the current opened gc file, null if none is opened*/
 	private File file;
+	/**Shows whether there are any unsaved changes*/
 	private boolean saved;
 	private JButton buttonSavefile;
 	private JButton buttonSavefileAs;
 	private JButton buttonClosefile;
+	/**Flag to display if there are any non-user changes performed at user input objects,
+	 * in order to prevent user input events to be fired.
+	 * Integer value represents the number of methods/threads that are currently performing those changes,
+	 * if equal 0 => no changes.*/
 	private int changeFlag;
 
 	/**
@@ -85,12 +96,14 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 		setBackground(ScyllaGUI.ColorBackground);
 		setLayout(new GridLayout(0, 1, 0, 0));
 		
+		//---Header panel---
 		JPanel panelHeader = new JPanel();
 		panelHeader.setFocusable(true);
 		panelHeader.setBackground(Color.DARK_GRAY);
 		GridBagLayout gbl_panelHeader = new GridBagLayout();
 		panelHeader.setLayout(gbl_panelHeader);
 		
+		// Button "New file"
 		JButton buttonNewfile = new JButton();
 		buttonNewfile.setToolTipText("New File (Ctrl + N)");
 		buttonNewfile.addActionListener(new ActionListener() {
@@ -104,6 +117,7 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 		gbc_buttonNewfile.fill = GridBagConstraints.BOTH;
 		panelHeader.add(buttonNewfile, gbc_buttonNewfile);
 		
+		// Button "Save file"
 		buttonSavefile = new JButton();
 		buttonSavefile.setToolTipText("Save (Ctrl + S)");
 		setSaved(true);
@@ -118,6 +132,7 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 		gbc_buttonSavefile.fill = GridBagConstraints.BOTH;
 		panelHeader.add(buttonSavefile, gbc_buttonSavefile);
 		
+		// Button "Save file as"
 		buttonSavefileAs = new JButton("");
 		buttonSavefileAs.setToolTipText("Save as (Ctrl + Shift + S)");
 		buttonSavefileAs.addActionListener(new ActionListener() {
@@ -131,6 +146,7 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 		gbc_buttonSavefileAs.fill = GridBagConstraints.BOTH;
 		panelHeader.add(buttonSavefileAs, gbc_buttonSavefileAs);
 		
+		// Button "Open file"
 		JButton buttonOpenfile = new JButton();
 		buttonOpenfile.setToolTipText("Open (Ctrl + O)");
 		buttonOpenfile.addActionListener(new ActionListener() {
@@ -144,6 +160,7 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 		gbc_buttonOpenfile.fill = GridBagConstraints.BOTH;
 		panelHeader.add(buttonOpenfile, gbc_buttonOpenfile);
 		
+		//Label displaying file title
 		labelFiletitle = new JLabel();
 		labelFiletitle.setText("<No editor opened. Open an existing file or create a new one.>");
 		labelFiletitle.setForeground(Color.WHITE);
@@ -153,6 +170,7 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 		gbc_textfieldFiletitle.fill = GridBagConstraints.BOTH;
 		panelHeader.add(labelFiletitle, gbc_textfieldFiletitle);
 		
+		//Button "Close file"
 		buttonClosefile = new JButton();
 		buttonClosefile.setToolTipText("Close current");
 		buttonClosefile.addActionListener(new ActionListener() {
@@ -166,8 +184,7 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 		gbc_buttonClosefile.fill = GridBagConstraints.BOTH;
 		panelHeader.add(buttonClosefile, gbc_buttonClosefile);
 		
-
-		
+		//---- Root Scrollpane ----
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.getVerticalScrollBar().setUnitIncrement(32);
 		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -175,6 +192,7 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 		
 		scrollPane.setColumnHeaderView(panelHeader);
 
+		//--- Main Panel ---
 		JPanel panelMain = new JPanel();
 		panelMain.setFocusable(true);
 		panelMain.setBackground(ScyllaGUI.ColorBackground);
@@ -182,12 +200,12 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 		GridBagLayout gbl_panelMain = new GridBagLayout();
 		panelMain.setLayout(gbl_panelMain);
 		
+		// -- General Information Panel --
 		JPanel panelGeneral = new JPanel();
 		panelGeneral.setFocusable(true);
 		GridBagConstraints gbc_panelGeneral = new GridBagConstraints();
 		gbc_panelGeneral.anchor = GridBagConstraints.PAGE_START;
-		int inset_b = 50;//TODO (int)(25.0*ScyllaGUI.SCALE);
-		int inset_s = 5;//(int)(2.5*ScyllaGUI.SCALE);
+		int inset_b = (int)(25.0*ScyllaGUI.SCALE);
 		gbc_panelGeneral.insets = new Insets(inset_b,inset_b,inset_b,inset_b);
 		gbc_panelGeneral.gridx = 0;
 		gbc_panelGeneral.gridy = 0;
@@ -198,15 +216,17 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 		gbl_panelGeneral.columnWeights = new double[]{1.0,3.0};
 		panelGeneral.setLayout(gbl_panelGeneral);
 		
+		//Label id
 		JLabel labelId = new JLabel();
 		labelId.setText("ID");
 		GridBagConstraints gbc_textfieldId = new GridBagConstraints();
-		gbc_textfieldId.insets = new Insets(inset_s, inset_s, inset_s, inset_s);
+		gbc_textfieldId.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
 		gbc_textfieldId.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textfieldId.gridx = 0;
 		gbc_textfieldId.gridy = 0;
 		panelGeneral.add(labelId, gbc_textfieldId);
 		
+		//Text input field for id
 		textfieldId = new JTextField();
 		textfieldId.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
 			if(isChangeFlag())return;
@@ -214,22 +234,24 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 			setSaved(false);
 		}));
 		GridBagConstraints gbc_textfieldIdEdit = new GridBagConstraints();
-		gbc_textfieldIdEdit.insets = new Insets(inset_s, inset_s, inset_s, inset_b);
+		gbc_textfieldIdEdit.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, inset_b);
 		gbc_textfieldIdEdit.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textfieldIdEdit.gridx = 1;
 		gbc_textfieldIdEdit.gridy = 0;
 		panelGeneral.add(textfieldId, gbc_textfieldIdEdit);
 		textfieldId.setColumns(10);
 		
+		//Label seed
 		JLabel labelSeed = new JLabel();
 		labelSeed.setText("Seed");
 		GridBagConstraints gbc_textfieldSeed = new GridBagConstraints();
-		gbc_textfieldSeed.insets = new Insets(inset_s, inset_s, inset_s, inset_s);
+		gbc_textfieldSeed.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
 		gbc_textfieldSeed.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textfieldSeed.gridx = 0;
 		gbc_textfieldSeed.gridy = 1;
 		panelGeneral.add(labelSeed, gbc_textfieldSeed);
 		
+		//Seed input field
 		NumberFormat format = NumberFormat.getInstance();
 		format.setGroupingUsed(false);
 		textfieldSeed = new JFormattedTextField(format);
@@ -245,27 +267,49 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 			}catch(Exception exc){}
 		}));
 		GridBagConstraints gbc_textfieldSeedEdit = new GridBagConstraints();
-		gbc_textfieldSeedEdit.insets = new Insets(inset_s, inset_s, inset_s, inset_b);
+		gbc_textfieldSeedEdit.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, inset_b);
 		gbc_textfieldSeedEdit.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textfieldSeedEdit.gridx = 1;
 		gbc_textfieldSeedEdit.gridy = 1;
 		panelGeneral.add(textfieldSeed, gbc_textfieldSeedEdit);
 		textfieldSeed.setColumns(10);
 		
+		//Label timezone
 		JLabel labelTimezone = new JLabel();
 		labelTimezone.setText("Timezone");
 		GridBagConstraints gbc_textfieldTimezone = new GridBagConstraints();
-		gbc_textfieldTimezone.insets = new Insets(inset_s, inset_s, inset_s, inset_s);
+		gbc_textfieldTimezone.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
 		gbc_textfieldTimezone.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textfieldTimezone.gridx = 0;
 		gbc_textfieldTimezone.gridy = 2;
 		panelGeneral.add(labelTimezone, gbc_textfieldTimezone);
 		
+		//25 Timezone from -12 to +12 (which are indeed equal)
 		ZoneId[] timeZones = new ZoneId[25];
 		for(int i = -12; i <= 12; i++){
 			timeZones[i+12] = ZoneId.ofOffset("UTC",ZoneOffset.ofHours(i));
 		}
-		comboboxTimezone = new JComboBox<ZoneId>();//TODO timeZones);
+		String[] timeZoneNames = new String[]{
+				"Baker Island Time","Samoa Standard Time","Hawaii–Aleutian Standard Time","Alaska Standard Time","Pacific Standard Time (North America)",
+				"Mountain Standard Time (North America)","Central Standard Time (North America)", "Eastern Standard Time (North America)", "Venezuelan Standard Time", "Brasilia Time",
+				"South Georgia and the South Sandwich Islands Time", "Eastern Greenland Time", "Coordinated Universal Time/Greenwich Mean Time", "Central European Time", "Eastern European Time",
+				"Moscow Time", "Georgia Standard Time", "Pakistan Standard Time", "Bangladesh Standard Time", "Indochina Time",
+				"Western Standard Time", "Japan Standard Time", "Australian Eastern Standard Time", "Vanuatu Time", "New Zealand Standard Time", ""
+		};
+		//Timezone input combobox
+		comboboxTimezone = new JComboBox<ZoneId>(timeZones);
+		comboboxTimezone.setRenderer(new DefaultListCellRenderer(){
+			@Override 
+			public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+				int i = 0;
+				for(; i < timeZones.length; i++){
+					if(timeZones[i].equals(value))break;
+				}
+				if(value == null)value = "";
+				return super.getListCellRendererComponent(list, value.toString()+" "+timeZoneNames[i], index, isSelected, cellHasFocus);
+			}
+				       
+		});
 		comboboxTimezone.addItemListener((ItemEvent e)->{
 			if(e.getStateChange() == ItemEvent.SELECTED){
 				if(isChangeFlag())return;
@@ -274,7 +318,7 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 			}
 		});
 		GridBagConstraints gbc_comboboxTimezone = new GridBagConstraints();
-		gbc_comboboxTimezone.insets = new Insets(inset_s, inset_s, inset_s, inset_b);
+		gbc_comboboxTimezone.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, inset_b);
 		gbc_comboboxTimezone.fill = GridBagConstraints.HORIZONTAL;
 		gbc_comboboxTimezone.gridx = 1;
 		gbc_comboboxTimezone.gridy = 2;
@@ -307,6 +351,7 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 		gbc_panelResources.gridx = 0;
 		gbc_panelResources.gridy = 1;
 
+		//Resource title label
 		JLabel resourceLabel = new JLabel("Resources");
 		resourceLabel.setBackground(ScyllaGUI.ColorField0);
 		resourceLabel.setForeground(ScyllaGUI.TITLEFONT_COLOR);
@@ -317,9 +362,12 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 		panelMain.add(panelResourcesExpand, gbc_panelResources);
 		
 
+		//Timetable initialization
 		timetableObserverList = new ArrayList<JComboBox<String>>();
 		timetables = new ArrayList<String>();
-		timetables.add("");
+		timetables.add("");//"No timetable"-option
+		
+		//--- Timetable panel ---
 		panelTimetables = new ListChooserPanel(){
 
 			@Override
@@ -338,6 +386,7 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 			@Override
 			public ComponentHolder onCreate() {
 				setSaved(false);
+				//Note: Newly created timetables/resources are not added until they are renamed
 //				for(JComboBox<String> cbm : getTimetableObserverList()){
 //					cbm.addItem("<enter name>");
 //				}
@@ -357,7 +406,7 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 		gbc_panelTimetables.gridx = 0;
 		gbc_panelTimetables.gridy = 2;
 		
-		
+		//Timetable title label
 		JLabel timetableLabel = new JLabel("Timetables");
 		timetableLabel.setBackground(ScyllaGUI.ColorField0);
 		timetableLabel.setForeground(ScyllaGUI.TITLEFONT_COLOR);
@@ -367,6 +416,7 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 		panelTimetablesExpand.expand();
 		panelMain.add(panelTimetablesExpand, gbc_panelTimetables);
 		
+		//Layout fixing, empty buffer panel
 		JPanel panelBuffer = new JPanel();
 		panelBuffer.setFocusable(true);
 		panelBuffer.setBackground(panelMain.getBackground());
@@ -379,7 +429,9 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 		gbc_panelBuffer.gridy = 3;
 		panelMain.add(panelBuffer,gbc_panelBuffer);
 		
+		//Disable as no gc is opened
 		setEnabled(false);
+		//Add enter traversal for textfields etc.
 		Set<AWTKeyStroke> forwardKeys = new HashSet<AWTKeyStroke>(getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
 		forwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
 		setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, forwardKeys);
@@ -388,6 +440,11 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 		
 	}
 	
+	/**
+	 * Initialization method that has to be called directly after the constructor,
+	 * but can only be called if the panel has already been added to a parent.<br>
+	 * Initializes keybindings, as they won't work otherwise
+	 */
 	public void init(){
 		JTabbedPane parent = (JTabbedPane) getParent();
 		parent.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_S,InputEvent.CTRL_DOWN_MASK),"save");
@@ -425,42 +482,57 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 		});
 	}
 	
+	/**
+	 * Button event for creating new gc files
+	 */
 	private void be_create(){
 		setChangeFlag(true);
 		labelFiletitle.setText("<unsaved file>");
 		createGC();
 		setChangeFlag(false);
+		//Id should be edited right after creation
 		textfieldId.setText("NewGlobalConfiguration");
 		textfieldId.requestFocusInWindow();
 		textfieldId.selectAll();
 	}
 	
+	/**
+	 * Creates a new global configuration
+	 */
 	private void createGC(){
 		creator = new GlobalConfigurationCreator();
 		setSaved(false);
 		setEnabled(true);
 	}
 
-	private void be_open(){		
+	/**
+	 * Button event for opening existing gcs
+	 */
+	private void be_open(){	
+		//Show unsaved changes dialog; if cancel is pressed the whole process is canceled
 		if(!saved){
 			int i = showUnsavedChangesDialog();
 			if(i != 1)return;
 		}
+		//Choose file to be opened
 		ScalingFileChooser chooser = new ScalingFileChooser(ScyllaGUI.DEFAULTFILEPATH);
 		chooser.setDialogTitle("Open");
 		int c = chooser.showDialog(this,"Open");
+		//if the process is canceled, nothing happens
 		if(c == ScalingFileChooser.APPROVE_OPTION){
 			file = chooser.getSelectedFile();
 			if(file != null){
+				//Close current opened file
 				closeGC();
+				//Update default file path
 				ScyllaGUI.DEFAULTFILEPATH = chooser.getSelectedFile().getPath();
 				try {
 					creator = GlobalConfigurationCreator.createFromFile(file.getPath());
 					labelFiletitle.setText(chooser.getSelectedFile().getPath());
+					openGC();
 				} catch (JDOMException | IOException e) {
 					e.printStackTrace();
 				}
-				openGC();
 			}else{
 				System.err.println("Could not find file");//TODO
 			}
@@ -468,11 +540,14 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 		
 	}	
 	
+	/**
+	 * Opens the gc that is currently loaded in the creator
+	 */
 	private void openGC(){
 		setChangeFlag(true);
 		textfieldId.setText(creator.getId());
-		textfieldSeed.setValue(creator.getSeed());
-		comboboxTimezone.setSelectedItem(ZoneId.ofOffset("UTC",creator.getTimeOffset()));
+		if(creator.getSeed() != null)textfieldSeed.setValue(creator.getSeed());
+		if(creator.getTimeOffset() != null)comboboxTimezone.setSelectedItem(ZoneId.ofOffset("UTC",creator.getTimeOffset()));
 		
 		for(Timetable t : creator.getTimetables()){
 			importTimetable(t);
@@ -484,14 +559,21 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 		setEnabled(true);
 	}
 
-	
+	/**
+	 * Button event for save button,
+	 * overrides file if already existing, otherwise opens "save as" dialog
+	 */
 	private void be_save(){
 		if(saved)return;
 		if(file != null)saveGC();
 		else be_saveAs();
 	}
 	
+	/**
+	 * Button event for "save as" button
+	 */
 	private void be_saveAs(){
+		//Select file and confirm override if file is already existing
 		ScalingFileChooser chooser = new ScalingFileChooser(ScyllaGUI.DEFAULTFILEPATH){
 			@Override
 			public void approveSelection(){
@@ -508,6 +590,8 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 						return;
 					default : return;
 					}
+				}else{
+					super.approveSelection();
 				}
 			}
 		};
@@ -527,6 +611,9 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 		}
 	}
 	
+	/**
+	 * Saves the gc to the current file
+	 */
 	private void saveGC(){
 		try {
 			setSaved(true);
@@ -536,13 +623,21 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 		}
 	}
 	
+	/**
+	 * Button event close
+	 * Closes gc but asks to save unsaved changes if existing
+	 */
 	private void be_close(){
 		if(!saved){
 			int i = showUnsavedChangesDialog();
+			//If cancel was pressed OR the gc was saved, it is closed
 			if(i == 1)closeGC();
-		}
-		else closeGC();
+			//else return;
+		}else closeGC();
 	}
+	/**
+	 * Closes the gc, resets, clears and disables all fields
+	 */
 	private void closeGC(){
 		setChangeFlag(true);
 		creator = null;
@@ -561,6 +656,14 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 		setEnabled(false);
 	}
 	
+	/**
+	 * Shows a dialog to save the current gc
+	 * @return
+	 * 	-1 : if canceled by closing the dialog OR if save changes is pressed and canceled
+	 * 	1 : if discard changes is pressed OR if save changes is pressed and it is saved
+	 * 	2 : if canceled by pressing cancel
+	 * 
+	 */
 	private int showUnsavedChangesDialog(){
 		int i = JOptionPane.showOptionDialog(
 				this,
@@ -583,20 +686,27 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 		return i;
 	}
 	
+
+	@Override
 	public void setSaved(boolean b){
 		saved = b;
+		//Also set the save button to display if saved or not
 		buttonSavefile.setEnabled(!b);
 	}
 	
 	@Override
 	public boolean isChangeFlag() {
+		//If the counter is higher than 0, at least one method is performing changes
 		return changeFlag > 0;
 	}
 	
 	@Override
 	public void setChangeFlag(boolean b) {
+		//Increment the counter, if another method starts doing changes,
 		if(b)changeFlag++;
+		//Decrement the counter, if a method stops doing changes
 		else changeFlag--;
+		//Throw an error (type should be changed), if more methods stop than having started
 		if(changeFlag < 0)throw new java.lang.NegativeArraySizeException();
 	}
 	
@@ -610,11 +720,18 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 		return timetables;
 	}
 
+	/**
+	 * @return The name of the current opened gc, if already a file exists, the filename is taken
+	 */
 	private String getFileName(){
 		if(file != null)return file.getName();
 		else return labelFiletitle.getText();
 	}
 	
+
+	/**
+	 * Enables or disables all User input components
+	 */
 	@Override
 	public void setEnabled(boolean b){
 		buttonClosefile.setEnabled(b);
@@ -627,12 +744,22 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 		super.setEnabled(b);
 	}
 	
+	/**
+	 * Imports a resource to the resource panel, i.e. creating a panel/page for it
+	 * @param res : Wrapper object of the resource to add
+	 */
 	public void importResource(ResourceType res){
 		panelResources.add(
 				newResource(res)
 		);
 	}
 	
+	/**
+	 * Creates a panel for a given resource
+	 * @param res : Wrapper of the given resource
+	 * @return : A new componentholder for a ResourcePanel object
+	 * @see {@link ResourcePanel}
+	 */
 	private ComponentHolder newResource(ResourceType res){
 		return new ListChooserPanel.ComponentHolder() {
 			ResourcePanel p = new ResourcePanel(GlobalConfigurationPane.this);
@@ -651,6 +778,8 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 			public void setName(String s){
 				String t = s;
 				int i = 2;
+				//If the name has changed, but is already given,
+				//it will be serially numbered, and the first free number is chosen
 				if(!res.getId().equals(s)){
 					while(creator.getResourceType(t) != null){
 						t = s+"("+i+")";
@@ -663,6 +792,10 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 		};
 	}
 	
+	/**
+	 * Imports a timetable, i.e. creates a TimetablePanel object and adds it to the timeable panel
+	 * @param t : Wrapper for the timetable
+	 */
 	public void importTimetable(Timetable t){
 		panelTimetables.add(newTimetable(t));
 		for(JComboBox<String> cbm : getTimetableObserverList()){
@@ -671,6 +804,12 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 		timetables.add(t.getId());
 	}
 	
+	/**
+	 * Creates a panel for a given timetable
+	 * @param res : Wrapper of the given timetable
+	 * @return : A new componentholder for a TimetablePanel object
+	 * @see {@link TimetablePanel}
+	 */
 	private ComponentHolder newTimetable(Timetable t){
 		return new ListChooserPanel.ComponentHolder() {
 			TimetablePanel p = new TimetablePanel(GlobalConfigurationPane.this);
@@ -688,6 +827,8 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 			@Override
 			public void setName(String n){
 				String s = n;
+				//If the name has changed, but is already given,
+				//it will be serially numbered, and the first free number is chosen
 				int i = 2;
 				if(!t.getId().equals(n)){
 					while(creator.getTimetable(s) != null){
@@ -695,16 +836,21 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 						i++;
 					}
 				}
+				//Notify timetable observer
 				for(JComboBox<String> cbm : getTimetableObserverList()){
 					String sel = (String) cbm.getSelectedItem();
 					cbm.removeItem(t.getId());
 					cbm.addItem(s);
+					//Reset combobox selection to null, as it will automatically change when the set is changed
 					if(sel == null || sel.equals(""))cbm.setSelectedItem("");
+					//If the current item is the selected one, it is also renamed in the box
 					else if(sel.equals(t.getId()))cbm.setSelectedItem(s);
 					
 				}
+				//Update timetable list
 				timetables.remove(t.getId());
 				timetables.add(s);
+				//Set id
 				t.setId(s);
 				setSaved(false);
 			}
