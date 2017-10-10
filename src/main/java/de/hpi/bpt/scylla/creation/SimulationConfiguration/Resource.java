@@ -15,7 +15,7 @@ public class Resource extends ElementLink{
 	 */
 	private Resource(Element toLink) {
 		super(toLink);
-		// TODO Auto-generated constructor stub
+		// TODO create linking constructor
 	}
 	
 	public Resource(String i, String n){

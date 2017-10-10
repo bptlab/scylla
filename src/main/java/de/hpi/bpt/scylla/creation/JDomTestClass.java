@@ -130,7 +130,7 @@ public class JDomTestClass {
 		testDistribution.setAttribute(0, 0.2);
 		s.getStartEvent().setArrivalRateDistribution(testDistribution);
 		
-		Task t = s.getTask("Task_1tvvo6w");
+		Task t = (Task)s.getElement("Task_1tvvo6w");
 		t.setDurationDistribution(new Distribution(DistributionType.constant));
 		t.getDurationDistribution().setAttribute("constantValue", 100);
 		t.assignResource(student).setAmount(5);
@@ -145,7 +145,9 @@ public class JDomTestClass {
 		t.getResource(prof.getId()).removeAssignmentDefinition();
 		t.deassignResource(prof.getId());
 		
-		for(Task task : s.getTasks()){
+		for(ElementLink element : s.getElements()){
+			if(!(element instanceof Task))continue;
+			Task task = (Task)element;
 			Distribution d = new Distribution(DistributionType.triangular);
 			d.setAttribute(0,11);
 			d.setAttribute(2,33);

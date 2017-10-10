@@ -20,8 +20,9 @@ public class Task extends ElementLink{
 	 * Link constructor
 	 * @param toLink
 	 */
-	private Task(Element toLink) {
+	protected Task(Element toLink) {
 		super(toLink);
+		// TODO create linking constructor
 	}
 	
 	public Task(String id, String name) {

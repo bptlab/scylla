@@ -20,10 +20,18 @@ public abstract class ElementLink {
 		nsp = el.getNamespace();
 	}
 	
+	/**
+	 * Adds this objects wrapped element to a given element
+	 * @param e : The element to be added to
+	 */
 	public void addTo(Element e){
 		e.addContent(el);
 	}
 	
+	/**
+	 * Removes this objects wrapped element from a given element
+	 * @param e : The element to be removed from
+	 */
 	public void removeFrom(Element e){
 		e.removeContent(el);
 	}

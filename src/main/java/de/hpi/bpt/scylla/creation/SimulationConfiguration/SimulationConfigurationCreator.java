@@ -1,6 +1,7 @@
 package de.hpi.bpt.scylla.creation.SimulationConfiguration;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.TreeMap;
 import java.util.List;
@@ -23,7 +24,7 @@ public class SimulationConfigurationCreator extends ElementLink{
 	/**Start event element*/
 	private StartEvent startEvent;
 	/**Task list*/
-	private Map<String,Task> tasks;
+	private Map<String,ElementLink> elements;
 	
 	/**
 	 * Public constructor,
@@ -36,7 +37,7 @@ public class SimulationConfigurationCreator extends ElementLink{
 		doc = new Document(superroot);
 		root = el;
 		superroot.addContent(root);
-		tasks = new TreeMap<String,Task>();
+		elements = new TreeMap<String,ElementLink>();
 	}
 	
 	/**
@@ -79,6 +80,12 @@ public class SimulationConfigurationCreator extends ElementLink{
 			System.out.println("Not found");
 			return;
 		}
+		
+		addProcessElements(process);
+
+	}
+	
+	public void addProcessElements(Element process){
 		for(Element child : process.getChildren()){
 			if(isKnownModelElement(child.getName()))
 				createModelElement(child);
@@ -94,28 +101,47 @@ public class SimulationConfigurationCreator extends ElementLink{
 			startEvent = new StartEvent(child.getAttributeValue("id"));
 			startEvent.addTo(root);
 			break;
+		case "subProcess" :
+			SubProcess s = new SubProcess(child.getAttributeValue("id"),child.getAttributeValue("name"));
+			s.addTo(root);
+			elements.put(s.getId(),s);
+			addProcessElements(child);
+			break;
+		case "exclusiveGateway" :
+			List<Element> branches = child.getChildren("outgoing",stdNsp);
+			List<String> branchids = new ArrayList<String>();
+			for(Element b : branches){branchids.add(b.getValue());}
+			ExclusiveGateway eg = new ExclusiveGateway(child.getAttributeValue("id"),branchids);
+			eg.addTo(root);
+			elements.put(eg.getId(),eg);
+			break;
 		default :
 			if(name.equals("task") || name.endsWith("Task")){
 				Task t = new Task(child.getAttributeValue("id"),child.getAttributeValue("name"));
 				t.addTo(root);
-				tasks.put(t.getId(),t);
-			}
+				elements.put(t.getId(),t);
+			}break;
 		}
 	}
 
+    /**{@link de.hpi.bpt.scylla.parser.ProcessModelParser#isKnownElement(String name)}*/
 	private boolean isKnownModelElement(String name) {
-        return name.equals("sequenceFlow") || name.equals("task") || name.endsWith("Task") || name.endsWith("Event")
-                || name.endsWith("Gateway") || name.equals("subProcess") || name.equals("callActivity")
-                || name.equals("laneSet") || name.equals("dataObjectReference") || name.equals("ioSpecification")
-                || name.equals("dataObject");
+	      return name.equals("task") || name.endsWith("Task")
+	      || name.endsWith("Gateway") || name.equals("subProcess");
+//        return name.equals("sequenceFlow") || name.equals("task") || name.endsWith("Task") || name.endsWith("Event")
+//                || name.endsWith("Gateway") || name.equals("subProcess") || name.equals("callActivity")
+//                || name.equals("laneSet") || name.equals("dataObjectReference") || name.equals("ioSpecification")
+//                || name.equals("dataObject");
     }
 	
-	public Task getTask(String id){
-		return tasks.get(id);
+	
+	
+	public ElementLink getElement(String id){
+		return elements.get(id);
 	}
 	
-	public Collection<Task> getTasks(){
-		return tasks.values();
+	public Collection<ElementLink> getElements(){
+		return elements.values();
 	}
 	
 	

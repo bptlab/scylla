@@ -17,6 +17,7 @@ public class StartEvent extends ElementLink{
 	 */
 	private StartEvent(Element toLink) {
 		super(toLink);
+		// TODO create linking constructor
 	}
 	
 	public StartEvent(String id) {
