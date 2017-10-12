@@ -13,9 +13,10 @@ public class Resource extends ElementLink{
 	 * Link constructor
 	 * @param toLink
 	 */
-	private Resource(Element toLink) {
+	public Resource(Element toLink) {
 		super(toLink);
-		// TODO create linking constructor
+		id = el.getAttributeValue("id");
+		name = el.getAttributeValue("name");
 	}
 	
 	public Resource(String i, String n){

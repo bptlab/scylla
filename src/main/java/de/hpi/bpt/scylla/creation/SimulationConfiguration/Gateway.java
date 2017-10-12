@@ -10,24 +10,33 @@ public abstract class Gateway extends ElementLink{
 	
 	
 
-	public Gateway(Element toLink) {
+	protected Gateway(Element toLink) {
 		super(toLink);
-		// TODO create linking constructor
+		init();
 	}
 	
 	public Gateway(String id, String type, List<String> branches){
 		super(new Element(type,stdNsp));
+		init();
+		setAttribute("id", id);
 		for(String s : branches){
 			addBranch(s);
 		}
 	}
 
 	public String getId(){return el.getAttributeValue("id");}
-	public Element addBranch(String id){
+	
+	protected Element addBranch(String id){
 		Element branch = new Element("outgoingSequenceFlow",stdNsp);
 		branch.setAttribute("id", id);
 		el.addContent(branch);
 		return branch;
 	}
+	
+	/**
+	 * Method that can be overridden in order to initialize fields that might be used in the superconstructor
+	 * e.g. in an overridden addBranch method.
+	 */
+	protected void init(){}
 
 }

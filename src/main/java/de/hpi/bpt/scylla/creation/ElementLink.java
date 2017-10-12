@@ -29,11 +29,27 @@ public abstract class ElementLink {
 	}
 	
 	/**
+	 * Adds this objects wrapped element to the element of a given wrapper
+	 * @param e : The element to be added to
+	 */
+	public void addTo(ElementLink e){
+		e.el.addContent(el);
+	}
+	
+	/**
 	 * Removes this objects wrapped element from a given element
 	 * @param e : The element to be removed from
 	 */
 	public void removeFrom(Element e){
 		e.removeContent(el);
+	}
+	
+	/**
+	 * Removes this objects wrapped element from a given wrappers element
+	 * @param e : The element to be removed from
+	 */
+	public void removeFrom(ElementLink e){
+		e.el.removeContent(el);
 	}
 	
 	/**

@@ -15,9 +15,10 @@ public class StartEvent extends ElementLink{
 	 * Link constructor
 	 * @param toLink
 	 */
-	private StartEvent(Element toLink) {
+	public StartEvent(Element toLink) {
 		super(toLink);
-		// TODO create linking constructor
+		arrivalRate = el.getChild("arrivalRate",nsp);
+		arrivalRateDistribution = new Distribution(arrivalRate.getChildren().get(0));
 	}
 	
 	public StartEvent(String id) {
@@ -30,7 +31,7 @@ public class StartEvent extends ElementLink{
 	
 	public void setArrivalRateDistribution(Distribution d){
 		if(arrivalRateDistribution != null){
-			arrivalRate.removeChild("distribution", nsp);
+			arrivalRate.removeContent();
 		}
 		arrivalRateDistribution = d;
 		d.addTo(arrivalRate);

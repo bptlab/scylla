@@ -6,11 +6,11 @@ public class SubProcess extends Task{
 
 	public SubProcess(String id, String name) {
 		super(id, name);
+		el.setName("subProcess");
 	}
 	
 	protected SubProcess(Element toLink){
 		super(toLink);
-		// TODO create linking constructor
 	}
 
 }

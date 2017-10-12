@@ -22,7 +22,14 @@ public class Task extends ElementLink{
 	 */
 	protected Task(Element toLink) {
 		super(toLink);
-		// TODO create linking constructor
+		duration = el.getChild("duration",nsp);
+		durationDistribution = new Distribution(duration.getChildren().get(0));
+		resourcesElement = el.getChild("resources", nsp);
+		resources = new TreeMap<String, Resource>();
+		for(Element res : resourcesElement.getChildren("resource", nsp)){
+			Resource r = new Resource(res);
+			resources.put(r.getId(), r);
+		}
 	}
 	
 	public Task(String id, String name) {
@@ -53,7 +60,7 @@ public class Task extends ElementLink{
 	
 	public void setDurationDistribution(Distribution d){
 		if(durationDistribution != null){
-			duration.removeChild("distribution", nsp);
+			duration.removeContent();
 		}
 		durationDistribution = d;
 		d.addTo(duration);

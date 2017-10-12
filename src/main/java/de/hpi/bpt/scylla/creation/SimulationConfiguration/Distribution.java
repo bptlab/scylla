@@ -42,7 +42,7 @@ public class Distribution extends ElementLink{
 	 * Link constructor
 	 * @param toLink
 	 */
-	private Distribution(Element toLink) {
+	public Distribution(Element toLink) {
 		super(toLink);
 		try{
 			type = DistributionType.valueOf(toLink.getName().split("Distribution")[0]);
