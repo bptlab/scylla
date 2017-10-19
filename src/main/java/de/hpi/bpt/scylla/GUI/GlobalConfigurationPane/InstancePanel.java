@@ -19,7 +19,6 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 
-import de.hpi.bpt.scylla.GUI.FormManager;
 import de.hpi.bpt.scylla.GUI.InsertRemoveListener;
 import de.hpi.bpt.scylla.GUI.ScalingCheckBoxIcon;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
@@ -44,13 +43,13 @@ public class InstancePanel extends JPanel{
 	private ResourceInstance instance;
 	
 	/**Central object for managing the whole form*/
-	private FormManager formManager;
+	private GCFormManager formManager;
 
 	/**
 	 * Constructor
 	 * @param fm : The formmanager
 	 */
-	public InstancePanel(FormManager fm) {
+	public InstancePanel(GCFormManager fm) {
 		formManager = fm;
 		GridBagLayout gbl_topPanel = new GridBagLayout();
 		gbl_topPanel.columnWeights = new double[]{0, 1.0, 0, 1.0, 0.0};

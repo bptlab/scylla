@@ -25,7 +25,6 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.DocumentEvent;
 
-import de.hpi.bpt.scylla.GUI.FormManager;
 import de.hpi.bpt.scylla.GUI.InsertRemoveListener;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
@@ -55,13 +54,13 @@ public class ResourcePanel extends JSplitPane{
 	private ResourceType resourceType;
 	
 	/**Central object for managing the whole form*/
-	private FormManager formManager;
+	private GCFormManager formManager;
 
 	/**
 	 * Constructor
 	 * @param fm : The objects formmanager
 	 */
-	public ResourcePanel(FormManager fm) {
+	public ResourcePanel(GCFormManager fm) {
 		setEnabled(false);
 		setOrientation(JSplitPane.VERTICAL_SPLIT);
 		formManager = fm;

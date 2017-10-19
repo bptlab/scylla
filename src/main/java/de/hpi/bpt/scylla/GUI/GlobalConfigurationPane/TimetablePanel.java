@@ -34,7 +34,6 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
-import de.hpi.bpt.scylla.GUI.FormManager;
 import de.hpi.bpt.scylla.GUI.InsertRemoveListener;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.Timetable;
@@ -69,7 +68,7 @@ public class TimetablePanel extends JSplitPane {
 	private JLabel labelEndAt;
 
 	/**The form manager*/
-	private FormManager formManager;
+	private GCFormManager formManager;
 	/**The current selected item*/
 	private TimetableItem selected;
 	/**Wrapper for the corresponding timetable*/
@@ -79,7 +78,7 @@ public class TimetablePanel extends JSplitPane {
 	 * Create the panel.
 	 * @param globalConfigurationPane 
 	 */
-	public TimetablePanel(FormManager fm) {
+	public TimetablePanel(GCFormManager fm) {
 		formManager = fm;
 		setOrientation(JSplitPane.VERTICAL_SPLIT);
 		setEnabled(false);

@@ -1,58 +1,38 @@
 package de.hpi.bpt.scylla.GUI.GlobalConfigurationPane;
 
-import java.awt.AWTKeyStroke;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.KeyboardFocusManager;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
-import java.awt.event.KeyEvent;
-import java.io.File;
 import java.io.IOException;
 import java.text.NumberFormat;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import javax.swing.AbstractAction;
 import javax.swing.DefaultListCellRenderer;
-import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.event.DocumentEvent;
 
+import org.eclipse.wb.swing.FocusTraversalOnArray;
 import org.jdom2.JDOMException;
 
+import de.hpi.bpt.scylla.GUI.EditorPanel;
 import de.hpi.bpt.scylla.GUI.ExpandPanel;
-import de.hpi.bpt.scylla.GUI.FormManager;
 import de.hpi.bpt.scylla.GUI.InsertRemoveListener;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel.ComponentHolder;
-import de.hpi.bpt.scylla.GUI.ScalingFileChooser;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.ResourceType;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.Timetable;
-import org.eclipse.wb.swing.FocusTraversalOnArray;
 
 /**
  * 
@@ -60,145 +40,32 @@ import org.eclipse.wb.swing.FocusTraversalOnArray;
  *
  */
 @SuppressWarnings("serial")
-public class GlobalConfigurationPane extends JPanel implements FormManager{
-	private JLabel labelFiletitle;
+public class GlobalConfigurationPane extends EditorPanel implements GCFormManager{
+	
+	//General Information form components
 	private JTextField textfieldId;
 	private JFormattedTextField textfieldSeed;
 	private JComboBox<ZoneId> comboboxTimezone;
 
+	/**Timetable Panel*/
 	private ListChooserPanel panelTimetables;
+	/**Resource Panel*/
+	private ListChooserPanel panelResources;
+
 	/**List of all JComboboxes, that display timetables, in order to update their entries*/
 	private List<JComboBox<String>> timetableObserverList;
 	/**List of all known timetable ids, in order to pass them to newly created displays (e.g. Comboboxes)*/
 	private List<String> timetables;
-	private ListChooserPanel panelResources;
 	
 	/**Central XML-Link object*/
 	private GlobalConfigurationCreator creator;
-	/**File reference to the current opened gc file, null if none is opened*/
-	private File file;
-	/**Shows whether there are any unsaved changes*/
-	private boolean saved;
-	private JButton buttonSavefile;
-	private JButton buttonSavefileAs;
-	private JButton buttonClosefile;
-	/**Flag to display if there are any non-user changes performed at user input objects,
-	 * in order to prevent user input events to be fired.
-	 * Integer value represents the number of methods/threads that are currently performing those changes,
-	 * if equal 0 => no changes.*/
-	private int changeFlag;
+
+
 
 	/**
 	 * Create the panel.
 	 */
 	public GlobalConfigurationPane() {
-		setFocusable(true);
-		setBackground(ScyllaGUI.ColorBackground);
-		setLayout(new GridLayout(0, 1, 0, 0));
-		
-		//---Header panel---
-		JPanel panelHeader = new JPanel();
-		panelHeader.setFocusable(true);
-		panelHeader.setBackground(Color.DARK_GRAY);
-		GridBagLayout gbl_panelHeader = new GridBagLayout();
-		panelHeader.setLayout(gbl_panelHeader);
-		
-		// Button "New file"
-		JButton buttonNewfile = new JButton();
-		buttonNewfile.setToolTipText("New File (Ctrl + N)");
-		buttonNewfile.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				be_create();
-			}
-		});
-		buttonNewfile.setIcon(ScyllaGUI.ICON_NEW);
-		GridBagConstraints gbc_buttonNewfile = new GridBagConstraints();
-		gbc_buttonNewfile.weightx = 0;
-		gbc_buttonNewfile.fill = GridBagConstraints.BOTH;
-		panelHeader.add(buttonNewfile, gbc_buttonNewfile);
-		
-		// Button "Save file"
-		buttonSavefile = new JButton();
-		buttonSavefile.setToolTipText("Save (Ctrl + S)");
-		setSaved(true);
-		buttonSavefile.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				be_save();
-			}
-		});
-		buttonSavefile.setIcon(ScyllaGUI.ICON_SAVE);
-		GridBagConstraints gbc_buttonSavefile = new GridBagConstraints();
-		gbc_buttonSavefile.weightx = 0;
-		gbc_buttonSavefile.fill = GridBagConstraints.BOTH;
-		panelHeader.add(buttonSavefile, gbc_buttonSavefile);
-		
-		// Button "Save file as"
-		buttonSavefileAs = new JButton("");
-		buttonSavefileAs.setToolTipText("Save as (Ctrl + Shift + S)");
-		buttonSavefileAs.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				be_saveAs();
-			}
-		});
-		buttonSavefileAs.setIcon(ScyllaGUI.ICON_SAVEAS);
-		GridBagConstraints gbc_buttonSavefileAs = new GridBagConstraints();
-		gbc_buttonSavefileAs.weightx = 0;
-		gbc_buttonSavefileAs.fill = GridBagConstraints.BOTH;
-		panelHeader.add(buttonSavefileAs, gbc_buttonSavefileAs);
-		
-		// Button "Open file"
-		JButton buttonOpenfile = new JButton();
-		buttonOpenfile.setToolTipText("Open (Ctrl + O)");
-		buttonOpenfile.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				be_open();
-			}
-		});
-		buttonOpenfile.setIcon(ScyllaGUI.ICON_OPEN);
-		GridBagConstraints gbc_buttonOpenfile = new GridBagConstraints();
-		gbc_buttonOpenfile.weightx = 0;
-		gbc_buttonOpenfile.fill = GridBagConstraints.BOTH;
-		panelHeader.add(buttonOpenfile, gbc_buttonOpenfile);
-		
-		//Label displaying file title
-		labelFiletitle = new JLabel();
-		labelFiletitle.setText("<No editor opened. Open an existing file or create a new one.>");
-		labelFiletitle.setForeground(Color.WHITE);
-		GridBagConstraints gbc_textfieldFiletitle = new GridBagConstraints();
-		gbc_textfieldFiletitle.weightx = 37;
-		gbc_textfieldFiletitle.insets = new Insets(0,ScyllaGUI.TITLEFONT.getSize(),  0, 0);
-		gbc_textfieldFiletitle.fill = GridBagConstraints.BOTH;
-		panelHeader.add(labelFiletitle, gbc_textfieldFiletitle);
-		
-		//Button "Close file"
-		buttonClosefile = new JButton();
-		buttonClosefile.setToolTipText("Close current");
-		buttonClosefile.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				be_close();
-			}
-		});
-		buttonClosefile.setIcon(ScyllaGUI.resizeIcon(ScyllaGUI.ICON_X,ScyllaGUI.TITLEFONT.getSize(),ScyllaGUI.TITLEFONT.getSize()));
-		GridBagConstraints gbc_buttonClosefile = new GridBagConstraints();
-		gbc_buttonClosefile.weightx = 0;
-		gbc_buttonClosefile.fill = GridBagConstraints.BOTH;
-		panelHeader.add(buttonClosefile, gbc_buttonClosefile);
-		
-		//---- Root Scrollpane ----
-		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.getVerticalScrollBar().setUnitIncrement(32);
-		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		add(scrollPane);
-		
-		scrollPane.setColumnHeaderView(panelHeader);
-
-		//--- Main Panel ---
-		JPanel panelMain = new JPanel();
-		panelMain.setFocusable(true);
-		panelMain.setBackground(ScyllaGUI.ColorBackground);
-		scrollPane.setViewportView(panelMain);
-		GridBagLayout gbl_panelMain = new GridBagLayout();
-		panelMain.setLayout(gbl_panelMain);
 		
 		// -- General Information Panel --
 		JPanel panelGeneral = new JPanel();
@@ -219,12 +86,12 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 		//Label id
 		JLabel labelId = new JLabel();
 		labelId.setText("ID");
-		GridBagConstraints gbc_textfieldId = new GridBagConstraints();
-		gbc_textfieldId.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
-		gbc_textfieldId.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textfieldId.gridx = 0;
-		gbc_textfieldId.gridy = 0;
-		panelGeneral.add(labelId, gbc_textfieldId);
+		GridBagConstraints gbc_labelId = new GridBagConstraints();
+		gbc_labelId.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
+		gbc_labelId.fill = GridBagConstraints.HORIZONTAL;
+		gbc_labelId.gridx = 0;
+		gbc_labelId.gridy = 0;
+		panelGeneral.add(labelId, gbc_labelId);
 		
 		//Text input field for id
 		textfieldId = new JTextField();
@@ -233,12 +100,12 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 			creator.setId(textfieldId.getText());
 			setSaved(false);
 		}));
-		GridBagConstraints gbc_textfieldIdEdit = new GridBagConstraints();
-		gbc_textfieldIdEdit.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, inset_b);
-		gbc_textfieldIdEdit.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textfieldIdEdit.gridx = 1;
-		gbc_textfieldIdEdit.gridy = 0;
-		panelGeneral.add(textfieldId, gbc_textfieldIdEdit);
+		GridBagConstraints gbc_textfieldId = new GridBagConstraints();
+		gbc_textfieldId.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, inset_b);
+		gbc_textfieldId.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textfieldId.gridx = 1;
+		gbc_textfieldId.gridy = 0;
+		panelGeneral.add(textfieldId, gbc_textfieldId);
 		textfieldId.setColumns(10);
 		
 		//Label seed
@@ -416,7 +283,7 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 		panelTimetablesExpand.expand();
 		panelMain.add(panelTimetablesExpand, gbc_panelTimetables);
 		
-		//Layout fixing, empty buffer panel
+		//Layout fixing empty buffer panel
 		JPanel panelBuffer = new JPanel();
 		panelBuffer.setFocusable(true);
 		panelBuffer.setBackground(panelMain.getBackground());
@@ -431,119 +298,42 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 		
 		//Disable as no gc is opened
 		setEnabled(false);
-		//Add enter traversal for textfields etc.
-		Set<AWTKeyStroke> forwardKeys = new HashSet<AWTKeyStroke>(getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
-		forwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
-		setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, forwardKeys);
-        
+		
 		setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{buttonNewfile, buttonSavefile, buttonSavefileAs, buttonOpenfile, buttonClosefile, textfieldId, textfieldSeed, comboboxTimezone, panelResourcesExpand, panelTimetablesExpand}));
 		
 	}
 	
-	/**
-	 * Initialization method that has to be called directly after the constructor,
-	 * but can only be called if the panel has already been added to a parent.<br>
-	 * Initializes keybindings, as they won't work otherwise
-	 */
-	public void init(){
-		JTabbedPane parent = (JTabbedPane) getParent();
-		parent.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_S,InputEvent.CTRL_DOWN_MASK),"save");
-		parent.getActionMap().put("save", new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				//Workaround: adding directly to this.getInputMap does not work, but adding to parent also triggers events when this panel is not selected
-				if(parent.getSelectedComponent() != GlobalConfigurationPane.this)return;
-				be_save();
-			}
-		});
-		parent.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_S,InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK),"saveAs");
-		parent.getActionMap().put("saveAs", new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if(parent.getSelectedComponent() != GlobalConfigurationPane.this)return;
-				be_saveAs();
-			}
-		});
-		parent.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_O,InputEvent.CTRL_DOWN_MASK),"open");
-		parent.getActionMap().put("open", new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if(parent.getSelectedComponent() != GlobalConfigurationPane.this)return;
-				be_open();
-			}
-		});
-		parent.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_N,InputEvent.CTRL_DOWN_MASK),"new");
-		parent.getActionMap().put("new", new AbstractAction() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if(parent.getSelectedComponent() != GlobalConfigurationPane.this)return;
-				be_create();
-			}
-		});
+	protected String getId(){
+		return creator.getId();
 	}
 	
 	/**
-	 * Button event for creating new gc files
+	 * Creates a new global configuration
 	 */
-	private void be_create(){
+	@Override
+	protected void create(){
 		setChangeFlag(true);
 		labelFiletitle.setText("<unsaved file>");
-		createGC();
+		close();
+		creator = new GlobalConfigurationCreator();
+		setSaved(false);
+		setEnabled(true);
 		setChangeFlag(false);
 		//Id should be edited right after creation
 		textfieldId.setText("NewGlobalConfiguration");
 		textfieldId.requestFocusInWindow();
 		textfieldId.selectAll();
 	}
-	
-	/**
-	 * Creates a new global configuration
-	 */
-	private void createGC(){
-		creator = new GlobalConfigurationCreator();
-		setSaved(false);
-		setEnabled(true);
-	}
 
-	/**
-	 * Button event for opening existing gcs
-	 */
-	private void be_open(){	
-		//Show unsaved changes dialog; if cancel is pressed the whole process is canceled
-		if(!saved){
-			int i = showUnsavedChangesDialog();
-			if(i != 1)return;
-		}
-		//Choose file to be opened
-		ScalingFileChooser chooser = new ScalingFileChooser(ScyllaGUI.DEFAULTFILEPATH);
-		chooser.setDialogTitle("Open");
-		int c = chooser.showDialog(this,"Open");
-		//if the process is canceled, nothing happens
-		if(c == ScalingFileChooser.APPROVE_OPTION){
-			file = chooser.getSelectedFile();
-			if(file != null){
-				//Close current opened file
-				closeGC();
-				//Update default file path
-				ScyllaGUI.DEFAULTFILEPATH = chooser.getSelectedFile().getPath();
-				try {
-					creator = GlobalConfigurationCreator.createFromFile(file.getPath());
-					labelFiletitle.setText(chooser.getSelectedFile().getPath());
-					openGC();
-				} catch (JDOMException | IOException e) {
-					e.printStackTrace();
-				}
-			}else{
-				System.err.println("Could not find file");//TODO
-			}
-		}
-		
-	}	
 	
 	/**
 	 * Opens the gc that is currently loaded in the creator
+	 * @throws IOException 
+	 * @throws JDOMException 
 	 */
-	private void openGC(){
+	@Override
+	protected void open() throws JDOMException, IOException{
+		creator = GlobalConfigurationCreator.createFromFile(getFile().getPath());
 		setChangeFlag(true);
 		textfieldId.setText(creator.getId());
 		if(creator.getSeed() != null)textfieldSeed.setValue(creator.getSeed());
@@ -558,90 +348,28 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 		setChangeFlag(false);
 		setEnabled(true);
 	}
-
-	/**
-	 * Button event for save button,
-	 * overrides file if already existing, otherwise opens "save as" dialog
-	 */
-	private void be_save(){
-		if(saved)return;
-		if(file != null)saveGC();
-		else be_saveAs();
-	}
-	
-	/**
-	 * Button event for "save as" button
-	 */
-	private void be_saveAs(){
-		//Select file and confirm override if file is already existing
-		ScalingFileChooser chooser = new ScalingFileChooser(ScyllaGUI.DEFAULTFILEPATH){
-			@Override
-			public void approveSelection(){
-				File f = getSelectedFile();
-				if(f == null)return;
-				if(f.exists()){
-					int override = JOptionPane.showConfirmDialog(this, "File already exists. Override?","Confirm Override",JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.PLAIN_MESSAGE);
-					switch(override){
-					case JOptionPane.YES_OPTION:
-						super.approveSelection();
-						return;
-					case JOptionPane.CANCEL_OPTION:
-						super.cancelSelection();
-						return;
-					default : return;
-					}
-				}else{
-					super.approveSelection();
-				}
-			}
-		};
-		if(file != null)chooser.setSelectedFile(file);
-		else if(!creator.getId().equals("")) chooser.setSelectedFile(new File(ScyllaGUI.DEFAULTFILEPATH+"\\"+creator.getId()+".xml"));
-		chooser.setDialogTitle("Save");
-		int c = chooser.showDialog(null,"Save");
-		if(c == ScalingFileChooser.APPROVE_OPTION){
-			file = chooser.getSelectedFile();
-			if(file != null){
-				labelFiletitle.setText(chooser.getSelectedFile().getPath());
-				ScyllaGUI.DEFAULTFILEPATH = chooser.getSelectedFile().getPath();
-				saveGC();
-			}else{
-				System.err.println("Could not find file");//TODO
-			}
-		}
-	}
 	
 	/**
 	 * Saves the gc to the current file
 	 */
-	private void saveGC(){
+	@Override
+	protected void save(){
 		try {
 			setSaved(true);
-			creator.save(file.getPath());
+			creator.save(getFile().getPath());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
 	/**
-	 * Button event close
-	 * Closes gc but asks to save unsaved changes if existing
-	 */
-	private void be_close(){
-		if(!saved){
-			int i = showUnsavedChangesDialog();
-			//If cancel was pressed OR the gc was saved, it is closed
-			if(i == 1)closeGC();
-			//else return;
-		}else closeGC();
-	}
-	/**
 	 * Closes the gc, resets, clears and disables all fields
 	 */
-	private void closeGC(){
+	@Override
+	protected void close(){
 		setChangeFlag(true);
 		creator = null;
-		labelFiletitle.setText("<No editor opened. Open an existing file or create a new one.>");
+		setFile(null);
 		textfieldId.setText("");
 		textfieldSeed.setValue(null);
 		comboboxTimezone.setSelectedItem(null);
@@ -656,60 +384,7 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 		setEnabled(false);
 	}
 	
-	/**
-	 * Shows a dialog to save the current gc
-	 * @return
-	 * 	-1 : if canceled by closing the dialog OR if save changes is pressed and canceled
-	 * 	1 : if discard changes is pressed OR if save changes is pressed and it is saved
-	 * 	2 : if canceled by pressing cancel
-	 * 
-	 */
-	private int showUnsavedChangesDialog(){
-		int i = JOptionPane.showOptionDialog(
-				this,
-				getFileName()+"has unsaved changes. Would you like to save them?",
-				"Unsaved Changes",
-				JOptionPane.YES_NO_CANCEL_OPTION,
-				JOptionPane.PLAIN_MESSAGE,
-				ScyllaGUI.ICON_SAVE,
-				new Object[]{new JButton("Save Changes"){{
-					setIcon(ScyllaGUI.ICON_SAVE);
-					addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent arg0) {
-							((JDialog)getTopLevelAncestor()).dispose();
-							be_save();
-							//closeGC();
-						}
-					});
-				}},"Discard Changes","Cancel"}, 0);
-		if(saved)i = 1;
-		return i;
-	}
-	
 
-	@Override
-	public void setSaved(boolean b){
-		saved = b;
-		//Also set the save button to display if saved or not
-		buttonSavefile.setEnabled(!b);
-	}
-	
-	@Override
-	public boolean isChangeFlag() {
-		//If the counter is higher than 0, at least one method is performing changes
-		return changeFlag > 0;
-	}
-	
-	@Override
-	public void setChangeFlag(boolean b) {
-		//Increment the counter, if another method starts doing changes,
-		if(b)changeFlag++;
-		//Decrement the counter, if a method stops doing changes
-		else changeFlag--;
-		//Throw an error (type should be changed), if more methods stop than having started
-		if(changeFlag < 0)throw new java.lang.NegativeArraySizeException();
-	}
-	
 	@Override
 	public List<JComboBox<String>> getTimetableObserverList() {
 		return timetableObserverList;
@@ -719,14 +394,6 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 	public List<String> getTimetables() {
 		return timetables;
 	}
-
-	/**
-	 * @return The name of the current opened gc, if already a file exists, the filename is taken
-	 */
-	private String getFileName(){
-		if(file != null)return file.getName();
-		else return labelFiletitle.getText();
-	}
 	
 
 	/**
@@ -734,8 +401,6 @@ public class GlobalConfigurationPane extends JPanel implements FormManager{
 	 */
 	@Override
 	public void setEnabled(boolean b){
-		buttonClosefile.setEnabled(b);
-		buttonSavefileAs.setEnabled(b);
 		textfieldId.setEnabled(b);
 		textfieldSeed.setEnabled(b);
 		comboboxTimezone.setEnabled(b);

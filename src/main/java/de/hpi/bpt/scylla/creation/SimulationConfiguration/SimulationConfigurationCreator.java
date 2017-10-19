@@ -79,9 +79,15 @@ public class SimulationConfigurationCreator extends ElementLink{
 	public void setEndDateTime(ZonedDateTime endTime){setAttribute("endDateTime", endTime);}
 	public String getEndDateTime(){return root.getAttributeValue("endDateTime");}
 	//TODO public void setResourceAssignmentOrder(String id){setAttribute("resourceAssignmentOrder", id);}
-	public void setRandomSeed(int seed){setAttribute("randomSeed", seed);}
+	public void setRandomSeed(long seed){
+		if(root.getChild("randomSeed",nsp) == null)root.addContent(new Element("randomSeed",nsp));
+		root.getChild("randomSeed",nsp).setText(seed+"");
+	}
 	public void removeRandomSeed(){root.removeAttribute("randomSeed");}
-	public String getRandomSeed(){return root.getAttributeValue("randomSeed");}
+	public Integer getRandomSeed(){
+		if(root.getChild("randomSeed",nsp) == null)return null;
+		return Integer.parseInt(root.getChild("randomSeed",nsp).getText());
+	}
 	
 	public StartEvent getStartEvent(){return startEvent;}
 	
