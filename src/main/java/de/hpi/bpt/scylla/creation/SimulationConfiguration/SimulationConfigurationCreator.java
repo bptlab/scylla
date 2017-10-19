@@ -6,21 +6,18 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.TreeMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
-import org.jdom2.Namespace;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
 import de.hpi.bpt.scylla.creation.ElementLink;
-import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator;
 
 
 public class SimulationConfigurationCreator extends ElementLink{

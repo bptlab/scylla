@@ -106,75 +106,75 @@ public class JDomTestClass {
 		
 
 		
-//        Element r = null;
-//		try {
-//	        Document doc;
-//	        SAXBuilder builder = new SAXBuilder();
-//			doc = builder.build("./samples/p2_normal.bpmn");
-//	        r = doc.getRootElement();
-//		} catch (JDOMException | IOException e1){
-//			e1.printStackTrace();
-//		}
-//		
-//		SimulationConfigurationCreator s = new SimulationConfigurationCreator();
-//		s.setId("This is the id");
-//		//s.setProcessRef("Process_2");
-//		s.setProcessInstances(10);
-//		s.setStartDateTime(ZonedDateTime.parse("2017-07-06T09:00:00.000+02:00"));
-//		s.setEndDateTime(ZonedDateTime.parse("2017-07-12T09:00:00.000+02:00"));
-//		s.setRandomSeed(1337);
-//        s.setModel(r);
-//        
-//		Distribution testDistribution = new Distribution(DistributionType.binomial);
-//		testDistribution.setAttribute("amount",5);
-//		testDistribution.setAttribute(0, 0.2);
-//		s.getStartEvent().setArrivalRateDistribution(testDistribution);
-//		
-//		Task t = (Task)s.getElement("Task_1tvvo6w");
-//		t.setDurationDistribution(new Distribution(DistributionType.constant));
-//		t.getDurationDistribution().setAttribute("constantValue", 100);
-//		t.assignResource(student).setAmount(5);
-//		t.assignResource(prof).setAmount(5);
-//		
-//		t.getResource("Student").setAmount(13);
-//		t.deassignResource(prof.getId());
-//		t.getResource(student.getId()).setAssignmentPriority(5);
-//
-//		t.assignResource(prof).setAmount(5);
-//		t.getResource("Professor").setAssignmentPriority(0);
-//		t.getResource(prof.getId()).removeAssignmentDefinition();
-//		t.deassignResource(prof.getId());
-//		
-//		for(ElementLink element : s.getElements()){
-//			if(!(element instanceof Task))continue;
-//			Task task = (Task)element;
-//			Distribution d = new Distribution(DistributionType.triangular);
-//			d.setAttribute(0,11);
-//			d.setAttribute(2,33);
-//			d.setAttribute("peak",22);
-//			task.setDurationDistribution(d);
-//			task.assignResource(prof).setAmount(3);
-//		}
-//		
-//		ExclusiveGateway g = null;
-//		for(ElementLink element : s.getElements()){
-//			if(element instanceof ExclusiveGateway){
-//				g = (ExclusiveGateway) element;
-//				break;
-//			}
-//		}
-//		g.setBranchingProbability("SequenceFlow_1237oxj", 1);
-//		
-//		for(String branch : g.getBranches()){
-//			System.err.println(s.getFlowTarget(branch).el.getAttributeValue("name"));
-//		}
+        Element r = null;
+		try {
+	        Document doc;
+	        SAXBuilder builder = new SAXBuilder();
+			doc = builder.build("./samples/p2_normal.bpmn");
+	        r = doc.getRootElement();
+		} catch (JDOMException | IOException e1){
+			e1.printStackTrace();
+		}
 		
-		SimulationConfigurationCreator s = null;
+		SimulationConfigurationCreator s = new SimulationConfigurationCreator();
+		s.setId("This is the id");
+		//s.setProcessRef("Process_2");
+		s.setProcessInstances(10);
+		s.setStartDateTime(ZonedDateTime.parse("2017-07-06T09:00:00.000+02:00"));
+		s.setEndDateTime(ZonedDateTime.parse("2017-07-12T09:00:00.000+02:00"));
+
+		s.setRandomSeed(1337);
+        s.setModel(r);
+        
+		Distribution testDistribution = new Distribution(DistributionType.binomial);
+		testDistribution.setAttribute("amount",5);
+		testDistribution.setAttribute(0, 0.2);
+		s.getStartEvent().setArrivalRateDistribution(testDistribution);
+		
+		Task t = (Task)s.getElement("Task_1tvvo6w");
+		t.setDurationDistribution(new Distribution(DistributionType.constant));
+		t.getDurationDistribution().setAttribute("constantValue", 100);
+		t.assignResource(student).setAmount(5);
+		t.assignResource(prof).setAmount(5);
+		
+		t.getResource("Student").setAmount(13);
+		t.deassignResource(prof.getId());
+		t.getResource(student.getId()).setAssignmentPriority(5);
+
+		t.assignResource(prof).setAmount(5);
+		t.getResource("Professor").setAssignmentPriority(0);
+		t.getResource(prof.getId()).removeAssignmentDefinition();
+		t.deassignResource(prof.getId());
+		
+		for(ElementLink element : s.getElements()){
+			if(!(element instanceof Task))continue;
+			Task task = (Task)element;
+			Distribution d = new Distribution(DistributionType.triangular);
+			d.setAttribute(0,11);
+			d.setAttribute(2,33);
+			d.setAttribute("peak",22);
+			task.setDurationDistribution(d);
+			task.assignResource(prof).setAmount(3);
+		}
+		
+		ExclusiveGateway g = null;
+		for(ElementLink element : s.getElements()){
+			if(element instanceof ExclusiveGateway){
+				g = (ExclusiveGateway) element;
+				break;
+			}
+		}
+		g.setBranchingProbability("SequenceFlow_1237oxj", 1);
+		
+		for(String branch : g.getBranches()){
+			System.err.println(s.getFlowTarget(branch).el.getAttributeValue("name"));
+		}
+		/*		SimulationConfigurationCreator s = null;
 		try {
 			s = SimulationConfigurationCreator.createFromFile("./samples/p2_normal_sim.xml", "./samples/p2_normal.bpmn");
 		} catch (JDOMException | IOException e1) {
 			e1.printStackTrace();
-		}
+		}*/
 		
 		try {
 			writer = new FileWriter("testFile2.xml");

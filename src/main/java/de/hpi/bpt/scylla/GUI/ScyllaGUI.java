@@ -21,6 +21,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.ColorUIResource;
 
 import de.hpi.bpt.scylla.GUI.GlobalConfigurationPane.GlobalConfigurationPane;
+import de.hpi.bpt.scylla.GUI.SimulationConfigurationPane.SimulationConfigurationPane;
 /**
  * Scylla UI Main class, provides UI constants and starts the UI.
  * @author Leon Bein
@@ -108,6 +109,8 @@ public class ScyllaGUI extends JFrame {
 	private SimulationPane simulationPane;
 	/**Pane to create and edit global configurations*/
 	private GlobalConfigurationPane globalconfPane;
+	/**Pane to create and edit simulation configurations*/
+	private SimulationConfigurationPane simconfPane;
 	/**Tabpane to switch between the panes*/
 	private JTabbedPane contentPane;
 	
@@ -188,11 +191,13 @@ public class ScyllaGUI extends JFrame {
 
 		simulationPane = new SimulationPane();
 		globalconfPane = new GlobalConfigurationPane();
+		simconfPane = new SimulationConfigurationPane();
 	    contentPane = new JTabbedPane(JTabbedPane.TOP);
 		setContentPane(contentPane);
 		contentPane.addTab("Simulation", simulationPane);
 		contentPane.addTab("Global Configuration Editor", globalconfPane);
 		globalconfPane.init();
+		contentPane.addTab("Under Construction", simconfPane);
 		
 		System.setOut(simulationPane.getConsole().getOut());
 	}
