@@ -1,3 +1,5 @@
 /target/
 /samples/*.html
 /output_*/*
+/samples/output_*/*
+/.idea/*

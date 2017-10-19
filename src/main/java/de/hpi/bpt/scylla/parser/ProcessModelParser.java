@@ -17,6 +17,7 @@ import de.hpi.bpt.scylla.logger.DebugLogger;
 import de.hpi.bpt.scylla.model.process.CommonProcessElements;
 import de.hpi.bpt.scylla.model.process.ProcessModel;
 import de.hpi.bpt.scylla.model.process.graph.Graph;
+//import de.hpi.bpt.scylla.model.process.graph.Node;
 import de.hpi.bpt.scylla.model.process.graph.exception.MultipleStartNodesException;
 import de.hpi.bpt.scylla.model.process.graph.exception.NoStartNodeException;
 import de.hpi.bpt.scylla.model.process.graph.exception.NodeNotFoundException;
@@ -172,8 +173,8 @@ public class ProcessModelParser extends Parser<ProcessModel> {
 
         Map<Integer, Element> boundaryEvents = new HashMap<Integer, Element>();
         Map<Integer, Element> sequenceFlows = new HashMap<Integer, Element>();
-        Map<Integer, List<Element>> tasksWithDataInputAssociations = new HashMap<Integer, List<Element>>();
-        Map<Integer, List<Element>> tasksWithDataOutputAssociations = new HashMap<Integer, List<Element>>();
+        Map<Integer, List<Element>> tasksWithDataInputAssociations = new HashMap<Integer, List<Element>>(); //not only tasks anymore, also events
+        Map<Integer, List<Element>> tasksWithDataOutputAssociations = new HashMap<Integer, List<Element>>(); //not only tasks anymore, also events
         int nodeId = 1;
         for (Element el : process.getChildren()) {
             String elementName = el.getName();
@@ -376,6 +377,14 @@ public class ProcessModelParser extends Parser<ProcessModel> {
                             boundaryEvents.put(nodeId, el);
                         }
                     }
+                    List<Element> dataInElements = el.getChildren("dataInputAssociation", bpmnNamespace);
+                    if (!dataInElements.isEmpty()) {
+                        tasksWithDataInputAssociations.put(nodeId, dataInElements);
+                    }
+                    List<Element> dataOutElements = el.getChildren("dataOutputAssociation", bpmnNamespace);
+                    if (!dataOutElements.isEmpty()) {
+                        tasksWithDataOutputAssociations.put(nodeId, dataOutElements);
+                    }
                 }
                 else if (elementName.equals("dataObjectReference")) {
                 	String dataObjectRef = el.getAttributeValue("dataObjectRef");
@@ -431,7 +440,13 @@ public class ProcessModelParser extends Parser<ProcessModel> {
         for (Integer nId : boundaryEvents.keySet()) {
             Element boundaryEvent = boundaryEvents.get(nId);
             // interrupting or not?
-            boolean cancelActivity = Boolean.valueOf(boundaryEvent.getAttributeValue("cancelActivity"));
+            boolean cancelActivity; //initially true, because at least "Camunda Modeler" does not set the cancelActivity value if it is an interrupting activity
+            if (boundaryEvent.getAttributeValue("cancelActivity") != null) {
+            	cancelActivity = Boolean.valueOf(boundaryEvent.getAttributeValue("cancelActivity"));
+            } else {
+            	cancelActivity = true;
+            }
+            
             cancelActivities.put(nId, cancelActivity);
 
             // attached to?
@@ -444,6 +459,7 @@ public class ProcessModelParser extends Parser<ProcessModel> {
             referencesToBoundaryEvents.get(nodeIdOfAttachedTo).add(nId);
         }
 
+        //System.out.println("-----------NORMALFLOW-------------");
         for (Integer nId : sequenceFlows.keySet()) {
             Element sequenceFlow = sequenceFlows.get(nId);
             String sourceRef = sequenceFlow.getAttributeValue("sourceRef");
@@ -451,21 +467,29 @@ public class ProcessModelParser extends Parser<ProcessModel> {
             int sourceId = identifiersToNodeIds.get(sourceRef);
             int targetId = identifiersToNodeIds.get(targetRef);
             graph.addEdge(sourceId, nId);
+            //System.out.println(identifiers.get(sourceId)+" -> "+identifiers.get(nId)+" -> "+identifiers.get(targetId));
             graph.addEdge(nId, targetId);
         }
-
+        //System.out.println("-----------DATAFLOWOUT-------------");
         for (Integer nId : tasksWithDataInputAssociations.keySet()) {
             List<Element> dataInputAssociations = tasksWithDataInputAssociations.get(nId);
             for (Element elem : dataInputAssociations) {
                 String sourceRef = elem.getChild("sourceRef", bpmnNamespace).getText();
                 if (identifiersToNodeIds.containsKey(sourceRef)) {
                     int dataObjectNodeId = identifiersToNodeIds.get(sourceRef);
+                    //System.out.println(identifiers.get(dataObjectNodeId)+" -> "+identifiers.get(nId));
                     dataObjectsGraph.addEdge(dataObjectNodeId, nId);
+                    /*Map<Integer, Node<Integer>> nodes = dataObjectsGraph.getNodes();
+                    Node<Integer> currentNode = nodes.get(nId);
+                    currentNode.setId(identifiers.get(nId));   
+                    currentNode = nodes.get(dataObjectNodeId);
+                    currentNode.setId(identifiers.get(dataObjectNodeId));*/
                 }
                 // String targetRef = elem.getChild("targetRef", bpmnNamespace).getText();
             }
         }
-
+        
+        //System.out.println("-----------DATAFLOWIN-------------");
         for (Integer nId : tasksWithDataOutputAssociations.keySet()) {
             List<Element> dataOutputAssociations = tasksWithDataOutputAssociations.get(nId);
             for (Element elem : dataOutputAssociations) {
@@ -473,7 +497,13 @@ public class ProcessModelParser extends Parser<ProcessModel> {
                 String targetRef = elem.getChild("targetRef", bpmnNamespace).getText();
                 if (identifiersToNodeIds.containsKey(targetRef)) {
                     int dataObjectNodeId = identifiersToNodeIds.get(targetRef);
+                    //System.out.println(identifiers.get(nId)+" -> "+identifiers.get(dataObjectNodeId));
                     dataObjectsGraph.addEdge(nId, dataObjectNodeId);
+                    /*Map<Integer, Node<Integer>> nodes = dataObjectsGraph.getNodes();
+                    Node<Integer> currentNode = nodes.get(nId);
+                    currentNode.setId(identifiers.get(nId));   
+                    currentNode = nodes.get(dataObjectNodeId);
+                    currentNode.setId(identifiers.get(dataObjectNodeId));*/
                 }
             }
         }
@@ -498,6 +528,7 @@ public class ProcessModelParser extends Parser<ProcessModel> {
             subProcessModel.setParent(processModel);
         }
 
+        //System.out.println(dataObjectsGraph);
         return processModel;
     }
 

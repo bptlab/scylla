@@ -44,8 +44,8 @@ public class TaskTerminateEvent extends TaskEvent {
         SimulationModel model = (SimulationModel) getModel();
         ProcessModel processModel = processInstance.getProcessModel();
         // int processInstanceId = processInstance.getId();
-
-        try {
+        
+      try {
             ProcessModel subProcess = processModel.getSubProcesses().get(nodeId);
             TaskType type = processModel.getTasks().get(nodeId);
 
@@ -140,7 +140,7 @@ public class TaskTerminateEvent extends TaskEvent {
         ProcessModel processModel = processInstance.getProcessModel();
         String processScopeNodeId = SimulationUtils.getProcessScopeNodeId(processModel, nodeId);
 
-        ProcessNodeInfo info = new ProcessNodeInfo(processScopeNodeId, source, timestamp, taskName, resources,
+        ProcessNodeInfo info = new ProcessNodeInfo(nodeId, processScopeNodeId, source, timestamp, taskName, resources,
                 transition);
         model.addNodeInfo(processModel, processInstance, info);
     }

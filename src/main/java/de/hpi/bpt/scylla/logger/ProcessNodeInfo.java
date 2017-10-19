@@ -1,5 +1,7 @@
 package de.hpi.bpt.scylla.logger;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -11,12 +13,14 @@ import java.util.Set;
  */
 public class ProcessNodeInfo {
 
+    private Integer id;
     private String processScopeNodeId;
     private String source;
     private long timestamp;
     private String taskName;
     private Set<String> resources;
     private ProcessNodeTransitionType transition;
+    private Map<String, Object> dataObjectField; //holds for each processed Node (and so each field) the generated values of one specific instance
 
     /**
      * Constructor.
@@ -34,7 +38,7 @@ public class ProcessNodeInfo {
      * @param transition
      *            transition of node
      */
-    public ProcessNodeInfo(String processScopeNodeId, String source, long timestamp, String nodeName,
+    public ProcessNodeInfo(Integer id, String processScopeNodeId, String source, long timestamp, String nodeName,
             Set<String> resources, ProcessNodeTransitionType transition) {
         this.processScopeNodeId = processScopeNodeId;
         this.source = source;
@@ -42,7 +46,10 @@ public class ProcessNodeInfo {
         this.taskName = nodeName;
         this.resources = resources;
         this.transition = transition;
+        this.dataObjectField = new HashMap<String, Object>();
+        this.id = id;
     }
+    
 
     public String getProcessScopeNodeId() {
         return processScopeNodeId;
@@ -67,5 +74,20 @@ public class ProcessNodeInfo {
     public ProcessNodeTransitionType getTransition() {
         return transition;
     }
+    
+    public Map<String, Object> getDataObjectField() {
+    	return dataObjectField;
+    }
+    
+    public void SetDataObjectField(Map<String, Object> dataObjectField) {
+    	for (Map.Entry<String, Object> entry : dataObjectField.entrySet()) {
+    	    String key = entry.getKey();
+    	    Object value = entry.getValue();
+    	    this.dataObjectField.put(key, value);
+    	}
+    }
 
+    public Integer getId(){
+        return id;
+    }
 }

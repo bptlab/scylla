@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bsim:globalConfiguration xmlns:bsim="http://bsim.hpi.uni-potsdam.de/scylla/simModel" targetNamespace="http://www.hpi.de" id="NewGlobalConfigura&quot;&gt;tion">
+  <bsim:resourceData>
+    <bsim:dynamicResource id="&lt;enter name&gt;" defaultQuantity="10002" defaultCost="-12.0" defaultTimeUnit="SECONDS" defaultTimetableId="&lt;enter name&gt;">
+      <bsim:instance name="&lt;enter name&gt;" />
+    </bsim:dynamicResource>
+  </bsim:resourceData>
+  <bsim:timetables>
+    <bsim:timetable id="&lt;enter name&gt;">
+      <bsim:timetableItem from="MONDAY" to="MONDAY" beginTime="01:00" endTime="02:00" />
+      <bsim:timetableItem from="MONDAY" to="MONDAY" beginTime="04:00" endTime="13:00" />
+      <bsim:timetableItem from="TUESDAY" to="TUESDAY" beginTime="01:00" endTime="02:00" />
+    </bsim:timetable>
+  </bsim:timetables>
+</bsim:globalConfiguration>

@@ -38,11 +38,11 @@ public abstract class BPMNEvent extends ScyllaEvent {
         String processScopeNodeId = SimulationUtils.getProcessScopeNodeId(processModel, nodeId);
 
         ProcessNodeInfo info;
-        info = new ProcessNodeInfo(processScopeNodeId, source, timestamp, taskName, resources,
+        info = new ProcessNodeInfo(nodeId, processScopeNodeId, source, timestamp, taskName, resources,
                 ProcessNodeTransitionType.EVENT_BEGIN);
         model.addNodeInfo(processModel, processInstance, info);
 
-        info = new ProcessNodeInfo(processScopeNodeId, source, timestamp, taskName, resources,
+        info = new ProcessNodeInfo(nodeId, processScopeNodeId, source, timestamp, taskName, resources,
                 ProcessNodeTransitionType.EVENT_TERMINATE);
         model.addNodeInfo(processModel, processInstance, info);
     };

@@ -48,12 +48,18 @@ public class ScyllaGUI extends JFrame {
 	private static GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
 	/**Screen rectangle*/
 	private static java.awt.Rectangle r = env.getMaximumWindowBounds();
+<<<<<<< HEAD
 	/**Screen width*/
 	public static final int WIDTH = r.width;//1200
 	/**Screen height*/
 	public static final int HEIGHT = r.height;//900
 	/**General scale; calculated as height scale to a 1200x900 display*/
 	public static final double SCALE = ((double)HEIGHT)/900.0;
+=======
+	private static int WIDTH = r.width;//1200
+	private static int HEIGHT = r.height;//900
+	private static double SCALE = ((double)HEIGHT)/900.0;
+>>>>>>> refs/remotes/origin/dev_ui
 
 //	private static double SCALE = 1;
 //	private static int WIDTH = 1200;//(int)(1200.0 * SCALE);

@@ -2,7 +2,10 @@ package de.hpi.bpt.scylla.plugin.batch;
 
 import java.time.Duration;
 
-class MinMaxRule {
+import de.hpi.bpt.scylla.simulation.ProcessInstance;
+import de.hpi.bpt.scylla.simulation.event.TaskBeginEvent;
+
+class MinMaxRule implements ActivationRule{
 
     private int minInstances;
     private Duration minTimeout;
@@ -16,19 +19,18 @@ class MinMaxRule {
         this.maxTimeout = maxTimeout;
     }
 
-    public int getMinInstances() {
+    public int getThreshold(TaskBeginEvent desmojEvent, ProcessInstance processInstance) {
         return minInstances;
+        //TODO if similar instances exists then maxInstances
+        // TODO implement ExistingEqualPI() --> check all Instances which has not yet reached the batch activity, 
+        //whether one exists with the same data view, if yes, provide maxInstances!!!! 
+        
     }
 
-    public Duration getMinTimeout() {
+    public Duration getTimeOut(TaskBeginEvent desmojEvent, ProcessInstance processInstance) {
         return minTimeout;
+      //TODO if similar instances exists then minInstances
+        // TODO implement ExistingEqualPI()
     }
 
-    public int getMaxInstances() {
-        return maxInstances;
-    }
-
-    public Duration getMaxTimeout() {
-        return maxTimeout;
-    }
 }

@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.jdom2.Document;
@@ -20,6 +21,8 @@ import de.hpi.bpt.scylla.model.configuration.SimulationConfiguration;
 import de.hpi.bpt.scylla.model.global.GlobalConfiguration;
 import de.hpi.bpt.scylla.model.process.CommonProcessElements;
 import de.hpi.bpt.scylla.model.process.ProcessModel;
+import de.hpi.bpt.scylla.model.process.graph.Graph;
+import de.hpi.bpt.scylla.model.process.graph.exception.NodeNotFoundException;
 import de.hpi.bpt.scylla.parser.CommonProcessElementsParser;
 import de.hpi.bpt.scylla.parser.GlobalConfigurationParser;
 import de.hpi.bpt.scylla.parser.ProcessModelParser;
@@ -29,6 +32,7 @@ import de.hpi.bpt.scylla.plugin_type.parser.CommonProcessElementsParserPluggable
 import de.hpi.bpt.scylla.plugin_type.parser.GlobalConfigurationParserPluggable;
 import de.hpi.bpt.scylla.plugin_type.parser.ProcessModelParserPluggable;
 import de.hpi.bpt.scylla.plugin_type.parser.SimulationConfigurationParserPluggable;
+import de.hpi.bpt.scylla.simulation.ProcessSimulationComponents;
 import de.hpi.bpt.scylla.simulation.SimulationModel;
 import de.hpi.bpt.scylla.simulation.utils.DateTimeUtils;
 import desmoj.core.simulator.Experiment;
@@ -213,7 +217,8 @@ public class SimulationManager {
         exp.start();
         exp.report();
         exp.finish();
-
+       
+           
         try {
 
             // log process execution

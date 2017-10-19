@@ -1,5 +1,6 @@
 package de.hpi.bpt.scylla.plugin.batch;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,8 +23,9 @@ class BatchCluster extends Entity {
 
     private List<ProcessInstance> processInstances;
     private List<TaskBeginEvent> parentalStartEvents;
-    private Map<String, String> dataView;
+    private Map<String, Object> dataView;
     private BatchClusterState state;
+    private Duration currentTimeOut;
 
     private ProcessInstance responsibleProcessInstance;
     private List<TaskTerminateEvent> parentalEndEvents;
@@ -32,7 +34,7 @@ class BatchCluster extends Entity {
     private TimeInstant startTime;
 
     BatchCluster(Model owner, TimeInstant creationTime, ProcessSimulationComponents pSimComponents,
-            BatchRegion batchRegion, int nodeId, Map<String, String> dataView, boolean showInTrace) {
+            BatchRegion batchRegion, int nodeId, Map<String, Object> dataView, boolean showInTrace) {
         super(owner, buildBatchClusterName(pSimComponents, nodeId), showInTrace);
         this.creationTime = creationTime;
         this.pSimComponents = pSimComponents;
@@ -79,7 +81,7 @@ class BatchCluster extends Entity {
         return nodeId;
     }
 
-    Map<String, String> getDataView() {
+    Map<String, Object> getDataView() {
         return dataView;
     }
 
@@ -95,7 +97,8 @@ class BatchCluster extends Entity {
         this.processInstances.add(processInstance);
         this.processInstanceEntranceTimes.add(processInstance.presentTime());
         int numberOfProcessInstances = processInstances.size();
-        if (numberOfProcessInstances == batchRegion.getMinMaxRule().getMinInstances()) {
+        // in case that the threshold is not defined, it never gets activated here
+        if (numberOfProcessInstances == batchRegion.getActivationRule().getThreshold(parentalStartEvent, processInstance)) {
             this.state = BatchClusterState.READY;
         }
         if (numberOfProcessInstances == batchRegion.getMaxBatchSize()) {
@@ -136,5 +139,13 @@ class BatchCluster extends Entity {
     public List<TimeInstant> getProcessInstanceEntranceTimes() {
         return processInstanceEntranceTimes;
     }
+
+	public Duration getCurrentTimeOut() {
+		return currentTimeOut;
+	}
+
+	public void setCurrentTimeOut(Duration currentTimeOut) {
+		this.currentTimeOut = currentTimeOut;
+	}
 
 }

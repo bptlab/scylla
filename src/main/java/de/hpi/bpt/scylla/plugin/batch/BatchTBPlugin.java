@@ -11,6 +11,7 @@ import de.hpi.bpt.scylla.simulation.ProcessSimulationComponents;
 import de.hpi.bpt.scylla.simulation.event.BPMNStartEvent;
 import de.hpi.bpt.scylla.simulation.event.ScyllaEvent;
 import de.hpi.bpt.scylla.simulation.event.TaskBeginEvent;
+import de.hpi.bpt.scylla.simulation.event.TaskTerminateEvent;
 import desmoj.core.simulator.TimeSpan;
 
 public class BatchTBPlugin extends TaskBeginEventPluggable {
@@ -43,7 +44,7 @@ public class BatchTBPlugin extends TaskBeginEventPluggable {
 
             for (Integer eventIndex : nextEventMap.keySet()) {
                 ScyllaEvent eventToSchedule = nextEventMap.get(eventIndex);
-                if (eventToSchedule instanceof BPMNStartEvent) {
+                if (eventToSchedule instanceof BPMNStartEvent || eventToSchedule instanceof TaskTerminateEvent) {
                     Integer indexOfSubprocessBPMNStartEvent = eventIndex;
 
                     nextEventMap.remove(indexOfSubprocessBPMNStartEvent);

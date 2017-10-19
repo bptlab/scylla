@@ -100,6 +100,10 @@ public class Graph<V> {
         }
         return node.getTargetObjects();
     }
+    
+    Node<V> getNode(V nId){
+    	return nodes.get(nId);
+    }
 
     @Override
     public String toString() {
@@ -110,4 +114,47 @@ public class Graph<V> {
         }
         return sb.toString();
     }
+    
+    /*public String print() {
+    	StringBuffer sb = new StringBuffer();
+        for (V n : nodes.keySet()) {
+        	if (!getNode(n).getNodeId().contains("DataObject")){
+	            Node<V> node = nodes.get(n);
+	            sb.append(getNode(n).getNodeId());
+	            Set<V> nodeSourceObjects = node.getSourceObjects();
+	            if (!nodeSourceObjects.isEmpty()) {
+	            	sb.append(" reads from ");
+	            }
+	            Integer nSCounter = nodeSourceObjects.size();
+	            for (V sn : nodeSourceObjects) {
+	            	Node<V> sN = getNode(sn);
+	            	if (sN.getNodeId().contains("DataObject")) {
+	            		sb.append(sN.getNodeId());
+	            		if (nSCounter != 1) {
+	            			sb.append(", ");
+	            		}
+	            	}
+	            	nSCounter--;
+	            }
+	            
+	            Set<V> nodeTargetObjects = node.getTargetObjects();
+	            if (!nodeTargetObjects.isEmpty()) {
+	            	sb.append(" writes on ");
+	            }
+	            Integer nTCounter = nodeTargetObjects.size();
+	            for (V tn : nodeTargetObjects) {
+	            	Node<V> tN = getNode(tn);
+	            	if (tN.getNodeId().contains("DataObject")) {
+	            		sb.append(tN.getNodeId());
+	            		if (nTCounter != 1) {
+	            			sb.append(", ");
+	            		}
+	            	}  
+	            	nTCounter--;
+	            }
+	            sb.append("\n");
+        	}
+        }
+        return sb.toString();
+    }*/
 }

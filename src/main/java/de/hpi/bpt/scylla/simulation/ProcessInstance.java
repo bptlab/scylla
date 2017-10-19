@@ -49,7 +49,7 @@ public class ProcessInstance extends Entity {
      * Constructor.
      * 
      * @param owner
-     *            simulation model to which the process instance belogs
+     *            simulation model to which the process instance belongs
      * @param processModel
      *            process model of the process instance
      * @param processInstanceId

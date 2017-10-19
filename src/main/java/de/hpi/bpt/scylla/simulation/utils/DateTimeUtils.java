@@ -392,7 +392,7 @@ public class DateTimeUtils {
                     }
 
                     ProcessNodeTransitionType transition = ProcessNodeTransitionType.PAUSE;
-                    ProcessNodeInfo nodeInfo = new ProcessNodeInfo(processScopeNodeId, source, timeRelativeToStart,
+                    ProcessNodeInfo nodeInfo = new ProcessNodeInfo(nodeId, processScopeNodeId, source, timeRelativeToStart,
                             taskName, resources, transition);
                     model.addNodeInfo(processModel, processInstance, nodeInfo);
                 }
@@ -418,7 +418,7 @@ public class DateTimeUtils {
                     }
 
                     ProcessNodeTransitionType transition = ProcessNodeTransitionType.RESUME;
-                    ProcessNodeInfo nodeInfo = new ProcessNodeInfo(processScopeNodeId, source, timeRelativeToStart,
+                    ProcessNodeInfo nodeInfo = new ProcessNodeInfo(nodeId, processScopeNodeId, source, timeRelativeToStart,
                             taskName, resources, transition);
                     model.addNodeInfo(processModel, processInstance, nodeInfo);
                 }

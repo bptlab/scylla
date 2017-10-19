@@ -9,10 +9,18 @@ import desmoj.core.dist.NumericalDist;
 
 public class DataDistributionWrapper extends DistributionWrapper {
 
-	private double min = -Double.MAX_VALUE;
-	private double max = Double.MAX_VALUE;
+	/*private double min = -Double.MAX_VALUE;
+	private double max = Double.MAX_VALUE;*/
 	private NumericalDist<?> desmojDistribution;
 	private DataDistributionType type;
+	
+	/*double getMin() {
+		return this.min;
+	}
+	
+	double getMax() {
+		return this.max;
+	}*/
 	
 	public DataDistributionWrapper(DataDistributionType type) {
 		this.type = type;
@@ -22,13 +30,13 @@ public class DataDistributionWrapper extends DistributionWrapper {
 		this.desmojDistribution = desmojDistribution;
 	}
 	
-	public void setMin(double min) {
+	/*public void setMin(double min) {
 		this.min = min;
 	}
 	
 	public void setMax(double max) {
 		this.max = max;
-	}
+	}*/
 	
 	public Object getSample() throws ScyllaRuntimeException, ScyllaValidationException {
 		if(desmojDistribution == null) {
@@ -37,12 +45,19 @@ public class DataDistributionWrapper extends DistributionWrapper {
 		
 		double value;
 		
-		// generate data in the given range with the given distribution
-		do{
+		
+		/*do{
 			value = desmojDistribution.sample().doubleValue();
-		} while(min < value && value > max);
+		} while(min > value || value > max);*/
+		
+		// generate data in the given range with the given distribution, project it
+		
+		//value = min + (max-min) * ((desmojDistribution.sample().doubleValue() - Double.MAX_VALUE)/(Double.MAX_VALUE - Double.MAX_VALUE));
+		
+		value = desmojDistribution.sample().doubleValue();
 		
 		// handle LONG samples
+		
 		if( type == DataDistributionType.LONG ) {
 			return Math.round(value);
 		} 

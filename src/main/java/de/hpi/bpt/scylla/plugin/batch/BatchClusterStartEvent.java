@@ -62,6 +62,7 @@ public class BatchClusterStartEvent extends Event<BatchCluster> {
             subprocessInstance.setParent(responsibleProcessInstance);
             ScyllaEvent subprocessEvent = new BPMNStartEvent(model, source, currentSimulationTime,
                     pSimComponentsOfSubprocess, subprocessInstance, startNodeId);
+          System.out.println("Created BPMNStartEvent for PI " + subprocessInstance.getId() + " / "+responsibleProcessInstance.getId()+" in Batch Cluster");
             subprocessEvent.schedule(subprocessInstance);
         }
         catch (NodeNotFoundException | MultipleStartNodesException | NoStartNodeException e) {
