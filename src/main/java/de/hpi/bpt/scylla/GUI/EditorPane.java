@@ -32,7 +32,7 @@ import org.jdom2.JDOMException;
 
 
 @SuppressWarnings("serial")
-public abstract class EditorPanel extends JPanel implements FormManager{
+public abstract class EditorPane extends JPanel implements FormManager{
 	
 	/**Flag to display if there are any non-user changes performed at user input objects,
 	 * in order to prevent user input events to be fired.
@@ -58,7 +58,7 @@ public abstract class EditorPanel extends JPanel implements FormManager{
 	protected JPanel panelMain;
 	protected JScrollPane scrollPane;
 	
-	public EditorPanel() {
+	public EditorPane() {
 		
 		
 		setFocusable(true);
@@ -188,7 +188,7 @@ public abstract class EditorPanel extends JPanel implements FormManager{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				//Workaround: adding directly to this.getInputMap does not work, but adding to parent also triggers events when this panel is not selected
-				if(parent.getSelectedComponent() != EditorPanel.this)return;
+				if(parent.getSelectedComponent() != EditorPane.this)return;
 				be_save();
 			}
 		});
@@ -196,7 +196,7 @@ public abstract class EditorPanel extends JPanel implements FormManager{
 		parent.getActionMap().put("saveAs", new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(parent.getSelectedComponent() != EditorPanel.this)return;
+				if(parent.getSelectedComponent() != EditorPane.this)return;
 				be_saveAs();
 			}
 		});
@@ -204,7 +204,7 @@ public abstract class EditorPanel extends JPanel implements FormManager{
 		parent.getActionMap().put("open", new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(parent.getSelectedComponent() != EditorPanel.this)return;
+				if(parent.getSelectedComponent() != EditorPane.this)return;
 				be_open();
 			}
 		});
@@ -212,7 +212,7 @@ public abstract class EditorPanel extends JPanel implements FormManager{
 		parent.getActionMap().put("new", new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(parent.getSelectedComponent() != EditorPanel.this)return;
+				if(parent.getSelectedComponent() != EditorPane.this)return;
 				be_create();
 			}
 		});
@@ -296,11 +296,11 @@ public abstract class EditorPanel extends JPanel implements FormManager{
 		int c = chooser.showDialog(this,"Open");
 		//if the process is canceled, nothing happens
 		if(c == ScalingFileChooser.APPROVE_OPTION){
-			setFile(chooser.getSelectedFile());
-			if(getFile() != null){
+			if(chooser.getSelectedFile() != null){
 				//Close current opened file
 				close();
 				//Update default file path
+				setFile(chooser.getSelectedFile());
 				ScyllaGUI.DEFAULTFILEPATH = chooser.getSelectedFile().getPath();
 				try {
 					open();

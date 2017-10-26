@@ -6,26 +6,37 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
 import java.io.IOException;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
 import javax.swing.event.DocumentEvent;
 
 import org.jdom2.JDOMException;
 
-import de.hpi.bpt.scylla.GUI.EditorPanel;
+import de.hpi.bpt.scylla.GUI.EditorPane;
 import de.hpi.bpt.scylla.GUI.ExpandPanel;
 import de.hpi.bpt.scylla.GUI.InsertRemoveListener;
+import de.hpi.bpt.scylla.GUI.ScalingCheckBoxIcon;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.SimulationConfigurationCreator;
 
 @SuppressWarnings("serial")
-public class SimulationConfigurationPane extends EditorPanel {
+public class SimulationConfigurationPane extends EditorPane {
 	
 	private SimulationConfigurationCreator creator;
 	
@@ -33,12 +44,28 @@ public class SimulationConfigurationPane extends EditorPanel {
 
 	private JFormattedTextField textfieldSeed;
 
+	private JSpinner spinnerNOI;
+
+	private JFormattedTextField textfieldStartDate;
+
+	private ZonedDateTime startDateTime;
+
+	private JFormattedTextField textfieldStartTime;
+
+	private JFormattedTextField textfieldEndTime;
+
+	private ZonedDateTime endDateTime;
+
+	private JFormattedTextField textfieldEndDate;
+
+	private JCheckBox checkboxUnlimited;
+
+	private StartEventPanel startEventPanel;
+
 	/**
 	 * Create the panel.
 	 */
 	public SimulationConfigurationPane() {
-		
-		setBounds(100, 100, 800, 450);
 
 		int inset_b = 25;//(int)(25.0*ScyllaGUI.SCALE);
 		
@@ -152,7 +179,7 @@ public class SimulationConfigurationPane extends EditorPanel {
 		gbc_panelGeneral.weightx = 1;
 		panelMain.add(panelGeneral, gbc_panelGeneral);
 		GridBagLayout gbl_panelGeneral = new GridBagLayout();
-		gbl_panelGeneral.columnWeights = new double[]{1.0,1.0,0.0,3.0};
+		gbl_panelGeneral.columnWeights = new double[]{1.0,1.0,0.0,1.0, 0.0};
 		panelGeneral.setLayout(gbl_panelGeneral);
 		
 		//General panel title label
@@ -162,11 +189,11 @@ public class SimulationConfigurationPane extends EditorPanel {
 		labelGeneralTitle.setFont(ScyllaGUI.TITLEFONT);
 		labelGeneralTitle.setOpaque(true);
 		GridBagConstraints gbc_labelGeneralTitle = new GridBagConstraints();
-		gbc_labelGeneralTitle.insets = new Insets(0, 0, 5, 0);
+		gbc_labelGeneralTitle.insets = new Insets(0, 0, 0, 0);
 		gbc_labelGeneralTitle.fill = GridBagConstraints.HORIZONTAL;
 		gbc_labelGeneralTitle.gridx = 0;
 		gbc_labelGeneralTitle.gridy = 0;
-		gbc_labelGeneralTitle.gridwidth = 4;
+		gbc_labelGeneralTitle.gridwidth = 5;
 		panelGeneral.add(labelGeneralTitle, gbc_labelGeneralTitle);
 		
 		//Id label
@@ -186,7 +213,7 @@ public class SimulationConfigurationPane extends EditorPanel {
 			setSaved(false);
 		}));
 		GridBagConstraints gbc_textfieldId = new GridBagConstraints();
-		gbc_textfieldId.gridwidth = 3;
+		gbc_textfieldId.gridwidth = 4;
 		gbc_textfieldId.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, inset_b);
 		gbc_textfieldId.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textfieldId.gridx = 1;
@@ -199,7 +226,7 @@ public class SimulationConfigurationPane extends EditorPanel {
 		gbc_labelSeed.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
 		gbc_labelSeed.fill = GridBagConstraints.HORIZONTAL;
 		gbc_labelSeed.gridx = 0;
-		gbc_labelSeed.gridy = 1;
+		gbc_labelSeed.gridy = 2;
 		panelGeneral.add(labelSeed, gbc_labelSeed);
 		
 		//Seed input field
@@ -223,16 +250,189 @@ public class SimulationConfigurationPane extends EditorPanel {
 			setSaved(false);
 		}));
 		GridBagConstraints gbc_textfieldSeed = new GridBagConstraints();
-		gbc_textfieldSeed.gridwidth = 3;
+		gbc_textfieldSeed.gridwidth = 4;
 		gbc_textfieldSeed.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, inset_b);
 		gbc_textfieldSeed.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textfieldSeed.gridx = 1;
-		gbc_textfieldSeed.gridy = 1;
+		gbc_textfieldSeed.gridy = 2;
 		panelGeneral.add(textfieldSeed, gbc_textfieldSeed);
 		
+		//Number of instances (NOI) label
+		JLabel labelNOI = new JLabel("Number of instances");
+		GridBagConstraints gbc_labelNOI = new GridBagConstraints();
+		gbc_labelNOI.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
+		gbc_labelNOI.fill = GridBagConstraints.HORIZONTAL;
+		gbc_labelNOI.gridx = 0;
+		gbc_labelNOI.gridy = 3;
+		panelGeneral.add(labelNOI, gbc_labelNOI);
+		
+		//Spinner for number of instances (NOI)
+		spinnerNOI = new JSpinner();
+		spinnerNOI.setModel(new SpinnerNumberModel(new Integer(0), new Integer(0), null, new Integer(1)));
+		spinnerNOI.addChangeListener((ChangeEvent e)->{
+			if(isChangeFlag())return;
+			creator.setProcessInstances((Integer)spinnerNOI.getValue());
+			setSaved(false);
+		});
+		GridBagConstraints gbc_spinnerNOI = new GridBagConstraints();
+		gbc_spinnerNOI.gridwidth = 4;
+		gbc_spinnerNOI.fill = GridBagConstraints.BOTH;
+		gbc_spinnerNOI.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, inset_b);
+		gbc_spinnerNOI.gridx = 1;
+		gbc_spinnerNOI.gridy = 3;
+		panelGeneral.add(spinnerNOI, gbc_spinnerNOI);
+		
+		//Start Date label
+		JLabel labelStartDate = new JLabel("Start Date");
+		GridBagConstraints gbc_labelStartDate = new GridBagConstraints();
+		gbc_labelStartDate.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
+		gbc_labelStartDate.fill = GridBagConstraints.HORIZONTAL;
+		gbc_labelStartDate.gridx = 0;
+		gbc_labelStartDate.gridy = 4;
+		panelGeneral.add(labelStartDate, gbc_labelStartDate);
+		
+		//Startdate input field
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+		SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+		textfieldStartDate = new JFormattedTextField(df);
+		textfieldStartDate.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
+			if(isChangeFlag())return;
+			try{
+				LocalDate d = LocalDate.parse(textfieldStartDate.getText(),dtf);
+				if(startDateTime == null)startDateTime = ZonedDateTime.now();
+				if(!d.equals(startDateTime.toLocalDate())){
+					startDateTime = startDateTime.with(d);
+					creator.setStartDateTime(startDateTime);
+					setSaved(false);
+				}
+			}catch(Exception exc){}
+		}));
+		textfieldStartDate.setText(dtf.format(LocalDate.now()));
+		GridBagConstraints gbc_textfieldStartDate = new GridBagConstraints();
+		gbc_textfieldStartDate.insets =   new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET,  ScyllaGUI.STDINSET);
+		gbc_textfieldStartDate.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textfieldStartDate.gridx = 1;
+		gbc_textfieldStartDate.gridy = 4;
+		panelGeneral.add(textfieldStartDate, gbc_textfieldStartDate);
+		
+		//Start Time label
+		JLabel labelStartTime = new JLabel("at");
+		GridBagConstraints gbc_labelStartTime = new GridBagConstraints();
+		gbc_labelStartTime.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
+		gbc_labelStartTime.fill = GridBagConstraints.NONE;
+		gbc_labelStartTime.gridx = 2;
+		gbc_labelStartTime.gridy = 4;
+		panelGeneral.add(labelStartTime, gbc_labelStartTime);
+		
+		//Start time input field
+		textfieldStartTime = new JFormattedTextField(DateTimeFormatter.ISO_LOCAL_TIME.toFormat());
+		textfieldStartTime.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
+			if(isChangeFlag())return;
+			try{
+				LocalTime l = LocalTime.parse(textfieldStartTime.getText());
+				if(startDateTime == null)startDateTime = ZonedDateTime.now();
+				if(!l.equals(startDateTime.toLocalTime())){
+					startDateTime = startDateTime.with(l);
+					creator.setStartDateTime(startDateTime);
+					setSaved(false);
+				}
+			}catch(Exception exc){}
+		}));
+		textfieldStartTime.setValue(LocalTime.of(0, 0, 0));//Triggers event!
+		GridBagConstraints gbc_textfieldStartTime = new GridBagConstraints();
+		gbc_textfieldStartTime.gridwidth = 2;
+		gbc_textfieldStartTime.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, inset_b);
+		gbc_textfieldStartTime.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textfieldStartTime.gridx = 3;
+		gbc_textfieldStartTime.gridy = 4;
+		panelGeneral.add(textfieldStartTime, gbc_textfieldStartTime);
+		
+		//End Date label
+		JLabel labelEndDate = new JLabel("End Date");
+		GridBagConstraints gbc_labelEndDate = new GridBagConstraints();
+		gbc_labelEndDate.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
+		gbc_labelEndDate.fill = GridBagConstraints.HORIZONTAL;
+		gbc_labelEndDate.gridx = 0;
+		gbc_labelEndDate.gridy = 5;
+		panelGeneral.add(labelEndDate, gbc_labelEndDate);
+		
+		//Enddate input field
+		textfieldEndDate = new JFormattedTextField(df);
+		textfieldEndDate.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
+			if(isChangeFlag())return;
+			if(textfieldEndDate.getText().equals(""));
+			else try{
+				LocalDate d = LocalDate.parse(textfieldEndDate.getText(),dtf);
+				if(endDateTime == null)endDateTime = ZonedDateTime.now();
+				if(!d.equals(endDateTime.toLocalDate())){
+					endDateTime = endDateTime.with(d);
+					creator.setEndDateTime(endDateTime);
+					setSaved(false);
+				}
+			}catch(Exception exc){}
+		}));
+		textfieldEndDate.setText(dtf.format(LocalDate.now()));
+		GridBagConstraints gbc_textfieldEndDate = new GridBagConstraints();
+		gbc_textfieldEndDate.insets =   new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
+		gbc_textfieldEndDate.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textfieldEndDate.gridx = 1;
+		gbc_textfieldEndDate.gridy = 5;
+		panelGeneral.add(textfieldEndDate, gbc_textfieldEndDate);
+		
+		//End Time label
+		JLabel labelEndTime = new JLabel("at");
+		GridBagConstraints gbc_labelEndTime = new GridBagConstraints();
+		gbc_labelEndTime.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
+		gbc_labelEndTime.fill = GridBagConstraints.NONE;
+		gbc_labelEndTime.gridx = 2;
+		gbc_labelEndTime.gridy = 5;
+		panelGeneral.add(labelEndTime, gbc_labelEndTime);
+		
+		//End time input field
+		textfieldEndTime = new JFormattedTextField(DateTimeFormatter.ISO_LOCAL_TIME.toFormat());
+		textfieldEndTime.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
+			if(isChangeFlag())return;
+			try{
+				LocalTime l = LocalTime.parse(textfieldEndTime.getText());
+				if(endDateTime == null)endDateTime = ZonedDateTime.now();
+				if(!l.equals(endDateTime.toLocalTime())){
+					endDateTime = endDateTime.with(l);
+					creator.setEndDateTime(endDateTime);
+					setSaved(false);
+				}
+			}catch(Exception exc){}
+		}));
+		textfieldEndTime.setValue(LocalTime.of(23, 59, 59));//Triggers event!
+		GridBagConstraints gbc_textfieldEndTime = new GridBagConstraints();
+		gbc_textfieldEndTime.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
+		gbc_textfieldEndTime.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textfieldEndTime.gridx = 3;
+		gbc_textfieldEndTime.gridy = 5;
+		panelGeneral.add(textfieldEndTime, gbc_textfieldEndTime);
+		
+		//Check box for unlimited simulation time (= no end time)
+		checkboxUnlimited = new JCheckBox("unlimited");
+		checkboxUnlimited.setIcon(new ScalingCheckBoxIcon(textfieldEndTime.getFont().getSize()));
+		checkboxUnlimited.addItemListener((ItemEvent e)->{
+			boolean checked = checkboxUnlimited.isSelected();
+			textfieldEndDate.setEnabled(!checked);
+			textfieldEndTime.setEnabled(!checked);
+			if(checked){
+				creator.removeEndDateTime();
+			}else{
+				creator.setEndDateTime(endDateTime);
+			}
+		});
+		GridBagConstraints gbc_checkboxUnlimited = new GridBagConstraints();
+		gbc_checkboxUnlimited.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, inset_b);
+		gbc_checkboxUnlimited.gridx = 4;
+		gbc_checkboxUnlimited.gridy = 5;
+		panelGeneral.add(checkboxUnlimited, gbc_checkboxUnlimited);
 		
 		
-		//------
+		
+		
+		//------ Start Event Panel -----
 		GridBagConstraints gbc_panelStartevent = new GridBagConstraints();
 		gbc_panelStartevent.anchor = GridBagConstraints.PAGE_START;
 		gbc_panelStartevent.fill = GridBagConstraints.HORIZONTAL;
@@ -246,9 +446,12 @@ public class SimulationConfigurationPane extends EditorPanel {
 		starteventLabel.setForeground(ScyllaGUI.TITLEFONT_COLOR);
 		starteventLabel.setFont(ScyllaGUI.TITLEFONT);
 		starteventLabel.setOpaque(true);
-		ExpandPanel panelStarteventExpand = new ExpandPanel(starteventLabel, new JPanel());
+		startEventPanel = new StartEventPanel(this);
+		ExpandPanel panelStarteventExpand = new ExpandPanel(starteventLabel, startEventPanel);
 		panelStarteventExpand.expand();
 		panelMain.add(panelStarteventExpand, gbc_panelStartevent);
+		
+		
 		
 		GridBagConstraints gbc_panelTasks = new GridBagConstraints();
 		gbc_panelTasks.anchor = GridBagConstraints.PAGE_START;
@@ -296,6 +499,12 @@ public class SimulationConfigurationPane extends EditorPanel {
 		gbc_panelBuffer.gridx = 0;
 		gbc_panelBuffer.gridy = 5;
 		panelMain.add(panelBuffer,gbc_panelBuffer);
+		
+		{//TODO delete
+			creator = new SimulationConfigurationCreator();
+			startEventPanel.setStartEvent(creator.getStartEvent());
+			setBounds(100, 100, 1475, 902);
+		}
 		
 
 	}

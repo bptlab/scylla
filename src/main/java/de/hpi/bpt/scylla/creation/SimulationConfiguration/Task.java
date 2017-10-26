@@ -23,7 +23,7 @@ public class Task extends ElementLink{
 	protected Task(Element toLink) {
 		super(toLink);
 		duration = el.getChild("duration",nsp);
-		durationDistribution = new Distribution(duration.getChildren().get(0));
+		durationDistribution = Distribution.create(duration.getChildren().get(0));
 		resourcesElement = el.getChild("resources", nsp);
 		resources = new TreeMap<String, Resource>();
 		for(Element res : resourcesElement.getChildren("resource", nsp)){

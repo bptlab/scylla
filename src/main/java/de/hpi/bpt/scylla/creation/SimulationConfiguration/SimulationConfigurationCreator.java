@@ -47,6 +47,7 @@ public class SimulationConfigurationCreator extends ElementLink{
 		superroot.addContent(root);
 		elements = new TreeMap<String,ElementLink>();
 		flows = new HashMap<String,String[]>();
+		startEvent = new StartEvent("startEvent");
 	}
 	
 	private SimulationConfigurationCreator(Element r, Document d) {
@@ -78,6 +79,7 @@ public class SimulationConfigurationCreator extends ElementLink{
 	public String getStartDateTime(){return root.getAttributeValue("startDateTime");}
 	public void setEndDateTime(ZonedDateTime endTime){setAttribute("endDateTime", endTime);}
 	public String getEndDateTime(){return root.getAttributeValue("endDateTime");}
+	public void removeEndDateTime(){root.removeAttribute("endDateTime");}
 	//TODO public void setResourceAssignmentOrder(String id){setAttribute("resourceAssignmentOrder", id);}
 	public void setRandomSeed(long seed){
 		if(root.getChild("randomSeed",nsp) == null)root.addContent(new Element("randomSeed",nsp));

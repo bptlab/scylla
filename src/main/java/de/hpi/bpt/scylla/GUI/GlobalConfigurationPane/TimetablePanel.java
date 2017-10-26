@@ -401,6 +401,7 @@ public class TimetablePanel extends JSplitPane {
 		removeFromTable(selected);
 		formManager.setSaved(false);
 		timeTable.removeItem(selected);
+		tableTime.repaint();
 	}
 	
 	private void removeFromTable(TimetableItem i){

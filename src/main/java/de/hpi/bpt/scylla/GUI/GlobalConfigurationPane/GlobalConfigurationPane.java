@@ -24,7 +24,7 @@ import javax.swing.event.DocumentEvent;
 import org.eclipse.wb.swing.FocusTraversalOnArray;
 import org.jdom2.JDOMException;
 
-import de.hpi.bpt.scylla.GUI.EditorPanel;
+import de.hpi.bpt.scylla.GUI.EditorPane;
 import de.hpi.bpt.scylla.GUI.ExpandPanel;
 import de.hpi.bpt.scylla.GUI.InsertRemoveListener;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel;
@@ -40,7 +40,7 @@ import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator
  *
  */
 @SuppressWarnings("serial")
-public class GlobalConfigurationPane extends EditorPanel implements GCFormManager{
+public class GlobalConfigurationPane extends EditorPane implements GCFormManager{
 	
 	//General Information form components
 	private JTextField textfieldId;

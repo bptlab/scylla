@@ -18,7 +18,7 @@ public class StartEvent extends ElementLink{
 	public StartEvent(Element toLink) {
 		super(toLink);
 		arrivalRate = el.getChild("arrivalRate",nsp);
-		arrivalRateDistribution = new Distribution(arrivalRate.getChildren().get(0));
+		arrivalRateDistribution = Distribution.create(arrivalRate.getChildren().get(0));
 	}
 	
 	public StartEvent(String id) {
