@@ -61,4 +61,13 @@ public abstract class ElementLink {
 		el.setAttribute(name, value.toString());
 	}
 	
+	/**Returns the elements identifier if existent*/
+	public String getId() {return el.getAttributeValue("id");}
+	/**Returns the elements name or id if no name is specified*/
+	public String getName(){
+		String name = el.getAttributeValue("name");
+		if(name != null)return name;
+		else return getId();
+	}
+	
 }

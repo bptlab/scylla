@@ -87,8 +87,8 @@ public class SimulationConfigurationCreator extends ElementLink{
 	}
 	public void removeRandomSeed(){root.removeAttribute("randomSeed");}
 	public Integer getRandomSeed(){
-		if(root.getChild("randomSeed",nsp) == null)return null;
-		return Integer.parseInt(root.getChild("randomSeed",nsp).getText());
+		if(root.getAttributeValue("randomSeed") == null)return null;
+		return Integer.parseInt(root.getAttributeValue("randomSeed"));
 	}
 	
 	public StartEvent getStartEvent(){return startEvent;}
@@ -134,16 +134,18 @@ public class SimulationConfigurationCreator extends ElementLink{
 	
 	
     private void createModelElement(Element child, ElementLink addTo) {
+    	String id = child.getAttributeValue("id");
+    	if(id != null && ! id.isEmpty() && elements.containsKey(id))return;
 		String name = child.getName();
 		switch(name){
 		case "startEvent" :
 			if(!addTo.equals(this))break;//ignore subProcess startEvents
-			startEvent = new StartEvent(child.getAttributeValue("id"));
+			startEvent = new StartEvent(id);
 			startEvent.addTo(addTo);
 			break;
 			
 		case "subProcess" :
-			SubProcess s = new SubProcess(child.getAttributeValue("id"),child.getAttributeValue("name"));
+			SubProcess s = new SubProcess(id,child.getAttributeValue("name"));
 			s.addTo(addTo);
 			elements.put(s.getId(),s);
 			addProcessModelElements(child,s);
@@ -155,18 +157,19 @@ public class SimulationConfigurationCreator extends ElementLink{
 			for(Element b : branches){
 				if(b.getName().equals("outgoing"))branchids.add(b.getValue());
 			}
-			ExclusiveGateway eg = new ExclusiveGateway(child.getAttributeValue("id"),branchids);
+			if(branchids.size() <= 1)break;//No branching probabilities for a join gateway
+			ExclusiveGateway eg = new ExclusiveGateway(id,branchids);
 			eg.addTo(addTo);
 			elements.put(eg.getId(),eg);
 			break;
 			
 		case "sequenceFlow" :
-			flows.put(child.getAttributeValue("id"), new String[]{child.getAttributeValue("sourceRef"),child.getAttributeValue("targetRef")});
+			flows.put(id, new String[]{child.getAttributeValue("sourceRef"),child.getAttributeValue("targetRef")});
 			break;
 			
 		default :
 			if(name.equals("task") || name.endsWith("Task")){
-				Task t = new Task(child.getAttributeValue("id"),child.getAttributeValue("name"));
+				Task t = new Task(id,child.getAttributeValue("name"));
 				t.addTo(addTo);
 				elements.put(t.getId(),t);
 			}break;
@@ -247,7 +250,13 @@ public class SimulationConfigurationCreator extends ElementLink{
         SAXBuilder builder = new SAXBuilder();
         Document doc = builder.build(scPath);
         Element r = doc.getRootElement();
-       	return new SimulationConfigurationCreator(r,doc);
+        SimulationConfigurationCreator sc = new SimulationConfigurationCreator(r,doc);
+        
+        SAXBuilder builder_model = new SAXBuilder();
+        Document doc_model = builder_model.build(bpmnPath);
+        Element r_model = doc_model.getRootElement();
+        sc.setModel(r_model);
+        return sc;
 	}
 	
 	/**

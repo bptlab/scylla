@@ -118,9 +118,11 @@ public class StartEventPanel extends JPanel {
 		
 		this.startEvent = startEvent;
 		Distribution d = startEvent.getArrivalRateDistribution();
-		comboboxDistribution.setSelectedItem(d.getType());
 		if(d != null){
 			setPanelDistribution(d);
+			comboboxDistribution.setSelectedItem(d.getType());
+		}else{
+			comboboxDistribution.setSelectedIndex(-1);
 		}
 		comboboxTimeunit.setSelectedItem(TimeUnit.valueOf(startEvent.getArritvalTimeUnit()));
 				

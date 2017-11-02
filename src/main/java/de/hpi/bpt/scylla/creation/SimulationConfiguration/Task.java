@@ -45,13 +45,9 @@ public class Task extends ElementLink{
 		el.addContent(resourcesElement);
 		resources = new TreeMap<String, Resource>();
 	}
-
-
-	public String getId(){return el.getAttributeValue("id");}
-	public String getName(){return el.getAttributeValue("name");}
 	
 
-	private void setDurationTimeUnit(TimeUnit t) {
+	public void setDurationTimeUnit(TimeUnit t) {
 		duration.setAttribute("timeUnit",t.toString());
 	}
 	public String getDurationTimeUnit(){

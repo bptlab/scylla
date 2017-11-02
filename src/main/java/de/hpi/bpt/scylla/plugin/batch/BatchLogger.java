@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import de.hpi.bpt.scylla.Scylla;
 import de.hpi.bpt.scylla.plugin_type.logger.OutputLoggerPluggable;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
 import de.hpi.bpt.scylla.simulation.SimulationModel;
@@ -98,7 +99,7 @@ public class BatchLogger extends OutputLoggerPluggable {
         else {
             String resourceUtilizationFileName = outputPathWithoutExtension + model.getGlobalConfiguration().getFileNameWithoutExtension() + "_batchregionstats.txt";
 
-            if (System.getProperty("os.name").contains("Linux")) {
+            if ((Scylla.OS.contains("Linux") || Scylla.OS.contains("Mac OS"))) {
                 File f = new File(resourceUtilizationFileName);
                 f.getParentFile().mkdirs();
                 f.createNewFile();

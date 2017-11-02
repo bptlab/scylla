@@ -569,13 +569,6 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 			return items.size();
 		}
 		
-		/**
-		 * @return Unique identifier of this timetable
-		 */
-		public String getId() {
-			return id;
-		}
-		
 		public void setId(String s) {
 			id = s;
 			setAttribute("id",id);

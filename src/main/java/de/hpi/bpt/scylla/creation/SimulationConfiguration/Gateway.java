@@ -23,8 +23,6 @@ public abstract class Gateway extends ElementLink{
 			addBranch(s);
 		}
 	}
-
-	public String getId(){return el.getAttributeValue("id");}
 	
 	protected Element addBranch(String id){
 		Element branch = new Element("outgoingSequenceFlow",stdNsp);

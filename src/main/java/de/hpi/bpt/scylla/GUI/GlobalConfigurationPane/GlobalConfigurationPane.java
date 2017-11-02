@@ -27,7 +27,7 @@ import org.jdom2.JDOMException;
 import de.hpi.bpt.scylla.GUI.EditorPane;
 import de.hpi.bpt.scylla.GUI.ExpandPanel;
 import de.hpi.bpt.scylla.GUI.InsertRemoveListener;
-import de.hpi.bpt.scylla.GUI.ListChooserPanel;
+import de.hpi.bpt.scylla.GUI.ExtendedListChooserPanel;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel.ComponentHolder;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator;
@@ -48,9 +48,9 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 	private JComboBox<ZoneId> comboboxTimezone;
 
 	/**Timetable Panel*/
-	private ListChooserPanel panelTimetables;
+	private ExtendedListChooserPanel panelTimetables;
 	/**Resource Panel*/
-	private ListChooserPanel panelResources;
+	private ExtendedListChooserPanel panelResources;
 
 	/**List of all JComboboxes, that display timetables, in order to update their entries*/
 	private List<JComboBox<String>> timetableObserverList;
@@ -192,7 +192,7 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 		panelGeneral.add(comboboxTimezone, gbc_comboboxTimezone);
 		
 		//---Resource Panel---
-		panelResources = new ListChooserPanel(){
+		panelResources = new ExtendedListChooserPanel(){
 
 			@Override
 			public void onDelete(ComponentHolder toDel) {
@@ -235,7 +235,7 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 		timetables.add("");//"No timetable"-option
 		
 		//--- Timetable panel ---
-		panelTimetables = new ListChooserPanel(){
+		panelTimetables = new ExtendedListChooserPanel(){
 
 			@Override
 			public void onDelete(ComponentHolder toDel) {
@@ -426,7 +426,7 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 	 * @see {@link ResourcePanel}
 	 */
 	private ComponentHolder newResource(ResourceType res){
-		return new ListChooserPanel.ComponentHolder() {
+		return new ExtendedListChooserPanel.ComponentHolder() {
 			ResourcePanel p = new ResourcePanel(GlobalConfigurationPane.this);
 			{
 				p.setResourceType(res);
@@ -476,7 +476,7 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 	 * @see {@link TimetablePanel}
 	 */
 	private ComponentHolder newTimetable(Timetable t){
-		return new ListChooserPanel.ComponentHolder() {
+		return new ExtendedListChooserPanel.ComponentHolder() {
 			TimetablePanel p = new TimetablePanel(GlobalConfigurationPane.this);
 			{
 				p.setTimetable(t);

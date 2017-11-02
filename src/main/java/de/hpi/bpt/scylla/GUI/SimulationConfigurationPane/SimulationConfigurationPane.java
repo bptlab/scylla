@@ -1,6 +1,7 @@
 package de.hpi.bpt.scylla.GUI.SimulationConfigurationPane;
 
 
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -12,6 +13,7 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -31,36 +33,40 @@ import org.jdom2.JDOMException;
 import de.hpi.bpt.scylla.GUI.EditorPane;
 import de.hpi.bpt.scylla.GUI.ExpandPanel;
 import de.hpi.bpt.scylla.GUI.InsertRemoveListener;
+import de.hpi.bpt.scylla.GUI.ListChooserPanel;
+import de.hpi.bpt.scylla.GUI.ListChooserPanel.ComponentHolder;
 import de.hpi.bpt.scylla.GUI.ScalingCheckBoxIcon;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
+import de.hpi.bpt.scylla.GUI.GlobalConfigurationPane.ExclusiveGatewayPanel;
+import de.hpi.bpt.scylla.creation.ElementLink;
+import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator;
+import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.ResourceType;
+import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.Timetable;
+import de.hpi.bpt.scylla.creation.SimulationConfiguration.ExclusiveGateway;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.SimulationConfigurationCreator;
+import de.hpi.bpt.scylla.creation.SimulationConfiguration.Task;
 
 @SuppressWarnings("serial")
 public class SimulationConfigurationPane extends EditorPane {
 	
 	private SimulationConfigurationCreator creator;
+	private String bpmnPath;
+	private String globalPath;
 	
 	private JTextField textfieldId;
-
 	private JFormattedTextField textfieldSeed;
-
 	private JSpinner spinnerNOI;
-
 	private JFormattedTextField textfieldStartDate;
-
 	private ZonedDateTime startDateTime;
-
 	private JFormattedTextField textfieldStartTime;
-
 	private JFormattedTextField textfieldEndTime;
-
 	private ZonedDateTime endDateTime;
-
 	private JFormattedTextField textfieldEndDate;
-
 	private JCheckBox checkboxUnlimited;
-
 	private StartEventPanel startEventPanel;
+	private ListChooserPanel gatewayPanel;
+	private ListChooserPanel taskPanel;
+	private DateTimeFormatter dateFormatter;
 
 	/**
 	 * Create the panel.
@@ -292,13 +298,13 @@ public class SimulationConfigurationPane extends EditorPane {
 		panelGeneral.add(labelStartDate, gbc_labelStartDate);
 		
 		//Startdate input field
-		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+		dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 		SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy");
 		textfieldStartDate = new JFormattedTextField(df);
 		textfieldStartDate.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
 			if(isChangeFlag())return;
 			try{
-				LocalDate d = LocalDate.parse(textfieldStartDate.getText(),dtf);
+				LocalDate d = LocalDate.parse(textfieldStartDate.getText(),dateFormatter);
 				if(startDateTime == null)startDateTime = ZonedDateTime.now();
 				if(!d.equals(startDateTime.toLocalDate())){
 					startDateTime = startDateTime.with(d);
@@ -307,7 +313,7 @@ public class SimulationConfigurationPane extends EditorPane {
 				}
 			}catch(Exception exc){}
 		}));
-		textfieldStartDate.setText(dtf.format(LocalDate.now()));
+		textfieldStartDate.setText(dateFormatter.format(LocalDate.now()));
 		GridBagConstraints gbc_textfieldStartDate = new GridBagConstraints();
 		gbc_textfieldStartDate.insets =   new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET,  ScyllaGUI.STDINSET);
 		gbc_textfieldStartDate.fill = GridBagConstraints.HORIZONTAL;
@@ -362,7 +368,7 @@ public class SimulationConfigurationPane extends EditorPane {
 			if(isChangeFlag())return;
 			if(textfieldEndDate.getText().equals(""));
 			else try{
-				LocalDate d = LocalDate.parse(textfieldEndDate.getText(),dtf);
+				LocalDate d = LocalDate.parse(textfieldEndDate.getText(),dateFormatter);
 				if(endDateTime == null)endDateTime = ZonedDateTime.now();
 				if(!d.equals(endDateTime.toLocalDate())){
 					endDateTime = endDateTime.with(d);
@@ -371,7 +377,7 @@ public class SimulationConfigurationPane extends EditorPane {
 				}
 			}catch(Exception exc){}
 		}));
-		textfieldEndDate.setText(dtf.format(LocalDate.now()));
+		textfieldEndDate.setText(dateFormatter.format(LocalDate.now()));
 		GridBagConstraints gbc_textfieldEndDate = new GridBagConstraints();
 		gbc_textfieldEndDate.insets =   new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
 		gbc_textfieldEndDate.fill = GridBagConstraints.HORIZONTAL;
@@ -451,7 +457,9 @@ public class SimulationConfigurationPane extends EditorPane {
 		panelStarteventExpand.expand();
 		panelMain.add(panelStarteventExpand, gbc_panelStartevent);
 		
-		
+		//------ Task Panel ------
+		taskPanel = new ListChooserPanel();
+		taskPanel.add((ComponentHolder)new TaskPanel(new Task("testtask","delete me"),SimulationConfigurationPane.this));
 		
 		GridBagConstraints gbc_panelTasks = new GridBagConstraints();
 		gbc_panelTasks.anchor = GridBagConstraints.PAGE_START;
@@ -466,9 +474,13 @@ public class SimulationConfigurationPane extends EditorPane {
 		tasksLabel.setForeground(ScyllaGUI.TITLEFONT_COLOR);
 		tasksLabel.setFont(ScyllaGUI.TITLEFONT);
 		tasksLabel.setOpaque(true);
-		ExpandPanel panelTasksExpand = new ExpandPanel(tasksLabel, new JPanel());
+		ExpandPanel panelTasksExpand = new ExpandPanel(tasksLabel, taskPanel);
 		panelTasksExpand.expand();
 		panelMain.add(panelTasksExpand, gbc_panelTasks);
+		
+		// ----- Gateway Panel -----
+		gatewayPanel = new ListChooserPanel();
+		
 		
 		GridBagConstraints gbc_panelGateways = new GridBagConstraints();
 		gbc_panelGateways.anchor = GridBagConstraints.PAGE_START;
@@ -483,7 +495,7 @@ public class SimulationConfigurationPane extends EditorPane {
 		gatewaysLabel.setForeground(ScyllaGUI.TITLEFONT_COLOR);
 		gatewaysLabel.setFont(ScyllaGUI.TITLEFONT);
 		gatewaysLabel.setOpaque(true);
-		ExpandPanel panelGatewaysExpand = new ExpandPanel(gatewaysLabel, new JPanel());
+		ExpandPanel panelGatewaysExpand = new ExpandPanel(gatewaysLabel, gatewayPanel);
 		panelGatewaysExpand.expand();
 		panelMain.add(panelGatewaysExpand, gbc_panelGateways);
 		
@@ -501,8 +513,22 @@ public class SimulationConfigurationPane extends EditorPane {
 		panelMain.add(panelBuffer,gbc_panelBuffer);
 		
 		{//TODO delete
-			creator = new SimulationConfigurationCreator();
-			startEventPanel.setStartEvent(creator.getStartEvent());
+			
+			bpmnPath = "./samples/p2_normal.bpmn";
+			
+//			//creator = new SimulationConfigurationCreator();
+//			try {
+//				creator = SimulationConfigurationCreator.createFromFile("./samples/p2_normal_sim.xml", "./samples/p2_normal.bpmn");
+//			} catch (JDOMException | IOException e1) {
+//				e1.printStackTrace();
+//			}
+//			startEventPanel.setStartEvent(creator.getStartEvent());
+//			for(ElementLink el : creator.getElements()){
+//				if(el instanceof ExclusiveGateway){
+//					gatewayPanel.add((ComponentHolder)new ExclusiveGatewayPanel((ExclusiveGateway) el, this, creator));
+//				}
+//			}
+			
 			setBounds(100, 100, 1475, 902);
 		}
 		
@@ -523,8 +549,36 @@ public class SimulationConfigurationPane extends EditorPane {
 
 	@Override
 	protected void open() throws JDOMException, IOException {
-		// TODO Auto-generated method stub
+		creator = SimulationConfigurationCreator.createFromFile(getFile().getPath(),bpmnPath);
+		setChangeFlag(true);
+		textfieldId.setText(creator.getId());
+		if(creator.getRandomSeed() != null){
+			textfieldSeed.setValue(creator.getRandomSeed());
+		}
+		if(creator.getProcessInstances() != null)spinnerNOI.setValue(Integer.parseInt(creator.getProcessInstances()));
+		String startDateTime = creator.getStartDateTime();
+		if(startDateTime != null){
+			textfieldStartTime.setValue(ZonedDateTime.parse(startDateTime).toLocalTime());
+			textfieldStartDate.setText(dateFormatter.format(ZonedDateTime.parse(startDateTime).toLocalDate()));
+		}
+		String endDateTime = creator.getEndDateTime();
+		if(endDateTime != null){
+			textfieldEndTime.setValue(ZonedDateTime.parse(endDateTime).toLocalTime());
+			textfieldEndDate.setText(dateFormatter.format(ZonedDateTime.parse(endDateTime).toLocalDate()));
+		}
 		
+		startEventPanel.setStartEvent(creator.getStartEvent());
+		
+		for(ElementLink el : creator.getElements()){
+			if(el instanceof Task){
+				taskPanel.add((ComponentHolder)new TaskPanel((Task) el, this));
+			}else if(el instanceof ExclusiveGateway){
+				gatewayPanel.add((ComponentHolder)new ExclusiveGatewayPanel((ExclusiveGateway) el, this, creator));
+			}
+		}
+		
+		setChangeFlag(false);
+		setEnabled(true);
 	}
 
 	@Override

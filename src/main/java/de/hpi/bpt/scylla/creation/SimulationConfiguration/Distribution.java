@@ -19,7 +19,7 @@ public class Distribution extends ElementLink{
 		normal(			"normal", 					"Normal", 			new String[]{"mean","standardDeviation"}, new AttributeType[]{AttributeType.DOUBLE,AttributeType.DOUBLE}),
 		poisson(		"poisson", 					"Poisson", 			new String[]{"mean"}, 					new AttributeType[]{AttributeType.DOUBLE}),
 		uniform(		"uniform", 					"Uniform", 			new String[]{"lower","upper"}, 			new AttributeType[]{AttributeType.DOUBLE,AttributeType.DOUBLE}),
-		discrete(		"arbitraryFiniteProbability", "Descrete", 		new String[]{"entry"}, 					new AttributeType[]{AttributeType.ENTRYSET}),
+		arbitraryFiniteProbability(		"arbitraryFiniteProbability", "Descrete", 		new String[]{"entry"}, 					new AttributeType[]{AttributeType.ENTRYSET}),
 		;
 		public final String id;
 		public final String displayName;
@@ -46,7 +46,7 @@ public class Distribution extends ElementLink{
 		try{
 			DistributionType type = DistributionType.valueOf(toLink.getName().split("Distribution")[0]);
 			switch(type){
-			case discrete : return new DiscreteDistribution(toLink);
+			case arbitraryFiniteProbability : return new DiscreteDistribution(toLink);
 			default : return new Distribution(toLink, type);
 			}
 		}catch(IllegalArgumentException e){
@@ -56,7 +56,7 @@ public class Distribution extends ElementLink{
 	
 	public static Distribution create(DistributionType type){
 		switch(type){
-		case discrete : return new DiscreteDistribution();
+		case arbitraryFiniteProbability : return new DiscreteDistribution();
 		default : return new Distribution( type);
 		}
 	}
@@ -108,11 +108,11 @@ public class Distribution extends ElementLink{
 	public static class DiscreteDistribution extends Distribution{
 
 		private DiscreteDistribution(Element toLink) {
-			super(toLink,DistributionType.discrete);
+			super(toLink,DistributionType.arbitraryFiniteProbability);
 		}
 		
 		private DiscreteDistribution() {
-			super(DistributionType.discrete);
+			super(DistributionType.arbitraryFiniteProbability);
 		}
 		
 		public void addEntry(Object value, Double frequency){
