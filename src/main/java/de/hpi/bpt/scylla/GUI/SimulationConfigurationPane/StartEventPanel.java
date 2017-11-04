@@ -124,7 +124,7 @@ public class StartEventPanel extends JPanel {
 		}else{
 			comboboxDistribution.setSelectedIndex(-1);
 		}
-		comboboxTimeunit.setSelectedItem(TimeUnit.valueOf(startEvent.getArritvalTimeUnit()));
+		comboboxTimeunit.setSelectedItem(TimeUnit.valueOf(startEvent.getArrivalTimeUnit()));
 				
 		fm.setChangeFlag(false);
 	}

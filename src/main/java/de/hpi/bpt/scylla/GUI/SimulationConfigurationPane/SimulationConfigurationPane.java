@@ -8,6 +8,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
+import java.io.File;
 import java.io.IOException;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -52,6 +53,8 @@ public class SimulationConfigurationPane extends EditorPane {
 	private SimulationConfigurationCreator creator;
 	private String bpmnPath;
 	private String globalPath;
+	
+	private GlobalConfigurationCreator gcc;
 	
 	private JTextField textfieldId;
 	private JFormattedTextField textfieldSeed;
@@ -281,7 +284,7 @@ public class SimulationConfigurationPane extends EditorPane {
 			setSaved(false);
 		});
 		GridBagConstraints gbc_spinnerNOI = new GridBagConstraints();
-		gbc_spinnerNOI.gridwidth = 4;
+		gbc_spinnerNOI.gridwidth = 1;
 		gbc_spinnerNOI.fill = GridBagConstraints.BOTH;
 		gbc_spinnerNOI.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, inset_b);
 		gbc_spinnerNOI.gridx = 1;
@@ -459,7 +462,6 @@ public class SimulationConfigurationPane extends EditorPane {
 		
 		//------ Task Panel ------
 		taskPanel = new ListChooserPanel();
-		taskPanel.add((ComponentHolder)new TaskPanel(new Task("testtask","delete me"),SimulationConfigurationPane.this));
 		
 		GridBagConstraints gbc_panelTasks = new GridBagConstraints();
 		gbc_panelTasks.anchor = GridBagConstraints.PAGE_START;
@@ -515,6 +517,19 @@ public class SimulationConfigurationPane extends EditorPane {
 		{//TODO delete
 			
 			bpmnPath = "./samples/p2_normal.bpmn";
+			 try {
+				gcc = GlobalConfigurationCreator.createFromFile("./samples/p0_globalconf.xml");
+			} catch (JDOMException | IOException e1) {
+				e1.printStackTrace();
+			}
+			
+			setFile(new File("./samples/p2_normal_sim.xml"));
+			try {
+				open();
+			} catch (JDOMException | IOException e) {
+				e.printStackTrace();
+			}
+
 			
 //			//creator = new SimulationConfigurationCreator();
 //			try {
@@ -571,7 +586,7 @@ public class SimulationConfigurationPane extends EditorPane {
 		
 		for(ElementLink el : creator.getElements()){
 			if(el instanceof Task){
-				taskPanel.add((ComponentHolder)new TaskPanel((Task) el, this));
+				taskPanel.add((ComponentHolder)new TaskPanel((Task) el, this, gcc));
 			}else if(el instanceof ExclusiveGateway){
 				gatewayPanel.add((ComponentHolder)new ExclusiveGatewayPanel((ExclusiveGateway) el, this, creator));
 			}

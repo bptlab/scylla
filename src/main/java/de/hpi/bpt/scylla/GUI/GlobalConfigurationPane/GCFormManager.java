@@ -1,7 +1,6 @@
 package de.hpi.bpt.scylla.GUI.GlobalConfigurationPane;
 
 import java.util.List;
-
 import javax.swing.JComboBox;
 
 import de.hpi.bpt.scylla.GUI.FormManager;
@@ -24,5 +23,12 @@ public interface GCFormManager extends FormManager{
 	 * @return
 	 */
 	public List<String> getTimetables();
+	
+	
+	public interface ResourceObserver{
+		public void notifyResourceCreation(String id);
+		public void notifyResourceDeletion(String id);
+		public void notifyResourceRenaming(String id, String newid);
+	}
 
 }

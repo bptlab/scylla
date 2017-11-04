@@ -26,8 +26,8 @@ import org.jdom2.JDOMException;
 
 import de.hpi.bpt.scylla.GUI.EditorPane;
 import de.hpi.bpt.scylla.GUI.ExpandPanel;
-import de.hpi.bpt.scylla.GUI.InsertRemoveListener;
 import de.hpi.bpt.scylla.GUI.ExtendedListChooserPanel;
+import de.hpi.bpt.scylla.GUI.InsertRemoveListener;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel.ComponentHolder;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator;
@@ -313,8 +313,8 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 	@Override
 	protected void create(){
 		setChangeFlag(true);
-		labelFiletitle.setText("<unsaved file>");
 		close();
+		labelFiletitle.setText("<unsaved file>");
 		creator = new GlobalConfigurationCreator();
 		setSaved(false);
 		setEnabled(true);

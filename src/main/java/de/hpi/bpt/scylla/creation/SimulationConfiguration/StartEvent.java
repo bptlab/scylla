@@ -45,7 +45,7 @@ public class StartEvent extends ElementLink{
 		arrivalRate.setAttribute("timeUnit",t.toString());
 	}
 	
-	public String getArritvalTimeUnit(){
+	public String getArrivalTimeUnit(){
 		return arrivalRate.getAttributeValue("timeUnit");
 	}
 	

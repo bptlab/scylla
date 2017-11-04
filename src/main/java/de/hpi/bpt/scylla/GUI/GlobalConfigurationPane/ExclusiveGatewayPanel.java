@@ -109,7 +109,6 @@ public class ExclusiveGatewayPanel extends JPanel implements ComponentHolder{
 		panel.add(textfieldProbability, gbc_textfieldProbability);
 		String prob = gateway.getBranchingProbability(branch);
 		if(prob != null && !prob.isEmpty()){
-			System.out.println((Double.parseDouble(prob)*100.0));
 			textfieldProbability.setValue((Double.parseDouble(prob)*100.0));
 		}else{
 			textfieldProbability.setText(0.0+"");

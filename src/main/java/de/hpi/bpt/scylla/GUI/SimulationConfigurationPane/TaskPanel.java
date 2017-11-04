@@ -23,15 +23,17 @@ import javax.swing.event.ChangeEvent;
 import de.hpi.bpt.scylla.GUI.FormManager;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel.ComponentHolder;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
+import de.hpi.bpt.scylla.GUI.GlobalConfigurationPane.GCFormManager;
+import de.hpi.bpt.scylla.GUI.GlobalConfigurationPane.GCFormManager.ResourceObserver;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.ResourceType;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.Distribution;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.Distribution.DistributionType;
-import de.hpi.bpt.scylla.creation.SimulationConfiguration.Resource;
+import de.hpi.bpt.scylla.creation.SimulationConfiguration.ResourceAssignment;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.Task;
 
 @SuppressWarnings("serial")
-public class TaskPanel extends JPanel implements ComponentHolder {
+public class TaskPanel extends JPanel implements ComponentHolder,ResourceObserver {
 
 	private JComboBox<TimeUnit> comboboxTimeunit;
 	private JComboBox<DistributionType> comboboxDistribution;
@@ -39,18 +41,21 @@ public class TaskPanel extends JPanel implements ComponentHolder {
 	private Component panelDistribution;
 	
 	private FormManager fm;
+	private GlobalConfigurationCreator gcc;
 	private Task task;
 	private JPanel panelResources;
+	private JComboBox<String> comboboxAssign;
 
 	/**
 	 * Create the panel.
 	 */
-	public TaskPanel(Task t, FormManager f) {
+	public TaskPanel(Task t, FormManager f, GlobalConfigurationCreator gcc) {
 		
 		fm = f;
-		task = t;
+		setGcc(gcc);
 		
 		GridBagLayout gridBagLayout = new GridBagLayout();
+		gridBagLayout.columnWeights = new double[] {0,1,2};
 		setLayout(gridBagLayout);
 		
 		//Duration label
@@ -195,7 +200,12 @@ public class TaskPanel extends JPanel implements ComponentHolder {
 		gbc_labelAssign.gridy = 6;
 		add(labelAssign, gbc_labelAssign);
 		
-		JComboBox<ResourceType> comboboxAssign = new JComboBox<ResourceType>();//TODO add values
+		comboboxAssign = new JComboBox<String>();
+		if(gcc != null) {
+			for(ResourceType rt : gcc.getResourceTypes()) {
+				comboboxAssign.addItem(rt.getId());
+			}
+		}
 		GridBagConstraints gbc_comboboxAssign = new GridBagConstraints();
 		gbc_comboboxAssign.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
 		gbc_comboboxAssign.fill = GridBagConstraints.HORIZONTAL;
@@ -206,11 +216,10 @@ public class TaskPanel extends JPanel implements ComponentHolder {
 		JButton buttonAssign = new JButton("assign");
 		buttonAssign.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				ResourceType type = new GlobalConfigurationCreator().addResourceType("Test");//TODO
-				type.setName("Delete me");
+				ResourceType type = gcc.getResourceType((String) comboboxAssign.getSelectedItem());
 				if(type != null){
-					Resource res = task.assignResource(type);
-					panelResources.add(createAssigner(res, 3));
+					ResourceAssignment res = task.assignResource(type);
+					panelResources.add(createAssigner(res));
 					getParent().getParent().revalidate();
 					repaint();
 				}
@@ -222,6 +231,32 @@ public class TaskPanel extends JPanel implements ComponentHolder {
 		gbc_buttonAssign.gridy = 7;
 		add(buttonAssign, gbc_buttonAssign);
 		
+		setTask(t);
+		
+	}
+	
+	private void setGcc(GlobalConfigurationCreator gcc) {
+		this.gcc = gcc;
+		gcc.getResourceObserverList().add(this);
+	}
+
+	private void setTask(Task t) {
+		fm.setChangeFlag(true);
+		task = t;
+		Distribution d = task.getDurationDistribution();
+		if(d != null){
+			setPanelDistribution(d);
+			comboboxDistribution.setSelectedItem(d.getType());
+		}else{
+			comboboxDistribution.setSelectedIndex(-1);
+		}
+		comboboxTimeunit.setSelectedItem(TimeUnit.valueOf(task.getDurationTimeUnit()));
+		
+		for(String id : t.getResources()) {
+			panelResources.add(createAssigner(t.getResource(id)));
+		}
+
+		fm.setChangeFlag(false);
 	}
 
 	private void setPanelDistribution(Distribution d) {
@@ -232,7 +267,7 @@ public class TaskPanel extends JPanel implements ComponentHolder {
 		repaint();
 	}
 	
-	private JPanel createAssigner(Resource r, int amount){
+	private JPanel createAssigner(ResourceAssignment r){
 		JPanel panel = new JPanel();
 		GridBagLayout gbl_panel = new GridBagLayout(); 
 		gbl_panel.columnWeights = new double[]{1,0,1,1,10};
@@ -254,6 +289,7 @@ public class TaskPanel extends JPanel implements ComponentHolder {
 		
 		JSpinner spinner = new JSpinner(new SpinnerNumberModel(new Integer(0), new Integer(0), null, new Integer(1)));
 		//TODO set maximum to Resource maximum and add resource change listener for that
+		spinner.setValue(Integer.parseInt(r.getAmount()));
 		spinner.addChangeListener((ChangeEvent e)->{
 			if(fm.isChangeFlag())return;
 			r.setAmount((Integer)spinner.getValue());
@@ -301,6 +337,22 @@ public class TaskPanel extends JPanel implements ComponentHolder {
 	@Override
 	public String toString(){
 		return task.getName();
+	}
+
+	@Override
+	public void notifyResourceCreation(String id) {
+		comboboxAssign.addItem(id);
+	}
+
+	@Override
+	public void notifyResourceDeletion(String id) {
+		comboboxAssign.removeItem(id);
+	}
+
+	@Override
+	public void notifyResourceRenaming(String id, String newid) {
+		comboboxAssign.removeItem(id);
+		comboboxAssign.addItem(newid);
 	}
 
 }

@@ -18,6 +18,7 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
 import de.hpi.bpt.scylla.creation.ElementLink;
+import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator;
 
 
 public class SimulationConfigurationCreator extends ElementLink{
@@ -33,6 +34,8 @@ public class SimulationConfigurationCreator extends ElementLink{
 	private Map<String,ElementLink> elements;
 	
 	private Map<String,String[]> flows;
+	
+	private GlobalConfigurationCreator gcc;
 	
 	/**
 	 * Public constructor,
@@ -135,6 +138,7 @@ public class SimulationConfigurationCreator extends ElementLink{
 	
     private void createModelElement(Element child, ElementLink addTo) {
     	String id = child.getAttributeValue("id");
+    	//Don't add elements that are already parsed (e.g when loading an existing, incomplete SC)
     	if(id != null && ! id.isEmpty() && elements.containsKey(id))return;
 		String name = child.getName();
 		switch(name){
@@ -142,6 +146,7 @@ public class SimulationConfigurationCreator extends ElementLink{
 			if(!addTo.equals(this))break;//ignore subProcess startEvents
 			startEvent = new StartEvent(id);
 			startEvent.addTo(addTo);
+			elements.put(startEvent.getId(),startEvent);
 			break;
 			
 		case "subProcess" :
@@ -184,11 +189,12 @@ public class SimulationConfigurationCreator extends ElementLink{
                 || name.equals("resources");*/
 				if(name.equals("startEvent")){
 					startEvent = new StartEvent(e);
+					elements.put(startEvent.getId(),startEvent);
 				}else if(name.equals("task") || name.endsWith("Task")){
-					Task t = new Task(e);
+					Task t = new Task(e,gcc);
 					elements.put(t.getId(), t);
 				}else if(name.equals("subProcess")){
-					SubProcess p = new SubProcess(e);
+					SubProcess p = new SubProcess(e,gcc);
 					elements.put(p.getId(), p);
 					addProcessSCElements(e);
 				}else if(name.equals("exclusiveGateway")){

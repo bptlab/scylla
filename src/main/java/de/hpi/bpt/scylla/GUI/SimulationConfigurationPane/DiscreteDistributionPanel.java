@@ -29,6 +29,7 @@ public class DiscreteDistributionPanel extends JScrollPane {
 	
 	private DiscreteDistribution distribution;
 	private FormManager formManager;
+	private DefaultTableModel model;
 
 
 	public DiscreteDistributionPanel(DiscreteDistribution d, FormManager fm) {
@@ -36,11 +37,10 @@ public class DiscreteDistributionPanel extends JScrollPane {
 		setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		getVerticalScrollBar().setUnitIncrement(32);
 		
-		distribution = d;
 		formManager = fm;
 		
 		
-		DefaultTableModel model = new DefaultTableModel(new Object[][]{}, new Object[]{"Value","Probability (in %)"});
+		model = new DefaultTableModel(new Object[][]{}, new Object[]{"Value","Probability (in %)"});
 		JTable list = new JTable(model);
 		list.setFillsViewportHeight(true);
 		list.setShowVerticalLines(false);
@@ -130,7 +130,22 @@ public class DiscreteDistributionPanel extends JScrollPane {
 		gbc_buttonRemove.gridx = 0;
 		gbc_buttonRemove.gridy = 1;
 		panelSidebar.add(buttonRemove, gbc_buttonRemove);
+		
+		setDistribution(d);
 
+	}
+
+
+	private void setDistribution(DiscreteDistribution d) {
+		formManager.setChangeFlag(true);
+		
+		distribution = d;
+		int size = d.getEntrySize();
+		for(int i = 0; i < size; i++){
+			model.addRow(new Object[]{d.getValue(i),d.getFrequency(i)});
+		}
+		
+		formManager.setChangeFlag(false);
 	}
 	
 

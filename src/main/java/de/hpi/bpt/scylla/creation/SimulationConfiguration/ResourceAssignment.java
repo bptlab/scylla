@@ -3,31 +3,33 @@ package de.hpi.bpt.scylla.creation.SimulationConfiguration;
 import org.jdom2.Element;
 
 import de.hpi.bpt.scylla.creation.ElementLink;
+import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.ResourceType;
 
-public class Resource extends ElementLink{
-
-	private String name;
+public class ResourceAssignment extends ElementLink{
+	
 	private String id;
-
+	private ResourceType type;
+	
 	/**
 	 * Link constructor
 	 * @param toLink
 	 */
-	public Resource(Element toLink) {
+	public ResourceAssignment(Element toLink, ResourceType t) {
 		super(toLink);
 		id = el.getAttributeValue("id");
-		name = el.getAttributeValue("name");
+		if(t == null)System.err.println("Warning: Type id of assignment definition with id "+id+" is not defined.");
+		else if(!id.equals(t.getId()))System.err.println("Warning: Type id "+t.getId()+" does not fit assignment definition id "+id+".");
+		type = t;
 	}
 	
-	public Resource(String i, String n){
+	public ResourceAssignment(ResourceType t){
 		super(new Element("resource",stdNsp));
-		id = i;
+		this.id = t.getId();
 		setAttribute("id",id);
-		name = n;
 		setAmount(0);
 	}
 
-	public String getName(){return name;}
+	public ResourceType getType(){return type;}
 	public String getId(){return id;}
 	
 	public String getAmount(){
