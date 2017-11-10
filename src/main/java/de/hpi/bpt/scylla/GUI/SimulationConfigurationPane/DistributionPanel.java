@@ -41,7 +41,7 @@ public class DistributionPanel extends JPanel {
 		
 		DistributionType type = d.getType();
 		switch(type){
-		case arbitraryFiniteProbability :
+		case descrete :
 			JComponent table = getTypeInputComponent(null,AttributeType.ENTRYSET);
 			GridBagConstraints gbc_table = new GridBagConstraints();
 			gbc_table.gridx = 0;
