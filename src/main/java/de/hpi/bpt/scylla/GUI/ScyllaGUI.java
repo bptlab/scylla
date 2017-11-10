@@ -200,6 +200,7 @@ public class ScyllaGUI extends JFrame {
 		contentPane.addTab("Global Configuration Editor", globalconfPane);
 		globalconfPane.init();
 		contentPane.addTab("Under Construction", simconfPane);
+		simconfPane.init();
 		
 		//TODO System.setOut(simulationPane.getConsole().getOut());
 	}

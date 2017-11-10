@@ -142,7 +142,7 @@ public class DiscreteDistributionPanel extends JScrollPane {
 		distribution = d;
 		int size = d.getEntrySize();
 		for(int i = 0; i < size; i++){
-			model.addRow(new Object[]{d.getValue(i),d.getFrequency(i)});
+			model.addRow(new Object[]{d.getValue(i),d.getFrequency(i)*100.0});
 		}
 		
 		formManager.setChangeFlag(false);

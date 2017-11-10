@@ -29,7 +29,10 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.DocumentEvent;
 
+import org.jdom2.Document;
+import org.jdom2.Element;
 import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
 
 import de.hpi.bpt.scylla.GUI.EditorPane;
 import de.hpi.bpt.scylla.GUI.ExpandPanel;
@@ -37,6 +40,7 @@ import de.hpi.bpt.scylla.GUI.InsertRemoveListener;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel.ComponentHolder;
 import de.hpi.bpt.scylla.GUI.ScalingCheckBoxIcon;
+import de.hpi.bpt.scylla.GUI.ScalingFileChooser;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
 import de.hpi.bpt.scylla.GUI.GlobalConfigurationPane.ExclusiveGatewayPanel;
 import de.hpi.bpt.scylla.creation.ElementLink;
@@ -70,6 +74,10 @@ public class SimulationConfigurationPane extends EditorPane {
 	private ListChooserPanel gatewayPanel;
 	private ListChooserPanel taskPanel;
 	private DateTimeFormatter dateFormatter;
+	private JLabel labelrefPMshow;
+	private JLabel labelrefGCshow;
+	private JButton button_openPM;
+	private JButton button_openGC;
 
 	/**
 	 * Create the panel.
@@ -116,7 +124,7 @@ public class SimulationConfigurationPane extends EditorPane {
 		panelReference.add(labelRefPM, gbc_labelRefPM);
 		
 		//Label to show ref PM
-		JLabel labelrefPMshow = new JLabel(" ");
+		labelrefPMshow = new JLabel(" ");
 		labelrefPMshow.setBackground(ScyllaGUI.ColorField2);
 		labelrefPMshow.setOpaque(true);
 		GridBagConstraints gbc_labelrefPMshow = new GridBagConstraints();
@@ -126,11 +134,29 @@ public class SimulationConfigurationPane extends EditorPane {
 		gbc_labelrefPMshow.gridy = 1;
 		panelReference.add(labelrefPMshow, gbc_labelrefPMshow);
 		
-		JButton button_openPM = new JButton();
+		button_openPM = new JButton();
 		button_openPM.setToolTipText("Open Process Model File");
 		button_openPM.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//TODO
+				//Choose file to be opened
+				ScalingFileChooser chooser = new ScalingFileChooser(ScyllaGUI.DEFAULTFILEPATH);
+				chooser.setDialogTitle("Open Process Model File");
+				int c = chooser.showDialog(SimulationConfigurationPane.this,"Open");
+				//if the process is canceled, nothing happens
+				if(c == ScalingFileChooser.APPROVE_OPTION){
+					if(chooser.getSelectedFile() != null){
+						try {
+							bpmnPath = chooser.getSelectedFile().getPath();
+							if(creator != null)updateModel();
+							labelRefPM.setText(bpmnPath);
+						} catch (JDOMException | IOException e1) {
+							e1.printStackTrace();
+						}
+						ScyllaGUI.DEFAULTFILEPATH = chooser.getSelectedFile().getPath();
+					}else{
+						System.err.println("Could not open file");
+					}
+				}
 			}
 		});
 		button_openPM.setIcon(ScyllaGUI.ICON_OPEN);
@@ -151,7 +177,7 @@ public class SimulationConfigurationPane extends EditorPane {
 		panelReference.add(labelRefGC, gbc_labelRefGC);
 		
 		//Label to show ref gc
-		JLabel labelrefGCshow = new JLabel(" ");
+		labelrefGCshow = new JLabel(" ");
 		labelrefGCshow.setBackground(ScyllaGUI.ColorField2);
 		labelrefGCshow.setOpaque(true);
 		GridBagConstraints gbc_labelrefGCshow = new GridBagConstraints();
@@ -161,11 +187,29 @@ public class SimulationConfigurationPane extends EditorPane {
 		gbc_labelrefGCshow.gridy = 2;
 		panelReference.add(labelrefGCshow, gbc_labelrefGCshow);
 		
-		JButton button_openGC = new JButton();
+		button_openGC = new JButton();
 		button_openGC.setToolTipText("Open Global Configuration File");
 		button_openGC.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//TODO
+				//Choose file to be opened
+				ScalingFileChooser chooser = new ScalingFileChooser(ScyllaGUI.DEFAULTFILEPATH);
+				chooser.setDialogTitle("Open Global Configuration File");
+				int c = chooser.showDialog(SimulationConfigurationPane.this,"Open");
+				//if the process is canceled, nothing happens
+				if(c == ScalingFileChooser.APPROVE_OPTION){
+					if(chooser.getSelectedFile() != null){
+						try {
+							globalPath = chooser.getSelectedFile().getPath();
+							if(creator != null)updateGCC();
+							labelrefGCshow.setText(globalPath);
+						} catch (JDOMException | IOException e1) {
+							e1.printStackTrace();
+						}
+						ScyllaGUI.DEFAULTFILEPATH = chooser.getSelectedFile().getPath();
+					}else{
+						System.err.println("Could not open file");
+					}
+				}
 			}
 		});
 		button_openGC.setIcon(ScyllaGUI.ICON_OPEN);
@@ -245,18 +289,13 @@ public class SimulationConfigurationPane extends EditorPane {
 		textfieldSeed.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
 			if(isChangeFlag())return;
 			try{
-				long s = creator.getRandomSeed();
-				long n = Long.parseLong(textfieldSeed.getText());
-				if(s != n){
+				Long s = creator.getRandomSeed();
+				Long n = Long.parseLong(textfieldSeed.getText());
+				if(!n.equals(s)){
 					creator.setRandomSeed(n);
 					setSaved(false);
 				}
 			}catch(Exception exc){}
-		}));
-		textfieldSeed.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
-			if(isChangeFlag())return;
-			creator.setId(textfieldSeed.getText());
-			setSaved(false);
 		}));
 		GridBagConstraints gbc_textfieldSeed = new GridBagConstraints();
 		gbc_textfieldSeed.gridwidth = 4;
@@ -426,6 +465,7 @@ public class SimulationConfigurationPane extends EditorPane {
 			boolean checked = checkboxUnlimited.isSelected();
 			textfieldEndDate.setEnabled(!checked);
 			textfieldEndTime.setEnabled(!checked);
+			if(isChangeFlag())return;
 			if(checked){
 				creator.removeEndDateTime();
 			}else{
@@ -519,16 +559,12 @@ public class SimulationConfigurationPane extends EditorPane {
 			bpmnPath = "./samples/p2_normal.bpmn";
 			 try {
 				gcc = GlobalConfigurationCreator.createFromFile("./samples/p0_globalconf.xml");
+				setFile(new File("./samples/p2_normal_sim.xml"));
+				open();
 			} catch (JDOMException | IOException e1) {
 				e1.printStackTrace();
 			}
-			
-			setFile(new File("./samples/p2_normal_sim.xml"));
-			try {
-				open();
-			} catch (JDOMException | IOException e) {
-				e.printStackTrace();
-			}
+
 
 			
 //			//creator = new SimulationConfigurationCreator();
@@ -552,14 +588,28 @@ public class SimulationConfigurationPane extends EditorPane {
 
 	@Override
 	protected void create() {
-		// TODO Auto-generated method stub
-		
+		setChangeFlag(true);
+		close();
+		labelFiletitle.setText("<unsaved file>");
+		creator = new SimulationConfigurationCreator();
+		creator.setStartDateTime(startDateTime);
+		setSaved(false);
+		setEnabled(true);
+		setChangeFlag(false);
+		//Id should be edited right after creation
+		textfieldId.setText("NewSimulationConfiguration");
+		textfieldId.requestFocusInWindow();
+		textfieldId.selectAll();
 	}
 
 	@Override
 	protected void save() {
-		// TODO Auto-generated method stub
-		
+		try {
+			setSaved(true);
+			creator.save(getFile().getPath());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -571,17 +621,31 @@ public class SimulationConfigurationPane extends EditorPane {
 			textfieldSeed.setValue(creator.getRandomSeed());
 		}
 		if(creator.getProcessInstances() != null)spinnerNOI.setValue(Integer.parseInt(creator.getProcessInstances()));
-		String startDateTime = creator.getStartDateTime();
-		if(startDateTime != null){
-			textfieldStartTime.setValue(ZonedDateTime.parse(startDateTime).toLocalTime());
-			textfieldStartDate.setText(dateFormatter.format(ZonedDateTime.parse(startDateTime).toLocalDate()));
+		String startDt = creator.getStartDateTime();
+		if(startDt != null){
+			startDateTime = ZonedDateTime.parse(startDt);
+			textfieldStartTime.setValue(startDateTime.toLocalTime());
+			textfieldStartDate.setText(dateFormatter.format(startDateTime.toLocalDate()));
 		}
-		String endDateTime = creator.getEndDateTime();
-		if(endDateTime != null){
-			textfieldEndTime.setValue(ZonedDateTime.parse(endDateTime).toLocalTime());
-			textfieldEndDate.setText(dateFormatter.format(ZonedDateTime.parse(endDateTime).toLocalDate()));
+		String endDt = creator.getEndDateTime();
+		if(endDt != null){
+			checkboxUnlimited.setSelected(false);
+			endDateTime = ZonedDateTime.parse(endDt);
+			textfieldEndTime.setValue(endDateTime.toLocalTime());
+			textfieldEndDate.setText(dateFormatter.format(endDateTime.toLocalDate()));
+		}else {
+			checkboxUnlimited.setSelected(true);
+			textfieldEndDate.setEnabled(false);
+			textfieldEndTime.setEnabled(false);
 		}
 		
+		importCreatorEvents();
+		
+		setChangeFlag(false);
+		setEnabled(true);
+	}
+	
+	private void importCreatorEvents() {
 		startEventPanel.setStartEvent(creator.getStartEvent());
 		
 		for(ElementLink el : creator.getElements()){
@@ -591,15 +655,19 @@ public class SimulationConfigurationPane extends EditorPane {
 				gatewayPanel.add((ComponentHolder)new ExclusiveGatewayPanel((ExclusiveGateway) el, this, creator));
 			}
 		}
-		
-		setChangeFlag(false);
-		setEnabled(true);
 	}
 
 	@Override
 	protected void close() {
-		// TODO Auto-generated method stub
-		
+		setChangeFlag(true);
+		creator = null;
+		setFile(null);
+		textfieldId.setText("");
+		textfieldSeed.setValue(null);
+		clear();
+		setChangeFlag(false);
+		setSaved(true);
+		setEnabled(false);
 	}
 
 	@Override
@@ -612,8 +680,52 @@ public class SimulationConfigurationPane extends EditorPane {
 	 */
 	@Override
 	public void setEnabled(boolean b){
-		//TODO
+		
+		textfieldId.setEnabled(b);
+		textfieldSeed.setEnabled(b);
+		spinnerNOI.setEnabled(b);
+		textfieldStartTime.setEnabled(b);
+		textfieldStartDate.setEnabled(b);
+		textfieldEndTime.setEnabled(b && !checkboxUnlimited.isSelected());
+		textfieldEndDate.setEnabled(b && !checkboxUnlimited.isSelected());
+		checkboxUnlimited.setEnabled(b);
+		
+		startEventPanel.setEnabled(b);
+		taskPanel.setEnabled(b);
+		gatewayPanel.setEnabled(b);
+		
 		super.setEnabled(b);
+	}
+	
+	public void clear() {
+		textfieldId.setText("");
+		textfieldSeed.setText("");
+		spinnerNOI.setValue(0);
+		textfieldStartTime.setValue(LocalTime.of(0, 0, 0));
+		textfieldStartDate.setText(dateFormatter.format(LocalDate.now()));
+		textfieldEndTime.setValue(LocalTime.of(23, 59, 59));
+		textfieldEndDate.setText(dateFormatter.format(LocalDate.now()));
+		checkboxUnlimited.setSelected(true);
+		
+		startEventPanel.clear();
+		taskPanel.clear();
+		gatewayPanel.clear();
+	}
+	
+	private void updateModel() throws JDOMException, IOException {
+        Document doc;
+        SAXBuilder builder = new SAXBuilder();
+		doc = builder.build(bpmnPath);
+        Element modelRoot = doc.getRootElement();
+        creator.setModel(modelRoot);
+        taskPanel.clear();
+        gatewayPanel.clear();
+        importCreatorEvents();
+        button_openPM.setEnabled(false);
+	}
+	
+	private void updateGCC() throws JDOMException, IOException {
+		creator.setGCC(globalPath);
 	}
 
 }

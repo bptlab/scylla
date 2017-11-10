@@ -104,6 +104,8 @@ public class TaskPanel extends JPanel implements ComponentHolder,ResourceObserve
 			if(type != null){
 				Distribution d = Distribution.create(type);
 				setPanelDistribution(d);
+				getParent().getParent().revalidate();
+				repaint();
 				task.setDurationDistribution(d);
 				fm.setSaved(false);
 			}
@@ -250,7 +252,8 @@ public class TaskPanel extends JPanel implements ComponentHolder,ResourceObserve
 		}else{
 			comboboxDistribution.setSelectedIndex(-1);
 		}
-		comboboxTimeunit.setSelectedItem(TimeUnit.valueOf(task.getDurationTimeUnit()));
+		if(task.getDurationTimeUnit() != null)
+			comboboxTimeunit.setSelectedItem(TimeUnit.valueOf(task.getDurationTimeUnit()));
 		
 		for(String id : t.getResources()) {
 			panelResources.add(createAssigner(t.getResource(id)));
@@ -263,8 +266,6 @@ public class TaskPanel extends JPanel implements ComponentHolder,ResourceObserve
 		if(panelDistribution != null)remove(panelDistribution);
 		panelDistribution = new DistributionPanel(d, fm);
 		add(panelDistribution, gbc_panelDistribution);
-		revalidate();
-		repaint();
 	}
 	
 	private JPanel createAssigner(ResourceAssignment r){

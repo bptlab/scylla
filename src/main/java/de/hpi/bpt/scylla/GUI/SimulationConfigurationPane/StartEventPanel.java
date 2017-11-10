@@ -105,6 +105,7 @@ public class StartEventPanel extends JPanel {
 			startEvent.setArrivalTimeUnit((TimeUnit) comboboxTimeunit.getSelectedItem());
 			fm.setSaved(false);
 		});
+		comboboxTimeunit.setSelectedIndex(-1);
 		GridBagConstraints gbc_comboboxTimeunit = new GridBagConstraints();
 		gbc_comboboxTimeunit.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
 		gbc_comboboxTimeunit.fill = GridBagConstraints.HORIZONTAL;
@@ -139,6 +140,21 @@ public class StartEventPanel extends JPanel {
 		add(panelDistribution, gbc_panelDistribution);
 		revalidate();
 		repaint();
+	}
+	
+	@Override
+	public void setEnabled(boolean b) {
+		comboboxDistribution.setEnabled(b);
+		comboboxTimeunit.setEnabled(b);
+		panelDistribution.setEnabled(b);
+	}
+
+	public void clear() {
+		comboboxDistribution.setSelectedIndex(-1);
+		if(panelDistribution != null)remove(panelDistribution);
+		panelDistribution = new JLabel(" ");
+		add(panelDistribution, gbc_panelDistribution);
+		comboboxTimeunit.setSelectedIndex(-1);
 	}
 
 }

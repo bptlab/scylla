@@ -51,6 +51,8 @@ public class SimulationConfigurationCreator extends ElementLink{
 		elements = new TreeMap<String,ElementLink>();
 		flows = new HashMap<String,String[]>();
 		startEvent = new StartEvent("startEvent");
+		startEvent.addTo(this);
+		elements.put(startEvent.getId(),startEvent);
 	}
 	
 	private SimulationConfigurationCreator(Element r, Document d) {
@@ -85,13 +87,12 @@ public class SimulationConfigurationCreator extends ElementLink{
 	public void removeEndDateTime(){root.removeAttribute("endDateTime");}
 	//TODO public void setResourceAssignmentOrder(String id){setAttribute("resourceAssignmentOrder", id);}
 	public void setRandomSeed(long seed){
-		if(root.getChild("randomSeed",nsp) == null)root.addContent(new Element("randomSeed",nsp));
-		root.getChild("randomSeed",nsp).setText(seed+"");
+		root.setAttribute("randomSeed",seed+"");
 	}
 	public void removeRandomSeed(){root.removeAttribute("randomSeed");}
-	public Integer getRandomSeed(){
+	public Long getRandomSeed(){
 		if(root.getAttributeValue("randomSeed") == null)return null;
-		return Integer.parseInt(root.getAttributeValue("randomSeed"));
+		return Long.parseLong(root.getAttributeValue("randomSeed"));
 	}
 	
 	public StartEvent getStartEvent(){return startEvent;}
@@ -116,15 +117,24 @@ public class SimulationConfigurationCreator extends ElementLink{
 					break;
 				}
 			}
+			if(process == null){
+				process = processes.get(0);
+				setProcessRef(process.getAttributeValue("id"));
+				System.err.println("Warning: Process matching to id "+ref+" not found, using "+getProcessRef()+" instead.");
+			}
 		}
 
-		if(process == null){
-			System.err.println("Process matching to id"+ref+"not found");
-			return;
-		}
+//		if(process == null){
+//			System.err.println("Process matching to id "+ref+" not found");
+//			return;
+//		}
 		
 		addProcessModelElements(process,this);
 
+	}
+	
+	public void setGCC(String path) throws JDOMException, IOException {
+		gcc = GlobalConfigurationCreator.createFromFile(path);
 	}
 	
 	public void addProcessModelElements(Element process, ElementLink addTo){

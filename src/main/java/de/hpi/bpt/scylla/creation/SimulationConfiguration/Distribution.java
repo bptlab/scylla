@@ -19,7 +19,7 @@ public class Distribution extends ElementLink{
 		normal(			"normal", 					"Normal", 			new String[]{"mean","standardDeviation"}, new AttributeType[]{AttributeType.DOUBLE,AttributeType.DOUBLE}),
 		poisson(		"poisson", 					"Poisson", 			new String[]{"mean"}, 					new AttributeType[]{AttributeType.DOUBLE}),
 		uniform(		"uniform", 					"Uniform", 			new String[]{"lower","upper"}, 			new AttributeType[]{AttributeType.DOUBLE,AttributeType.DOUBLE}),
-		arbitraryFiniteProbability(		"arbitraryFiniteProbability", "Descrete", 		new String[]{"entry"}, 					new AttributeType[]{AttributeType.ENTRYSET}),
+		arbitraryFiniteProbability("arbitraryFiniteProbability","Descrete", new String[]{}, 				new AttributeType[]{}),
 		;
 		public final String id;
 		public final String displayName;

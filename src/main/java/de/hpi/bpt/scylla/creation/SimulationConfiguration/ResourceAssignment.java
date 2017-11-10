@@ -28,6 +28,12 @@ public class ResourceAssignment extends ElementLink{
 		setAttribute("id",id);
 		setAmount(0);
 	}
+	
+	public void setResourceType(ResourceType t) {
+		if(t == null)throw new NullPointerException("Cannot set resource type: is null.");
+		if(!id.equals(t.getId()))System.err.println("Warning: Type id "+t.getId()+" does not fit assignment definition id "+id+".");
+		else type = t;
+	}
 
 	public ResourceType getType(){return type;}
 	public String getId(){return id;}

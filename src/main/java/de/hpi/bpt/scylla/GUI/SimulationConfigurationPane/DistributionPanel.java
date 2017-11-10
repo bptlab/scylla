@@ -9,6 +9,7 @@ import de.hpi.bpt.scylla.GUI.InsertRemoveListener;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
 import de.hpi.bpt.scylla.GUI.GlobalConfigurationPane.NoNegativeDoubleFormat;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.Distribution;
+import de.hpi.bpt.scylla.creation.SimulationConfiguration.Distribution.AttributeType;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.Distribution.DiscreteDistribution;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.Distribution.DistributionType;
 
@@ -20,6 +21,7 @@ import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 
 @SuppressWarnings("serial")
@@ -40,7 +42,7 @@ public class DistributionPanel extends JPanel {
 		DistributionType type = d.getType();
 		switch(type){
 		case arbitraryFiniteProbability :
-			JComponent table = getTypeInputComponent(null, type.types[0]);
+			JComponent table = getTypeInputComponent(null,AttributeType.ENTRYSET);
 			GridBagConstraints gbc_table = new GridBagConstraints();
 			gbc_table.gridx = 0;
 			gbc_table.gridy = 0;
@@ -118,6 +120,13 @@ public class DistributionPanel extends JPanel {
 			}else return null;
 			
 		default : return null;
+		}
+	}
+	
+	@Override
+	public void setEnabled(boolean b) {
+		for(Component c : getComponents()){
+			c.setEnabled(b);
 		}
 	}
 

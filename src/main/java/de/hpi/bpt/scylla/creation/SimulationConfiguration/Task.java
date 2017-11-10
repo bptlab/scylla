@@ -25,10 +25,11 @@ public class Task extends ElementLink{
 	protected Task(Element toLink,GlobalConfigurationCreator gcc) {
 		super(toLink);
 		duration = el.getChild("duration",nsp);
-		durationDistribution = Distribution.create(duration.getChildren().get(0));
+		//Does it make sense for a subprocess to have a duration distribution?
+		if(duration != null)durationDistribution = Distribution.create(duration.getChildren().get(0));
 		resourcesElement = el.getChild("resources", nsp);
 		resources = new TreeMap<String, ResourceAssignment>();
-		for(Element res : resourcesElement.getChildren("resource", nsp)){
+		if(resourcesElement != null)for(Element res : resourcesElement.getChildren("resource", nsp)){
 			ResourceType type = gcc != null ? gcc.getResourceType(res.getAttributeValue("id")) : null;
 			ResourceAssignment r = new ResourceAssignment(res,type);
 			resources.put(r.getId(), r);
@@ -49,15 +50,35 @@ public class Task extends ElementLink{
 		resources = new TreeMap<String, ResourceAssignment>();
 	}
 	
+	public void setGCC(GlobalConfigurationCreator gcc) {
+		for(ResourceAssignment a : resources.values()) {
+			ResourceType type = gcc.getResourceType(a.getId());
+			if(type == null) {
+				System.err.println("Resource type definiton for Id "+a.getId()+" not found, cannot set assignment type.");
+			}else {
+				a.setResourceType(type);
+			}
+		}
+	}
+	
 
 	public void setDurationTimeUnit(TimeUnit t) {
+		if(duration == null) {
+			duration = new Element("duration",nsp);
+			el.addContent(duration);
+		}
 		duration.setAttribute("timeUnit",t.toString());
 	}
 	public String getDurationTimeUnit(){
+		if(duration == null)return null;
 		return duration.getAttributeValue("timeUnit");
 	}
 	
 	public void setDurationDistribution(Distribution d){
+		if(duration == null) {
+			duration = new Element("duration",nsp);
+			el.addContent(duration);
+		}
 		if(durationDistribution != null){
 			duration.removeContent();
 		}
