@@ -50,9 +50,10 @@ public class SimulationConfigurationCreator extends ElementLink{
 		superroot.addContent(root);
 		elements = new TreeMap<String,ElementLink>();
 		flows = new HashMap<String,String[]>();
-		startEvent = new StartEvent("startEvent");
-		startEvent.addTo(this);
-		elements.put(startEvent.getId(),startEvent);
+		//There shall be no startevent, that has a non-matching id.
+//		startEvent = new StartEvent("startEvent");
+//		startEvent.addTo(this);
+//		elements.put(startEvent.getId(),startEvent);
 	}
 	
 	private SimulationConfigurationCreator(Element r, Document d) {
@@ -96,9 +97,9 @@ public class SimulationConfigurationCreator extends ElementLink{
 	}
 	
 	public StartEvent getStartEvent(){return startEvent;}
-	
-	
-	
+	private void setStartEvent(StartEvent e) {startEvent = e;}
+
+
 	public void setModel(Element modelRoot){
 		List<Element> processes = modelRoot.getChildren("process",modelRoot.getNamespace());
 		if(processes.size() == 0){
@@ -128,20 +129,27 @@ public class SimulationConfigurationCreator extends ElementLink{
 //			System.err.println("Process matching to id "+ref+" not found");
 //			return;
 //		}
-		
 		addProcessModelElements(process,this);
+		
+		ArrayList<String> toRem = new ArrayList<String>();
+		outer:for(String id : elements.keySet()) {
+			for(Element child : process.getChildren()){
+				if(id.equals(child.getAttributeValue("id")))continue outer;
+			}
+			toRem.add(id);
+		}
+		for(String id : toRem)elements.remove(id);
 
 	}
 	
-	public void setGCC(String path) throws JDOMException, IOException {
-		gcc = GlobalConfigurationCreator.createFromFile(path);
+	public void setGCC(GlobalConfigurationCreator g){
+		gcc = g;
 	}
 	
 	public void addProcessModelElements(Element process, ElementLink addTo){
 		for(Element child : process.getChildren()){
 			if(isKnownModelElement(child.getName()))
 				createModelElement(child, addTo);
-				//System.out.println(child.getQualifiedName());
 		}
 	}
 	
@@ -154,9 +162,9 @@ public class SimulationConfigurationCreator extends ElementLink{
 		switch(name){
 		case "startEvent" :
 			if(!addTo.equals(this))break;//ignore subProcess startEvents
-			startEvent = new StartEvent(id);
-			startEvent.addTo(addTo);
-			elements.put(startEvent.getId(),startEvent);
+			setStartEvent(new StartEvent(id));
+			getStartEvent().addTo(addTo);
+			elements.put(getStartEvent().getId(),getStartEvent());
 			break;
 			
 		case "subProcess" :
@@ -198,8 +206,8 @@ public class SimulationConfigurationCreator extends ElementLink{
 				/*        return name.equals("task") || name.endsWith("Task") || name.equals("startEvent") || name.equals("subProcess")
                 || name.equals("resources");*/
 				if(name.equals("startEvent")){
-					startEvent = new StartEvent(e);
-					elements.put(startEvent.getId(),startEvent);
+					setStartEvent(new StartEvent(e));
+					elements.put(getStartEvent().getId(),getStartEvent());
 				}else if(name.equals("task") || name.endsWith("Task")){
 					Task t = new Task(e,gcc);
 					elements.put(t.getId(), t);
@@ -257,21 +265,15 @@ public class SimulationConfigurationCreator extends ElementLink{
 	/**
 	 * Creates a new SCCreator from an existing SC xml file
 	 * @param scPath to xml file
-	 * @param bpmnPath path to bpmn file
 	 * @return new SCCreator
 	 * @throws JDOMException when errors occur in parsing
 	 * @throws IOException when an I/O error prevents a document from being fully parsed
 	 */
-	public static SimulationConfigurationCreator createFromFile(String scPath, String bpmnPath) throws JDOMException, IOException{
+	public static SimulationConfigurationCreator createFromFile(String scPath) throws JDOMException, IOException{
         SAXBuilder builder = new SAXBuilder();
         Document doc = builder.build(scPath);
         Element r = doc.getRootElement();
         SimulationConfigurationCreator sc = new SimulationConfigurationCreator(r,doc);
-        
-        SAXBuilder builder_model = new SAXBuilder();
-        Document doc_model = builder_model.build(bpmnPath);
-        Element r_model = doc_model.getRootElement();
-        sc.setModel(r_model);
         return sc;
 	}
 	

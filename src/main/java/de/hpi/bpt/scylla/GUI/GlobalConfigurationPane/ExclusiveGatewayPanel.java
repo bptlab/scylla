@@ -27,6 +27,7 @@ public class ExclusiveGatewayPanel extends JPanel implements ComponentHolder{
 	private FormManager formManager;
 	private ExclusiveGateway gateway;
 	private SimulationConfigurationCreator scCreator;
+	private JPanel panelBranches;
 	
 
 	public ExclusiveGatewayPanel(ExclusiveGateway g, FormManager fm, SimulationConfigurationCreator scc) {
@@ -39,7 +40,7 @@ public class ExclusiveGatewayPanel extends JPanel implements ComponentHolder{
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		setLayout(gridBagLayout);
 		
-		JPanel panelBranches = new JPanel();
+		panelBranches = new JPanel();
 		GridBagConstraints gbc_panelBranches = new GridBagConstraints();
 		gbc_panelBranches.fill = GridBagConstraints.HORIZONTAL;
 		gbc_panelBranches.weightx = 1;
@@ -49,7 +50,10 @@ public class ExclusiveGatewayPanel extends JPanel implements ComponentHolder{
 		gbc_panelBranches.gridy = 0;
 		add(panelBranches, gbc_panelBranches);
 		panelBranches.setLayout(new BoxLayout(panelBranches, BoxLayout.Y_AXIS));
-		
+
+	}
+	
+	public void initBranches() {
 		for(String branch : gateway.getBranches()){
 			ElementLink target = scCreator.getFlowTarget(branch);
 			panelBranches.add(createBranchPanel(branch, target.getName()));

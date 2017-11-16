@@ -29,6 +29,9 @@ import de.hpi.bpt.scylla.GUI.SimulationConfigurationPane.SimulationConfiguration
 @SuppressWarnings("serial")
 public class ScyllaGUI extends JFrame {
 	
+	/**A Developer variable to suppress e.g. output forwarding*/
+	public static final boolean DEBUG = true;
+	
 	/** Default path for input and output files*/
 	public static String DEFAULTFILEPATH = "samples\\";
 	/** Path for desmoj output files*/
@@ -78,7 +81,9 @@ public class ScyllaGUI extends JFrame {
 	public static final Font FILECHOOSERFONT = new Font("Arial", Font.PLAIN, (int)(14.0*SCALE));
 	/**Font used for the console*/
 	public static final Font CONSOLEFONT = new Font("Consolas",Font.PLAIN,(int)(14.0*SCALE));
-
+	/**Color for error messages*/
+	public static final Color ERRORFONT_COLOR = new Color(255,0,0);
+	
 	/**Padding margin for textfields*/
 	public static final Insets LEFTMARGIN = new Insets(0, WIDTH/48, 0, 0);
 	
@@ -199,10 +204,10 @@ public class ScyllaGUI extends JFrame {
 		contentPane.addTab("Simulation", simulationPane);
 		contentPane.addTab("Global Configuration Editor", globalconfPane);
 		globalconfPane.init();
-		contentPane.addTab("Under Construction", simconfPane);
+		contentPane.addTab("Simulation Configuration Editor", simconfPane);
 		simconfPane.init();
 		
-		//TODO System.setOut(simulationPane.getConsole().getOut());
+		if(!DEBUG)System.setOut(simulationPane.getConsole().getOut());
 	}
 	
 	/**

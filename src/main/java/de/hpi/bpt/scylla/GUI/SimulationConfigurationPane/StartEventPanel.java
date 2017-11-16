@@ -123,6 +123,7 @@ public class StartEventPanel extends JPanel {
 			setPanelDistribution(d);
 			comboboxDistribution.setSelectedItem(d.getType());
 		}else{
+			setPanelDistribution(null);
 			comboboxDistribution.setSelectedIndex(-1);
 		}
 		comboboxTimeunit.setSelectedItem(TimeUnit.valueOf(startEvent.getArrivalTimeUnit()));
@@ -136,7 +137,8 @@ public class StartEventPanel extends JPanel {
 	 */
 	private void setPanelDistribution(Distribution d){
 		if(panelDistribution != null)remove(panelDistribution);
-		panelDistribution = new DistributionPanel(d, fm);
+		if(d != null)panelDistribution = new DistributionPanel(d, fm);
+		else panelDistribution = new JLabel(" ");
 		add(panelDistribution, gbc_panelDistribution);
 		revalidate();
 		repaint();

@@ -505,7 +505,7 @@ public class SimulationPane extends JPanel{
 	 * Loads the plugins from PluginLoader class into the plugin panel
 	 */
 	private void loadPlugins() {
-		System.setErr(console.getErr());
+		if(!ScyllaGUI.DEBUG)System.setErr(console.getErr());
 		PluginLoader p = PluginLoader.getDefaultPluginLoader();
 		
 		TreeMap<String, ArrayList<PluginLoader.PluginWrapper>> plugins = new TreeMap<String, ArrayList<PluginLoader.PluginWrapper>>();

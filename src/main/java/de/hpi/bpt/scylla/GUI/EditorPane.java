@@ -130,9 +130,18 @@ public abstract class EditorPane extends JPanel implements FormManager{
 		panelHeader.add(buttonOpenfile, gbc_buttonOpenfile);
 		
 		//Label displaying file title
-		labelFiletitle = new JLabel();
-		labelFiletitle.setText("<No editor opened. Open an existing file or create a new one.>");
-		labelFiletitle.setForeground(Color.WHITE);
+		labelFiletitle = new JLabel() {
+			@Override
+			/**
+			 * Always resets color and font when text is changed, to enable easy error messaging
+			 */
+			public void setText(String text) {
+				setForeground(Color.WHITE);
+				setFont(ScyllaGUI.TITLEFONT);
+				super.setText(text);
+			}
+		};
+		showNoEditorLabel();
 		GridBagConstraints gbc_textfieldFiletitle = new GridBagConstraints();
 		gbc_textfieldFiletitle.weightx = 37;
 		gbc_textfieldFiletitle.insets = new Insets(0,ScyllaGUI.TITLEFONT.getSize(),  0, 0);
@@ -407,7 +416,7 @@ public abstract class EditorPane extends JPanel implements FormManager{
 
 	protected void setFile(File file) {
 		if(file != null)labelFiletitle.setText(file.getPath());
-		else labelFiletitle.setText("<No editor opened. Open an existing file or create a new one.>");
+		else showNoEditorLabel();
 		this.file = file;
 	}
 	
@@ -418,6 +427,15 @@ public abstract class EditorPane extends JPanel implements FormManager{
 	public void setEnabled(boolean b){
 		buttonClosefile.setEnabled(b);
 		buttonSavefileAs.setEnabled(b);
+	}
+	
+	/**
+	 * Displays a message to indicate, that there is currently no file edited
+	 */
+	protected void showNoEditorLabel() {
+		labelFiletitle.setText("<No editor opened. Open an existing file or create a new one.>");
+		labelFiletitle.setFont(ScyllaGUI.DEFAULTFONT);
+		labelFiletitle.setForeground(ScyllaGUI.ERRORFONT_COLOR);
 	}
 
 }

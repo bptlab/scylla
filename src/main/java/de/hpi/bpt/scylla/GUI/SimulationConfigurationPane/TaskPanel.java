@@ -23,7 +23,6 @@ import javax.swing.event.ChangeEvent;
 import de.hpi.bpt.scylla.GUI.FormManager;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel.ComponentHolder;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
-import de.hpi.bpt.scylla.GUI.GlobalConfigurationPane.GCFormManager;
 import de.hpi.bpt.scylla.GUI.GlobalConfigurationPane.GCFormManager.ResourceObserver;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.ResourceType;
@@ -45,17 +44,19 @@ public class TaskPanel extends JPanel implements ComponentHolder,ResourceObserve
 	private Task task;
 	private JPanel panelResources;
 	private JComboBox<String> comboboxAssign;
+	private JButton buttonAssign;
+	private GridBagConstraints gbc_buttonAssign;
+	private JLabel labelErrorAssign;
 
 	/**
 	 * Create the panel.
 	 */
-	public TaskPanel(Task t, FormManager f, GlobalConfigurationCreator gcc) {
+	public TaskPanel(Task t, FormManager f, GlobalConfigurationCreator gc) {
 		
 		fm = f;
-		setGcc(gcc);
 		
 		GridBagLayout gridBagLayout = new GridBagLayout();
-		gridBagLayout.columnWeights = new double[] {0,1,2};
+		gridBagLayout.columnWeights = new double[] {0,0.5, 0.5,2};
 		setLayout(gridBagLayout);
 		
 		//Duration label
@@ -65,7 +66,7 @@ public class TaskPanel extends JPanel implements ComponentHolder,ResourceObserve
 		labelDuration.setFont(ScyllaGUI.TITLEFONT);
 		labelDuration.setOpaque(true);
 		GridBagConstraints gbc_labelDuration = new GridBagConstraints();
-		gbc_labelDuration.gridwidth = 3;
+		gbc_labelDuration.gridwidth = 4;
 		gbc_labelDuration.insets = new Insets(ScyllaGUI.STDINSET,0,ScyllaGUI.STDINSET,0);
 		gbc_labelDuration.fill = GridBagConstraints.HORIZONTAL;
 		gbc_labelDuration.anchor = GridBagConstraints.PAGE_START;
@@ -112,6 +113,7 @@ public class TaskPanel extends JPanel implements ComponentHolder,ResourceObserve
 		});
 		comboboxDistribution.setSelectedIndex(-1);
 		GridBagConstraints gbc_comboboxDistribution = new GridBagConstraints();
+		gbc_comboboxDistribution.gridwidth = 2;
 		gbc_comboboxDistribution.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
 		gbc_comboboxDistribution.fill = GridBagConstraints.HORIZONTAL;
 		gbc_comboboxDistribution.gridx = 1;
@@ -123,7 +125,7 @@ public class TaskPanel extends JPanel implements ComponentHolder,ResourceObserve
 		GridBagConstraints gbc_labelFill = new GridBagConstraints();
 		gbc_labelFill.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, 0);
 		gbc_labelFill.fill = GridBagConstraints.HORIZONTAL;
-		gbc_labelFill.gridx = 2;
+		gbc_labelFill.gridx = 3;
 		gbc_labelFill.gridy = 1;
 		add(labelFill, gbc_labelFill);
 		
@@ -146,6 +148,7 @@ public class TaskPanel extends JPanel implements ComponentHolder,ResourceObserve
 			fm.setSaved(false);
 		});
 		GridBagConstraints gbc_comboboxTimeunit = new GridBagConstraints();
+		gbc_comboboxTimeunit.gridwidth = 2;
 		gbc_comboboxTimeunit.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
 		gbc_comboboxTimeunit.fill = GridBagConstraints.HORIZONTAL;
 		gbc_comboboxTimeunit.gridx = 1;
@@ -159,7 +162,7 @@ public class TaskPanel extends JPanel implements ComponentHolder,ResourceObserve
 		labelResources.setFont(ScyllaGUI.TITLEFONT);
 		labelResources.setOpaque(true);
 		GridBagConstraints gbc_labelResources = new GridBagConstraints();
-		gbc_labelResources.gridwidth = 3;
+		gbc_labelResources.gridwidth = 4;
 		gbc_labelResources.insets = new Insets(ScyllaGUI.STDINSET,0,ScyllaGUI.STDINSET,0);
 		gbc_labelResources.fill = GridBagConstraints.HORIZONTAL;
 		gbc_labelResources.anchor = GridBagConstraints.PAGE_START;
@@ -172,7 +175,7 @@ public class TaskPanel extends JPanel implements ComponentHolder,ResourceObserve
 		scrollpaneResources.getVerticalScrollBar().setUnitIncrement(32);
 		scrollpaneResources.setPreferredSize(new Dimension(0,getFont().getSize()*10));
 		GridBagConstraints gbc_scrollpaneResources = new GridBagConstraints();
-		gbc_scrollpaneResources.gridwidth = 3;
+		gbc_scrollpaneResources.gridwidth = 4;
 		gbc_scrollpaneResources.insets = new Insets(ScyllaGUI.STDINSET,0,ScyllaGUI.STDINSET,0);
 		gbc_scrollpaneResources.fill = GridBagConstraints.BOTH;
 		gbc_scrollpaneResources.gridx = 0;
@@ -203,22 +206,19 @@ public class TaskPanel extends JPanel implements ComponentHolder,ResourceObserve
 		add(labelAssign, gbc_labelAssign);
 		
 		comboboxAssign = new JComboBox<String>();
-		if(gcc != null) {
-			for(ResourceType rt : gcc.getResourceTypes()) {
-				comboboxAssign.addItem(rt.getId());
-			}
-		}
 		GridBagConstraints gbc_comboboxAssign = new GridBagConstraints();
-		gbc_comboboxAssign.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
-		gbc_comboboxAssign.fill = GridBagConstraints.HORIZONTAL;
+		gbc_comboboxAssign.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, 0, ScyllaGUI.STDINSET);
+		gbc_comboboxAssign.fill = GridBagConstraints.HORIZONTAL; 
 		gbc_comboboxAssign.gridx = 0;
+		gbc_comboboxAssign.gridwidth = 2;
 		gbc_comboboxAssign.gridy = 7;
 		add(comboboxAssign, gbc_comboboxAssign);
+		comboboxAssign.setEnabled(false);
 		
-		JButton buttonAssign = new JButton("assign");
+		buttonAssign = new JButton("assign");
 		buttonAssign.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				ResourceType type = gcc.getResourceType((String) comboboxAssign.getSelectedItem());
+				ResourceType type = TaskPanel.this.gcc.getResourceType((String) comboboxAssign.getSelectedItem());
 				if(type != null){
 					ResourceAssignment res = task.assignResource(type);
 					panelResources.add(createAssigner(res));
@@ -227,19 +227,34 @@ public class TaskPanel extends JPanel implements ComponentHolder,ResourceObserve
 				}
 			}
 		});
-		GridBagConstraints gbc_buttonAssign = new GridBagConstraints();
-		gbc_buttonAssign.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
-		gbc_buttonAssign.gridx = 1;
-		gbc_buttonAssign.gridy = 7;
-		add(buttonAssign, gbc_buttonAssign);
+		labelErrorAssign = new JLabel("Cannot assign new resources if no global configuration is specified.");
+		labelErrorAssign.setForeground(ScyllaGUI.ERRORFONT_COLOR);
+		labelErrorAssign.setFont(ScyllaGUI.DEFAULTFONT);
 		
+		gbc_buttonAssign = new GridBagConstraints();
+		gbc_buttonAssign.anchor = GridBagConstraints.WEST;
+		gbc_buttonAssign.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, 0, ScyllaGUI.STDINSET);
+		gbc_buttonAssign.gridx = 2;
+		gbc_buttonAssign.gridy = 7;
+		add(labelErrorAssign, gbc_buttonAssign);
+		buttonAssign.setEnabled(false);
+
+		if(gc != null)setGcc(gc);
 		setTask(t);
 		
 	}
 	
-	private void setGcc(GlobalConfigurationCreator gcc) {
+	public void setGcc(GlobalConfigurationCreator gcc) {
 		this.gcc = gcc;
 		gcc.getResourceObserverList().add(this);
+		comboboxAssign.removeAllItems();
+		for(ResourceType type : gcc.getResourceTypes()) {
+			comboboxAssign.addItem(type.getId());
+		}
+		buttonAssign.setEnabled(true);
+		comboboxAssign.setEnabled(true);
+		remove(labelErrorAssign);
+		add(buttonAssign,gbc_buttonAssign);
 	}
 
 	private void setTask(Task t) {
@@ -250,6 +265,7 @@ public class TaskPanel extends JPanel implements ComponentHolder,ResourceObserve
 			setPanelDistribution(d);
 			comboboxDistribution.setSelectedItem(d.getType());
 		}else{
+			setPanelDistribution(null);
 			comboboxDistribution.setSelectedIndex(-1);
 		}
 		if(task.getDurationTimeUnit() != null)
@@ -264,7 +280,8 @@ public class TaskPanel extends JPanel implements ComponentHolder,ResourceObserve
 
 	private void setPanelDistribution(Distribution d) {
 		if(panelDistribution != null)remove(panelDistribution);
-		panelDistribution = new DistributionPanel(d, fm);
+		if(d != null)panelDistribution = new DistributionPanel(d, fm);
+		else panelDistribution = new JLabel(" ");
 		add(panelDistribution, gbc_panelDistribution);
 	}
 	
@@ -288,8 +305,10 @@ public class TaskPanel extends JPanel implements ComponentHolder,ResourceObserve
 		gbc_labelNumber.gridy = 0;
 		panel.add(labelNumber, gbc_labelNumber);
 		
-		JSpinner spinner = new JSpinner(new SpinnerNumberModel(new Integer(0), new Integer(0), null, new Integer(1)));
-		//TODO set maximum to Resource maximum and add resource change listener for that
+		Integer max = null;
+		if(r.getType() != null)max = Integer.valueOf(r.getType().getDefaultQuantity());
+		JSpinner spinner = new JSpinner(new SpinnerNumberModel(new Integer(0), new Integer(0), max, new Integer(1)));
+		//TODO set maximum to Resource maximum [done] and add resource change listener for that
 		spinner.setValue(Integer.parseInt(r.getAmount()));
 		spinner.addChangeListener((ChangeEvent e)->{
 			if(fm.isChangeFlag())return;

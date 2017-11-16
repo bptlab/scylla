@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.List;
+import java.util.function.Consumer;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -169,6 +170,16 @@ public class ListChooserPanel extends JSplitPane {
 			if(model.getValueAt(i, 0).equals(s))return true;
 		}
 		return false;
+	}
+	
+	/**
+	 * Calls a method for every componentholder element saved inside the list
+	 * @param lambda : Consumer functional interface, gets each element passed as argument
+	 */
+	public void forAll(Consumer<ComponentHolder> lambda) {
+		for(int i = 0; i < model.getRowCount(); i++) {
+			lambda.accept((ComponentHolder) model.getValueAt(i, 0));
+		}
 	}
 	
 	

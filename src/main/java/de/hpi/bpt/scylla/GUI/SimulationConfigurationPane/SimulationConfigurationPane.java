@@ -74,17 +74,20 @@ public class SimulationConfigurationPane extends EditorPane {
 	private ListChooserPanel gatewayPanel;
 	private ListChooserPanel taskPanel;
 	private DateTimeFormatter dateFormatter;
-	private JLabel labelrefPMshow;
-	private JLabel labelrefGCshow;
+	private JLabel labelRefPMshow;
+	private JLabel labelRefGCshow;
 	private JButton button_openPM;
 	private JButton button_openGC;
+	private ExpandPanel panelTasksExpand;
+	private ExpandPanel panelGatewaysExpand;
+	private ExpandPanel panelStarteventExpand;
 
 	/**
 	 * Create the panel.
 	 */
 	public SimulationConfigurationPane() {
 
-		int inset_b = 25;//(int)(25.0*ScyllaGUI.SCALE);
+		int inset_b = 25;//TODO (int)(25.0*ScyllaGUI.SCALE);
 		
 		// -- Reference Panel --
 		JPanel panelReference = new JPanel();
@@ -115,7 +118,7 @@ public class SimulationConfigurationPane extends EditorPane {
 		panelReference.add(labelReferenceTitle, gbc_labelReferenceTitle);
 		
 		//Label referenced Process Model
-		JLabel labelRefPM = new JLabel("Referenced Process Model file");
+		JLabel labelRefPM = new JLabel("Referenced process model file");
 		GridBagConstraints gbc_labelRefPM = new GridBagConstraints();
 		gbc_labelRefPM.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
 		gbc_labelRefPM.fill = GridBagConstraints.HORIZONTAL;
@@ -124,39 +127,21 @@ public class SimulationConfigurationPane extends EditorPane {
 		panelReference.add(labelRefPM, gbc_labelRefPM);
 		
 		//Label to show ref PM
-		labelrefPMshow = new JLabel(" ");
-		labelrefPMshow.setBackground(ScyllaGUI.ColorField2);
-		labelrefPMshow.setOpaque(true);
+		labelRefPMshow = new JLabel(" ");
+		labelRefPMshow.setBackground(ScyllaGUI.ColorField2);
+		labelRefPMshow.setOpaque(true);
 		GridBagConstraints gbc_labelrefPMshow = new GridBagConstraints();
 		gbc_labelrefPMshow.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
 		gbc_labelrefPMshow.fill = GridBagConstraints.HORIZONTAL;
 		gbc_labelrefPMshow.gridx = 1;
 		gbc_labelrefPMshow.gridy = 1;
-		panelReference.add(labelrefPMshow, gbc_labelrefPMshow);
+		panelReference.add(labelRefPMshow, gbc_labelrefPMshow);
 		
 		button_openPM = new JButton();
-		button_openPM.setToolTipText("Open Process Model File");
+		button_openPM.setToolTipText("Open process model File");
 		button_openPM.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//Choose file to be opened
-				ScalingFileChooser chooser = new ScalingFileChooser(ScyllaGUI.DEFAULTFILEPATH);
-				chooser.setDialogTitle("Open Process Model File");
-				int c = chooser.showDialog(SimulationConfigurationPane.this,"Open");
-				//if the process is canceled, nothing happens
-				if(c == ScalingFileChooser.APPROVE_OPTION){
-					if(chooser.getSelectedFile() != null){
-						try {
-							bpmnPath = chooser.getSelectedFile().getPath();
-							if(creator != null)updateModel();
-							labelRefPM.setText(bpmnPath);
-						} catch (JDOMException | IOException e1) {
-							e1.printStackTrace();
-						}
-						ScyllaGUI.DEFAULTFILEPATH = chooser.getSelectedFile().getPath();
-					}else{
-						System.err.println("Could not open file");
-					}
-				}
+				be_openPM();
 			}
 		});
 		button_openPM.setIcon(ScyllaGUI.ICON_OPEN);
@@ -177,39 +162,21 @@ public class SimulationConfigurationPane extends EditorPane {
 		panelReference.add(labelRefGC, gbc_labelRefGC);
 		
 		//Label to show ref gc
-		labelrefGCshow = new JLabel(" ");
-		labelrefGCshow.setBackground(ScyllaGUI.ColorField2);
-		labelrefGCshow.setOpaque(true);
+		labelRefGCshow = new JLabel(" ");
+		labelRefGCshow.setBackground(ScyllaGUI.ColorField2);
+		labelRefGCshow.setOpaque(true);
 		GridBagConstraints gbc_labelrefGCshow = new GridBagConstraints();
 		gbc_labelrefGCshow.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
 		gbc_labelrefGCshow.fill = GridBagConstraints.HORIZONTAL;
 		gbc_labelrefGCshow.gridx = 1;
 		gbc_labelrefGCshow.gridy = 2;
-		panelReference.add(labelrefGCshow, gbc_labelrefGCshow);
+		panelReference.add(labelRefGCshow, gbc_labelrefGCshow);
 		
 		button_openGC = new JButton();
 		button_openGC.setToolTipText("Open Global Configuration File");
 		button_openGC.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//Choose file to be opened
-				ScalingFileChooser chooser = new ScalingFileChooser(ScyllaGUI.DEFAULTFILEPATH);
-				chooser.setDialogTitle("Open Global Configuration File");
-				int c = chooser.showDialog(SimulationConfigurationPane.this,"Open");
-				//if the process is canceled, nothing happens
-				if(c == ScalingFileChooser.APPROVE_OPTION){
-					if(chooser.getSelectedFile() != null){
-						try {
-							globalPath = chooser.getSelectedFile().getPath();
-							if(creator != null)updateGCC();
-							labelrefGCshow.setText(globalPath);
-						} catch (JDOMException | IOException e1) {
-							e1.printStackTrace();
-						}
-						ScyllaGUI.DEFAULTFILEPATH = chooser.getSelectedFile().getPath();
-					}else{
-						System.err.println("Could not open file");
-					}
-				}
+				be_openGC();
 			}
 		});
 		button_openGC.setIcon(ScyllaGUI.ICON_OPEN);
@@ -496,8 +463,7 @@ public class SimulationConfigurationPane extends EditorPane {
 		starteventLabel.setFont(ScyllaGUI.TITLEFONT);
 		starteventLabel.setOpaque(true);
 		startEventPanel = new StartEventPanel(this);
-		ExpandPanel panelStarteventExpand = new ExpandPanel(starteventLabel, startEventPanel);
-		panelStarteventExpand.expand();
+		panelStarteventExpand = new ExpandPanel(starteventLabel, createPMErrorLabel());
 		panelMain.add(panelStarteventExpand, gbc_panelStartevent);
 		
 		//------ Task Panel ------
@@ -516,8 +482,7 @@ public class SimulationConfigurationPane extends EditorPane {
 		tasksLabel.setForeground(ScyllaGUI.TITLEFONT_COLOR);
 		tasksLabel.setFont(ScyllaGUI.TITLEFONT);
 		tasksLabel.setOpaque(true);
-		ExpandPanel panelTasksExpand = new ExpandPanel(tasksLabel, taskPanel);
-		panelTasksExpand.expand();
+		panelTasksExpand = new ExpandPanel(tasksLabel, createPMErrorLabel());
 		panelMain.add(panelTasksExpand, gbc_panelTasks);
 		
 		// ----- Gateway Panel -----
@@ -537,8 +502,7 @@ public class SimulationConfigurationPane extends EditorPane {
 		gatewaysLabel.setForeground(ScyllaGUI.TITLEFONT_COLOR);
 		gatewaysLabel.setFont(ScyllaGUI.TITLEFONT);
 		gatewaysLabel.setOpaque(true);
-		ExpandPanel panelGatewaysExpand = new ExpandPanel(gatewaysLabel, gatewayPanel);
-		panelGatewaysExpand.expand();
+		panelGatewaysExpand = new ExpandPanel(gatewaysLabel, createPMErrorLabel());
 		panelMain.add(panelGatewaysExpand, gbc_panelGateways);
 		
 		//Layout fixing empty buffer panel
@@ -554,36 +518,58 @@ public class SimulationConfigurationPane extends EditorPane {
 		gbc_panelBuffer.gridy = 5;
 		panelMain.add(panelBuffer,gbc_panelBuffer);
 		
+		setEnabled(false);
+		
 		{//TODO delete
-			
-			bpmnPath = "./samples/p2_normal.bpmn";
-			 try {
-				gcc = GlobalConfigurationCreator.createFromFile("./samples/p0_globalconf.xml");
-				setFile(new File("./samples/p2_normal_sim.xml"));
-				open();
-			} catch (JDOMException | IOException e1) {
-				e1.printStackTrace();
-			}
-
-
-			
-//			//creator = new SimulationConfigurationCreator();
-//			try {
-//				creator = SimulationConfigurationCreator.createFromFile("./samples/p2_normal_sim.xml", "./samples/p2_normal.bpmn");
-//			} catch (JDOMException | IOException e1) {
-//				e1.printStackTrace();
-//			}
-//			startEventPanel.setStartEvent(creator.getStartEvent());
-//			for(ElementLink el : creator.getElements()){
-//				if(el instanceof ExclusiveGateway){
-//					gatewayPanel.add((ComponentHolder)new ExclusiveGatewayPanel((ExclusiveGateway) el, this, creator));
-//				}
-//			}
-			
 			setBounds(100, 100, 1475, 902);
 		}
 		
 
+	}
+
+	private void be_openPM() {
+		//Choose file to be opened
+		ScalingFileChooser chooser = new ScalingFileChooser(ScyllaGUI.DEFAULTFILEPATH);
+		chooser.setDialogTitle("Open Process Model File");
+		int c = chooser.showDialog(SimulationConfigurationPane.this,"Open");
+		//if the process is canceled, nothing happens
+		if(c == ScalingFileChooser.APPROVE_OPTION){
+			if(chooser.getSelectedFile() != null){
+				try {
+					bpmnPath = chooser.getSelectedFile().getPath();
+					if(creator != null)updateModel();
+					labelRefPMshow.setText(bpmnPath);
+				} catch (JDOMException | IOException e1) {
+					e1.printStackTrace();
+				}
+				ScyllaGUI.DEFAULTFILEPATH = chooser.getSelectedFile().getPath();
+			}else{
+				System.err.println("Could not open file");
+			}
+		}
+	}
+	
+	private void be_openGC() {
+		//Choose file to be opened
+		ScalingFileChooser chooser = new ScalingFileChooser(ScyllaGUI.DEFAULTFILEPATH);
+		chooser.setDialogTitle("Open Global Configuration File");
+		int c = chooser.showDialog(SimulationConfigurationPane.this,"Open");
+		//if the process is canceled, nothing happens
+		if(c == ScalingFileChooser.APPROVE_OPTION){
+			if(chooser.getSelectedFile() != null){
+				try {
+					globalPath = chooser.getSelectedFile().getPath();
+					gcc = GlobalConfigurationCreator.createFromFile(globalPath);
+					if(creator != null)updateGCC();
+					labelRefGCshow.setText(globalPath);
+				} catch (JDOMException | IOException e1) {
+					e1.printStackTrace();
+				}
+				ScyllaGUI.DEFAULTFILEPATH = chooser.getSelectedFile().getPath();
+			}else{
+				System.err.println("Could not open file");
+			}
+		}
 	}
 
 	@Override
@@ -592,7 +578,14 @@ public class SimulationConfigurationPane extends EditorPane {
 		close();
 		labelFiletitle.setText("<unsaved file>");
 		creator = new SimulationConfigurationCreator();
+		if(gcc != null)updateGCC();
+		if(bpmnPath != null && !bpmnPath.isEmpty())try {
+			updateModel();
+		} catch (JDOMException | IOException e) {
+			e.printStackTrace();
+		}
 		creator.setStartDateTime(startDateTime);
+		creator.setEndDateTime(endDateTime);
 		setSaved(false);
 		setEnabled(true);
 		setChangeFlag(false);
@@ -614,7 +607,17 @@ public class SimulationConfigurationPane extends EditorPane {
 
 	@Override
 	protected void open() throws JDOMException, IOException {
-		creator = SimulationConfigurationCreator.createFromFile(getFile().getPath(),bpmnPath);
+		creator = SimulationConfigurationCreator.createFromFile(getFile().getPath());
+		if(gcc != null)creator.setGCC(gcc);
+		if(bpmnPath != null && !bpmnPath.isEmpty())try {
+	        Document doc;
+	        SAXBuilder builder = new SAXBuilder();
+			doc = builder.build(bpmnPath);
+	        Element modelRoot = doc.getRootElement();
+	        creator.setModel(modelRoot);
+		} catch (JDOMException | IOException e) {
+			e.printStackTrace();
+		}
 		setChangeFlag(true);
 		textfieldId.setText(creator.getId());
 		if(creator.getRandomSeed() != null){
@@ -639,14 +642,14 @@ public class SimulationConfigurationPane extends EditorPane {
 			textfieldEndTime.setEnabled(false);
 		}
 		
-		importCreatorEvents();
+		importCreatorElements();
 		
 		setChangeFlag(false);
 		setEnabled(true);
 	}
 	
-	private void importCreatorEvents() {
-		startEventPanel.setStartEvent(creator.getStartEvent());
+	private void importCreatorElements() {
+		if(creator.getStartEvent() != null)startEventPanel.setStartEvent(creator.getStartEvent());
 		
 		for(ElementLink el : creator.getElements()){
 			if(el instanceof Task){
@@ -662,8 +665,8 @@ public class SimulationConfigurationPane extends EditorPane {
 		setChangeFlag(true);
 		creator = null;
 		setFile(null);
-		textfieldId.setText("");
-		textfieldSeed.setValue(null);
+		globalPath = null;
+		bpmnPath = null;
 		clear();
 		setChangeFlag(false);
 		setSaved(true);
@@ -681,6 +684,9 @@ public class SimulationConfigurationPane extends EditorPane {
 	@Override
 	public void setEnabled(boolean b){
 		
+		button_openGC.setEnabled(b);
+		button_openPM.setEnabled(b);
+		
 		textfieldId.setEnabled(b);
 		textfieldSeed.setEnabled(b);
 		spinnerNOI.setEnabled(b);
@@ -694,12 +700,24 @@ public class SimulationConfigurationPane extends EditorPane {
 		taskPanel.setEnabled(b);
 		gatewayPanel.setEnabled(b);
 		
+		if(b) {
+			panelStarteventExpand.expand();
+			panelTasksExpand.expand();
+			panelGatewaysExpand.expand();
+		}else {
+			panelStarteventExpand.collapse();
+			panelTasksExpand.collapse();
+			panelGatewaysExpand.collapse();
+		}
+		
 		super.setEnabled(b);
 	}
 	
 	public void clear() {
+		labelRefGCshow.setText(" ");
+		labelRefPMshow.setText(" ");
 		textfieldId.setText("");
-		textfieldSeed.setText("");
+		textfieldSeed.setValue(null);
 		spinnerNOI.setValue(0);
 		textfieldStartTime.setValue(LocalTime.of(0, 0, 0));
 		textfieldStartDate.setText(dateFormatter.format(LocalDate.now()));
@@ -708,8 +726,11 @@ public class SimulationConfigurationPane extends EditorPane {
 		checkboxUnlimited.setSelected(true);
 		
 		startEventPanel.clear();
+		panelStarteventExpand.setContent(createPMErrorLabel());
 		taskPanel.clear();
+		panelTasksExpand.setContent(createPMErrorLabel());
 		gatewayPanel.clear();
+		panelGatewaysExpand.setContent(createPMErrorLabel());
 	}
 	
 	private void updateModel() throws JDOMException, IOException {
@@ -718,14 +739,38 @@ public class SimulationConfigurationPane extends EditorPane {
 		doc = builder.build(bpmnPath);
         Element modelRoot = doc.getRootElement();
         creator.setModel(modelRoot);
+        
+        //Reimport updated creator elements
+        startEventPanel.setStartEvent(creator.getStartEvent());
         taskPanel.clear();
         gatewayPanel.clear();
-        importCreatorEvents();
+        importCreatorElements();
+        
         button_openPM.setEnabled(false);
+        
+        panelStarteventExpand.setContent(startEventPanel);
+        panelTasksExpand.setContent(taskPanel);
+        panelGatewaysExpand.setContent(gatewayPanel);
+        gatewayPanel.forAll((gateway)->{
+        	if(gateway instanceof ExclusiveGatewayPanel) {
+        		((ExclusiveGatewayPanel) gateway).initBranches();
+        	}
+        });
 	}
 	
-	private void updateGCC() throws JDOMException, IOException {
-		creator.setGCC(globalPath);
+	private void updateGCC(){
+		creator.setGCC(gcc);
+		taskPanel.forAll((taskPanel)->{
+			((TaskPanel)taskPanel).setGcc(gcc);
+		});
+	}
+	
+	private static JLabel createPMErrorLabel() {
+		JLabel errorLabel = new JLabel("  Cannot edit until process model file is specified");
+		errorLabel.setOpaque(true);
+		errorLabel.setForeground(ScyllaGUI.ERRORFONT_COLOR);
+		errorLabel.setFont(ScyllaGUI.DEFAULTFONT);
+		return errorLabel;
 	}
 
 }

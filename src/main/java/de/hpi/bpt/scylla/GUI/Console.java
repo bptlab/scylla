@@ -1,6 +1,5 @@
 package de.hpi.bpt.scylla.GUI;
 
-import java.awt.Color;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -19,7 +18,7 @@ public class Console extends JTextPane{
 	
 	public Console() {
 		Style styleErr = addStyle(null, null);
-		StyleConstants.setForeground(styleErr, Color.RED);
+		StyleConstants.setForeground(styleErr, ScyllaGUI.ERRORFONT_COLOR);
 		setOut(new PrintStream(new OutputStream(){
 			@Override
 			public void write(int c) throws IOException {
