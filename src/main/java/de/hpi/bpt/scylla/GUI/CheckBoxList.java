@@ -13,7 +13,7 @@ import javax.swing.event.ListSelectionListener;
 
 @SuppressWarnings("serial")
 /**
- * A List that containing objects that are represented by checkboxes and observe their selection
+ * A List that contains objects that are represented by checkboxes and observes their selection
  * @author Leon Bein
  *
  * @param <T>

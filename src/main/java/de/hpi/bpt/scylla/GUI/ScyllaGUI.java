@@ -27,6 +27,7 @@ import javax.swing.plaf.ColorUIResource;
 
 import de.hpi.bpt.scylla.GUI.GlobalConfigurationPane.GlobalConfigurationPane;
 import de.hpi.bpt.scylla.GUI.SimulationConfigurationPane.SimulationConfigurationPane;
+import de.hpi.bpt.scylla.GUI.SimulationPane.SimulationPane;
 /**
  * Scylla UI Main class, provides UI constants and starts the UI.
  * @author Leon Bein
@@ -98,6 +99,8 @@ public class ScyllaGUI extends JFrame {
 	public static final ImageIcon ICON_X = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/remove.png")),ICONSIZE,ICONSIZE);
 	/**Icon for "further options"*/
 	public static final ImageIcon ICON_MORE = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/more.png")),ICONSIZE,ICONSIZE);
+	/**Icon for editing*/
+	public static final ImageIcon ICON_EDIT = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/edit.png")),ICONSIZE,ICONSIZE);
 	
 	/**Icon to expand*/
 	public static final ImageIcon ICON_EXPAND = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/expand.png")),DEFAULTFONT.getSize(),DEFAULTFONT.getSize());
@@ -116,10 +119,14 @@ public class ScyllaGUI extends JFrame {
 	/**Icon for open file*/
 	public static final ImageIcon ICON_OPEN = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/open.png")),TITLEFONT.getSize(),TITLEFONT.getSize());
 
+	
 	public static final String ACTIONKEY_NEW = "new";
 	public static final String ACTIONKEY_OPEN = "open";
 	public static final String ACTIONKEY_SAVE = "save";
 	public static final String ACTIONKEY_SAVEAS = "saveas";
+	
+	
+	
 
 	/**Simulation pane for running and configuring simulations*/
 	private SimulationPane simulationPane;

@@ -40,7 +40,7 @@ public class ListChooserPanel extends JSplitPane {
 	
 	/**Model of the list on the left side, as realized by a JTable*/
 	protected DefaultTableModel model;
-	/**List realization by a tably*/
+	/**List realization by a table*/
 	protected JTable list;
 	/**Empty panel if no item is selected*/
 	protected JPanel panelRight;

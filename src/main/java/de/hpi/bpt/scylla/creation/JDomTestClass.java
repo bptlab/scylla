@@ -23,6 +23,8 @@ import de.hpi.bpt.scylla.creation.SimulationConfiguration.Distribution;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.Distribution.DistributionType;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.ExclusiveGateway;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.SimulationConfigurationCreator;
+import de.hpi.bpt.scylla.creation.SimulationConfiguration.SimulationConfigurationCreator.NoProcessSpecifiedException;
+import de.hpi.bpt.scylla.creation.SimulationConfiguration.SimulationConfigurationCreator.NotAuthorizedToOverrideException;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.Task;
 
 //TODO delete
@@ -124,7 +126,11 @@ public class JDomTestClass {
 		s.setEndDateTime(ZonedDateTime.parse("2017-07-12T09:00:00.000+02:00"));
 
 		s.setRandomSeed(1337);
-        s.setModel(r);
+        try {
+			s.setModel(r, false);
+		} catch (NoProcessSpecifiedException | NotAuthorizedToOverrideException e1) {
+			e1.printStackTrace();
+		}
         
 		Distribution testDistribution = Distribution.create(DistributionType.BINOMIAL);
 		testDistribution.setAttribute("amount",5);
