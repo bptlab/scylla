@@ -1,4 +1,4 @@
-package de.hpi.bpt.scylla.GUI.GlobalConfigurationPane;
+package de.hpi.bpt.scylla.GUI.SimulationConfigurationPane;
 
 import java.awt.Component;
 import java.awt.GridBagConstraints;
@@ -16,6 +16,7 @@ import de.hpi.bpt.scylla.GUI.FormManager;
 import de.hpi.bpt.scylla.GUI.InsertRemoveListener;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel.ComponentHolder;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
+import de.hpi.bpt.scylla.GUI.GlobalConfigurationPane.NoNegativeDoubleFormat;
 import de.hpi.bpt.scylla.creation.ElementLink;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.ExclusiveGateway;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.SimulationConfigurationCreator;

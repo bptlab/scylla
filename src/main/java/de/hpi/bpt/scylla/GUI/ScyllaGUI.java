@@ -6,16 +6,21 @@ import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.io.PrintStream;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Locale;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
+import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.ColorUIResource;
@@ -110,7 +115,11 @@ public class ScyllaGUI extends JFrame {
 	public static final ImageIcon ICON_SAVEAS = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/saveas.png")),TITLEFONT.getSize(),TITLEFONT.getSize());
 	/**Icon for open file*/
 	public static final ImageIcon ICON_OPEN = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/open.png")),TITLEFONT.getSize(),TITLEFONT.getSize());
-	
+
+	public static final String ACTIONKEY_NEW = "new";
+	public static final String ACTIONKEY_OPEN = "open";
+	public static final String ACTIONKEY_SAVE = "save";
+	public static final String ACTIONKEY_SAVEAS = "saveas";
 
 	/**Simulation pane for running and configuring simulations*/
 	private SimulationPane simulationPane;
@@ -201,11 +210,10 @@ public class ScyllaGUI extends JFrame {
 		simconfPane = new SimulationConfigurationPane();
 	    contentPane = new JTabbedPane(JTabbedPane.TOP);
 		setContentPane(contentPane);
+	    initKeyBindings();
 		contentPane.addTab("Simulation", simulationPane);
 		contentPane.addTab("Global Configuration Editor", globalconfPane);
-		globalconfPane.init();
 		contentPane.addTab("Simulation Configuration Editor", simconfPane);
-		simconfPane.init();
 		
 		if(!DEBUG)System.setOut(simulationPane.getConsole().getOut());
 	}
@@ -240,6 +248,40 @@ public class ScyllaGUI extends JFrame {
 		for(Object key : Collections.list(keys)){
 	    	if (key.toString().endsWith(".font"))UIManager.put (key, font);
 	    }
+	}
+	
+	/**
+	 * Initializes key bindings and key event redirection to the current selected panel
+	 */
+	public void initKeyBindings(){
+		contentPane.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_S,InputEvent.CTRL_DOWN_MASK),ACTIONKEY_SAVE);
+		contentPane.getActionMap().put(ACTIONKEY_SAVE, new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				((JComponent)contentPane.getSelectedComponent()).getActionMap().get(ACTIONKEY_SAVE).actionPerformed(e);
+			}
+		});
+		contentPane.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_S,InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK),ACTIONKEY_SAVEAS);
+		contentPane.getActionMap().put(ACTIONKEY_SAVEAS, new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				((JComponent)contentPane.getSelectedComponent()).getActionMap().get(ACTIONKEY_SAVEAS).actionPerformed(e);
+			}
+		});
+		contentPane.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_O,InputEvent.CTRL_DOWN_MASK),ACTIONKEY_OPEN);
+		contentPane.getActionMap().put(ACTIONKEY_OPEN, new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				((JComponent)contentPane.getSelectedComponent()).getActionMap().get(ACTIONKEY_OPEN).actionPerformed(e);
+			}
+		});
+		contentPane.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_N,InputEvent.CTRL_DOWN_MASK),ACTIONKEY_NEW);
+		contentPane.getActionMap().put(ACTIONKEY_NEW, new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				((JComponent)contentPane.getSelectedComponent()).getActionMap().get(ACTIONKEY_NEW).actionPerformed(e);
+			}
+		});
 	}
 	
 }

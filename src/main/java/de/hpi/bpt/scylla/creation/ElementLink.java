@@ -16,6 +16,7 @@ public abstract class ElementLink {
 	 * @param toLink
 	 */
 	public ElementLink(Element toLink){
+		if(toLink == null)throw new NullPointerException("Cannot create Elementlink: Element to link with is null!");
 		el = toLink;
 		nsp = el.getNamespace();
 	}

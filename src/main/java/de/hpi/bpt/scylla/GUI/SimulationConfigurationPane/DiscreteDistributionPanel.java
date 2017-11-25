@@ -24,14 +24,28 @@ import de.hpi.bpt.scylla.GUI.ScyllaGUI;
 import de.hpi.bpt.scylla.GUI.GlobalConfigurationPane.NoNegativeDoubleFormat;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.Distribution.DiscreteDistribution;
 
+/**
+ * Special {@link DistributionPanel} sub panel for discrete distributions
+ * @author Leon Bein
+ *
+ */
 @SuppressWarnings("serial")
 public class DiscreteDistributionPanel extends JScrollPane {
 	
+	/**Displayed distribution type; doubles {@link DistributionPanel#distribution} to avoid multiple casts*/
 	private DiscreteDistribution distribution;
+	/**General simulation configuration form manager*/
 	private FormManager formManager;
+	
+	/**Table model managing entry set entries*/
 	private DefaultTableModel model;
 
 
+	/**
+	 * Constructor
+	 * @param d : Discrete distribution to be displayed
+	 * @param fm : Supervising form manager
+	 */
 	public DiscreteDistributionPanel(DiscreteDistribution d, FormManager fm) {
 		setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -39,7 +53,7 @@ public class DiscreteDistributionPanel extends JScrollPane {
 		
 		formManager = fm;
 		
-		
+		//Create table/list with entries and their probabilities in %
 		model = new DefaultTableModel(new Object[][]{}, new Object[]{"Value","Probability (in %)"});
 		JTable list = new JTable(model);
 		list.setFillsViewportHeight(true);
@@ -50,16 +64,18 @@ public class DiscreteDistributionPanel extends JScrollPane {
 		list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		list.setSurrendersFocusOnKeystroke(true);
 		setViewportView(list);
+		//Set value input as positive integer field
 		{
 			NumberFormatter formatter = new NumberFormatter(NumberFormat.getInstance());
 		    formatter.setValueClass(Integer.class);
-		    formatter.setMinimum(0);//No negative durations allowed
+		    formatter.setMinimum(0);//No negative task durations allowed
 		    formatter.setMaximum(Integer.MAX_VALUE);
 		    formatter.setAllowsInvalid(false);
 			JFormattedTextField intfield = new JFormattedTextField(formatter);
 			intfield.setColumns(10);
 			list.getColumn("Value").setCellEditor(new DefaultCellEditor(intfield));
 		}
+		//Set probability input as percent field
 		{
 			NumberFormatter formatter = new NumberFormatter(new NoNegativeDoubleFormat());
 			formatter.setValueClass(Double.class);
@@ -70,6 +86,7 @@ public class DiscreteDistributionPanel extends JScrollPane {
 			doublefield.setColumns(10);
 			list.getColumn("Probability (in %)").setCellEditor(new DefaultCellEditor(doublefield));
 		}
+		//Set table editing listener to value/frequency editing
 		{
 			model.addTableModelListener((TableModelEvent e) -> {
 				if(e.getType() == TableModelEvent.UPDATE && !formManager.isChangeFlag()){
@@ -136,6 +153,10 @@ public class DiscreteDistributionPanel extends JScrollPane {
 	}
 
 
+	/**
+	 * Sets this panel's distribution and imports all entries if existing
+	 * @param d
+	 */
 	private void setDistribution(DiscreteDistribution d) {
 		formManager.setChangeFlag(true);
 		

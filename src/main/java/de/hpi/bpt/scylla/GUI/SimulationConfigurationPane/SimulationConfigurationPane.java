@@ -1,27 +1,26 @@
 package de.hpi.bpt.scylla.GUI.SimulationConfigurationPane;
 
 
-import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
-import java.io.File;
 import java.io.IOException;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
@@ -42,13 +41,13 @@ import de.hpi.bpt.scylla.GUI.ListChooserPanel.ComponentHolder;
 import de.hpi.bpt.scylla.GUI.ScalingCheckBoxIcon;
 import de.hpi.bpt.scylla.GUI.ScalingFileChooser;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
-import de.hpi.bpt.scylla.GUI.GlobalConfigurationPane.ExclusiveGatewayPanel;
 import de.hpi.bpt.scylla.creation.ElementLink;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator;
-import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.ResourceType;
-import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.Timetable;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.ExclusiveGateway;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.SimulationConfigurationCreator;
+import de.hpi.bpt.scylla.creation.SimulationConfiguration.SimulationConfigurationCreator.NoProcessSpecifiedException;
+import de.hpi.bpt.scylla.creation.SimulationConfiguration.SimulationConfigurationCreator.NotAValidFileException;
+import de.hpi.bpt.scylla.creation.SimulationConfiguration.SimulationConfigurationCreator.NotAuthorizedToOverrideException;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.Task;
 
 @SuppressWarnings("serial")
@@ -536,9 +535,14 @@ public class SimulationConfigurationPane extends EditorPane {
 		if(c == ScalingFileChooser.APPROVE_OPTION){
 			if(chooser.getSelectedFile() != null){
 				try {
+					boolean success = true;
 					bpmnPath = chooser.getSelectedFile().getPath();
-					if(creator != null)updateModel();
-					labelRefPMshow.setText(bpmnPath);
+					if(creator != null)success = updateModel();
+					if(!success) {
+						clearBpmnPath();
+					}else {
+						labelRefPMshow.setText(bpmnPath);
+					}
 				} catch (JDOMException | IOException e1) {
 					e1.printStackTrace();
 				}
@@ -607,15 +611,36 @@ public class SimulationConfigurationPane extends EditorPane {
 
 	@Override
 	protected void open() throws JDOMException, IOException {
-		creator = SimulationConfigurationCreator.createFromFile(getFile().getPath());
+		buttonClosefile.setEnabled(true);
+		try {
+			creator = SimulationConfigurationCreator.createFromFile(getFile().getPath());
+		} catch (NotAValidFileException e1) {
+			setFile(null);
+			e1.printStackTrace();
+			return;
+		}
 		if(gcc != null)creator.setGCC(gcc);
+		Element modelRoot = null;
 		if(bpmnPath != null && !bpmnPath.isEmpty())try {
 	        Document doc;
 	        SAXBuilder builder = new SAXBuilder();
 			doc = builder.build(bpmnPath);
-	        Element modelRoot = doc.getRootElement();
-	        creator.setModel(modelRoot);
+	        modelRoot = doc.getRootElement();
+	        creator.setModel(modelRoot,false);
 		} catch (JDOMException | IOException e) {
+			e.printStackTrace();
+		} catch (NoProcessSpecifiedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NotAuthorizedToOverrideException e) {
+			int override = showModelOverrideConfirmationDialog(e);
+			if(override == 0)
+				try {
+					creator.setModel(modelRoot, true);
+				} catch (NoProcessSpecifiedException | NotAuthorizedToOverrideException e1) {
+					e1.printStackTrace();
+				}
+			else clearBpmnPath();
 			e.printStackTrace();
 		}
 		setChangeFlag(true);
@@ -648,6 +673,7 @@ public class SimulationConfigurationPane extends EditorPane {
 		setEnabled(true);
 	}
 	
+
 	private void importCreatorElements() {
 		if(creator.getStartEvent() != null)startEventPanel.setStartEvent(creator.getStartEvent());
 		
@@ -733,12 +759,26 @@ public class SimulationConfigurationPane extends EditorPane {
 		panelGatewaysExpand.setContent(createPMErrorLabel());
 	}
 	
-	private void updateModel() throws JDOMException, IOException {
+	private boolean updateModel() throws JDOMException, IOException {
         Document doc;
         SAXBuilder builder = new SAXBuilder();
 		doc = builder.build(bpmnPath);
         Element modelRoot = doc.getRootElement();
-        creator.setModel(modelRoot);
+        try {
+			creator.setModel(modelRoot, false);
+		} catch (NoProcessSpecifiedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NotAuthorizedToOverrideException e) {
+			if(showModelOverrideConfirmationDialog(e) == 0) {
+				try {
+					creator.setModel(modelRoot, true);
+				} catch (NoProcessSpecifiedException | NotAuthorizedToOverrideException e1) {
+					e1.printStackTrace();
+				}
+			}
+			else return false;
+		}
         
         //Reimport updated creator elements
         startEventPanel.setStartEvent(creator.getStartEvent());
@@ -756,6 +796,25 @@ public class SimulationConfigurationPane extends EditorPane {
         		((ExclusiveGatewayPanel) gateway).initBranches();
         	}
         });
+        
+        return true;
+	}
+	
+	private int showModelOverrideConfirmationDialog(NotAuthorizedToOverrideException e) {
+		return JOptionPane.showOptionDialog(
+				this,
+				"Cannot find process ref "+e.getOldRef()+". Override with found ref "+e.getNewRef()+"?",
+				"Override process ref",
+				JOptionPane.YES_NO_OPTION,
+				JOptionPane.PLAIN_MESSAGE,
+				null,
+				new Object[]{"Override process ref","Clear process model path"}, 
+				0);
+	}
+	
+	private void clearBpmnPath() {
+		bpmnPath = "";
+		labelRefPMshow.setText(" ");
 	}
 	
 	private void updateGCC(){

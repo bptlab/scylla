@@ -23,15 +23,15 @@ public class Distribution extends ElementLink{
 	 * @author Leon Bein
 	 */
 	public enum DistributionType{
-		binomial(		"binomial",					"Binomial", 		new String[]{"probability","amount"}, 	new AttributeType[]{AttributeType.DOUBLE,AttributeType.INT}),
-		constant(		"constant", 				"Constant", 		new String[]{"constantValue"}, 			new AttributeType[]{AttributeType.DOUBLE}),
-		erlang(			"erlang", 					"Erlang", 			new String[]{"order","mean"}, 			new AttributeType[]{AttributeType.INT,AttributeType.DOUBLE}),
-		exponential(	"exponential", 				"Exponential", 		new String[]{"mean"}, 					new AttributeType[]{AttributeType.DOUBLE}),
-		triangular(		"triangular", 				"Triangluar", 		new String[]{"lower","peak","upper"}, 	new AttributeType[]{AttributeType.DOUBLE,AttributeType.DOUBLE,AttributeType.DOUBLE}),
-		normal(			"normal", 					"Normal", 			new String[]{"mean","standardDeviation"}, new AttributeType[]{AttributeType.DOUBLE,AttributeType.DOUBLE}),
-		poisson(		"poisson", 					"Poisson", 			new String[]{"mean"}, 					new AttributeType[]{AttributeType.DOUBLE}),
-		uniform(		"uniform", 					"Uniform", 			new String[]{"lower","upper"}, 			new AttributeType[]{AttributeType.DOUBLE,AttributeType.DOUBLE}),
-		descrete(		"arbitraryFiniteProbability","Descrete", 		new String[]{}, 						new AttributeType[]{}),
+		BINOMIAL(		"binomial",					"Binomial", 		new String[]{"probability","amount"}, 	new AttributeType[]{AttributeType.DOUBLE,AttributeType.INT}),
+		CONSTANT(		"constant", 				"Constant", 		new String[]{"constantValue"}, 			new AttributeType[]{AttributeType.DOUBLE}),
+		ERLANG(			"erlang", 					"Erlang", 			new String[]{"order","mean"}, 			new AttributeType[]{AttributeType.INT,AttributeType.DOUBLE}),
+		EXPONENTIAL(	"exponential", 				"Exponential", 		new String[]{"mean"}, 					new AttributeType[]{AttributeType.DOUBLE}),
+		TRIANGULAR(		"triangular", 				"Triangluar", 		new String[]{"lower","peak","upper"}, 	new AttributeType[]{AttributeType.DOUBLE,AttributeType.DOUBLE,AttributeType.DOUBLE}),
+		NORMAL(			"normal", 					"Normal", 			new String[]{"mean","standardDeviation"}, new AttributeType[]{AttributeType.DOUBLE,AttributeType.DOUBLE}),
+		POISSON(		"poisson", 					"Poisson", 			new String[]{"mean"}, 					new AttributeType[]{AttributeType.DOUBLE}),
+		UNIFORM(		"uniform", 					"Uniform", 			new String[]{"lower","upper"}, 			new AttributeType[]{AttributeType.DOUBLE,AttributeType.DOUBLE}),
+		DISCRETE(		"arbitraryFiniteProbability","Discrete", 		new String[]{}, 						new AttributeType[]{}),
 		;
 		/**Identification String inside the SC*/
 		public final String id;
@@ -97,7 +97,7 @@ public class Distribution extends ElementLink{
 		try{
 			DistributionType type = DistributionType.get(toLink.getName());
 			switch(type){
-			case descrete : return new DiscreteDistribution(toLink);
+			case DISCRETE : return new DiscreteDistribution(toLink);
 			default : return new Distribution(toLink, type);
 			}
 		}catch(IllegalArgumentException e){
@@ -113,7 +113,7 @@ public class Distribution extends ElementLink{
 	 */
 	public static Distribution create(DistributionType type){
 		switch(type){
-		case descrete : return new DiscreteDistribution();
+		case DISCRETE : return new DiscreteDistribution();
 		default : return new Distribution( type);
 		}
 	}
@@ -212,14 +212,14 @@ public class Distribution extends ElementLink{
 		 * @param toLink : Element to link with
 		 */
 		private DiscreteDistribution(Element toLink) {
-			super(toLink,DistributionType.descrete);
+			super(toLink,DistributionType.DISCRETE);
 		}
 		
 		/**
 		 * Creates a new distribution object and element of type descrete
 		 */
 		private DiscreteDistribution() {
-			super(DistributionType.descrete);
+			super(DistributionType.DISCRETE);
 		}
 		
 		/**

@@ -8,6 +8,8 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.BoxLayout;
@@ -47,6 +49,7 @@ public class TaskPanel extends JPanel implements ComponentHolder,ResourceObserve
 	private JButton buttonAssign;
 	private GridBagConstraints gbc_buttonAssign;
 	private JLabel labelErrorAssign;
+	private Set<AssignerPanel> assignerPanels;
 
 	/**
 	 * Create the panel.
@@ -221,7 +224,7 @@ public class TaskPanel extends JPanel implements ComponentHolder,ResourceObserve
 				ResourceType type = TaskPanel.this.gcc.getResourceType((String) comboboxAssign.getSelectedItem());
 				if(type != null){
 					ResourceAssignment res = task.assignResource(type);
-					panelResources.add(createAssigner(res));
+					createAssigner(res);
 					getParent().getParent().revalidate();
 					repaint();
 				}
@@ -238,6 +241,8 @@ public class TaskPanel extends JPanel implements ComponentHolder,ResourceObserve
 		gbc_buttonAssign.gridy = 7;
 		add(labelErrorAssign, gbc_buttonAssign);
 		buttonAssign.setEnabled(false);
+		
+		assignerPanels = new HashSet<AssignerPanel>();
 
 		if(gc != null)setGcc(gc);
 		setTask(t);
@@ -254,6 +259,10 @@ public class TaskPanel extends JPanel implements ComponentHolder,ResourceObserve
 		buttonAssign.setEnabled(true);
 		comboboxAssign.setEnabled(true);
 		remove(labelErrorAssign);
+		for(AssignerPanel assigner: assignerPanels) {
+			String type = assigner.assignment.getId();
+			assigner.setErrored(gcc.getResourceType(type) == null);
+		}
 		add(buttonAssign,gbc_buttonAssign);
 	}
 
@@ -272,7 +281,7 @@ public class TaskPanel extends JPanel implements ComponentHolder,ResourceObserve
 			comboboxTimeunit.setSelectedItem(TimeUnit.valueOf(task.getDurationTimeUnit()));
 		
 		for(String id : t.getResources()) {
-			panelResources.add(createAssigner(t.getResource(id)));
+			createAssigner(t.getResource(id));
 		}
 
 		fm.setChangeFlag(false);
@@ -285,67 +294,93 @@ public class TaskPanel extends JPanel implements ComponentHolder,ResourceObserve
 		add(panelDistribution, gbc_panelDistribution);
 	}
 	
-	private JPanel createAssigner(ResourceAssignment r){
-		JPanel panel = new JPanel();
-		GridBagLayout gbl_panel = new GridBagLayout(); 
-		gbl_panel.columnWeights = new double[]{1,0,1,1,10};
-		panel.setLayout(gbl_panel);
+	private class AssignerPanel extends JPanel{
+		
+		private ResourceAssignment assignment;
+		private JLabel labelError;
+		
+		private AssignerPanel(ResourceAssignment r) {
+			assignment = r;
+			GridBagLayout gbl_panel = new GridBagLayout(); 
+			gbl_panel.columnWeights = new double[]{1,0,1,1,1,9};
+			setLayout(gbl_panel);
 
-		JLabel labelName = new JLabel(r.getName());
-		GridBagConstraints gbc_labelName = new GridBagConstraints();
-		gbc_labelName.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
-		gbc_labelName.gridx = 0;
-		gbc_labelName.gridy = 0;
-		panel.add(labelName, gbc_labelName);
+			JLabel labelName = new JLabel(r.getName());
+			GridBagConstraints gbc_labelName = new GridBagConstraints();
+			gbc_labelName.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
+			gbc_labelName.gridx = 0;
+			gbc_labelName.gridy = 0;
+			add(labelName, gbc_labelName);
+			
+			JLabel labelNumber = new JLabel("Amount:");
+			GridBagConstraints gbc_labelNumber = new GridBagConstraints();
+			gbc_labelNumber.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
+			gbc_labelNumber.gridx = 1;
+			gbc_labelNumber.gridy = 0;
+			add(labelNumber, gbc_labelNumber);
+			
+			Integer max = null;
+			if(r.getType() != null)max = Integer.valueOf(r.getType().getDefaultQuantity());
+			JSpinner spinner = new JSpinner(new SpinnerNumberModel(new Integer(0), new Integer(0), max, new Integer(1)));
+			//TODO set maximum to Resource maximum [done] and add resource change listener for that
+			spinner.setValue(Integer.parseInt(r.getAmount()));
+			spinner.addChangeListener((ChangeEvent e)->{
+				if(fm.isChangeFlag())return;
+				r.setAmount((Integer)spinner.getValue());
+				fm.setSaved(false);
+			});
+			GridBagConstraints gbc_spinner = new GridBagConstraints();
+			gbc_spinner.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
+			gbc_spinner.gridx = 2;
+			gbc_spinner.gridy = 0;
+			gbc_spinner.fill = GridBagConstraints.HORIZONTAL;
+			add(spinner, gbc_spinner);
+			
+			JButton buttonDeassign = new JButton("deassign");
+			buttonDeassign.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					task.deassignResource(r.getId());
+					panelResources.remove(AssignerPanel.this);
+					assignerPanels.remove(AssignerPanel.this);
+					TaskPanel.this.getParent().getParent().revalidate();
+					TaskPanel.this.repaint();
+				}
+			});
+			GridBagConstraints gbc_buttonDeassign = new GridBagConstraints();
+			gbc_buttonDeassign.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
+			gbc_buttonDeassign.gridx = 3;
+			gbc_buttonDeassign.gridy = 0;
+			add(buttonDeassign, gbc_buttonDeassign);
+			
+			labelError = new JLabel(" ");
+			labelError.setForeground(ScyllaGUI.ERRORFONT_COLOR);
+			labelError.setFont(ScyllaGUI.DEFAULTFONT);
+			GridBagConstraints gbc_labelError = new GridBagConstraints();
+			gbc_labelError.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
+			gbc_labelError.gridx = 4;
+			gbc_labelError.gridy = 0;
+			add(labelError, gbc_labelError);
+			
+			JLabel labelFill = new JLabel(" ");
+			GridBagConstraints gbc_labelFill = new GridBagConstraints();
+			gbc_labelFill.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
+			gbc_labelFill.gridx = 5;
+			gbc_labelFill.gridy = 0;
+			add(labelFill, gbc_labelFill);
+		}
 		
-		JLabel labelNumber = new JLabel("Amount:");
-		GridBagConstraints gbc_labelNumber = new GridBagConstraints();
-		gbc_labelNumber.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
-		gbc_labelNumber.gridx = 1;
-		gbc_labelNumber.gridy = 0;
-		panel.add(labelNumber, gbc_labelNumber);
-		
-		Integer max = null;
-		if(r.getType() != null)max = Integer.valueOf(r.getType().getDefaultQuantity());
-		JSpinner spinner = new JSpinner(new SpinnerNumberModel(new Integer(0), new Integer(0), max, new Integer(1)));
-		//TODO set maximum to Resource maximum [done] and add resource change listener for that
-		spinner.setValue(Integer.parseInt(r.getAmount()));
-		spinner.addChangeListener((ChangeEvent e)->{
-			if(fm.isChangeFlag())return;
-			r.setAmount((Integer)spinner.getValue());
-			fm.setSaved(false);
-		});
-		GridBagConstraints gbc_spinner = new GridBagConstraints();
-		gbc_spinner.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
-		gbc_spinner.gridx = 2;
-		gbc_spinner.gridy = 0;
-		gbc_spinner.fill = GridBagConstraints.HORIZONTAL;
-		panel.add(spinner, gbc_spinner);
-		
-		JButton buttonDeassign = new JButton("deassign");
-		buttonDeassign.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				task.deassignResource(r.getId());
-				panelResources.remove(panel);
-				getParent().getParent().revalidate();
-				repaint();
-			}
-		});
-		GridBagConstraints gbc_buttonDeassign = new GridBagConstraints();
-		gbc_buttonDeassign.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
-		gbc_buttonDeassign.gridx = 3;
-		gbc_buttonDeassign.gridy = 0;
-		panel.add(buttonDeassign, gbc_buttonDeassign);
-		
-		JLabel labelFill = new JLabel(" ");
-		GridBagConstraints gbc_labelFill = new GridBagConstraints();
-		gbc_labelFill.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
-		gbc_labelFill.gridx = 4;
-		gbc_labelFill.gridy = 0;
-		panel.add(labelFill, gbc_labelFill);
-		
-		return panel;
+		private void setErrored(boolean b) {
+			if(!b) labelError.setText(" ");
+			else labelError.setText("Warning: The resource type of this assignment does not appear in the current global configuration file.");
+		}
 	}
+	
+	private void createAssigner(ResourceAssignment r){
+		AssignerPanel assigner = new AssignerPanel(r);
+		panelResources.add(assigner);
+		assignerPanels.add(assigner);
+	}
+
 
 	@Override
 	public Component getComponent() {

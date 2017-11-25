@@ -111,8 +111,10 @@ public class ListChooserPanel extends JSplitPane {
 					int i = source.getMinSelectionIndex();
 					if(i == -1 || !(model.getValueAt(i,0) instanceof ComponentHolder))setRightComponent(panelRight);
 					else setRightComponent(((ComponentHolder) model.getValueAt(i,0)).getComponent());
-					getParent().revalidate();
-					getParent().repaint();
+					if(getParent() != null) {
+						getParent().revalidate();
+						getParent().repaint();
+					}
 					revalidate();
 					repaint();
 				}

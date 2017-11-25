@@ -11,11 +11,21 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 
 @SuppressWarnings("serial")
+/**
+ * Console pane that can print plain and error messages and can be used to reroute standard console output.
+ * @author Leon Bein
+ *
+ */
 public class Console extends JTextPane{
 
+	/**Standard output stream*/
 	private PrintStream out;
+	/**Error output stream*/
 	private PrintStream err;
 	
+	/**
+	 * Constructor, initializes the print streams and their styles
+	 */
 	public Console() {
 		Style styleErr = addStyle(null, null);
 		StyleConstants.setForeground(styleErr, ScyllaGUI.ERRORFONT_COLOR);
@@ -48,18 +58,22 @@ public class Console extends JTextPane{
 		}));
 	}
 
+	/** @return The standard output print stream. */
 	public PrintStream getOut() {
 		return out;
 	}
 
+	/** Sets the standard output print stream */
 	private void setOut(PrintStream out) {
 		this.out = out;
 	}
 
+	/**@return The error output print stream*/
 	public PrintStream getErr() {
 		return err;
 	}
 
+	/**Sets the error output print stream*/
 	private void setErr(PrintStream err) {
 		this.err = err;
 	}

@@ -126,13 +126,13 @@ public class JDomTestClass {
 		s.setRandomSeed(1337);
         s.setModel(r);
         
-		Distribution testDistribution = Distribution.create(DistributionType.binomial);
+		Distribution testDistribution = Distribution.create(DistributionType.BINOMIAL);
 		testDistribution.setAttribute("amount",5);
 		testDistribution.setAttribute(0, 0.2);
 		s.getStartEvent().setArrivalRateDistribution(testDistribution);
 		
 		Task t = (Task)s.getElement("Task_1tvvo6w");
-		t.setDurationDistribution(Distribution.create(DistributionType.constant));
+		t.setDurationDistribution(Distribution.create(DistributionType.CONSTANT));
 		t.getDurationDistribution().setAttribute("constantValue", 100);
 		t.assignResource(student).setAmount(5);
 		t.assignResource(prof).setAmount(5);
@@ -149,7 +149,7 @@ public class JDomTestClass {
 		for(ElementLink element : s.getElements()){
 			if(!(element instanceof Task))continue;
 			Task task = (Task)element;
-			Distribution d = Distribution.create(DistributionType.triangular);
+			Distribution d = Distribution.create(DistributionType.TRIANGULAR);
 			d.setAttribute(0,11);
 			d.setAttribute(2,33);
 			d.setAttribute("peak",22);
