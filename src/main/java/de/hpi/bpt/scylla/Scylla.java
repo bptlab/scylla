@@ -20,6 +20,11 @@ public class Scylla {
          * Simulation scenarios to test plug-ins.
          */
 
+        if (Arrays.stream(args).anyMatch(x -> x.contains("--help"))) {
+                System.out.println("Usage: Scylla --config=<your config file> --bpmn=<your first bpmn file> [--bpmn=<your second bpmn file>] [--bpmn=...] --sim=<your first sim file> [--sim=<your second sim file>] [--sim=...] [--output=<your output path>]");
+                return;
+        }
+
         String configurationFile = Arrays.stream(args)
                                                 .filter(x -> x.contains("--config"))
                                                 .map(s -> {
@@ -38,7 +43,7 @@ public class Scylla {
                                                 .toArray(String[]::new);
 
         if (bpmnFilenames.length == 0) {
-                throw new Exception("You have to provide at least one bpmn diagram file. Usage: --bpmn=<your file path>");
+                throw new IllegalArgumentException("You have to provide at least one bpmn diagram file. Usage: --bpmn=<your file path>");
         }
 
         String[] simFilenames = Arrays.stream(args)
@@ -50,7 +55,7 @@ public class Scylla {
                                                 .toArray(String[]::new);
 
         if (simFilenames.length == 0) {
-                throw new Exception("You have to provide at least one simulation file. Usage: --sim=<your file path>");
+                throw new IllegalArgumentException("You have to provide at least one simulation file. Usage: --sim=<your file path>");
         }
 
         boolean enableBpsLogging = Arrays.stream(args).anyMatch(x -> "--enable-bps-logging".equalsIgnoreCase(x));
