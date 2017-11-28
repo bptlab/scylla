@@ -11,7 +11,7 @@ import java.util.Arrays;
  */
 public class Scylla {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         /**
          * BEGIN of simulation scenarios
          */
@@ -20,17 +20,51 @@ public class Scylla {
          * Simulation scenarios to test plug-ins.
          */
 
-        String configurationFile = args[0];
+        String configurationFile = Arrays.stream(args)
+                                                .filter(x -> x.contains("--config"))
+                                                .map(s -> {
+                                                        String[] splitted = s.split("=");
+                                                        return splitted[splitted.length - 1];
+                                                })
+                                                .findFirst()
+                                                .orElseThrow(() -> new Exception("You have to provide a configuration file. Usage: --config=<your file path>"));
+
         String[] bpmnFilenames = Arrays.stream(Arrays.copyOfRange(args, 1, args.length))
-                                                .filter(x -> x.contains(".bpmn"))
+                                                .filter(x -> x.contains("--bpmn"))
+                                                .map(s -> {
+                                                        String[] splitted = s.split("=");
+                                                        return splitted[splitted.length - 1];
+                                                })
                                                 .toArray(String[]::new);
+
+        if (bpmnFilenames.length == 0) {
+                throw new Exception("You have to provide at least one bpmn diagram file. Usage: --bpmn=<your file path>");
+        }
 
         String[] simFilenames = Arrays.stream(Arrays.copyOfRange(args, 1, args.length))
                                                 .filter(x -> x.contains(".xml"))
+                                                .map(s -> {
+                                                        String[] splitted = s.split("=");
+                                                        return splitted[splitted.length - 1];
+                                                })
                                                 .toArray(String[]::new);
 
-        String outputFolder = args[args.length - 1];
+        if (simFilenames.length == 0) {
+                throw new Exception("You have to provide at least one simulation file. Usage: --sim=<your file path>");
+        }
 
+        boolean enableBpsLogging = Arrays.stream(args).anyMatch(x -> "--enable-bps-logging".equalsIgnoreCase(x));
+        boolean enableDesmojLogging = Arrays.stream(args).anyMatch(x -> "--desmoj-logging".equalsIgnoreCase(x));
+
+        String outputFolder = Arrays.stream(args)
+                                        .filter(x -> x.contains("--output"))
+                                        .map(s -> {
+                                                String[] splitted = s.split("=");
+                                                return splitted[splitted.length - 1];
+                                        })
+                                        .findFirst()
+                                        .orElse("sim-out/");
+        
     	/**
          * Simulation scenarios to test dmn simulation.
          */
@@ -42,9 +76,6 @@ public class Scylla {
         /**
          * END of simulation scenarios
          */
-
-        boolean enableBpsLogging = true;
-        boolean enableDesmojLogging = true;
 
         SimulationManager manager = new SimulationManager(outputFolder, bpmnFilenames, simFilenames, configurationFile,
                 enableBpsLogging, enableDesmojLogging);
