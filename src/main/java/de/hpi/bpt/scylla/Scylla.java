@@ -27,7 +27,7 @@ public class Scylla {
                                                         return splitted[splitted.length - 1];
                                                 })
                                                 .findFirst()
-                                                .orElseThrow(() -> new Exception("You have to provide a configuration file. Usage: --config=<your file path>"));
+                                                .orElseThrow(() -> new IllegalArgumentException("You have to provide a configuration file. Usage: --config=<your file path>"));
 
         String[] bpmnFilenames = Arrays.stream(args)
                                                 .filter(x -> x.contains("--bpmn"))
@@ -41,7 +41,7 @@ public class Scylla {
                 throw new Exception("You have to provide at least one bpmn diagram file. Usage: --bpmn=<your file path>");
         }
 
-        String[] simFilenames = Arrays.stream(args))
+        String[] simFilenames = Arrays.stream(args)
                                                 .filter(x -> x.contains(".xml"))
                                                 .map(s -> {
                                                         String[] splitted = s.split("=");
