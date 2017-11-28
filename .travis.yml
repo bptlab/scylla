@@ -9,3 +9,6 @@ jdk:
   - oraclejdk9
 
 script: mvn '-Dtest=de.hpi.bpt.scylla.*Tests' test
+
+notifications:
+  email: false
