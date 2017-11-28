@@ -54,10 +54,12 @@
 	    <scope>system</scope>
 	    <systemPath>${project.basedir}/lib/desmoj-2.5.1c-bin.jar</systemPath>
 	</dependency>	
-	<dependency> <!-- for unit testing and CI-->
-  		<groupId>junit</groupId>
-  		<artifactId>junit</artifactId>
- 			<version>4.12</version>
+  <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
+	<dependency>
+		<groupId>org.junit.jupiter</groupId>
+		<artifactId>junit-jupiter-engine</artifactId>
+		<version>5.0.0-M1</version>
+		<scope>test</scope>
 	</dependency>
   </dependencies>
   
