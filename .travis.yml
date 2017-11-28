@@ -7,6 +7,5 @@ git:
 jdk:
   - oraclejdk8
   - oraclejdk9
-  - openjdk7
 
 script: mvn '-Dtest=de.hpi.bpt.scylla.*Tests' test
