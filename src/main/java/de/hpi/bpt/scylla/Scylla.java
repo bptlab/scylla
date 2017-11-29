@@ -12,13 +12,6 @@ import java.util.Arrays;
 public class Scylla {
 
     public static void main(String[] args) throws Exception {
-        /**
-         * BEGIN of simulation scenarios
-         */
-
-        /**
-         * Simulation scenarios to test plug-ins.
-         */
 
         if (Arrays.stream(args).anyMatch(x -> x.contains("--help"))) {
                 System.out.println("Usage: Scylla --config=<your config file> --bpmn=<your first bpmn file> [--bpmn=<your second bpmn file>] [--bpmn=...] --sim=<your first sim file> [--sim=<your second sim file>] [--sim=...] [--output=<your output path>]");
@@ -70,18 +63,6 @@ public class Scylla {
                                         .findFirst()
                                         .orElse("sim-out/");
         
-    	/**
-         * Simulation scenarios to test dmn simulation.
-         */
-    	
-        /**
-         * Simulation scenarios to test batch processes. May be used for regular simulation.
-         */
-
-        /**
-         * END of simulation scenarios
-         */
-
         SimulationManager manager = new SimulationManager(outputFolder, bpmnFilenames, simFilenames, configurationFile,
                 enableBpsLogging, enableDesmojLogging);
         manager.run();
