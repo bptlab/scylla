@@ -1,5 +1,11 @@
 /target/
 
+# Ignore desmoj output
+*_debug.html
+*_error.html
+*_report.html
+*_trace.html
+
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
