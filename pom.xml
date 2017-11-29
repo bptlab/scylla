@@ -54,12 +54,22 @@
 	    <scope>system</scope>
 	    <systemPath>${project.basedir}/lib/desmoj-2.5.1c-bin.jar</systemPath>
 	</dependency>	
-  <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
+  
+	<!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
 	<dependency>
 		<groupId>org.junit.jupiter</groupId>
 		<artifactId>junit-jupiter-engine</artifactId>
 		<version>5.0.0-M1</version>
 		<scope>test</scope>
+	</dependency>
+	
+	<!-- Plugins which can be used inside Scylla -->
+	<dependency>
+	    <groupId>de.hpi.bpt.scylla.plugins</groupId>
+	    <artifactId>StatisticsLogging</artifactId>
+	    <version>20171129</version>
+	    <scope>system</scope>
+	    <systemPath>${project.basedir}/lib/OpenXES-XStream-20160212.jar</systemPath>
 	</dependency>
   </dependencies>
   
