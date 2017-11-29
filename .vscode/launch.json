@@ -19,7 +19,7 @@
             "cwd": "${workspaceFolder}",
             "mainClass": "de.hpi.bpt.scylla.Scylla",
             "projectName": "scylla",
-            "args": "--config=samples/p0_globalconf.xml --enable-bps-logging --bpmn=samples/p2_normal.bpmn --sim=samples/p2_normal_sim.xml"
+            "args": "--config=samples/p0_globalconf.xml --enable-bps-logging --bpmn=samples/p7_dmn.bpmn --sim=samples/p7_dmn_sim.xml"
         },
         {
             "type": "java",

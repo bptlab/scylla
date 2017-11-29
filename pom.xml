@@ -69,7 +69,14 @@
 	    <artifactId>StatisticsLogging</artifactId>
 	    <version>20171129</version>
 	    <scope>system</scope>
-	    <systemPath>${project.basedir}/lib/OpenXES-XStream-20160212.jar</systemPath>
+	    <systemPath>${project.basedir}/plugins/StatsLogger.jar</systemPath>
+	</dependency>
+	<dependency>
+	    <groupId>de.hpi.bpt.scylla.plugins</groupId>
+	    <artifactId>InterfaceTesting</artifactId>
+	    <version>20171129</version>
+	    <scope>system</scope>
+	    <systemPath>${project.basedir}/plugins/InterfaceTesting.jar</systemPath>
 	</dependency>
   </dependencies>
   
