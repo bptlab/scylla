@@ -6,6 +6,10 @@
 *_report.html
 *_trace.html
 
+# Ignore output of scylla
+*_resourceutilization.txt
+*.xes
+
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
