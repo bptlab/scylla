@@ -40,7 +40,7 @@ public class Scylla {
         }
 
         String[] simFilenames = Arrays.stream(args)
-                                                .filter(x -> x.contains(".xml"))
+                                                .filter(x -> x.contains("--sim"))
                                                 .map(s -> {
                                                         String[] splitted = s.split("=");
                                                         return splitted[splitted.length - 1];
