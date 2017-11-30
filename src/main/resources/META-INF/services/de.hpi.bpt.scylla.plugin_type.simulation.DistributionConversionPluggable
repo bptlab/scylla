@@ -1,3 +1,0 @@
-de.hpi.bpt.scylla.plugin.boundaryevent.BoundaryDistributionConversionPlugin
-de.hpi.bpt.scylla.plugin.gateway_exclusive.ExclusiveGatewayDistributionConversionPlugin
-de.hpi.bpt.scylla.plugin.dataobject.DataObjectDistributionConversionPlugin

@@ -10,11 +10,11 @@
 	    </bsim:startEvent>
 	    <bsim:task id="sid-10642FA7-3483-45AF-AC53-88080CD67FF9" name="write thesis">
 	    	<bsim:duration timeUnit="MINUTES">
-	    		<bsim:empiricalDistribution>
+	    		<bsim:arbitraryFiniteProbabilityDistribution>
 	    			<bsim:entry value="10" frequency="20"/>
 	    			<bsim:entry value="6" frequency="5"/>
 	    			<bsim:entry value="12" frequency="1"/>
-	    		</bsim:empiricalDistribution>
+	    		</bsim:arbitraryFiniteProbabilityDistribution>
 	    	</bsim:duration>
 	    	<bsim:resources>
 	    		<bsim:resource id="Student" amount="1"/>

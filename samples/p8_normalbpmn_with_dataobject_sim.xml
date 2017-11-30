@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bsim:definitions xmlns:bsim="http://bsim.hpi.uni-potsdam.de/scylla/simModel" id="Simulation_8" targetNamespace="http://www.hpi.de">
+	<bsim:simulationConfiguration id="SimulationConfiguration_8" processRef="Process_8" processInstances="30" startDateTime="2016-08-01T09:00:00.000+02:00" endDateTime="2016-08-05T15:00:00.000+02:00" resourceAssignmentOrder="priority,simulationTime"><!-- randomSeed="9281">-->
+	    <bsim:startEvent id="StartEvent_1">
+	    	<bsim:arrivalRate timeUnit="MINUTES">
+	    		<bsim:exponentialDistribution>
+	    			<bsim:mean>150.5</bsim:mean>
+	    		</bsim:exponentialDistribution>
+	    	</bsim:arrivalRate>
+	    </bsim:startEvent>
+	    <bsim:task id="Task_0bcata7" name="write paper">
+	    	<bsim:duration timeUnit="MINUTES">
+	    		<bsim:erlangDistribution>
+	    			<bsim:order>10</bsim:order>
+	    			<bsim:mean>25</bsim:mean>
+	    		</bsim:erlangDistribution>
+	    	</bsim:duration>
+	    	<bsim:resources>
+	    		<bsim:resource id="Student" amount="1">
+			    	<bsim:assignmentDefinition>
+						<bsim:priority>1</bsim:priority>
+					</bsim:assignmentDefinition>
+				</bsim:resource>
+	    	</bsim:resources>
+	    </bsim:task>
+	    <bsim:dataObject id="DataObjectReference_01imo1t" name="thesis">
+			<bsim:field name="ty" type="string">
+				<bsim:arbitraryFiniteProbabilityDistribution>
+					<bsim:entry value="A" frequency="20"></bsim:entry>
+					<bsim:entry value="B" frequency="5"></bsim:entry>
+					<bsim:entry value="C" frequency="2"></bsim:entry>
+				</bsim:arbitraryFiniteProbabilityDistribution> 
+			</bsim:field>
+			<bsim:field name="ao" type="long">
+				<bsim:arbitraryFiniteProbabilityDistribution>
+					<bsim:entry value="10" frequency="20"></bsim:entry>
+					<bsim:entry value="25" frequency="5"></bsim:entry>
+				</bsim:arbitraryFiniteProbabilityDistribution> 
+			</bsim:field>
+		</bsim:dataObject>
+		<bsim:dataObject id="DataObjectReference_04kcxof" name="anotherobject">			
+		</bsim:dataObject>
+	    <bsim:task id="Task_0f1si4k" name="write thesis">
+			<bsim:duration timeUnit="SECONDS">
+	    		<bsim:triangularDistribution>
+	    			<bsim:lower>600</bsim:lower>
+	    			<bsim:peak>1800</bsim:peak>
+	    			<bsim:upper>2400</bsim:upper>
+	    		</bsim:triangularDistribution>
+	    	</bsim:duration>
+	    	<bsim:resources>
+	    		<bsim:resource id="Student" amount="1">
+			    	<bsim:assignmentDefinition>
+						<bsim:priority>2</bsim:priority>
+					</bsim:assignmentDefinition>
+				</bsim:resource>
+	    		<bsim:resource id="Professor" amount="1">
+			    	<bsim:assignmentDefinition>
+						<bsim:priority>2</bsim:priority>
+					</bsim:assignmentDefinition>
+				</bsim:resource>
+	    	</bsim:resources>
+	    </bsim:task>
+	    <bsim:task id="Task_0ueq6jk" name="be happy">
+			<bsim:duration timeUnit="MINUTES">
+	    		<bsim:binomialDistribution>
+	    			<bsim:probability>0.1</bsim:probability>
+	    			<bsim:amount>250</bsim:amount>
+	    		</bsim:binomialDistribution>
+	    	</bsim:duration>
+	    	<bsim:resources>
+	    		<bsim:resource id="Professor" amount="1">
+			    	<bsim:assignmentDefinition>
+						<bsim:priority>3</bsim:priority>
+					</bsim:assignmentDefinition>
+				</bsim:resource>
+	    	</bsim:resources>
+	    </bsim:task>
+	</bsim:simulationConfiguration>
+</bsim:definitions>

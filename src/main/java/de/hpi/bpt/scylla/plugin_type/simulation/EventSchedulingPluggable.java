@@ -2,11 +2,11 @@ package de.hpi.bpt.scylla.plugin_type.simulation;
 
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.ServiceLoader;
 import java.util.Set;
 
 import de.hpi.bpt.scylla.exception.ScyllaRuntimeException;
 import de.hpi.bpt.scylla.exception.ScyllaValidationException;
+import de.hpi.bpt.scylla.plugin_loader.PluginLoader;
 import de.hpi.bpt.scylla.plugin_type.IPluggable;
 import de.hpi.bpt.scylla.simulation.event.ScyllaEvent;
 import desmoj.core.simulator.TimeSpan;
@@ -15,9 +15,10 @@ public abstract class EventSchedulingPluggable implements IPluggable, IEventSche
 
     public static boolean runPlugins(ScyllaEvent event, TimeSpan timeSpan) throws ScyllaRuntimeException {
         Class<EventSchedulingPluggable> clazz = EventSchedulingPluggable.class;
-        ServiceLoader<? extends EventSchedulingPluggable> serviceLoader = (ServiceLoader<? extends EventSchedulingPluggable>) ServiceLoader
+        /*ServiceLoader<? extends EventSchedulingPluggable> serviceLoader = (ServiceLoader<? extends EventSchedulingPluggable>) ServiceLoader
                 .load(clazz);
-        Iterator<? extends EventSchedulingPluggable> plugins = serviceLoader.iterator();
+        Iterator<? extends EventSchedulingPluggable> plugins = serviceLoader.iterator();*/
+        Iterator<? extends EventSchedulingPluggable> plugins = PluginLoader.dGetPlugins(clazz);
         String eName = clazz.getName().substring(clazz.getName().lastIndexOf(".") + 1);
         Set<String> namesOfExtensions = new HashSet<String>();
         boolean normalScheduleBehavior = true;

@@ -392,7 +392,7 @@ public class DateTimeUtils {
                     }
 
                     ProcessNodeTransitionType transition = ProcessNodeTransitionType.PAUSE;
-                    ProcessNodeInfo nodeInfo = new ProcessNodeInfo(processScopeNodeId, source, timeRelativeToStart,
+                    ProcessNodeInfo nodeInfo = new ProcessNodeInfo(nodeId, processScopeNodeId, source, timeRelativeToStart,
                             taskName, resources, transition);
                     model.addNodeInfo(processModel, processInstance, nodeInfo);
                 }
@@ -418,7 +418,7 @@ public class DateTimeUtils {
                     }
 
                     ProcessNodeTransitionType transition = ProcessNodeTransitionType.RESUME;
-                    ProcessNodeInfo nodeInfo = new ProcessNodeInfo(processScopeNodeId, source, timeRelativeToStart,
+                    ProcessNodeInfo nodeInfo = new ProcessNodeInfo(nodeId, processScopeNodeId, source, timeRelativeToStart,
                             taskName, resources, transition);
                     model.addNodeInfo(processModel, processInstance, nodeInfo);
                 }
@@ -579,10 +579,24 @@ public class DateTimeUtils {
 
             DayOfWeek untilWeekday = item.getWeekdayTo();
             LocalTime untilTime = item.getEndTime();
+            
+            
+            if(isWithin(dateTime, item)){
+            	untilWeekday = endDateTime.getDayOfWeek();
+            	untilTime = endDateTime.toLocalTime();
+            }
+            
             ZonedDateTime dateTimeUntilEnd = getNextOrSameZonedDateTime(dateTime, untilWeekday, untilTime);
 
             DayOfWeek startWeekday = item.getWeekdayFrom();
             LocalTime startTime = item.getBeginTime();
+
+            
+            if(isWithin(dateTime, item)){
+            	startWeekday = dateTime.getDayOfWeek();
+            	startTime = dateTime.toLocalTime();
+            }
+
             ZonedDateTime dateTimeOfStart = getNextOrSameZonedDateTime(dateTime, startWeekday, startTime);
             if (dateTime.compareTo(dateTimeOfStart) < 0) { // i.e. dateTime is before dateTimeOfStart
                 dateTime = dateTimeOfStart;

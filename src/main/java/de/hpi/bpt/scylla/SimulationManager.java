@@ -1,10 +1,13 @@
 package de.hpi.bpt.scylla;
 
+import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.jdom2.Document;
@@ -18,6 +21,8 @@ import de.hpi.bpt.scylla.model.configuration.SimulationConfiguration;
 import de.hpi.bpt.scylla.model.global.GlobalConfiguration;
 import de.hpi.bpt.scylla.model.process.CommonProcessElements;
 import de.hpi.bpt.scylla.model.process.ProcessModel;
+import de.hpi.bpt.scylla.model.process.graph.Graph;
+import de.hpi.bpt.scylla.model.process.graph.exception.NodeNotFoundException;
 import de.hpi.bpt.scylla.parser.CommonProcessElementsParser;
 import de.hpi.bpt.scylla.parser.GlobalConfigurationParser;
 import de.hpi.bpt.scylla.parser.ProcessModelParser;
@@ -27,6 +32,7 @@ import de.hpi.bpt.scylla.plugin_type.parser.CommonProcessElementsParserPluggable
 import de.hpi.bpt.scylla.plugin_type.parser.GlobalConfigurationParserPluggable;
 import de.hpi.bpt.scylla.plugin_type.parser.ProcessModelParserPluggable;
 import de.hpi.bpt.scylla.plugin_type.parser.SimulationConfigurationParserPluggable;
+import de.hpi.bpt.scylla.simulation.ProcessSimulationComponents;
 import de.hpi.bpt.scylla.simulation.SimulationModel;
 import de.hpi.bpt.scylla.simulation.utils.DateTimeUtils;
 import desmoj.core.simulator.Experiment;
@@ -53,6 +59,8 @@ public class SimulationManager {
     private String[] processModelFilenames;
     private String[] simulationConfigurationFilenames;
     private String globalConfigurationFilename;
+    
+	private String outputPath;
 
     /**
      * Constructor.
@@ -69,6 +77,8 @@ public class SimulationManager {
      *            log {@link de.hpi.bpt.scylla.logger.ProcessNodeInfo} objects if true
      * @param enableDesLogging
      *            log DesmoJ traces and write HTML trace file if true
+     * @param gui
+     * 			a gui reference for feedback
      */
     public SimulationManager(String folder, String[] processModelFilenames, String[] simulationConfigurationFilenames,
             String globalConfigurationFilename, boolean enableBpsLogging, boolean enableDesLogging) {
@@ -79,7 +89,6 @@ public class SimulationManager {
         this.globalConfigurationFilename = globalConfigurationFilename;
         this.enableBpsLogging = enableBpsLogging;
         this.enableDesLogging = enableDesLogging;
-
     }
 
     /**
@@ -89,8 +98,8 @@ public class SimulationManager {
 
         try {
             SAXBuilder builder = new SAXBuilder();
-
-            if (globalConfigurationFilename == null) {
+            
+            if (globalConfigurationFilename == null || globalConfigurationFilename.isEmpty()) {
                 throw new ScyllaValidationException("No global configuration provided.");
             }
             else {
@@ -101,7 +110,7 @@ public class SimulationManager {
                 globalConfiguration = globalConfigurationParser.parse(gcDoc.getRootElement());
                 String fileNameWithoutExtension = globalConfigurationFilename.substring(// filename.lastIndexOf("\\") +
                                                                                         // 1,
-                        0, globalConfigurationFilename.lastIndexOf(".xml"));
+                		globalConfigurationFilename.lastIndexOf("\\")+1, globalConfigurationFilename.lastIndexOf(".xml"));
                 globalConfiguration.setFileNameWithoutExtension(fileNameWithoutExtension);
                 // plugins to parse global configuration
                 GlobalConfigurationParserPluggable.runPlugins(this, globalConfiguration, gcRootElement);
@@ -117,7 +126,7 @@ public class SimulationManager {
                 // parse common process elements from XML (BPMN)
                 CommonProcessElements commonProcessElementsFromFile = cpeParser.parse(pmRootElement);
                 String fileNameWithoutExtension = filename.substring(// filename.lastIndexOf("\\") + 1,
-                        0, filename.lastIndexOf(".bpmn"));
+                        filename.lastIndexOf("\\")+1, filename.lastIndexOf(".bpmn"));
                 commonProcessElementsFromFile.setBpmnFileNameWithoutExtension(fileNameWithoutExtension);
 
                 // plugins to parse common process elements
@@ -169,6 +178,7 @@ public class SimulationManager {
         String experimentName = Long.toString((new Date()).getTime());
         Experiment.setEpsilon(epsilon);
         Experiment exp = new Experiment(experimentName, experimentOutputFolder);
+        exp.setShowProgressBar(false);
 
         // XXX each simulation configuration may have its own seed
         Long randomSeed = globalConfiguration.getRandomSeed();
@@ -207,14 +217,18 @@ public class SimulationManager {
         exp.start();
         exp.report();
         exp.finish();
-
+       
+           
         try {
 
             // log process execution
             // log resources, process, tasks
 
-            String outputPathWithoutExtension = globalConfiguration.getFileNameWithoutExtension();
-            OutputLoggerPluggable.runPlugins(sm, outputPathWithoutExtension);
+            StringBuilder strb = new StringBuilder(globalConfigurationFilename.substring(0,globalConfigurationFilename.lastIndexOf(Scylla.FILEDELIM)+1));
+            outputPath = strb.substring(0,strb.lastIndexOf(Scylla.FILEDELIM)+1)+"output_"+new SimpleDateFormat("yy_MM_dd_HH_mm_ss").format(new Date())+ Scylla.FILEDELIM;
+            File outputPathFolder = new File(outputPath);
+            if(!outputPathFolder.exists())outputPathFolder.mkdir();
+            OutputLoggerPluggable.runPlugins(sm, outputPath);
 
         }
         catch (IOException e) {
@@ -229,4 +243,20 @@ public class SimulationManager {
     public Map<String, ProcessModel> getProcessModels() {
         return processModels;
     }
+
+    /**
+     * Returns default output path if set
+     * @return
+     */
+	public String getOutputPath() {
+		return outputPath;
+	}
+
+	/**
+	 * Methode to manually override default output path
+	 * @param outputPath : A String path to a folder
+	 */
+	public void setOutputPath(String outputPath) {
+		this.outputPath = outputPath;
+	}
 }

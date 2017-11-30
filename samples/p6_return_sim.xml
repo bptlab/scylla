@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scy:definitions xmlns:scy="http://scy.hpi.uni-potsdam.de/scylla/simModel" id="Simulation_6" targetNamespace="http://www.hpi.de">
-	<scy:simulationConfiguration id="SimulationConfiguration_6" processRef="returnProcess" processInstances="5" startDateTime="2016-07-04T14:20:00.000" endDateTime="2016-07-04T17:00:00.000" randomSeed="9281" ><!--resourceAssignmentOrder="priority,simulationTime">-->
+	<scy:simulationConfiguration id="SimulationConfiguration_6" processRef="returnProcess" processInstances="2" startDateTime="2016-07-04T14:20:00.000" endDateTime="2016-07-04T17:00:00.000" randomSeed="9280" ><!--resourceAssignmentOrder="priority,simulationTime">-->
 		<scy:startEvent id="StartEvent_1">
 	    	<scy:arrivalRate timeUnit="MINUTES">
 	    		<scy:exponentialDistribution>
@@ -10,14 +10,16 @@
 	    </scy:startEvent>
 	    <scy:task id="Task_0zs8ai5" name="Handle return request">
 	    	<scy:duration timeUnit="MINUTES">
-	    		<scy:exponentialDistribution>
-	    			<scy:mean>3</scy:mean>
-	    		</scy:exponentialDistribution>
+	    		<scy:normalDistribution>
+					<scy:mean>5</scy:mean>
+					<scy:standardDeviation>2</scy:standardDeviation>
+				</scy:normalDistribution>
 	    	</scy:duration>
 	    	<scy:resources>
 	    		<scy:resource id="Customer Care" amount="1"/>
 	    	</scy:resources>
 	    </scy:task>
+
 	    <scy:task id="Task_0ox3m1q" name="Archive return request">
 	    	<scy:duration timeUnit="MINUTES">
 	    		<scy:exponentialDistribution>
@@ -28,27 +30,48 @@
 	    		<scy:resource id="Customer Care" amount="1"/>
 	    	</scy:resources>
 	    </scy:task>
+
 	    <scy:task id="Task_1g5l68i" name="Collect return">
 	    	<scy:duration timeUnit="MINUTES">
-	    		<scy:empiricalDistribution>
-	    		<!--	<scy:entry value="8" frequency="1"/>
-	    			<scy:entry value="12" frequency="1"/>-->
-	    			<scy:entry value="16" frequency="1"/>
-	    		</scy:empiricalDistribution>
+	    		<scy:arbitraryFiniteProbabilityDistribution>
+	    			<scy:entry value="8" frequency="1"/>
+	    			<scy:entry value="12" frequency="1"/>
+	    			<scy:entry value="160" frequency="1"/>
+	    		</scy:arbitraryFiniteProbabilityDistribution>
 	    	</scy:duration>
 	    	<scy:resources>
 	    		<scy:resource id="Warehouse" amount="1"/>
 	    	</scy:resources>
+	    	<scy:boundaryEvents>
+				<scy:boundaryEvent id="BoundaryEvent_0zy3ci9" name="error in">
+					<scy:eventProbability>0.8</scy:eventProbability>
+					<scy:arrivalRate timeUnit="MINUTES">
+						<scy:constantDistribution>
+							<scy:constantValue>20</scy:constantValue>
+						</scy:constantDistribution>
+					</scy:arrivalRate>
+				</scy:boundaryEvent>
+			</scy:boundaryEvents>
 	    </scy:task>
 	    <scy:task id="Task_1qos0r1" name="Report about taking too long">
 	    	<scy:duration timeUnit="SECONDS">
-	    		<scy:constantDistribution>
-	    			<scy:constantValue>1</scy:constantValue>
-	    		</scy:constantDistribution>
+	    		<scy:binomialDistribution>
+	    			<scy:probability>0.1</scy:probability>
+	    			<scy:amount>10</scy:amount>
+	    		</scy:binomialDistribution>
 	    	</scy:duration>
 	    	<scy:resources>
 	    		<scy:resource id="System" amount="1"/>
 	    	</scy:resources>
 	    </scy:task>
+
+	    <scy:dataObject id="DataObjectReference_1x3envq" name="Letter for customer">
+			<scy:field name="Content" type="string">
+				<scy:arbitraryFiniteProbabilityDistribution>
+					<scy:entry value="ContentA" frequency="0.8"></scy:entry>
+					<scy:entry value="ContentB" frequency="0.2"></scy:entry>
+				</scy:arbitraryFiniteProbabilityDistribution> 
+			</scy:field>
+		</scy:dataObject>
 	</scy:simulationConfiguration>
 </scy:definitions>

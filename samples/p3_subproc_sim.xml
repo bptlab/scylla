@@ -65,9 +65,9 @@
 		    			<bsim:constantValue>50</bsim:constantValue>
 		    		</bsim:constantDistribution>
 		    	</bsim:duration>
-	    	<bsim:resources>
-	    		<bsim:resource id="Student" amount="1"/>
-	    	</bsim:resources>
+				<bsim:resources>
+					<bsim:resource id="Student" amount="1"/>
+				</bsim:resources>
 		    </bsim:task>
 		    <bsim:exclusiveGateway id="sid-DE5D1777-B468-4B65-8C18-E2260A58673C">
 		      <bsim:outgoingSequenceFlow id="sid-91AF73BE-E60D-43E3-9A39-0FD956A7A94A">
@@ -83,9 +83,9 @@
 		    			<bsim:constantValue>70</bsim:constantValue>
 		    		</bsim:constantDistribution>
 		    	</bsim:duration>
-	    	<bsim:resources>
-	    		<bsim:resource id="Student" amount="2"/>
-	    	</bsim:resources>
+				<bsim:resources>
+					<bsim:resource id="Student" amount="2"/>
+				</bsim:resources>
 		    </bsim:task>
 		    <bsim:task id="sid-3E857BAC-EFB7-437D-BA3A-3F6FC6634DBD" name="write chapters">
 		    	<bsim:duration timeUnit="MINUTES">
@@ -93,9 +93,9 @@
 		    			<bsim:constantValue>40</bsim:constantValue>
 		    		</bsim:constantDistribution>
 		    	</bsim:duration>
-	    	<bsim:resources>
-	    		<bsim:resource id="Student" amount="1"/>
-	    	</bsim:resources>
+				<bsim:resources>
+					<bsim:resource id="Student" amount="1"/>
+				</bsim:resources>
 		    </bsim:task>
 	    	<bsim:boundaryEvents>
 	    		<!--<bsim:boundaryEvent id="sid-71507C76-09EA-41FF-86AB-004A2447257A" name="error in">

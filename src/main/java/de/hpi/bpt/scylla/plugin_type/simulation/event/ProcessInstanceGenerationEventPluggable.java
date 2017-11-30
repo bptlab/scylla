@@ -2,11 +2,11 @@ package de.hpi.bpt.scylla.plugin_type.simulation.event;
 
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.ServiceLoader;
 import java.util.Set;
 
 import de.hpi.bpt.scylla.exception.ScyllaRuntimeException;
 import de.hpi.bpt.scylla.exception.ScyllaValidationException;
+import de.hpi.bpt.scylla.plugin_loader.PluginLoader;
 import de.hpi.bpt.scylla.plugin_type.IPluggable;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
 import de.hpi.bpt.scylla.simulation.event.ProcessInstanceGenerationEvent;
@@ -21,9 +21,10 @@ public abstract class ProcessInstanceGenerationEventPluggable
 
         // TODO: invoke serviceloader only once at start of Scylla
         Class<ProcessInstanceGenerationEventPluggable> clazz = ProcessInstanceGenerationEventPluggable.class;
-        ServiceLoader<ProcessInstanceGenerationEventPluggable> serviceLoader = (ServiceLoader<ProcessInstanceGenerationEventPluggable>) ServiceLoader
+        /*ServiceLoader<ProcessInstanceGenerationEventPluggable> serviceLoader = (ServiceLoader<ProcessInstanceGenerationEventPluggable>) ServiceLoader
                 .load(clazz);
-        Iterator<ProcessInstanceGenerationEventPluggable> plugins = serviceLoader.iterator();
+        Iterator<ProcessInstanceGenerationEventPluggable> plugins = serviceLoader.iterator();*/
+        Iterator<ProcessInstanceGenerationEventPluggable> plugins = PluginLoader.dGetPlugins(clazz);
         String eName = clazz.getName().substring(clazz.getName().lastIndexOf(".") + 1);
         Set<String> namesOfExtensions = new HashSet<String>();
         while (plugins.hasNext()) {

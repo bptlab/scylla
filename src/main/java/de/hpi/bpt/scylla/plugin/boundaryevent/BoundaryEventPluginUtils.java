@@ -333,7 +333,7 @@ class BoundaryEventPluginUtils {
                         }
                         else if (definition == EventDefinitionType.ESCALATION) {
                             message = "Schedule boundary escalation event: " + displayName;
-                        }
+                        }	
                         else {
                             if (eventIsInterrupting) {
                                 if (definition == EventDefinitionType.ERROR) {

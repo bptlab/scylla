@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bsim:globalConfiguration xmlns:bsim="http://bsim.hpi.uni-potsdam.de/scylla/simModel" targetNamespace="http://www.hpi.de" id="retailerProcess_glo">
+  <bsim:timetables>
+    <bsim:timetable id="Default">
+      	<bsim:timetableItem from="MONDAY" to="MONDAY" beginTime="09:00" endTime="17:00" />
+	<bsim:timetableItem from="TUESDAY" to="TUESDAY" beginTime="09:00" endTime="17:00" />
+	<bsim:timetableItem from="WEDNESDAY" to="WEDNESDAY" beginTime="09:00" endTime="17:00" />
+	<bsim:timetableItem from="THURSDAY" to="THURSDAY" beginTime="09:00" endTime="17:00" />
+	<bsim:timetableItem from="FRIDAY" to="FRIDAY" beginTime="09:00" endTime="17:00" />
+    </bsim:timetable>
+    <bsim:timetable id="24_7">
+      <bsim:timetableItem from="MONDAY" to="SUNDAY" beginTime="00:00" endTime="23:59:59" />
+    </bsim:timetable>
+  </bsim:timetables>
+  <bsim:resourceData>
+    <bsim:dynamicResource id="Worker" defaultQuantity="15" defaultCost="20.0" defaultTimetableId="Default" defaultTimeUnit="HOURS" />
+    <bsim:dynamicResource id="System" defaultQuantity="1" defaultCost="2.0" defaultTimetableId="24_7" defaultTimeUnit="HOURS" />
+    <bsim:dynamicResource id="Robot" defaultQuantity="2" defaultCost="4.0" defaultTimetableId="24_7" defaultTimeUnit="HOURS" />
+  </bsim:resourceData>
+</bsim:globalConfiguration>

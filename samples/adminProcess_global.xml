@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bsim:globalConfiguration xmlns:bsim="http://bsim.hpi.uni-potsdam.de/scylla/simModel" targetNamespace="http://www.hpi.de" id="evaluationProcessA_sim">
+  <bsim:timetables>
+    <bsim:timetable id="Standard">
+      <bsim:timetableItem from="MONDAY" to="MONDAY" beginTime="09:00" endTime="11:00" />
+      <bsim:timetableItem from="TUESDAY" to="TUESDAY" beginTime="09:00" endTime="11:00" />
+      <bsim:timetableItem from="WEDNESDAY" to="WEDNESDAY" beginTime="09:00" endTime="11:00" />
+      <bsim:timetableItem from="THURSDAY" to="THURSDAY" beginTime="09:00" endTime="11:00" />
+      <bsim:timetableItem from="FRIDAY" to="FRIDAY" beginTime="09:00" endTime="11:00" />
+    </bsim:timetable>
+  </bsim:timetables>
+  <bsim:resourceData>
+    <bsim:dynamicResource id="Clerk" defaultQuantity="1" defaultCost="30.0" defaultTimetableId="Standard" defaultTimeUnit="HOURS" />
+  </bsim:resourceData>
+</bsim:globalConfiguration>

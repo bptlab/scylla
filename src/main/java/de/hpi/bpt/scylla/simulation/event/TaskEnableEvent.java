@@ -128,7 +128,7 @@ public class TaskEnableEvent extends TaskEvent {
         ProcessModel processModel = processInstance.getProcessModel();
         String processScopeNodeId = SimulationUtils.getProcessScopeNodeId(processModel, nodeId);
 
-        ProcessNodeInfo info = new ProcessNodeInfo(processScopeNodeId, getName(), timestamp, taskName, resources,
+        ProcessNodeInfo info = new ProcessNodeInfo(nodeId, processScopeNodeId, getName(), timestamp, taskName, resources,
                 transition);
         model.addNodeInfo(processModel, processInstance, info);
 

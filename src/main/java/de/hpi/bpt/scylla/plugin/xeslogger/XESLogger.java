@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.deckfour.xes.classification.XEventAttributeClassifier;
@@ -50,7 +51,7 @@ public class XESLogger extends OutputLoggerPluggable {
                     .getBpmnFileNameWithoutExtension();
             ZonedDateTime baseDateTime = model.getStartDateTime();
             Map<Integer, List<ProcessNodeInfo>> nodeInfos = model.getProcessNodeInfos().get(processId);
-
+            
             XFactory factory = XFactoryRegistry.instance().currentDefault();
             XLog log = factory.createLog();
 
@@ -105,17 +106,24 @@ public class XESLogger extends OutputLoggerPluggable {
                         attributeMap.put(res, factory.createAttributeLiteral(XOrganizationalExtension.KEY_RESOURCE, res,
                                 organizationalExt));
                     }
+                    
+                   /* Set<String> dataObjects = info.getDataObejcts();
+                    for (String dO : dataObjects) {
+                        attributeMap.put(dO, factory.createAttributeLiteral(XOrganizationalExtension.KEY_RESOURCE, dO,
+                                organizationalExt));
+                    }*/
 
                     ZonedDateTime zonedDateTime = baseDateTime.plus(info.getTimestamp(),
                             DateTimeUtils.getReferenceChronoUnit());
                     Date timestamp = new Date(zonedDateTime.toInstant().toEpochMilli());
                     attributeMap.put(XTimeExtension.KEY_TIMESTAMP,
                             factory.createAttributeTimestamp(XTimeExtension.KEY_TIMESTAMP, timestamp, timeExt));
-
+                    
                     String taskName = info.getTaskName();
                     attributeMap.put(XConceptExtension.KEY_NAME,
                             factory.createAttributeLiteral(XConceptExtension.KEY_NAME, taskName, conceptExt));
-
+                    
+                    
                     ProcessNodeTransitionType transition = info.getTransition();
                     if (transition == ProcessNodeTransitionType.BEGIN
                             || transition == ProcessNodeTransitionType.EVENT_BEGIN) {
@@ -126,6 +134,16 @@ public class XESLogger extends OutputLoggerPluggable {
                             || transition == ProcessNodeTransitionType.EVENT_TERMINATE) {
                         attributeMap.put(XLifecycleExtension.KEY_TRANSITION, factory
                                 .createAttributeLiteral(XLifecycleExtension.KEY_TRANSITION, "complete", lifecycleExt));
+                        if (!info.getDataObjectField().isEmpty()) {
+                        	Integer size = info.getDataObjectField().size();
+                        	Object[] test = info.getDataObjectField().keySet().toArray();
+                        	Object[] test2 = info.getDataObjectField().values().toArray();
+                        	for (int i= 0; i < size; i++) {
+                        	attributeMap.put(Integer.toString(i), factory
+                                    .createAttributeLiteral(Objects.toString(test[i]), Objects.toString(test2[i], null), lifecycleExt));
+                        	}
+                        }
+                        
                     }
                     else if (transition == ProcessNodeTransitionType.CANCEL) {
                         attributeMap.put(XLifecycleExtension.KEY_TRANSITION, factory
@@ -150,13 +168,14 @@ public class XESLogger extends OutputLoggerPluggable {
             FileOutputStream fos;
             if (gzipOn) {
                 serializer = new XesXmlGZIPSerializer();
-                fos = new FileOutputStream(fileNameWithoutExtension + ".tar");
+                fos = new FileOutputStream(outputPathWithoutExtension + fileNameWithoutExtension +  ".tar");
             }
             else {
                 serializer = new XesXmlSerializer();
-                fos = new FileOutputStream(fileNameWithoutExtension + ".xes");
+                fos = new FileOutputStream(outputPathWithoutExtension + fileNameWithoutExtension + ".xes");
             }
             serializer.serialize(log, fos);
+            fos.close();
         }
     }
 

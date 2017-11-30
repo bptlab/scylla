@@ -69,11 +69,11 @@
 	    </bsim:task>
 	    <bsim:task id="Task_1nngha6" name="be so sad">
 	      <bsim:duration timeUnit="MINUTES">
-	    		<bsim:empiricalDistribution>
+	    		<bsim:arbitraryFiniteProbabilityDistribution>
 	    			<bsim:entry value="100" frequency="20"/>
 	    			<bsim:entry value="300" frequency="5"/>
 	    			<bsim:entry value="500" frequency="1"/>
-	    		</bsim:empiricalDistribution>
+	    		</bsim:arbitraryFiniteProbabilityDistribution>
 	    	</bsim:duration>
 	    	<bsim:resources>
 	    		<bsim:resource id="Professor" amount="1">

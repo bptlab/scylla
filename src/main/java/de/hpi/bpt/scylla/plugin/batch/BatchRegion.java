@@ -9,15 +9,15 @@ class BatchRegion {
     private ProcessModel processModel;
     private int nodeId;
     private Integer maxBatchSize;
-    private MinMaxRule minMaxRule;
+    private ActivationRule activationRule;
     private List<String> groupingCharacteristic;
 
-    BatchRegion(ProcessModel processModel, int nodeId, Integer maxBatchSize, MinMaxRule minMaxRule,
+    BatchRegion(ProcessModel processModel, int nodeId, Integer maxBatchSize, ActivationRule activationRule,
             List<String> groupingCharacteristic) {
         this.processModel = processModel;
         this.nodeId = nodeId;
         this.maxBatchSize = maxBatchSize;
-        this.minMaxRule = minMaxRule;
+        this.activationRule = activationRule;
         this.groupingCharacteristic = groupingCharacteristic;
     }
 
@@ -33,8 +33,8 @@ class BatchRegion {
         return maxBatchSize;
     }
 
-    MinMaxRule getMinMaxRule() {
-        return minMaxRule;
+   ActivationRule getActivationRule() {
+        return activationRule;
     }
 
     List<String> getGroupingCharacteristic() {

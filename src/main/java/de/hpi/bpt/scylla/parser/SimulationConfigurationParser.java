@@ -259,33 +259,39 @@ public class SimulationConfigurationParser extends Parser<SimulationConfiguratio
     
 	public static TimeDistributionWrapper getTimeDistributionWrapper(Element element, Namespace simNamespace) 
 			throws ScyllaValidationException {
-    	Distribution distribution = getDistribution(element, simNamespace);
+    	Distribution distribution = getDistribution(element, simNamespace, ""); //<--- fieldType should not atter, but my not be "string"
     	TimeUnit timeUnit = TimeUnit.valueOf(element.getAttributeValue("timeUnit"));
     	TimeDistributionWrapper distWrapper = new TimeDistributionWrapper(timeUnit);
     	distWrapper.setDistribution(distribution);
     	return distWrapper;
     }
     
-    public static Distribution getDistribution(Element element, Namespace simNamespace)
+    public static Distribution getDistribution(Element element, Namespace simNamespace, String fieldType)
             throws ScyllaValidationException {
     	Distribution distribution;
-        if (element.getChild("binomialDistribution", simNamespace) != null) {
-            Element el = element.getChild("binomialDistribution", simNamespace);
-            double probability = Double.valueOf(el.getChildText("probability", simNamespace));
-            int amount = Integer.valueOf(el.getChildText("amount", simNamespace));
-            distribution = new BinomialDistribution(probability, amount);
-        }
-        else if (element.getChild("constantDistribution", simNamespace) != null) {
-            Element el = element.getChild("constantDistribution", simNamespace);
-            double constantValue = Double.valueOf(el.getChildText("constantValue", simNamespace));
-            distribution = new ConstantDistribution(constantValue);
-        }
-        else if (element.getChild("empiricalDistribution", simNamespace) != null) {
-            Element el = element.getChild("empiricalDistribution", simNamespace);
-            EmpiricalDistribution dist = new EmpiricalDistribution();
+        if (element.getChild("arbitraryFiniteProbabilityDistribution", simNamespace) != null && fieldType.equals("string")) {
+            Element el = element.getChild("arbitraryFiniteProbabilityDistribution", simNamespace);
+            EmpiricalStringDistribution dist = new EmpiricalStringDistribution(); //changed name here but now in the whole project
             List<Element> entries = el.getChildren("entry", simNamespace);
             if (entries.isEmpty()) {
-                throw new ScyllaValidationException("No entries in empirical distribution.");
+                throw new ScyllaValidationException("No entries in arbitrary finite probability distribution.");
+            }
+            double sum = 0;
+            for (Element entry : entries) { // normalize frequency to 1.0
+                sum += Double.valueOf(entry.getAttributeValue("frequency"));
+            }
+            for (Element entry : entries) {
+                dist.addEntry(entry.getAttributeValue("value"),
+                        Double.valueOf(entry.getAttributeValue("frequency")) / sum);
+            }
+            distribution = dist;
+        }
+        else if (element.getChild("arbitraryFiniteProbabilityDistribution", simNamespace) != null) {
+            Element el = element.getChild("arbitraryFiniteProbabilityDistribution", simNamespace);
+            EmpiricalDistribution dist = new EmpiricalDistribution(); //changed name here but now in the whole project
+            List<Element> entries = el.getChildren("entry", simNamespace);
+            if (entries.isEmpty()) {
+                throw new ScyllaValidationException("No entries in arbitrary finite probability distribution.");
             }
             double sum = 0;
             for (Element entry : entries) { // normalize frequency to 1.0
@@ -297,22 +303,16 @@ public class SimulationConfigurationParser extends Parser<SimulationConfiguratio
             }
             distribution = dist;
         }
-        else if (element.getChild("empiricalStringDistribution", simNamespace) != null) {
-            Element el = element.getChild("empiricalStringDistribution", simNamespace);
-            EmpiricalStringDistribution dist = new EmpiricalStringDistribution();
-            List<Element> entries = el.getChildren("entry", simNamespace);
-            if (entries.isEmpty()) {
-                throw new ScyllaValidationException("No entries in empirical distribution.");
-            }
-            double sum = 0;
-            for (Element entry : entries) { // normalize frequency to 1.0
-                sum += Double.valueOf(entry.getAttributeValue("frequency"));
-            }
-            for (Element entry : entries) {
-                dist.addEntry(entry.getAttributeValue("value"),
-                        Double.valueOf(entry.getAttributeValue("frequency")) / sum);
-            }
-            distribution = dist;
+        else if (element.getChild("binomialDistribution", simNamespace) != null) {
+            Element el = element.getChild("binomialDistribution", simNamespace);
+            double probability = Double.valueOf(el.getChildText("probability", simNamespace));
+            int amount = Integer.valueOf(el.getChildText("amount", simNamespace));
+            distribution = new BinomialDistribution(probability, amount);
+        }
+        else if (element.getChild("constantDistribution", simNamespace) != null) {
+            Element el = element.getChild("constantDistribution", simNamespace);
+            double constantValue = Double.valueOf(el.getChildText("constantValue", simNamespace));
+            distribution = new ConstantDistribution(constantValue);
         }
         else if (element.getChild("erlangDistribution", simNamespace) != null) {
             Element el = element.getChild("erlangDistribution", simNamespace);
