@@ -1,0 +1,32 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+    {
+        "type": "java",
+        "name": "Debug (Launch)",
+        "request": "launch",
+        "cwd": "${workspaceFolder}",
+        "mainClass": "",
+        "args": ""
+    },
+        {
+            "type": "java",
+            "name": "Debug (Launch)-Scylla<scylla>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "de.hpi.bpt.scylla.Scylla",
+            "projectName": "scylla",
+            "args": "--config=samples/p0_globalconf.xml --enable-bps-logging --bpmn=samples/p7_dmn.bpmn --sim=samples/p7_dmn_sim.xml"
+        },
+        {
+            "type": "java",
+            "name": "Debug (Attach)",
+            "request": "attach",
+            "hostName": "localhost",
+            "port": 0
+        }
+    ]
+}
