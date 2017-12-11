@@ -128,7 +128,7 @@ public class DiscreteDistributionPanel extends JScrollPane {
 		panelSidebar.add(buttonAdd, gbc_buttonAdd);
 		
 		JButton buttonRemove = new JButton("");
-		buttonRemove.setIcon(ScyllaGUI.ICON_X);
+		buttonRemove.setIcon(ScyllaGUI.ICON_REMOVE);
 		buttonRemove.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				int i = list.getSelectedRow();

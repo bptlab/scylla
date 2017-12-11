@@ -79,7 +79,7 @@ public abstract class ExtendedListChooserPanel extends ListChooserPanel{
 		
 		//Button to remove items
 		buttonRemove = new JButton();
-		buttonRemove.setIcon(ScyllaGUI.ICON_X);
+		buttonRemove.setIcon(ScyllaGUI.ICON_REMOVE);
 		buttonRemove.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(list.getCellEditor() != null)list.getCellEditor().stopCellEditing();

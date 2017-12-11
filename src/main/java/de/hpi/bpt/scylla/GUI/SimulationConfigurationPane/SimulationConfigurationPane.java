@@ -7,6 +7,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
+import java.io.File;
 import java.io.IOException;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -17,7 +18,6 @@ import java.time.format.DateTimeFormatter;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -580,7 +580,7 @@ public class SimulationConfigurationPane extends EditorPane {
 	protected void create() {
 		setChangeFlag(true);
 		close();
-		labelFiletitle.setText("<unsaved file>");
+		setFile(new File("NewFile"+unnamedcount++ + ".xml"));
 		creator = new SimulationConfigurationCreator();
 		if(gcc != null)updateGCC();
 		if(bpmnPath != null && !bpmnPath.isEmpty())try {

@@ -263,7 +263,7 @@ public class TimetablePanel extends JSplitPane {
 		
 		//Delete selected item button
 		buttonDelete = new JButton();
-		buttonDelete.setIcon(ScyllaGUI.ICON_X);
+		buttonDelete.setIcon(ScyllaGUI.ICON_REMOVE);
 		buttonDelete.setToolTipText("Delete selected item (Delete)");
 		buttonDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {

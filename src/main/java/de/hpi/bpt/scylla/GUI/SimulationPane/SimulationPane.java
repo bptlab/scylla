@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.function.Consumer;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -33,10 +34,13 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import de.hpi.bpt.scylla.SimulationManager;
 import de.hpi.bpt.scylla.GUI.CheckboxListPanel;
 import de.hpi.bpt.scylla.GUI.Console;
+import de.hpi.bpt.scylla.GUI.EditorPane;
 import de.hpi.bpt.scylla.GUI.ListPanel;
 import de.hpi.bpt.scylla.GUI.ScalingCheckBoxIcon;
 import de.hpi.bpt.scylla.GUI.ScalingFileChooser;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
+import de.hpi.bpt.scylla.GUI.GlobalConfigurationPane.GlobalConfigurationPane;
+import de.hpi.bpt.scylla.GUI.SimulationConfigurationPane.SimulationConfigurationPane;
 import de.hpi.bpt.scylla.logger.DebugLogger;
 import de.hpi.bpt.scylla.plugin_loader.PluginLoader;
 import javax.swing.filechooser.FileFilter;
@@ -51,10 +55,8 @@ import javax.swing.filechooser.FileFilter;
 public class SimulationPane extends JPanel{
 	
 
-
 	private static final FileFilter FILEFILTER_XML = new FileNameExtensionFilter("XML files","xml");
 	private static final FileFilter FILEFILTER_BPMN = new FileNameExtensionFilter("BPMN files","bpmn");
-	
 	
 	//Global config components
 	private JLabel lblCurrentGlobalConfig;
@@ -95,11 +97,12 @@ public class SimulationPane extends JPanel{
 	private JPanel panel_AdvancedOptions;
 	private JCheckBox checkbox_debug;
 	private JCheckBox checkbox_desmoj;
+	private JButton button_newglobalconfig;
 	
 	/**
 	 * Constructor
 	 */
-	public SimulationPane(){
+	public SimulationPane(ScyllaGUI parent){
 		
 		setBackground(ScyllaGUI.ColorBackground);
 		GridBagLayout gridBagLayout = new GridBagLayout();
@@ -125,8 +128,13 @@ public class SimulationPane extends JPanel{
 		this.add(lblCurrentGlobalConfig, gbc_lblCurrentGlobalConfig);
 		
 		
-		displayCurrentGlobalConfigChosen = new FileListEntry(null," ", true, false);
-		displayCurrentGlobalConfigChosen.buttonEdit.setEnabled(false);
+		displayCurrentGlobalConfigChosen = new FileListEntry(null," ", (s)->{
+			EditorPane ep =  new GlobalConfigurationPane();
+			File f = new File(s);
+			ep.openFile(f);
+			parent.addEditor(ep);
+		}, false);
+		displayCurrentGlobalConfigChosen.buttonEdit.setVisible(false);
 		//textfield_CurrentGlobalConfig_chosen.setMargin(ScyllaGUI.LEFTMARGIN);
 		displayCurrentGlobalConfigChosen.setFont(ScyllaGUI.DEFAULTFONT);
 		displayCurrentGlobalConfigChosen.setToolTipText("Path for current global configuarition file");
@@ -139,8 +147,12 @@ public class SimulationPane extends JPanel{
 		panelGlobalConfigWrap.setViewportView(displayCurrentGlobalConfigChosen);
 		this.add(panelGlobalConfigWrap, gbc_displayCurrentGlobalConfigChosenWrap);
 		
+		
+		Container container_globalButtons = new Container();
+		container_globalButtons.setLayout(new GridLayout(2,1));
+		
 		button_openglobalconfig = new JButton();
-		button_openglobalconfig.setIcon(ScyllaGUI.ICON_MORE);
+		button_openglobalconfig.setIcon(ScyllaGUI.ICON_OPEN);
 		button_openglobalconfig.setFont(ScyllaGUI.DEFAULTFONT);
 		button_openglobalconfig.setToolTipText("Choose other file");
 		button_openglobalconfig.addActionListener(new ActionListener() {
@@ -152,17 +164,30 @@ public class SimulationPane extends JPanel{
 				int c = chooser.showDialog(null,"Open");
 				if(c == ScalingFileChooser.APPROVE_OPTION){
 					displayCurrentGlobalConfigChosen.setText(chooser.getSelectedFile().getPath());
-					displayCurrentGlobalConfigChosen.buttonEdit.setEnabled(true);
+					displayCurrentGlobalConfigChosen.buttonEdit.setVisible(true);
 					ScyllaGUI.DEFAULTFILEPATH = chooser.getSelectedFile().getPath();
 				}
 			}
 		});
-		GridBagConstraints gbc_button_openglobalconfig = new GridBagConstraints();
-		gbc_button_openglobalconfig.fill = GridBagConstraints.BOTH;
-		gbc_button_openglobalconfig.insets = new Insets(0, 0, 0, COL1);
-		gbc_button_openglobalconfig.gridx = 1;
-		gbc_button_openglobalconfig.gridy = 1;
-		this.add(button_openglobalconfig, gbc_button_openglobalconfig);
+		button_newglobalconfig = new JButton();
+		button_newglobalconfig.setIcon(ScyllaGUI.ICON_NEW);
+		button_newglobalconfig.setFont(ScyllaGUI.DEFAULTFONT);
+		button_newglobalconfig.setToolTipText("Create new global configuration file");
+		button_newglobalconfig.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				EditorPane ep =  new GlobalConfigurationPane();
+				ep.be_create();
+				parent.addEditor(ep);
+			}
+		});
+		GridBagConstraints gbc_container_globalButtons = new GridBagConstraints();
+		gbc_container_globalButtons.fill = GridBagConstraints.BOTH;
+		gbc_container_globalButtons.insets = new Insets(0, 0, 0, COL1);
+		gbc_container_globalButtons.gridx = 1;
+		gbc_container_globalButtons.gridy = 1;
+		container_globalButtons.add(button_openglobalconfig);
+		container_globalButtons.add(button_newglobalconfig);
+		this.add(container_globalButtons, gbc_container_globalButtons);
 		
 		
 		lblCurrentBpmnFiles = new JLabel();
@@ -208,7 +233,7 @@ public class SimulationPane extends JPanel{
 				int c = chooser.showDialog(null,"Open");
 				if(c == ScalingFileChooser.APPROVE_OPTION){
 					chooser.getSelectedFile();
-					list_CurrentBpmnFiles.addElement(new FileListEntry(list_CurrentBpmnFiles,chooser.getSelectedFile().getPath(),false, true));
+					list_CurrentBpmnFiles.addElement(new FileListEntry(list_CurrentBpmnFiles,chooser.getSelectedFile().getPath(),null, true));
 					ScyllaGUI.DEFAULTFILEPATH = chooser.getSelectedFile().getPath();
 				}
 			}
@@ -227,7 +252,7 @@ public class SimulationPane extends JPanel{
 //		button_removeBpmnFile.addActionListener(new ActionListener() {
 //			public void actionPerformed(ActionEvent e) {
 //				//List<ListEntry> remove = list_CurrentBpmnFiles.getSelectedValuesList();
-//				//TODO for(int i = 0; i < remove.size(); i++)m.removeElement(remove.get(i));
+//				//for(int i = 0; i < remove.size(); i++)m.removeElement(remove.get(i));
 //			}
 //		});
 //		button_removeBpmnFile.setIcon(ScyllaGUI.ICON_X);
@@ -280,7 +305,12 @@ public class SimulationPane extends JPanel{
 				chooser.setFileFilter(FILEFILTER_XML);
 				int c = chooser.showDialog(null,"Open");
 				if(c == ScalingFileChooser.APPROVE_OPTION){
-					list_CurrentSimFiles.addElement(new FileListEntry(list_CurrentSimFiles,chooser.getSelectedFile().getPath(),true,true));
+					list_CurrentSimFiles.addElement(new FileListEntry(list_CurrentSimFiles,chooser.getSelectedFile().getPath(),(s)->{
+						EditorPane ep =  new SimulationConfigurationPane();
+						File f = new File(s);
+						ep.openFile(f);
+						parent.addEditor(ep);
+					},true));
 					ScyllaGUI.DEFAULTFILEPATH = chooser.getSelectedFile().getPath();
 				}
 				
@@ -299,8 +329,9 @@ public class SimulationPane extends JPanel{
 		button_newSimfile.setToolTipText("Create new simulation configuration file");
 		button_newSimfile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-//				List<ListEntry> remove = list_CurrentSimFiles.getSelectedValuesList();
-//				for(int i = 0; i < remove.size(); i++)m.removeElement(remove.get(i));
+				EditorPane ep =  new SimulationConfigurationPane();
+				ep.be_create();
+				parent.addEditor(ep);
 			}
 		});
 		button_newSimfile.setIcon(ScyllaGUI.ICON_NEW);
@@ -606,7 +637,7 @@ public class SimulationPane extends JPanel{
 		private JButton buttonEdit;
 		private JButton buttonRemove;
 
-		public FileListEntry(ListPanel<FileListEntry> parent, String text, boolean hasEdit, boolean hasRemove) {
+		public FileListEntry(ListPanel<FileListEntry> parent, String text, Consumer<String> onEdit, boolean hasRemove) {
 			int textSize = ScyllaGUI.DEFAULTFONT.getSize();
 			
 			setBackground(ScyllaGUI.ColorField2);
@@ -623,11 +654,11 @@ public class SimulationPane extends JPanel{
 			gbc_labelText.gridy = 0;
 			add(labelText, gbc_labelText);
 			
-			if(hasEdit) {
+			if(onEdit != null) {
 				buttonEdit = new JButton();
 				buttonEdit.setBackground(getBackground());
 				buttonEdit.addActionListener((e)->{
-					//TODO
+					onEdit.accept(getText());
 				});
 				buttonEdit.setBorderPainted(false);
 				buttonEdit.setRolloverEnabled(true);
@@ -649,7 +680,7 @@ public class SimulationPane extends JPanel{
 				buttonRemove.setBorderPainted(false);
 				buttonRemove.setRolloverEnabled(true);
 				//buttonRemove.setContentAreaFilled(false);
-				buttonRemove.setIcon(ScyllaGUI.resizeIcon(ScyllaGUI.ICON_X, textSize, textSize));
+				buttonRemove.setIcon(ScyllaGUI.resizeIcon(ScyllaGUI.ICON_CLOSE, textSize, textSize));
 				GridBagConstraints gbc_buttonRemove = new GridBagConstraints();
 				gbc_buttonRemove.insets = new Insets(0, 0, 0, 0);
 				gbc_buttonRemove.gridx = 2;

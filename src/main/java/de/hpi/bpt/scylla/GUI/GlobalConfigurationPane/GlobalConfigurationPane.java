@@ -5,6 +5,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ItemEvent;
+import java.io.File;
 import java.io.IOException;
 import java.text.NumberFormat;
 import java.time.ZoneId;
@@ -314,7 +315,7 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 	protected void create(){
 		setChangeFlag(true);
 		close();
-		labelFiletitle.setText("<unsaved file>");
+		setFile(new File("NewFile"+unnamedcount++ + ".xml"));
 		creator = new GlobalConfigurationCreator();
 		setSaved(false);
 		setEnabled(true);

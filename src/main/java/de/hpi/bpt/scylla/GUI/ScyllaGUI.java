@@ -25,8 +25,6 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.ColorUIResource;
 
-import de.hpi.bpt.scylla.GUI.GlobalConfigurationPane.GlobalConfigurationPane;
-import de.hpi.bpt.scylla.GUI.SimulationConfigurationPane.SimulationConfigurationPane;
 import de.hpi.bpt.scylla.GUI.SimulationPane.SimulationPane;
 /**
  * Scylla UI Main class, provides UI constants and starts the UI.
@@ -95,12 +93,19 @@ public class ScyllaGUI extends JFrame {
 	
 	/**Icon for adding objects*/
 	public static final ImageIcon ICON_PLUS = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/plus.png")),ICONSIZE,ICONSIZE);
-	/**Icon for deleting/removing objects or to exit*/
-	public static final ImageIcon ICON_X = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/remove.png")),ICONSIZE,ICONSIZE);
+	/**Icon for deleting/removing objects*/
+	public static final ImageIcon ICON_REMOVE = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/remove.png")),ICONSIZE,ICONSIZE);
+	/**Icon to exit or close (can also be used for remove)*/
+	public static final ImageIcon ICON_CLOSE = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/close.png")),TITLEFONT.getSize(),TITLEFONT.getSize());
 	/**Icon for "further options"*/
 	public static final ImageIcon ICON_MORE = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/more.png")),ICONSIZE,ICONSIZE);
 	/**Icon for editing*/
 	public static final ImageIcon ICON_EDIT = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/edit.png")),ICONSIZE,ICONSIZE);
+	
+	/**Icon for global config*/
+	public static final ImageIcon ICON_GLOBALCONF = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/globalConf.png")),DEFAULTFONT.getSize(),DEFAULTFONT.getSize());
+	/**Icon for sim config*/
+	public static final ImageIcon ICON_SIMCONF = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/simConf.png")),DEFAULTFONT.getSize(),DEFAULTFONT.getSize());
 	
 	/**Icon to expand*/
 	public static final ImageIcon ICON_EXPAND = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/expand.png")),DEFAULTFONT.getSize(),DEFAULTFONT.getSize());
@@ -130,10 +135,6 @@ public class ScyllaGUI extends JFrame {
 
 	/**Simulation pane for running and configuring simulations*/
 	private SimulationPane simulationPane;
-	/**Pane to create and edit global configurations*/
-	private GlobalConfigurationPane globalconfPane;
-	/**Pane to create and edit simulation configurations*/
-	private SimulationConfigurationPane simconfPane;
 	/**Tabpane to switch between the panes*/
 	private JTabbedPane contentPane;
 	
@@ -212,15 +213,11 @@ public class ScyllaGUI extends JFrame {
 		setBounds(100, 100,WIDTH,HEIGHT);
 	    if(WIDTH == r.getWidth() && HEIGHT == r.getHeight())setExtendedState(JFrame.MAXIMIZED_BOTH);
 
-		simulationPane = new SimulationPane();
-		globalconfPane = new GlobalConfigurationPane();
-		simconfPane = new SimulationConfigurationPane();
+		simulationPane = new SimulationPane(this);
 	    contentPane = new JTabbedPane(JTabbedPane.TOP);
 		setContentPane(contentPane);
 	    initKeyBindings();
 		contentPane.addTab("Simulation", simulationPane);
-		contentPane.addTab("Global Configuration Editor", globalconfPane);
-		contentPane.addTab("Simulation Configuration Editor", simconfPane);
 		
 		if(!DEBUG)System.setOut(simulationPane.getConsole().getOut());
 	}
@@ -289,6 +286,12 @@ public class ScyllaGUI extends JFrame {
 				((JComponent)contentPane.getSelectedComponent()).getActionMap().get(ACTIONKEY_NEW).actionPerformed(e);
 			}
 		});
+	}
+	
+	public void addEditor(EditorPane component) {
+		contentPane.addTab("", component);
+		contentPane.setTabComponentAt(contentPane.indexOfComponent(component), new EditorTabTitlePane(contentPane, component));
+		contentPane.setSelectedComponent(component);
 	}
 	
 }
