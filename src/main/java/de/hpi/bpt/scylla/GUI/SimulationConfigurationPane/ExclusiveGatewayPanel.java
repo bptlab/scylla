@@ -21,13 +21,22 @@ import de.hpi.bpt.scylla.creation.ElementLink;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.ExclusiveGateway;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.SimulationConfigurationCreator;
 
+/**
+ * Display class for X-Gateway configurations
+ * TODO this is plugin content and might be moved to ui plugins in the future 
+ * @author Leon Bein
+ *
+ */
 @SuppressWarnings("serial")
 public class ExclusiveGatewayPanel extends JPanel implements ComponentHolder{
 
-	
+	/**Manager for changes*/
 	private FormManager formManager;
+	/**Wrapper for gateway to be configured*/
 	private ExclusiveGateway gateway;
+	/**Parent sc creator, to get branching targets*/
 	private SimulationConfigurationCreator scCreator;
+	/**Branch subpanel; must be internally visible for branch adding*/
 	private JPanel panelBranches;
 	
 
