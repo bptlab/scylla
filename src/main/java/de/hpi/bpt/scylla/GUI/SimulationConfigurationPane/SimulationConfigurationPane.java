@@ -263,6 +263,7 @@ public class SimulationConfigurationPane extends EditorPane {
 				}
 			}catch(Exception exc){}
 		}));
+		
 		GridBagConstraints gbc_textfieldSeed = new GridBagConstraints();
 		gbc_textfieldSeed.gridwidth = 4;
 		gbc_textfieldSeed.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, inset_b);

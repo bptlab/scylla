@@ -20,8 +20,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.text.NumberFormatter;
 
 import de.hpi.bpt.scylla.GUI.FormManager;
+import de.hpi.bpt.scylla.GUI.NoNegativeDoubleFormat;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
-import de.hpi.bpt.scylla.GUI.GlobalConfigurationPane.NoNegativeDoubleFormat;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.Distribution.DiscreteDistribution;
 
 /**

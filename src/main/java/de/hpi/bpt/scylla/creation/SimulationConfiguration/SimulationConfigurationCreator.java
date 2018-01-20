@@ -261,10 +261,14 @@ public class SimulationConfigurationCreator extends ElementLink{
 			for(Element b : branches){
 				if(b.getName().equals("outgoing"))branchids.add(b.getValue());
 			}
-			if(branchids.size() <= 1)break;//No branching probabilities for a join gateway
+
+			if(branchids.size() <= 1) {
+				elements.put(id,new ElementLink(child) {});
+				break;//No branching probabilities for a join gateway - no definition needed
+			}
 			ExclusiveGateway eg = new ExclusiveGateway(id,branchids);
-			eg.addTo(addTo);
 			elements.put(eg.getId(),eg);
+			eg.addTo(addTo);
 			break;
 			
 		case "sequenceFlow" :
@@ -276,7 +280,10 @@ public class SimulationConfigurationCreator extends ElementLink{
 				Task t = new Task(id,child.getAttributeValue("name"));
 				t.addTo(addTo);
 				elements.put(t.getId(),t);
-			}break;
+			} else if(name.endsWith("Event")) {
+				elements.put(id, new ElementLink(child) {});
+			}
+			break;
 		}
 	}
     
@@ -314,7 +321,7 @@ public class SimulationConfigurationCreator extends ElementLink{
      * @see {@link de.hpi.bpt.scylla.parser.ProcessModelParser#isKnownElement(String name)}
      */
 	private boolean isKnownModelElement(String name) {
-	      return name.equals("task") || name.endsWith("Task")
+	      return name.equals("task") || name.endsWith("Task") || name.endsWith("Event")
 	      || name.endsWith("Gateway") || name.equals("subProcess")
 	      || name.equals("sequenceFlow") || name.equals("startEvent");
 //        return name.equals("sequenceFlow") || name.equals("task") || name.endsWith("Task") || name.endsWith("Event")

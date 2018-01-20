@@ -134,6 +134,7 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 				}
 			}catch(Exception exc){}
 		}));
+		
 		GridBagConstraints gbc_textfieldSeedEdit = new GridBagConstraints();
 		gbc_textfieldSeedEdit.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, inset_b);
 		gbc_textfieldSeedEdit.fill = GridBagConstraints.HORIZONTAL;

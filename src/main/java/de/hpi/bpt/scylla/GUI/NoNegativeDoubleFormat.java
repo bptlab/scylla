@@ -1,4 +1,4 @@
-package de.hpi.bpt.scylla.GUI.GlobalConfigurationPane;
+package de.hpi.bpt.scylla.GUI;
 
 import java.text.DecimalFormat;
 import java.text.FieldPosition;

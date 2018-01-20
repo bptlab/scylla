@@ -1,28 +1,22 @@
 package de.hpi.bpt.scylla.GUI.SimulationConfigurationPane;
 
-import javax.swing.JPanel;
-import javax.swing.event.DocumentEvent;
-import javax.swing.text.NumberFormatter;
-
-import de.hpi.bpt.scylla.GUI.FormManager;
-import de.hpi.bpt.scylla.GUI.InsertRemoveListener;
-import de.hpi.bpt.scylla.GUI.ScyllaGUI;
-import de.hpi.bpt.scylla.GUI.GlobalConfigurationPane.NoNegativeDoubleFormat;
-import de.hpi.bpt.scylla.creation.SimulationConfiguration.Distribution;
-import de.hpi.bpt.scylla.creation.SimulationConfiguration.Distribution.AttributeType;
-import de.hpi.bpt.scylla.creation.SimulationConfiguration.Distribution.DiscreteDistribution;
-import de.hpi.bpt.scylla.creation.SimulationConfiguration.Distribution.DistributionType;
-
+import java.awt.Component;
+import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.text.NumberFormat;
 
 import javax.swing.JComponent;
-import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 
-import java.awt.Component;
-import java.awt.GridBagConstraints;
+import de.hpi.bpt.scylla.GUI.FormManager;
+import de.hpi.bpt.scylla.GUI.ScyllaGUI;
+import de.hpi.bpt.scylla.GUI.InputFields.NumberField;
+import de.hpi.bpt.scylla.creation.SimulationConfiguration.Distribution;
+import de.hpi.bpt.scylla.creation.SimulationConfiguration.Distribution.AttributeType;
+import de.hpi.bpt.scylla.creation.SimulationConfiguration.Distribution.DiscreteDistribution;
+import de.hpi.bpt.scylla.creation.SimulationConfiguration.Distribution.DistributionType;
 
 /**
  * Display class for distributions
@@ -93,46 +87,49 @@ public class DistributionPanel extends JPanel {
 	 * @return A component managing inputs for the given attribute
 	 */
 	private JComponent getTypeInputComponent(String name, Distribution.AttributeType type){
-		String value = distribution.getAttribute(name);
 		switch(type){
-		//Type INT: Positive Integers, default value 0, no invalid characters allowed
+		//Type INT: Positive Integers, default value 0
 		case INT : 
-			NumberFormatter formatter = new NumberFormatter(NumberFormat.getInstance());
-		    formatter.setValueClass(Integer.class);
-		    formatter.setMinimum(0);
-		    formatter.setMaximum(Integer.MAX_VALUE);
-		    formatter.setAllowsInvalid(false);
-			JFormattedTextField intfield = new JFormattedTextField(formatter);
-			if(value != null && !value.isEmpty())intfield.setText(value);
-			else intfield.setText("0");
-			intfield.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
-				if(formManager.isChangeFlag())return;
-				try{
-					long s = Long.parseLong(distribution.getAttribute(name));
-					long n = Long.parseLong(intfield.getText());
-					if(s != n){
-						distribution.setAttribute(name, n);
-						formManager.setSaved(false);
-					}
-				}catch(Exception exc){}
-			}));
-			intfield.setColumns(10);
-			return intfield;
+			return new NumberField<Integer>(formManager) {
+				{
+					setMinimum(0);
+				}
+				@Override
+				protected Integer getSavedValue() {
+					String attribute = distribution.getAttribute(name);
+					return attribute.isEmpty() ? null : Integer.parseInt(attribute);
+				}
+
+				@Override
+				protected void setSavedValue(Integer v) {
+					distribution.setAttribute(name, v);
+				}
+			}.getComponent();
 		
 		//Type DOUBLE: No negative double, default value 0
 		case DOUBLE : 
-			JFormattedTextField doublefield = new JFormattedTextField(new NumberFormatter(new NoNegativeDoubleFormat()));
-			if(value != null && !value.isEmpty())doublefield.setText(value);
-			else doublefield.setText("0.0");
-			doublefield.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
-				if(formManager.isChangeFlag())return;
-				try{
-					distribution.setAttribute(name, Double.parseDouble(doublefield.getText()));
-					formManager.setSaved(false);
-				}catch(NumberFormatException exc){}
-			}));
-			doublefield.setColumns(10);
-			return doublefield;
+			return new NumberField<Double>(formManager) {
+				
+				{
+					setMinimum(0.0);
+				}
+				
+				@Override
+				protected NumberFormat getFormat() {
+					return DECIMALFORMAT;
+				}
+				
+				@Override
+				protected Double getSavedValue() {
+					String attribute = distribution.getAttribute(name);
+					return attribute.isEmpty() ? null : Double.parseDouble(attribute);
+				}
+
+				@Override
+				protected void setSavedValue(Double v) {
+					distribution.setAttribute(name, v);
+				}
+			}.getComponent();
 			
 		//Type ENTRYSET: (Like discrete distribution) create a special panel for that
 		case ENTRYSET : 

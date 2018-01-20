@@ -590,41 +590,43 @@ public class SimulationPane extends JPanel{
 	 * @param bpmnFilenames : Array of bpmn file names
 	 * @param simFilenames : Array of sim file names
 	 */
-	private void startSimulation(String resFilename, String[] bpmnFilenames, String[] simFilenames) {
+	private synchronized void startSimulation(String resFilename, String[] bpmnFilenames, String[] simFilenames) {
 
 		button_StartSimulation.setText("Running ...");
         button_StartSimulation.setEnabled(false);
         
-    	boolean enableDebugLogging = checkbox_debug.isSelected();
-        boolean redirectErrors = checkbox_debug.isSelected();
-        boolean enableDesmojLogging = checkbox_desmoj.isSelected();
-        
-        DebugLogger.allowDebugLogging = enableDebugLogging;
-        if(redirectErrors) System.setErr(console.getErr());
-        else System.setErr(ScyllaGUI.getStdErr());
-        
-        boolean enableBpsLogging = true;
-        
-        boolean success = true;
+        new Thread(()->{
+        	boolean enableDebugLogging = checkbox_debug.isSelected();
+            boolean redirectErrors = checkbox_debug.isSelected();
+            boolean enableDesmojLogging = checkbox_desmoj.isSelected();
+            
+            DebugLogger.allowDebugLogging = enableDebugLogging;
+            if(redirectErrors) System.setErr(console.getErr());
+            else System.setErr(ScyllaGUI.getStdErr());
+            
+            boolean enableBpsLogging = true;
+            
+            boolean success = true;
 
-        SimulationManager manager = new SimulationManager(ScyllaGUI.DESMOJOUTPUTPATH, bpmnFilenames, simFilenames, resFilename,
-                enableBpsLogging, enableDesmojLogging);
-        try{
-        	System.out.println("Starting simulation at "+new SimpleDateFormat("HH:mm:ss").format(new Date()));
-            manager.run();
-        }catch(Exception e){
-        	e.printStackTrace();
-        	System.out.println("Fatal error, simulation has been canceled");
-        	success = false;
-        }
-        if(success){
-        	System.out.println("Finished simulation at "+new SimpleDateFormat("HH:mm:ss").format(new Date()));
-            lastOutPutFolder = manager.getOutputPath();
-        	button_OpenLastOutput.setEnabled(true);
-        }
-        System.out.println();
-        button_StartSimulation.setEnabled(true);
-		button_StartSimulation.setText("Start Simulation");
+            SimulationManager manager = new SimulationManager(ScyllaGUI.DESMOJOUTPUTPATH, bpmnFilenames, simFilenames, resFilename,
+                    enableBpsLogging, enableDesmojLogging);
+            try{
+            	System.out.println("Starting simulation at "+new SimpleDateFormat("HH:mm:ss").format(new Date()));
+                manager.run();
+            }catch(Exception e){
+            	e.printStackTrace();
+            	System.out.println("Fatal error, simulation has been canceled");
+            	success = false;
+            }
+            if(success){
+            	System.out.println("Finished simulation at "+new SimpleDateFormat("HH:mm:ss").format(new Date()));
+                lastOutPutFolder = manager.getOutputPath();
+            	button_OpenLastOutput.setEnabled(true);
+            }
+            System.out.println();
+            button_StartSimulation.setEnabled(true);
+    		button_StartSimulation.setText("Start Simulation");
+        }).start();
 	}
 	
 	public Console getConsole() {

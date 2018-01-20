@@ -20,6 +20,7 @@ import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 
 import de.hpi.bpt.scylla.GUI.InsertRemoveListener;
+import de.hpi.bpt.scylla.GUI.NoNegativeDoubleFormat;
 import de.hpi.bpt.scylla.GUI.ScalingCheckBoxIcon;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.ResourceType.ResourceInstance;

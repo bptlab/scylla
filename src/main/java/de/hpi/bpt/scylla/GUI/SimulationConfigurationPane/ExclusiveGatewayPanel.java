@@ -14,9 +14,9 @@ import javax.swing.text.NumberFormatter;
 
 import de.hpi.bpt.scylla.GUI.FormManager;
 import de.hpi.bpt.scylla.GUI.InsertRemoveListener;
+import de.hpi.bpt.scylla.GUI.NoNegativeDoubleFormat;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel.ComponentHolder;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
-import de.hpi.bpt.scylla.GUI.GlobalConfigurationPane.NoNegativeDoubleFormat;
 import de.hpi.bpt.scylla.creation.ElementLink;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.ExclusiveGateway;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.SimulationConfigurationCreator;
@@ -111,7 +111,7 @@ public class ExclusiveGatewayPanel extends JPanel implements ComponentHolder{
 		textfieldProbability.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
 			if(formManager.isChangeFlag())return;
 			try{
-				gateway.setBranchingProbability(branch, Double.parseDouble(textfieldProbability.getText()));
+				gateway.setBranchingProbability(branch, Double.parseDouble(textfieldProbability.getText())/100.0);
 				formManager.setSaved(false);
 			}catch(NumberFormatException exc){}
 		}));
