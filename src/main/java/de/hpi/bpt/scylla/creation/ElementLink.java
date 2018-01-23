@@ -16,6 +16,7 @@ public abstract class ElementLink {
 	 * @param toLink
 	 */
 	public ElementLink(Element toLink){
+		if(toLink == null)throw new NullPointerException("Cannot create Elementlink: Element to link with is null!");
 		el = toLink;
 		nsp = el.getNamespace();
 	}
@@ -59,6 +60,15 @@ public abstract class ElementLink {
 	 */
 	protected void setAttribute(String name, Object value){
 		el.setAttribute(name, value.toString());
+	}
+	
+	/**Returns the elements identifier if existent*/
+	public String getId() {return el.getAttributeValue("id");}
+	/**Returns the elements name or id if no name is specified*/
+	public String getName(){
+		String name = el.getAttributeValue("name");
+		if(name != null)return name;
+		else return getId();
 	}
 	
 }

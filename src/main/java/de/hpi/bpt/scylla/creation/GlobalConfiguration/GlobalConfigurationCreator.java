@@ -18,6 +18,7 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
+import de.hpi.bpt.scylla.GUI.GlobalConfigurationPane.GCFormManager.ResourceObserver;
 import de.hpi.bpt.scylla.creation.ElementLink;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.ResourceType.ResourceInstance;
 
@@ -35,6 +36,9 @@ public class GlobalConfigurationCreator extends ElementLink{
 
 	/**List of all resource types*/
 	private List<ResourceType> resourceTypes;
+	
+	/**List of all JComboboxes, that display resource type, in order to update their entries*/
+	private List<ResourceObserver> resourceObserverList;
 
 	/**List of all timetables*/
 	private List<Timetable> timetables;
@@ -52,6 +56,13 @@ public class GlobalConfigurationCreator extends ElementLink{
 
 		resourceTypes = new ArrayList<ResourceType>();
 		timetables = new ArrayList<Timetable>();
+		
+		resourceObserverList = new ArrayList<ResourceObserver>();
+	}
+	
+	
+	public List<ResourceObserver> getResourceObserverList() {
+		return resourceObserverList;
 	}
 	
 	/**
@@ -190,6 +201,9 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 
 		/**Resets the id to a new value, can cause invalidity by duplicate*/
 		public void setId(String id) {
+			for(ResourceObserver cbm : getResourceObserverList()){
+				cbm.notifyResourceRenaming(this.id, id);
+			}			
 			setAttribute("id",id);
 			this.id = id;
 		}
@@ -380,6 +394,9 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 		if(res == null){
 			res = new ResourceType(id);
 			resourceTypes.add(res);
+			for(ResourceObserver cbm : getResourceObserverList()){
+				cbm.notifyResourceCreation(res.getId());
+			}
 		}//else duplicate
 		return res;
 	}
@@ -395,6 +412,10 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 		//resourceData.removeContent(toRem.getEl());
 		toRem.removeFrom(resourceData);
 		resourceTypes.remove(toRem);
+		
+		for(ResourceObserver cbm : getResourceObserverList()){
+			cbm.notifyResourceDeletion(id);//TODO is that the id?
+		}
 	}
 	
 	
@@ -567,13 +588,6 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 		 */
 		public int getNumItems(){
 			return items.size();
-		}
-		
-		/**
-		 * @return Unique identifier of this timetable
-		 */
-		public String getId() {
-			return id;
 		}
 		
 		public void setId(String s) {
@@ -784,6 +798,9 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 
 		resourceTypes = new ArrayList<ResourceType>();
 		timetables = new ArrayList<Timetable>();
+		
+		//Resource type initialization
+		resourceObserverList = new ArrayList<ResourceObserver>();
 		
         for (Element el : root.getChildren(null,nsp)) {
             String elementName = el.getName();

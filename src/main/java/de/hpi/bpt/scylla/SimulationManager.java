@@ -110,7 +110,7 @@ public class SimulationManager {
                 globalConfiguration = globalConfigurationParser.parse(gcDoc.getRootElement());
                 String fileNameWithoutExtension = globalConfigurationFilename.substring(// filename.lastIndexOf("\\") +
                                                                                         // 1,
-                		globalConfigurationFilename.lastIndexOf("\\")+1, globalConfigurationFilename.lastIndexOf(".xml"));
+                		globalConfigurationFilename.lastIndexOf(Scylla.FILEDELIM)+1, globalConfigurationFilename.lastIndexOf(".xml"));
                 globalConfiguration.setFileNameWithoutExtension(fileNameWithoutExtension);
                 // plugins to parse global configuration
                 GlobalConfigurationParserPluggable.runPlugins(this, globalConfiguration, gcRootElement);

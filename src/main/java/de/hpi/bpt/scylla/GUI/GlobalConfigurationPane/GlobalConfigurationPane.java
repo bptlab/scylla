@@ -5,6 +5,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ItemEvent;
+import java.io.File;
 import java.io.IOException;
 import java.text.NumberFormat;
 import java.time.ZoneId;
@@ -24,10 +25,10 @@ import javax.swing.event.DocumentEvent;
 import org.eclipse.wb.swing.FocusTraversalOnArray;
 import org.jdom2.JDOMException;
 
-import de.hpi.bpt.scylla.GUI.EditorPanel;
+import de.hpi.bpt.scylla.GUI.EditorPane;
 import de.hpi.bpt.scylla.GUI.ExpandPanel;
+import de.hpi.bpt.scylla.GUI.ExtendedListChooserPanel;
 import de.hpi.bpt.scylla.GUI.InsertRemoveListener;
-import de.hpi.bpt.scylla.GUI.ListChooserPanel;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel.ComponentHolder;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator;
@@ -40,7 +41,7 @@ import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator
  *
  */
 @SuppressWarnings("serial")
-public class GlobalConfigurationPane extends EditorPanel implements GCFormManager{
+public class GlobalConfigurationPane extends EditorPane implements GCFormManager{
 	
 	//General Information form components
 	private JTextField textfieldId;
@@ -48,9 +49,9 @@ public class GlobalConfigurationPane extends EditorPanel implements GCFormManage
 	private JComboBox<ZoneId> comboboxTimezone;
 
 	/**Timetable Panel*/
-	private ListChooserPanel panelTimetables;
+	private ExtendedListChooserPanel panelTimetables;
 	/**Resource Panel*/
-	private ListChooserPanel panelResources;
+	private ExtendedListChooserPanel panelResources;
 
 	/**List of all JComboboxes, that display timetables, in order to update their entries*/
 	private List<JComboBox<String>> timetableObserverList;
@@ -133,6 +134,7 @@ public class GlobalConfigurationPane extends EditorPanel implements GCFormManage
 				}
 			}catch(Exception exc){}
 		}));
+		
 		GridBagConstraints gbc_textfieldSeedEdit = new GridBagConstraints();
 		gbc_textfieldSeedEdit.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, inset_b);
 		gbc_textfieldSeedEdit.fill = GridBagConstraints.HORIZONTAL;
@@ -192,7 +194,7 @@ public class GlobalConfigurationPane extends EditorPanel implements GCFormManage
 		panelGeneral.add(comboboxTimezone, gbc_comboboxTimezone);
 		
 		//---Resource Panel---
-		panelResources = new ListChooserPanel(){
+		panelResources = new ExtendedListChooserPanel(){
 
 			@Override
 			public void onDelete(ComponentHolder toDel) {
@@ -235,7 +237,7 @@ public class GlobalConfigurationPane extends EditorPanel implements GCFormManage
 		timetables.add("");//"No timetable"-option
 		
 		//--- Timetable panel ---
-		panelTimetables = new ListChooserPanel(){
+		panelTimetables = new ExtendedListChooserPanel(){
 
 			@Override
 			public void onDelete(ComponentHolder toDel) {
@@ -313,8 +315,8 @@ public class GlobalConfigurationPane extends EditorPanel implements GCFormManage
 	@Override
 	protected void create(){
 		setChangeFlag(true);
-		labelFiletitle.setText("<unsaved file>");
 		close();
+		setFile(new File("NewFile"+unnamedcount++ + ".xml"));
 		creator = new GlobalConfigurationCreator();
 		setSaved(false);
 		setEnabled(true);
@@ -426,7 +428,7 @@ public class GlobalConfigurationPane extends EditorPanel implements GCFormManage
 	 * @see {@link ResourcePanel}
 	 */
 	private ComponentHolder newResource(ResourceType res){
-		return new ListChooserPanel.ComponentHolder() {
+		return new ExtendedListChooserPanel.ComponentHolder() {
 			ResourcePanel p = new ResourcePanel(GlobalConfigurationPane.this);
 			{
 				p.setResourceType(res);
@@ -476,7 +478,7 @@ public class GlobalConfigurationPane extends EditorPanel implements GCFormManage
 	 * @see {@link TimetablePanel}
 	 */
 	private ComponentHolder newTimetable(Timetable t){
-		return new ListChooserPanel.ComponentHolder() {
+		return new ExtendedListChooserPanel.ComponentHolder() {
 			TimetablePanel p = new TimetablePanel(GlobalConfigurationPane.this);
 			{
 				p.setTimetable(t);

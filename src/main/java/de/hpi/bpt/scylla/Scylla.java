@@ -9,8 +9,8 @@ package de.hpi.bpt.scylla;
  */
 public class Scylla {
 
-
-    public static final String FILEDELIM = System.getProperty("os.name").contains("Linux") ? "/" : "\\";
+	public static final String OS = System.getProperty("os.name");
+    public static final String FILEDELIM = (OS.contains("Linux") || OS.contains("Mac OS")) ? "/" : "\\";
 
     public static void main(String[] args) {
         /**

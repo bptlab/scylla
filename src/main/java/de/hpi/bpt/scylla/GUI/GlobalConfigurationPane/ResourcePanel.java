@@ -26,7 +26,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.DocumentEvent;
 
 import de.hpi.bpt.scylla.GUI.InsertRemoveListener;
-import de.hpi.bpt.scylla.GUI.ListChooserPanel;
+import de.hpi.bpt.scylla.GUI.NoNegativeDoubleFormat;
+import de.hpi.bpt.scylla.GUI.ExtendedListChooserPanel;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel.ComponentHolder;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.ResourceType;
@@ -46,7 +47,7 @@ public class ResourcePanel extends JSplitPane{
 	private JComboBox<String> comboboxTimetable;
 	
 	/**Panel containing the panels corresponding to this resource*/
-	private ListChooserPanel listpanelInstances;
+	private ExtendedListChooserPanel listpanelInstances;
 	/**Additional list of all instances in order to retain access*/
 	private List<InstancePanel> instances;
 	
@@ -204,7 +205,7 @@ public class ResourcePanel extends JSplitPane{
 		bottomPanel.add(labelInstancesTitle, gbc_textfieldInstancesTitle);
 		
 		//Instance list panel
-		listpanelInstances = new ListChooserPanel(){
+		listpanelInstances = new ExtendedListChooserPanel(){
 
 			@Override
 			public void onDelete(ComponentHolder toDel) {

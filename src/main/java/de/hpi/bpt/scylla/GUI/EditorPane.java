@@ -9,11 +9,11 @@ import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Observer;
 import java.util.Set;
 
 import javax.swing.AbstractAction;
@@ -23,7 +23,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
 
@@ -32,7 +31,14 @@ import org.jdom2.JDOMException;
 
 
 @SuppressWarnings("serial")
-public abstract class EditorPanel extends JPanel implements FormManager{
+/**
+ * Abstract superclass for all kinds of file editing panes.
+ * Provides creation, saving, opening and closing buttons and functionalities.
+ * Provides a saving mechanism
+ * @author Leon Bein
+ *
+ */
+public abstract class EditorPane extends JPanel implements FormManager{
 	
 	/**Flag to display if there are any non-user changes performed at user input objects,
 	 * in order to prevent user input events to be fired.
@@ -46,24 +52,49 @@ public abstract class EditorPanel extends JPanel implements FormManager{
 
 	/**File reference to the current opened file, null if none is opened*/
 	private File file;
+	
+	/**Counts, how many unnamed file have been created in this program instance, in order to number them*/
+	protected static int unnamedcount = 0;
 
+	/**Header panel/button bar, accessible for subclasses*/
 	protected JPanel panelHeader;
+	/**Button for creating new files, accessible for subclasses*/
 	protected JButton buttonNewfile;
+	/**Button for override saving files, accessible for subclasses*/
 	protected JButton buttonSavefile;
+	/**Button for saving file with new name, accessible for subclasses*/
 	protected JButton buttonSavefileAs;
+	/**Button to open a new file, accessible for subclasses*/
 	protected JButton buttonOpenfile;
+	/**Label displaying the file title or any other title, accessible for subclasses*/
 	protected JLabel labelFiletitle;
+	/**Button to close the current file and clear the editor*/
 	protected JButton buttonClosefile;
 
+	/**Main editor panel, layout and content under the responsibility of subclasses*/
 	protected JPanel panelMain;
+	/**Main panel wrapping scrollpane, accessible for subclasses*/
 	protected JScrollPane scrollPane;
 	
-	public EditorPanel() {
-		
+	/**Observers for file title changes*/
+	protected Set<Observer> titleObservers;
+	
+	/**
+	 * Plain constructor, mainly initializes the header bar, keybindings etc.
+	 */
+	public EditorPane() {
 		
 		setFocusable(true);
 		setBackground(ScyllaGUI.ColorBackground);
 		setLayout(new GridLayout(0, 1, 0, 0));
+		
+		titleObservers = new HashSet<Observer>() {
+			public boolean add(Observer o) {	
+				boolean b = super.add(o);
+				notifyTitleObservers(getFile());
+				return b;
+			}
+		};
 		
 		//---Header panel---
 		panelHeader = new JPanel();
@@ -130,9 +161,18 @@ public abstract class EditorPanel extends JPanel implements FormManager{
 		panelHeader.add(buttonOpenfile, gbc_buttonOpenfile);
 		
 		//Label displaying file title
-		labelFiletitle = new JLabel();
-		labelFiletitle.setText("<No editor opened. Open an existing file or create a new one.>");
-		labelFiletitle.setForeground(Color.WHITE);
+		labelFiletitle = new JLabel() {
+			@Override
+			/**
+			 * Always resets color and font when text is changed, to enable easy error messaging
+			 */
+			public void setText(String text) {
+				setForeground(Color.WHITE);
+				setFont(ScyllaGUI.TITLEFONT);
+				super.setText(text);
+			}
+		};
+		showNoEditorLabel();
 		GridBagConstraints gbc_textfieldFiletitle = new GridBagConstraints();
 		gbc_textfieldFiletitle.weightx = 37;
 		gbc_textfieldFiletitle.insets = new Insets(0,ScyllaGUI.TITLEFONT.getSize(),  0, 0);
@@ -147,7 +187,7 @@ public abstract class EditorPanel extends JPanel implements FormManager{
 				be_close();
 			}
 		});
-		buttonClosefile.setIcon(ScyllaGUI.resizeIcon(ScyllaGUI.ICON_X,ScyllaGUI.TITLEFONT.getSize(),ScyllaGUI.TITLEFONT.getSize()));
+		buttonClosefile.setIcon(ScyllaGUI.ICON_CLOSE);
 		GridBagConstraints gbc_buttonClosefile = new GridBagConstraints();
 		gbc_buttonClosefile.weightx = 0;
 		gbc_buttonClosefile.fill = GridBagConstraints.BOTH;
@@ -173,46 +213,36 @@ public abstract class EditorPanel extends JPanel implements FormManager{
 		Set<AWTKeyStroke> forwardKeys = new HashSet<AWTKeyStroke>(getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
 		forwardKeys.add(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
 		setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, forwardKeys);
-    		
+		initKeyBindings();
 	}
 	
+	
+	
 	/**
-	 * Initialization method that has to be called directly after the constructor,
-	 * but can only be called if the panel has already been added to a parent.<br>
-	 * Initializes keybindings, as they won't work otherwise
+	 * Initializes keybindings for save(as), open and new
 	 */
-	public void init(){
-		JTabbedPane parent = (JTabbedPane) getParent();
-		parent.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_S,InputEvent.CTRL_DOWN_MASK),"save");
-		parent.getActionMap().put("save", new AbstractAction() {
+	public void initKeyBindings(){
+		getActionMap().put(ScyllaGUI.ACTIONKEY_SAVE, new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				//Workaround: adding directly to this.getInputMap does not work, but adding to parent also triggers events when this panel is not selected
-				if(parent.getSelectedComponent() != EditorPanel.this)return;
 				be_save();
 			}
 		});
-		parent.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_S,InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK),"saveAs");
-		parent.getActionMap().put("saveAs", new AbstractAction() {
+		getActionMap().put(ScyllaGUI.ACTIONKEY_SAVEAS, new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(parent.getSelectedComponent() != EditorPanel.this)return;
 				be_saveAs();
 			}
 		});
-		parent.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_O,InputEvent.CTRL_DOWN_MASK),"open");
-		parent.getActionMap().put("open", new AbstractAction() {
+		getActionMap().put(ScyllaGUI.ACTIONKEY_OPEN, new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(parent.getSelectedComponent() != EditorPanel.this)return;
 				be_open();
 			}
 		});
-		parent.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_N,InputEvent.CTRL_DOWN_MASK),"new");
-		parent.getActionMap().put("new", new AbstractAction() {
+		getActionMap().put(ScyllaGUI.ACTIONKEY_NEW, new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(parent.getSelectedComponent() != EditorPanel.this)return;
 				be_create();
 			}
 		});
@@ -221,7 +251,7 @@ public abstract class EditorPanel extends JPanel implements FormManager{
 	/**
 	 * Button event for creating new files
 	 */
-	protected void be_create(){
+	public void be_create(){
 		//Show unsaved changes dialog; if cancel is pressed the whole process is canceled
 		if(!isSaved()){
 			int i = showUnsavedChangesDialog();
@@ -234,16 +264,16 @@ public abstract class EditorPanel extends JPanel implements FormManager{
 	 * Button event for save button,
 	 * overrides file if already existing, otherwise opens "save as" dialog
 	 */
-	protected void be_save(){
+	public void be_save(){
 		if(isSaved())return;
-		if(getFile() != null)save();
+		if(getFile() != null && getFile().exists())save();
 		else be_saveAs();
 	}
 	
 	/**
 	 * Button event for "save as" button
 	 */
-	protected void be_saveAs(){
+	public void be_saveAs(){
 		//Select file and confirm override if file is already existing
 		ScalingFileChooser chooser = new ScalingFileChooser(ScyllaGUI.DEFAULTFILEPATH){
 			@Override
@@ -266,7 +296,7 @@ public abstract class EditorPanel extends JPanel implements FormManager{
 				}
 			}
 		};
-		if(getFile() != null)chooser.setSelectedFile(getFile());
+		if(getFile() != null && getFile().exists())chooser.setSelectedFile(getFile());
 		else if(!getId().equals("")) chooser.setSelectedFile(new File(ScyllaGUI.DEFAULTFILEPATH+"\\"+getId()+".xml"));
 		chooser.setDialogTitle("Save");
 		int c = chooser.showDialog(null,"Save");
@@ -284,7 +314,7 @@ public abstract class EditorPanel extends JPanel implements FormManager{
 	/**
 	 * Button event for opening existing gcs
 	 */
-	protected void be_open(){	
+	public void be_open(){	
 		//Show unsaved changes dialog; if cancel is pressed the whole process is canceled
 		if(!isSaved()){
 			int i = showUnsavedChangesDialog();
@@ -296,11 +326,11 @@ public abstract class EditorPanel extends JPanel implements FormManager{
 		int c = chooser.showDialog(this,"Open");
 		//if the process is canceled, nothing happens
 		if(c == ScalingFileChooser.APPROVE_OPTION){
-			setFile(chooser.getSelectedFile());
-			if(getFile() != null){
+			if(chooser.getSelectedFile() != null){
 				//Close current opened file
 				close();
 				//Update default file path
+				setFile(chooser.getSelectedFile());
 				ScyllaGUI.DEFAULTFILEPATH = chooser.getSelectedFile().getPath();
 				try {
 					open();
@@ -317,13 +347,12 @@ public abstract class EditorPanel extends JPanel implements FormManager{
 	 * Button event close
 	 * Closes gc but asks to save unsaved changes if existing
 	 */
-	protected void be_close(){
-		if(!isSaved()){
-			int i = showUnsavedChangesDialog();
-			//If cancel was pressed OR the gc was saved, it is closed
-			if(i == 1)close();
-			//else return;
-		}else close();
+	public void be_close(){
+	//If discard changes was pressed OR the gc was saved, it is closed
+		if(isSaved() || showUnsavedChangesDialog() == 1) {
+			close();
+			notifyTitleObservers(this);
+		}
 	}
 	
 	//Actions
@@ -331,6 +360,20 @@ public abstract class EditorPanel extends JPanel implements FormManager{
 	protected abstract void save();
 	protected abstract void open() throws JDOMException, IOException;
 	protected abstract void close();
+	
+	/**
+	 * Directly opens a file for editing without usr input.
+	 * @param f: A file matching the specific sub-class
+	 */
+	public void openFile(File f) {
+		if(f == null)return;
+		try {
+			setFile(f);
+			open();
+		} catch (JDOMException | IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 
 	@Override
@@ -358,6 +401,17 @@ public abstract class EditorPanel extends JPanel implements FormManager{
 		saved = b;
 		//Also set the save button to display if saved or not
 		buttonSavefile.setEnabled(!b);
+		notifyTitleObservers(getFile());
+	}
+	
+	public Set<Observer> getTitleObservers() {
+		return titleObservers;
+	}
+	
+	protected void notifyTitleObservers(Object arg) {
+		for(Observer o : titleObservers) {
+			o.update(null, arg);
+		}
 	}
 	
 	/**
@@ -371,7 +425,7 @@ public abstract class EditorPanel extends JPanel implements FormManager{
 	protected int showUnsavedChangesDialog(){
 		int i = JOptionPane.showOptionDialog(
 				this,
-				getFileName()+"has unsaved changes. Would you like to save them?",
+				getFileName()+" has unsaved changes. Would you like to save them?",
 				"Unsaved Changes",
 				JOptionPane.YES_NO_CANCEL_OPTION,
 				JOptionPane.PLAIN_MESSAGE,
@@ -405,10 +459,15 @@ public abstract class EditorPanel extends JPanel implements FormManager{
 	
 	protected abstract String getId();
 
+	/**
+	 * Sets the edited file, changes title labels etc. 
+	 * @param file
+	 */
 	protected void setFile(File file) {
 		if(file != null)labelFiletitle.setText(file.getPath());
-		else labelFiletitle.setText("<No editor opened. Open an existing file or create a new one.>");
-		this.file = file;
+		else showNoEditorLabel();
+		this.file = file;	
+		notifyTitleObservers(getFile());
 	}
 	
 	/**
@@ -418,6 +477,13 @@ public abstract class EditorPanel extends JPanel implements FormManager{
 	public void setEnabled(boolean b){
 		buttonClosefile.setEnabled(b);
 		buttonSavefileAs.setEnabled(b);
+	}
+	
+	/**
+	 * Displays a message to indicate, that there is currently no file edited
+	 */
+	protected void showNoEditorLabel() {
+		labelFiletitle.setText("<no file>");
 	}
 
 }

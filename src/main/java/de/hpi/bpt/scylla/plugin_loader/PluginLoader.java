@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.JarURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -17,6 +18,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import de.hpi.bpt.scylla.GUI.CheckBoxList.StateObserver;
+import de.hpi.bpt.scylla.GUI.ScyllaGUI;
 import de.hpi.bpt.scylla.logger.DebugLogger;
 import de.hpi.bpt.scylla.plugin_type.IPluggable;
 
@@ -86,9 +88,11 @@ public class PluginLoader {
 		
 		try {
 			//Collecting all plugin classpaths
-			File plugins_list = new File(PluginLoader.class.getClassLoader().getResource("META-INF/plugins/plugins_list").toURI());
+//			File plugins_list = new File(PluginLoader.class.getClassLoader().getResource("META-INF/plugins/plugins_list").toURI());
 
-			FileReader fr = new FileReader(plugins_list);
+			//FileReader fr = new FileReader(plugins_list);
+			String prefix = ScyllaGUI.INJAR ? "/resources" : "";
+			InputStreamReader fr = new InputStreamReader(PluginLoader.class.getResourceAsStream(prefix+"/META-INF/plugins/plugins_list"));
 			BufferedReader br = new BufferedReader(fr);
 
 			ArrayList<String> packages = new ArrayList<String>();
@@ -145,7 +149,7 @@ public class PluginLoader {
 				}
 			}
 			
-		} catch (URISyntaxException | IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		

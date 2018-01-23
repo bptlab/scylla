@@ -41,16 +41,7 @@ public class ExpandPanel extends JPanel{
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		setLayout(gridBagLayout);
 		
-		header = h;
-		GridBagConstraints gbc_header = new GridBagConstraints();
-		gbc_header.weightx = 1.0;
-		gbc_header.fill = GridBagConstraints.HORIZONTAL;
-		gbc_header.gridx = 0;
-		gbc_header.gridy = 0;
-		add(header, gbc_header);
-		if(header.getBackground() != null){
-			setBackground(header.getBackground());
-		}
+		setHeader(h);
 		
 		button_expand = new JButton();
 		button_expand.setIcon(ScyllaGUI.ICON_EXPAND);
@@ -69,6 +60,41 @@ public class ExpandPanel extends JPanel{
 		gbc_button_expand.gridy = 0;
 		add(button_expand, gbc_button_expand);
 		
+		setContent(c);
+		
+		expanded = true;
+		collapse();
+
+	}
+	
+	/**
+	 * Sets the header component
+	 * @param h: Component to be set, not null
+	 * @throws NullPointerException when h == null
+	 */
+	public void setHeader(Component h) {
+		if(h == null)throw new NullPointerException("ExpandPanel header cannot be null");
+		if(header != null)remove(header);
+		header = h;
+		GridBagConstraints gbc_header = new GridBagConstraints();
+		gbc_header.weightx = 1.0;
+		gbc_header.fill = GridBagConstraints.HORIZONTAL;
+		gbc_header.gridx = 0;
+		gbc_header.gridy = 0;
+		add(header, gbc_header);
+		if(header.getBackground() != null){
+			setBackground(header.getBackground());
+		}
+	}
+	
+	/**
+	 * Sets the content component
+	 * @param c: Component to be set, not null
+	 * @throws NullPointerException when c == null
+	 */
+	public void setContent(Component c) {
+		if(c == null)throw new NullPointerException("ExpandPanel content cannot be null");
+		if(content != null)remove(content);
 		content = c;
 		gbc_content = new GridBagConstraints();
 		gbc_content.fill = GridBagConstraints.HORIZONTAL;
@@ -76,10 +102,6 @@ public class ExpandPanel extends JPanel{
 		gbc_content.gridy = 1;
 		gbc_content.gridwidth = 2;
 		add(content, gbc_content);
-		
-		expanded = true;
-		collapse();
-
 	}
 	
 	/**
