@@ -98,9 +98,7 @@
       <boundaryEvent attachedToRef="sid-10642FA7-3483-45AF-AC53-88080CD67FF9" cancelActivity="false" id="sid-51AF51C9-5232-4B0E-A50F-DA6B09AECDF4" name="time in" parallelMultiple="false">
          <outgoing>sid-EE396ED4-04C6-4AE1-B749-81CF403464D0</outgoing>
          <timerEventDefinition id="sid-ebe582ba-f04b-4ed3-a09f-c1946b83b36e">
-          <!--  <timeDate id="sid-a39c732d-e1b5-47fd-a1e8-9605184e7293" xsi:type="tFormalExpression">2008-03-01T13:00:00+00:00</timeDate>
-            <timeCycle id="sid-dccf1c6d-be94-413e-bb4a-65f8318caace" xsi:type="tFormalExpression">R/2008-03-01T13:00:00+00:00/PT3M</timeCycle> -->
-            <timeDuration id="sid-383e9670-1224-4988-9d90-7a0eb30e80eb" xsi:type="tFormalExpression">PT5M</timeDuration>
+            <timeDuration id="sid-383e9670-1224-4988-9d90-7a0eb30e80eb" xsi:type="tFormalExpression">PT20H</timeDuration>
          </timerEventDefinition>
       </boundaryEvent>
       <boundaryEvent attachedToRef="sid-10642FA7-3483-45AF-AC53-88080CD67FF9" cancelActivity="false" id="sid-17EFE732-CE01-4205-AC11-4AB5B52484D3" name="condition in" parallelMultiple="false">

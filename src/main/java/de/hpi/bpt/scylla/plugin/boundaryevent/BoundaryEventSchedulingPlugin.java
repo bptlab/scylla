@@ -14,6 +14,7 @@ public class BoundaryEventSchedulingPlugin extends EventSchedulingPluggable {
 
     @Override
     public boolean scheduleEvent(ScyllaEvent event, TimeSpan timeSpan) throws ScyllaRuntimeException {
+
         BoundaryEventPluginUtils pluginInstance = BoundaryEventPluginUtils.getInstance();
         pluginInstance.createAndScheduleBoundaryEvents(event, timeSpan);
         return true;

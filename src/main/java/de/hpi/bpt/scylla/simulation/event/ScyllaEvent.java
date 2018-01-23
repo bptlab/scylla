@@ -1,13 +1,19 @@
 package de.hpi.bpt.scylla.simulation.event;
 
+import java.sql.Time;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import co.paralleluniverse.fibers.SuspendExecution;
 import de.hpi.bpt.scylla.exception.ScyllaRuntimeException;
+import de.hpi.bpt.scylla.logger.ProcessNodeInfo;
+import de.hpi.bpt.scylla.logger.ProcessNodeTransitionType;
 import de.hpi.bpt.scylla.model.process.ProcessModel;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
 import de.hpi.bpt.scylla.simulation.ProcessSimulationComponents;
+import de.hpi.bpt.scylla.simulation.SimulationModel;
 import de.hpi.bpt.scylla.simulation.utils.SimulationUtils;
 import desmoj.core.simulator.Event;
 import desmoj.core.simulator.Model;
@@ -64,12 +70,34 @@ public abstract class ScyllaEvent extends Event<ProcessInstance> {
     public void scheduleNextEvents() throws ScyllaRuntimeException, SuspendExecution {
         for (int i : nextEventMap.keySet()) {
             ScyllaEvent nextEvent = nextEventMap.get(i);
+            SimulationModel model = (SimulationModel) nextEvent.getModel();
             TimeSpan timeSpanToNextEvent = timeSpanToNextEventMap.get(i);
-            SimulationUtils.scheduleEvent(nextEvent, timeSpanToNextEvent);
+            //if this is known as canceld don't schedule outgoing Elements of this
+            boolean alreadyCanceled = false;
+            Collection<Map<Integer, List<ProcessNodeInfo>>> allProcesses = model.getProcessNodeInfos().values();
+            for (Map<Integer, java.util	.List<ProcessNodeInfo>> process : allProcesses) {
+                List<ProcessNodeInfo> currentProcess = process.get(processInstance.getId());
+                for (ProcessNodeInfo task : currentProcess) {
+                    if (task.getId().equals(nodeId) && task.getTransition().equals(ProcessNodeTransitionType.CANCEL)){
+                        alreadyCanceled = true;
+                    }
+                }
+            }
+            if (!alreadyCanceled) {
+                SimulationUtils.scheduleEvent(nextEvent, timeSpanToNextEvent);
+            }
         }
         // to make sure that one will not schedule events twice
         nextEventMap.clear();
         timeSpanToNextEventMap.clear();
+    }
+
+
+    public void setTimeSpanToNextEvent(Integer event, TimeSpan timeToEvent) {
+        if (this.timeSpanToNextEventMap.get(event) != null){
+            this.timeSpanToNextEventMap.put(event, timeToEvent);
+        }
+
     }
 
     public ProcessSimulationComponents getDesmojObjects() {

@@ -1,8 +1,6 @@
 package de.hpi.bpt.scylla.simulation.event;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import co.paralleluniverse.fibers.SuspendExecution;
 import de.hpi.bpt.scylla.exception.ScyllaRuntimeException;
@@ -119,7 +117,6 @@ public class TaskTerminateEvent extends TaskEvent {
             DebugLogger.error(e.getMessage());
             e.printStackTrace();
             SimulationUtils.abort(model, processInstance, nodeId, traceIsOn());
-            return;
         }
     }
 
@@ -137,12 +134,31 @@ public class TaskTerminateEvent extends TaskEvent {
         ProcessNodeTransitionType transition = ProcessNodeTransitionType.TERMINATE;
 
         SimulationModel model = (SimulationModel) getModel();
-        ProcessModel processModel = processInstance.getProcessModel();
-        String processScopeNodeId = SimulationUtils.getProcessScopeNodeId(processModel, nodeId);
 
-        ProcessNodeInfo info = new ProcessNodeInfo(nodeId, processScopeNodeId, source, timestamp, taskName, resources,
-                transition);
-        model.addNodeInfo(processModel, processInstance, info);
+
+
+
+        if (!alreadyCanceled(model)) {
+            ProcessModel processModel = processInstance.getProcessModel();
+            String processScopeNodeId = SimulationUtils.getProcessScopeNodeId(processModel, nodeId);
+
+            ProcessNodeInfo info = new ProcessNodeInfo(nodeId, processScopeNodeId, source, timestamp, taskName, resources,
+                    transition);
+            model.addNodeInfo(processModel, processInstance, info);
+        }
     }
 
+
+    private boolean alreadyCanceled(SimulationModel model){
+        Collection<Map<Integer, List<ProcessNodeInfo>>> allProcesses = model.getProcessNodeInfos().values();
+        for (Map<Integer, java.util	.List<ProcessNodeInfo>> process : allProcesses) {
+            List<ProcessNodeInfo> currentProcess = process.get(processInstance.getId());
+            for (ProcessNodeInfo task : currentProcess) {
+                if (task.getId().equals(nodeId) && task.getTransition().equals(ProcessNodeTransitionType.CANCEL)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }

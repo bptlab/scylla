@@ -5,6 +5,7 @@ import de.hpi.bpt.scylla.exception.ScyllaValidationException;
 import de.hpi.bpt.scylla.model.configuration.distribution.DistributionWrapper;
 import de.hpi.bpt.scylla.model.configuration.distribution.EmpiricalDistribution;
 import de.hpi.bpt.scylla.model.configuration.distribution.EmpiricalStringDistribution;
+import de.hpi.bpt.scylla.model.configuration.distribution.NormalDistribution;
 import desmoj.core.dist.NumericalDist;
 
 public class DataDistributionWrapper extends DistributionWrapper {
@@ -57,7 +58,7 @@ public class DataDistributionWrapper extends DistributionWrapper {
 		value = desmojDistribution.sample().doubleValue();
 		
 		// handle LONG samples
-		
+
 		if( type == DataDistributionType.LONG ) {
 			return Math.round(value);
 		} 
