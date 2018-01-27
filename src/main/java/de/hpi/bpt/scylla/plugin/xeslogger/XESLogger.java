@@ -1,5 +1,6 @@
 package de.hpi.bpt.scylla.plugin.xeslogger;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.ZonedDateTime;
@@ -166,12 +167,26 @@ public class XESLogger extends OutputLoggerPluggable {
 
             XesXmlSerializer serializer;
             FileOutputStream fos;
+
+
+
             if (gzipOn) {
                 serializer = new XesXmlGZIPSerializer();
+                if (System.getProperty("os.name").contains("Linux")) {
+                    File f = new File(outputPathWithoutExtension + fileNameWithoutExtension +  ".tar");
+                    f.getParentFile().mkdirs();
+                    f.createNewFile();
+                }
                 fos = new FileOutputStream(outputPathWithoutExtension + fileNameWithoutExtension +  ".tar");
             }
             else {
                 serializer = new XesXmlSerializer();
+
+                if (System.getProperty("os.name").contains("Linux")) {
+                    File f = new File(outputPathWithoutExtension + fileNameWithoutExtension +  ".xes");
+                    f.getParentFile().mkdirs();
+                    f.createNewFile();
+                }
                 fos = new FileOutputStream(outputPathWithoutExtension + fileNameWithoutExtension + ".xes");
             }
             serializer.serialize(log, fos);
