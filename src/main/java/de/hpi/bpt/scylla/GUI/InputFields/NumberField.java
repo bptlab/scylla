@@ -8,7 +8,7 @@ import javax.swing.text.NumberFormatter;
 
 import de.hpi.bpt.scylla.GUI.FormManager;
 
-public abstract class NumberField<T extends Number> extends InputField<T,JFormattedTextField> {
+public abstract class NumberField<T extends Number> extends FormattedTextInputField<T> {
 
 	protected NumberFormatter formatter;
 
@@ -20,8 +20,9 @@ public abstract class NumberField<T extends Number> extends InputField<T,JFormat
 	}
 	
 	/**
-	 * @return The format that is used for my component. 
+	 * @return The format that is used for my component.
 	 * Can be overridden to change/add properties.
+	 * Should be overridden, if no (mathematical) integers are displayed.
 	 */
 	protected NumberFormat getFormat() {
 		return NUMBERFORMAT;
@@ -40,19 +41,8 @@ public abstract class NumberField<T extends Number> extends InputField<T,JFormat
 	@Override
 	protected JFormattedTextField createComponent() {
 	    JFormattedTextField field = new JFormattedTextField(getFormatter());
-	    field.setValue(0);
+	    field.setValue(defaultValue());
 	    return field;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	protected T getValue() {
-		return (T)getComponent().getValue();
-	}
-
-	@Override
-	protected void setValue(T v) {
-		getComponent().setValue(v);
 	}
 	
 	public void setMaximum(T max) {
@@ -62,6 +52,11 @@ public abstract class NumberField<T extends Number> extends InputField<T,JFormat
 	public void setMinimum(T min) {
 		formatter.setMinimum((Comparable<?>) min);
 	}
-
+	
+	@Override
+	protected Object defaultValue() {
+		return 0;
+	}
+	
 
 }

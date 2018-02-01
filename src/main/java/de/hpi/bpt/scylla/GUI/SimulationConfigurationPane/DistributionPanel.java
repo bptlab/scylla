@@ -97,7 +97,7 @@ public class DistributionPanel extends JPanel {
 				@Override
 				protected Integer getSavedValue() {
 					String attribute = distribution.getAttribute(name);
-					return attribute.isEmpty() ? null : Integer.parseInt(attribute);
+					return attribute.isEmpty() ? null : Integer.valueOf(attribute);
 				}
 
 				@Override
@@ -122,7 +122,7 @@ public class DistributionPanel extends JPanel {
 				@Override
 				protected Double getSavedValue() {
 					String attribute = distribution.getAttribute(name);
-					return attribute.isEmpty() ? null : Double.parseDouble(attribute);
+					return attribute.isEmpty() ? null : Double.valueOf(attribute);
 				}
 
 				@Override
