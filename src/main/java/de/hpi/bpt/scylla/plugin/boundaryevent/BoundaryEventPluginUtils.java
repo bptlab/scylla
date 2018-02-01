@@ -149,12 +149,16 @@ class BoundaryEventPluginUtils {
                             BPMNIntermediateEvent event = new BPMNIntermediateEvent(model, source, timeInstant,
                                     desmojObjects, processInstance, nId);
 
-                            bo.getBoundaryEventsToSchedule().computeIfAbsent(timeToSchedule,
-                                    k -> new ArrayList<BPMNIntermediateEvent>());
+                            if (bo.getBoundaryEventsToSchedule().get(timeToSchedule) == null) {
+                                bo.getBoundaryEventsToSchedule().put(timeToSchedule,
+                                        new ArrayList<BPMNIntermediateEvent>());
+                            }
                             bo.getBoundaryEventsToSchedule().get(timeToSchedule).add(event);
 
                             String message = "Schedule boundary timer event: " + displayName;
-                            bo.getMessagesOfBoundaryEventsToSchedule().computeIfAbsent(timeToSchedule, k -> new ArrayList<String>());
+                            if (bo.getMessagesOfBoundaryEventsToSchedule().get(timeToSchedule) == null) {
+                                bo.getMessagesOfBoundaryEventsToSchedule().put(timeToSchedule, new ArrayList<String>());
+                            }
                             bo.getMessagesOfBoundaryEventsToSchedule().get(timeToSchedule).add(message);
                             // timeUntilWhenTimerEventsAreCreated = timeToSchedule;
                         }
@@ -220,12 +224,16 @@ class BoundaryEventPluginUtils {
                             BPMNIntermediateEvent event = new BPMNIntermediateEvent(model, source, timeInstant,
                                     desmojObjects, processInstance, nId);
 
-                            bo.getBoundaryEventsToSchedule().computeIfAbsent(timeToSchedule,
-                                    k -> new ArrayList<BPMNIntermediateEvent>());
+                            if (bo.getBoundaryEventsToSchedule().get(timeToSchedule) == null) {
+                                bo.getBoundaryEventsToSchedule().put(timeToSchedule,
+                                        new ArrayList<BPMNIntermediateEvent>());
+                            }
                             bo.getBoundaryEventsToSchedule().get(timeToSchedule).add(event);
 
                             String message = "Schedule boundary timer event: " + displayName;
-                            bo.getMessagesOfBoundaryEventsToSchedule().computeIfAbsent(timeToSchedule, k -> new ArrayList<String>());
+                            if (bo.getMessagesOfBoundaryEventsToSchedule().get(timeToSchedule) == null) {
+                                bo.getMessagesOfBoundaryEventsToSchedule().put(timeToSchedule, new ArrayList<String>());
+                            }
                             bo.getMessagesOfBoundaryEventsToSchedule().get(timeToSchedule).add(message);
 
                             actualNumberOfOccurrences++;
@@ -281,7 +289,7 @@ class BoundaryEventPluginUtils {
 
             // decide on next node
             model.skipTraceNote();
-            Integer nodeIdOfElementToSchedule = distribution.sample();
+            Integer nodeIdOfElementToSchedule = distribution.sample().intValue();
 //            System.out.println("Choosed: "+processModel.getIdentifiers().get(nodeIdOfElementToSchedule)+" "+processModel.getIdentifiers().get(nodeId));
             if (nodeIdOfElementToSchedule == nodeId) {
                 // no next boundary non-timer event, finish
@@ -349,8 +357,11 @@ class BoundaryEventPluginUtils {
                             }
                         }
 
-                        bo.getMessagesOfBoundaryEventsToSchedule().computeIfAbsent(timeUntilWhenNonTimerEventsAreCreated,
-                                k -> new ArrayList<String>());
+                        if (bo.getMessagesOfBoundaryEventsToSchedule()
+                                .get(timeUntilWhenNonTimerEventsAreCreated) == null) {
+                            bo.getMessagesOfBoundaryEventsToSchedule().put(timeUntilWhenNonTimerEventsAreCreated,
+                                    new ArrayList<String>());
+                        }
                         bo.getMessagesOfBoundaryEventsToSchedule().get(timeUntilWhenNonTimerEventsAreCreated)
                                 .add(message);
                     }
@@ -358,8 +369,10 @@ class BoundaryEventPluginUtils {
                     BPMNIntermediateEvent event = new BPMNIntermediateEvent(model, source, timeInstant, desmojObjects,
                             processInstance, nodeIdOfElementToSchedule);
 
-                    bo.getBoundaryEventsToSchedule().computeIfAbsent(timeUntilWhenNonTimerEventsAreCreated,
-                            k -> new ArrayList<BPMNIntermediateEvent>());
+                    if (bo.getBoundaryEventsToSchedule().get(timeUntilWhenNonTimerEventsAreCreated) == null) {
+                        bo.getBoundaryEventsToSchedule().put(timeUntilWhenNonTimerEventsAreCreated,
+                                new ArrayList<BPMNIntermediateEvent>());
+                    }
                     bo.getBoundaryEventsToSchedule().get(timeUntilWhenNonTimerEventsAreCreated).add(event);
 
                     if (eventIsInterrupting) {
@@ -374,8 +387,9 @@ class BoundaryEventPluginUtils {
         bo.setTimeUntilWhenNonTimerEventsAreCreated(timeUntilWhenNonTimerEventsAreCreated);
     }
 
-    private void scheduleBoundaryEvents(SimulationModel model, double startOfInterval, double endOfInterval) {
+    private boolean scheduleBoundaryEvents(SimulationModel model, double startOfInterval, double endOfInterval) {
 
+        boolean normalBehavior = true; // schedule event that is next to current event
 
         Set<String> boundaryObjectsToRemove = new HashSet<String>();
         for (String taskEnableEventName : boundaryObjects.keySet()) {
@@ -400,7 +414,9 @@ class BoundaryEventPluginUtils {
                 List<BPMNIntermediateEvent> events = boundaryEventsToSchedule.get(timeToSchedule);
                 List<String> messages = messagesOfBoundaryEventsToSchedule.get(timeToSchedule);
 
-                for (BPMNIntermediateEvent event : events) {
+                for (int i = 0; i < events.size(); i++) {
+                    BPMNIntermediateEvent event = events.get(i);
+
                     double durationRelativeToEventStart = timeToSchedule - startOfInterval;
 
                     TimeUnit unit = TimeUnit.SECONDS;
@@ -409,10 +425,10 @@ class BoundaryEventPluginUtils {
                     //Changed by L.B., see code below
 //                    event.schedule(processInstance, timeSpan);
                     try {
-                        SimulationUtils.scheduleEvent(event, timeSpan);
-                    } catch (ScyllaRuntimeException e) {
-                        e.printStackTrace();
-                    }
+						SimulationUtils.scheduleEvent(event, timeSpan);
+					} catch (ScyllaRuntimeException e) {
+						e.printStackTrace();
+					}
 
                     ProcessModel processModel = processInstance.getProcessModel();
                     int nodeId = event.getNodeId();
@@ -454,6 +470,7 @@ class BoundaryEventPluginUtils {
         for (String taskEnableEventName : boundaryObjectsToRemove) {
             boundaryObjects.remove(taskEnableEventName);
         }
+        return normalBehavior;
     }
 
     private double getNextEventTime(ScyllaEvent event) {

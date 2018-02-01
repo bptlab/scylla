@@ -203,13 +203,7 @@ public class ProcessSimulationComponents {
             ContDistErlang dist = (ContDistErlang) distribution;
             dist.skipTraceNote((int) dist.getOrder());
         }
-        double value = distribution.sample().doubleValue();
-
-        if (value < 0){
-            value = 0; //negative values are not allowed, DESMOJ can't handle negative event times
-        }
-
-        return value;
+        return distribution.sample().doubleValue();
     }
 
     public Map<Integer, NumericalDist<?>> getDistributions() {
