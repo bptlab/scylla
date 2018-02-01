@@ -26,7 +26,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.DocumentEvent;
 
 import de.hpi.bpt.scylla.GUI.InsertRemoveListener;
-import de.hpi.bpt.scylla.GUI.NoNegativeDoubleFormat;
 import de.hpi.bpt.scylla.GUI.ExtendedListChooserPanel;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
 import de.hpi.bpt.scylla.GUI.InputFields.NumberField;

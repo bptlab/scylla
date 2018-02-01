@@ -36,11 +36,10 @@ public class BoundaryTBPlugin extends TaskBeginEventPluggable {
         if (referenceToBoundaryEvents != null) {
             double startTimeOfTask = model.presentTime().getTimeAsDouble(TimeUnit.SECONDS);
             pluginInstance.initializeBoundaryObject(startTimeOfTask, desmojEvent, referenceToBoundaryEvents);
+            // we usually do that in the event scheduling part, but in BoundaryEventSchedulingPlugin, it might not be called
+            // if the TaskBeginEvent is put on a queue
+            pluginInstance.createAndScheduleBoundaryEvents(desmojEvent, new TimeSpan(0));
         }
-
-        // we usually do that in the event scheduling part, but in BoundaryEventSchedulingPlugin, it might not be called
-        // if the TaskBeginEvent is put on a queue
-        pluginInstance.createAndScheduleBoundaryEvents(desmojEvent, new TimeSpan(0));
 
     }
 

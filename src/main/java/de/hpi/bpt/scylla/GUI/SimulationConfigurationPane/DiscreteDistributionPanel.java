@@ -20,8 +20,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.text.NumberFormatter;
 
 import de.hpi.bpt.scylla.GUI.FormManager;
-import de.hpi.bpt.scylla.GUI.NoNegativeDoubleFormat;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
+import de.hpi.bpt.scylla.GUI.GlobalConfigurationPane.NoNegativeDoubleFormat;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.Distribution.DiscreteDistribution;
 
 /**
@@ -128,7 +128,7 @@ public class DiscreteDistributionPanel extends JScrollPane {
 		panelSidebar.add(buttonAdd, gbc_buttonAdd);
 		
 		JButton buttonRemove = new JButton("");
-		buttonRemove.setIcon(ScyllaGUI.ICON_REMOVE);
+		buttonRemove.setIcon(ScyllaGUI.ICON_X);
 		buttonRemove.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				int i = list.getSelectedRow();

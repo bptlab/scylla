@@ -19,10 +19,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
-import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
-import javax.swing.event.DocumentEvent;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -31,7 +29,6 @@ import org.jdom2.input.SAXBuilder;
 
 import de.hpi.bpt.scylla.GUI.EditorPane;
 import de.hpi.bpt.scylla.GUI.ExpandPanel;
-import de.hpi.bpt.scylla.GUI.InsertRemoveListener;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel.ComponentHolder;
 import de.hpi.bpt.scylla.GUI.ScalingCheckBoxIcon;
@@ -274,7 +271,6 @@ public class SimulationConfigurationPane extends EditorPane {
 			}
 			
 		};
-		
 		GridBagConstraints gbc_textfieldSeed = new GridBagConstraints();
 		gbc_textfieldSeed.gridwidth = 4;
 		gbc_textfieldSeed.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, inset_b);

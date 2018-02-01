@@ -88,7 +88,7 @@ public class DistributionPanel extends JPanel {
 	 */
 	private JComponent getTypeInputComponent(String name, Distribution.AttributeType type){
 		switch(type){
-		//Type INT: Positive Integers, default value 0
+		//Type INT: Positive Integers, default value 0, no invalid characters allowed
 		case INT : 
 			return new NumberField<Integer>(formManager) {
 				{

@@ -61,7 +61,7 @@ public abstract class InputField<DataType,ComponentType extends JComponent>{
 	protected abstract ComponentType createComponent();
 	
 	/**Create the component according to the component type*/
-	protected ComponentType createComponent(Object param) {	return getComponent(); }
+	protected ComponentType createComponent(Object param) {	return createComponent(); }
 	
 	/**Method to be called when an event is fired by the listener*/
 	protected void onChange() {
@@ -193,6 +193,9 @@ public abstract class InputField<DataType,ComponentType extends JComponent>{
 		
 		return (Class<DataType>)((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[0];
 	}
+	
+	public abstract void reset();
+	public abstract void clear();
 	
 	
 

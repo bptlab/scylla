@@ -22,9 +22,8 @@ public class Scylla {
          */
 
         String folder = "samples" + FILEDELIM;
-        String resFilename = folder + "Kreditkarte_global_1.xml";
-//    	String resFilename = folder + "p56_conf_DEMO.xml";
-//        String resFilename = folder + "p0_globalconf_without.xml";
+//      String resFilename = folder + "EmptyGC.xml";
+    	String resFilename = folder + "old\\p0_globalconf.xml";
 
 
 //        String[] bpmnFilename = new String[] { folder + "p1_boundary.bpmn", folder + "p2_normal.bpmn",
@@ -38,24 +37,26 @@ public class Scylla {
          */
 
 
-      String[] bpmnFilename = new String[] { folder + "test.bpmn"};
-      String[] simFilenames = new String[] { folder + "test.xml"};
+//      String[] bpmnFilename = new String[] { folder + "p1_boundary.bpmn"};
+//      String[] simFilenames = new String[] { folder + "p1_boundary_sim.xml"};
 
 
-//        String[] bpmnFilename = new String[] { folder + "p2_normal.bpmn"};
-//        String[] simFilenames = new String[] { folder + "p2_normal_sim.xml"};
+//        String[] bpmnFilename = new String[] { folder + "old\\p2_normal.bpmn"};
+//        String[] simFilenames = new String[] { folder + "old\\p2_normal_sim.xml"};
 
 
 //         String[] bpmnFilename = new String[] { folder + "p4_parallel.bpmn" };
 //         String[] simFilenames = new String[] { folder + "p4_parallel_sim.xml" };
 
 
-//      String[] bpmnFilename = new String[] { folder + "p6_return_DEMO.bpmn" };
-//      String[] simFilenames = new String[] { folder + "p6_return_sim_DEMO.xml" };
+//      String[] bpmnFilename = new String[] { folder + "p6_return.bpmn" };
+//      String[] simFilenames = new String[] { folder + "p6_return_sim.xml" };
 
 
-//        String[] bpmnFilename = new String[] { folder + "Kreditkarte_1.bpmn" };
-//        String[] simFilenames = new String[] { folder + "Kreditkarte_sim_1.xml" };
+//        String[] bpmnFilename = new String[] { folder + "Projekt_Event_Based_Gateway.bpmn" };
+//        String[] simFilenames = new String[] { folder + "EmptySC.xml" };
+        String[] bpmnFilename = new String[] { folder + "boundary\\test.bpmn" };
+        String[] simFilenames = new String[] { folder + "boundary\\test.xml" };
 
 
 //      String[] bpmnFilename = new String[] { folder + "p8_normalbpmn_with_dataobject.bpmn"};
