@@ -29,7 +29,6 @@ public class EditorTabTitlePanel extends JPanel implements Observer{
 	public EditorTabTitlePanel(JTabbedPane parent, EditorPane child) {
 		parentPane = parent;
 		childPane = child;
-		childPane.getTitleObservable().addObserver(this);
 		JLabel labelIcon = new JLabel();
 		if(child instanceof GlobalConfigurationPane)labelIcon.setIcon(ScyllaGUI.ICON_GLOBALCONF);
 		if(child instanceof SimulationConfigurationPane)labelIcon.setIcon(ScyllaGUI.ICON_SIMCONF);
