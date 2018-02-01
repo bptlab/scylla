@@ -29,6 +29,7 @@ public class EditorTabTitlePanel extends JPanel implements Observer{
 	public EditorTabTitlePanel(JTabbedPane parent, EditorPane child) {
 		parentPane = parent;
 		childPane = child;
+		childPane.getTitleObservable().addObserver(this);
 		JLabel labelIcon = new JLabel();
 		if(child instanceof GlobalConfigurationPane)labelIcon.setIcon(ScyllaGUI.ICON_GLOBALCONF);
 		if(child instanceof SimulationConfigurationPane)labelIcon.setIcon(ScyllaGUI.ICON_SIMCONF);
@@ -62,6 +63,7 @@ public class EditorTabTitlePanel extends JPanel implements Observer{
 	private void closeTab() {
 		parentPane.removeTabAt(parentPane.indexOfTabComponent(this));
 	}
+	//TODO: Notifications don't work
 
 	@Override
 	public void update(Observable o, Object arg) {
