@@ -7,6 +7,7 @@ import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
+import java.text.ParseException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -20,9 +21,9 @@ import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 
 import de.hpi.bpt.scylla.GUI.InsertRemoveListener;
-import de.hpi.bpt.scylla.GUI.NoNegativeDoubleFormat;
 import de.hpi.bpt.scylla.GUI.ScalingCheckBoxIcon;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
+import de.hpi.bpt.scylla.GUI.InputFields.NumberField;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.ResourceType.ResourceInstance;
 
 /**
@@ -34,7 +35,7 @@ import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator
 public class InstancePanel extends JPanel{
 	
 	//Input components
-	private JFormattedTextField textfieldCost;
+	private NumberField<Double> textfieldCost;
 	private JComboBox<TimeUnit> comboboxTimeunit;
 	private JComboBox<String> comboboxTimetable;
 	private JCheckBox checkboxDefaultTimetable;
@@ -67,21 +68,35 @@ public class InstancePanel extends JPanel{
 		add(labelCost, gbc_labelCost);
 		
 		//Cost input field
-		textfieldCost = new JFormattedTextField(new NoNegativeDoubleFormat());
-		textfieldCost.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
-			if(formManager.isChangeFlag())return;
-			try{
-				instance.setCost(Double.parseDouble(textfieldCost.getText()));
-				formManager.setSaved(false);
-			}catch(NumberFormatException exc){}
-		}));
+//		textfieldCost = new JFormattedTextField(new NoNegativeDoubleFormat());
+//		textfieldCost.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
+//			if(formManager.isChangeFlag())return;
+//			try{
+//				instance.setCost(Double.parseDouble(textfieldCost.getText()));
+//				formManager.setSaved(false);
+//			}catch(NumberFormatException exc){}
+//		}));
+		textfieldCost = new NumberField<Double>(formManager) {
+
+			@Override
+			protected Double getSavedValue() {
+				if(instance == null)return null;
+				String cost = instance.getCost();
+				if(cost == null)return null;
+				return cost.isEmpty() ? null : Double.valueOf(cost);
+			}
+
+			@Override
+			protected void setSavedValue(Double v) {
+				instance.setCost(v);
+			}
+		};
 		GridBagConstraints gbc_textfieldCost = new GridBagConstraints();
 		gbc_textfieldCost.insets = new Insets(ScyllaGUI.STDINSET, 0, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
 		gbc_textfieldCost.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textfieldCost.gridx = 1;
 		gbc_textfieldCost.gridy = 0;
-		add(textfieldCost, gbc_textfieldCost);
-		textfieldCost.setColumns(10);
+		add(textfieldCost.getComponent(), gbc_textfieldCost);
 		
 		//Timeunit label
 		JLabel labelTimeunit = new JLabel();
@@ -113,12 +128,13 @@ public class InstancePanel extends JPanel{
 			if(checkboxDefaultCost.isSelected()){
 				defaultsChanged();//Fire event to adapt to the defaults
 				labelCost.setEnabled(false);
-				textfieldCost.setEnabled(false);
+				textfieldCost.getComponent().setEnabled(false);
 				labelTimeunit.setEnabled(false);
 				comboboxTimeunit.setEnabled(false);
 			}else{
 				labelCost.setEnabled(true);
-				textfieldCost.setEnabled(true);
+				textfieldCost.getComponent().setEnabled(true);
+				try {textfieldCost.getComponent().commitEdit();} catch (ParseException e1) {e1.printStackTrace();}
 				labelTimeunit.setEnabled(true);
 				comboboxTimeunit.setEnabled(true);
 			}
@@ -189,9 +205,11 @@ public class InstancePanel extends JPanel{
 		instance = inst;
 		if(inst.getCost() != null){
 			checkboxDefaultCost.setSelected(false);
-			textfieldCost.setValue(Double.parseDouble(inst.getCost()));
+			textfieldCost.loadSavedValue();
+		}else {
+			checkboxDefaultCost.setSelected(true);
+			textfieldCost.getComponent().setText(instance.resourceType.getDefaultCost());
 		}
-		else checkboxDefaultCost.setSelected(true);
 		
 		if(inst.getTimeUnit() != null)comboboxTimeunit.setSelectedItem(TimeUnit.valueOf(inst.getTimeUnit()));
 		else comboboxTimeunit.setSelectedItem(TimeUnit.valueOf(inst.resourceType.getDefaultTimeUnit()));
@@ -209,7 +227,7 @@ public class InstancePanel extends JPanel{
 	 */
 	public void defaultsChanged(){
 		if(checkboxDefaultCost.isSelected()){
-			textfieldCost.setText(instance.resourceType.getDefaultCost());
+			textfieldCost.getComponent().setText(instance.resourceType.getDefaultCost());
 			comboboxTimeunit.setSelectedItem(TimeUnit.valueOf(instance.resourceType.getDefaultTimeUnit()));
 			instance.removeCost();
 			instance.removeTimetUnit();

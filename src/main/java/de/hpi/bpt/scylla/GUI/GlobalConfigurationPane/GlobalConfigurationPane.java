@@ -31,6 +31,8 @@ import de.hpi.bpt.scylla.GUI.ExtendedListChooserPanel;
 import de.hpi.bpt.scylla.GUI.InsertRemoveListener;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel.ComponentHolder;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
+import de.hpi.bpt.scylla.GUI.InputFields.NumberField;
+import de.hpi.bpt.scylla.GUI.InputFields.StringField;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.ResourceType;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.Timetable;
@@ -44,8 +46,8 @@ import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator
 public class GlobalConfigurationPane extends EditorPane implements GCFormManager{
 	
 	//General Information form components
-	private JTextField textfieldId;
-	private JFormattedTextField textfieldSeed;
+	private StringField textfieldId;
+	private NumberField<Long> textfieldSeed;
 	private JComboBox<ZoneId> comboboxTimezone;
 
 	/**Timetable Panel*/
@@ -95,19 +97,23 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 		panelGeneral.add(labelId, gbc_labelId);
 		
 		//Text input field for id
-		textfieldId = new JTextField();
-		textfieldId.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
-			if(isChangeFlag())return;
-			creator.setId(textfieldId.getText());
-			setSaved(false);
-		}));
+//		textfieldId = new JTextField();
+//		textfieldId.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
+//			if(isChangeFlag())return;
+//			creator.setId(textfieldId.getText());
+//			setSaved(false);
+//		}));
+		textfieldId = new StringField(this) {
+			protected String getSavedValue() {return creator != null ? creator.getId() : null;}
+			protected void setSavedValue(String v) {creator.setId(v);}
+		};
 		GridBagConstraints gbc_textfieldId = new GridBagConstraints();
 		gbc_textfieldId.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, inset_b);
 		gbc_textfieldId.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textfieldId.gridx = 1;
 		gbc_textfieldId.gridy = 0;
-		panelGeneral.add(textfieldId, gbc_textfieldId);
-		textfieldId.setColumns(10);
+		panelGeneral.add(textfieldId.getComponent(), gbc_textfieldId);
+//		textfieldId.setColumns(10);
 		
 		//Label seed
 		JLabel labelSeed = new JLabel();
@@ -120,28 +126,39 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 		panelGeneral.add(labelSeed, gbc_textfieldSeed);
 		
 		//Seed input field
-		NumberFormat format = NumberFormat.getInstance();
-		format.setGroupingUsed(false);
-		textfieldSeed = new JFormattedTextField(format);
-		textfieldSeed.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
-			if(isChangeFlag())return;
-			try{
-				long s = creator.getSeed();
-				long n = Long.parseLong(textfieldSeed.getText());
-				if(s != n){
-					creator.setSeed(n);
-					setSaved(false);
-				}
-			}catch(Exception exc){}
-		}));
+//		NumberFormat format = NumberFormat.getInstance();
+//		format.setGroupingUsed(false);
+//		textfieldSeed = new JFormattedTextField(format);
+//		textfieldSeed.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
+//			if(isChangeFlag())return;
+//			try{
+//				long s = creator.getSeed();
+//				long n = Long.parseLong(textfieldSeed.getText());
+//				if(s != n){
+//					creator.setSeed(n);
+//					setSaved(false);
+//				}
+//			}catch(Exception exc){}
+//		}));
+		textfieldSeed = new NumberField<Long>(this) {
+			
+			@Override
+			protected void setSavedValue(Long v) {
+				if(creator != null)creator.setSeed(v);
+			}
+			
+			@Override
+			protected Long getSavedValue() {
+				return creator != null ? creator.getSeed() : null;
+			}
+		};
 		
 		GridBagConstraints gbc_textfieldSeedEdit = new GridBagConstraints();
 		gbc_textfieldSeedEdit.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, inset_b);
 		gbc_textfieldSeedEdit.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textfieldSeedEdit.gridx = 1;
 		gbc_textfieldSeedEdit.gridy = 1;
-		panelGeneral.add(textfieldSeed, gbc_textfieldSeedEdit);
-		textfieldSeed.setColumns(10);
+		panelGeneral.add(textfieldSeed.getComponent(), gbc_textfieldSeedEdit);
 		
 		//Label timezone
 		JLabel labelTimezone = new JLabel();
@@ -301,7 +318,7 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 		//Disable as no gc is opened
 		setEnabled(false);
 		
-		setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{buttonNewfile, buttonSavefile, buttonSavefileAs, buttonOpenfile, buttonClosefile, textfieldId, textfieldSeed, comboboxTimezone, panelResourcesExpand, panelTimetablesExpand}));
+		setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{buttonNewfile, buttonSavefile, buttonSavefileAs, buttonOpenfile, buttonClosefile, textfieldId.getComponent(), textfieldSeed.getComponent(), comboboxTimezone, panelResourcesExpand, panelTimetablesExpand}));
 		
 	}
 	
@@ -322,9 +339,9 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 		setEnabled(true);
 		setChangeFlag(false);
 		//Id should be edited right after creation
-		textfieldId.setText("NewGlobalConfiguration");
-		textfieldId.requestFocusInWindow();
-		textfieldId.selectAll();
+		textfieldId.setValue("NewGlobalConfiguration");
+		textfieldId.getComponent().requestFocusInWindow();
+		textfieldId.getComponent().selectAll();
 	}
 
 	
@@ -337,8 +354,8 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 	protected void open() throws JDOMException, IOException{
 		creator = GlobalConfigurationCreator.createFromFile(getFile().getPath());
 		setChangeFlag(true);
-		textfieldId.setText(creator.getId());
-		if(creator.getSeed() != null)textfieldSeed.setValue(creator.getSeed());
+		textfieldId.loadSavedValue();
+		textfieldSeed.loadSavedValue();
 		if(creator.getTimeOffset() != null)comboboxTimezone.setSelectedItem(ZoneId.ofOffset("UTC",creator.getTimeOffset()));
 		
 		for(Timetable t : creator.getTimetables()){
@@ -372,8 +389,8 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 		setChangeFlag(true);
 		creator = null;
 		setFile(null);
-		textfieldId.setText("");
-		textfieldSeed.setValue(null);
+		textfieldId.reset();
+		textfieldSeed.clear();
 		comboboxTimezone.setSelectedItem(null);
 		
 		panelResources.clear();
@@ -403,8 +420,8 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 	 */
 	@Override
 	public void setEnabled(boolean b){
-		textfieldId.setEnabled(b);
-		textfieldSeed.setEnabled(b);
+		textfieldId.getComponent().setEnabled(b);
+		textfieldSeed.getComponent().setEnabled(b);
 		comboboxTimezone.setEnabled(b);
 		panelTimetables.setEnabled(b);
 		panelResources.setEnabled(b);

@@ -4,19 +4,16 @@ import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.text.NumberFormat;
 
 import javax.swing.BoxLayout;
-import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.event.DocumentEvent;
-import javax.swing.text.NumberFormatter;
 
 import de.hpi.bpt.scylla.GUI.FormManager;
-import de.hpi.bpt.scylla.GUI.InsertRemoveListener;
-import de.hpi.bpt.scylla.GUI.NoNegativeDoubleFormat;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel.ComponentHolder;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
+import de.hpi.bpt.scylla.GUI.InputFields.NumberField;
 import de.hpi.bpt.scylla.creation.ElementLink;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.ExclusiveGateway;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.SimulationConfigurationCreator;
@@ -102,31 +99,34 @@ public class ExclusiveGatewayPanel extends JPanel implements ComponentHolder{
 		gbc_labelProbability.gridy = 0;
 		panel.add(labelProbability, gbc_labelProbability);
 		
-		NumberFormatter formatter = new NumberFormatter(new NoNegativeDoubleFormat());
-		formatter.setValueClass(Double.class);
-		formatter.setMinimum(0.0);
-		formatter.setMaximum(100.0);
-		formatter.setAllowsInvalid(false);
-		JFormattedTextField textfieldProbability = new JFormattedTextField(formatter);
-		textfieldProbability.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
-			if(formManager.isChangeFlag())return;
-			try{
-				gateway.setBranchingProbability(branch, Double.parseDouble(textfieldProbability.getText())/100.0);
-				formManager.setSaved(false);
-			}catch(NumberFormatException exc){}
-		}));
+		
+		NumberField<Double> textfieldProbability = new NumberField<Double>(formManager) {
+			@Override
+			protected NumberFormat getFormat() {
+				return DECIMALFORMAT;
+			}
+
+			@Override
+			protected Double getSavedValue() {
+				String prob = gateway.getBranchingProbability(branch);
+				return prob.isEmpty() ? null : Double.valueOf(prob)*100.0;
+			}
+
+			@Override
+			protected void setSavedValue(Double v) {
+				gateway.setBranchingProbability(branch, v/100.0);
+			}
+		};
+		textfieldProbability.setMinimum(0.0);
+		textfieldProbability.setMaximum(100.0);
+		
 		GridBagConstraints gbc_textfieldProbability = new GridBagConstraints();
 		gbc_textfieldProbability.insets = new Insets(ScyllaGUI.STDINSET, 0, ScyllaGUI.STDINSET, 0);
 		gbc_textfieldProbability.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textfieldProbability.gridx = 2;
 		gbc_textfieldProbability.gridy = 0;
-		panel.add(textfieldProbability, gbc_textfieldProbability);
-		String prob = gateway.getBranchingProbability(branch);
-		if(prob != null && !prob.isEmpty()){
-			textfieldProbability.setValue((Double.parseDouble(prob)*100.0));
-		}else{
-			textfieldProbability.setText(0.0+"");
-		}
+		panel.add(textfieldProbability.getComponent(), gbc_textfieldProbability);
+
 		
 		JLabel labelPercent = new JLabel("%");
 		GridBagConstraints gbc_labelPercent = new GridBagConstraints();

@@ -1,14 +1,19 @@
 package de.hpi.bpt.scylla.GUI.InputFields;
 
+import java.awt.event.ItemEvent;
 import java.beans.PropertyChangeEvent;
 import java.lang.reflect.ParameterizedType;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.text.JTextComponent;
 
 import de.hpi.bpt.scylla.GUI.FormManager;
+import de.hpi.bpt.scylla.GUI.InsertRemoveListener;
 
 public abstract class InputField<DataType,ComponentType extends JComponent>{
 	
@@ -25,10 +30,15 @@ public abstract class InputField<DataType,ComponentType extends JComponent>{
 	 * @param fm: Form manager to be notified on changes
 	 */
 	public InputField(FormManager fm) {
+		this(fm, null);
+	}
+	
+	protected InputField(FormManager fm, Object param) {
 		setFormManager(fm);
-		component = createComponent();
+		component = createComponent(param);
+		//Load already saved value if existing
+		loadSavedValue();
 		createListener();
-		if(getSavedValue() != null)setValue(getSavedValue());
 	}
 	
 	/**
@@ -37,8 +47,12 @@ public abstract class InputField<DataType,ComponentType extends JComponent>{
 	 */
 	protected void createListener() {
 		switch(ListenerType.of(component.getClass())) {
-		case PROPERTYCHANGE:
+		case VALUECHANGE:
 			component.addPropertyChangeListener("value", (PropertyChangeEvent evt)->{onChange();});return;
+		case INSERTREMOVE:
+			((JTextComponent) component).getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{onChange();}));return;
+		case ITEM:
+			((JComboBox<?>) getComponent()).addItemListener((ItemEvent e)->{if(e.getStateChange() != ItemEvent.SELECTED)return;onChange();});
 		default: return;
 		}
 	}
@@ -46,10 +60,13 @@ public abstract class InputField<DataType,ComponentType extends JComponent>{
 	/**Create the component according to the component type*/
 	protected abstract ComponentType createComponent();
 	
+	/**Create the component according to the component type*/
+	protected ComponentType createComponent(Object param) {	return createComponent(); }
+	
 	/**Method to be called when an event is fired by the listener*/
 	protected void onChange() {
 		if(formManager.isChangeFlag())return;
-		if(!getValue().equals(getSavedValue())){
+		if(getValue() != null && !getValue().equals(getSavedValue())){
 			onEdit(getValue());
 			formManager.setSaved(false);
 		}
@@ -67,12 +84,12 @@ public abstract class InputField<DataType,ComponentType extends JComponent>{
 	/**
 	 * @return The value that is currently inside the component (not the saved value)
 	 */
-	protected abstract DataType getValue();
+	public abstract DataType getValue();
 	/**
 	 * Sets the value of the component (not the saved value)
 	 * @param v: Value to be set
 	 */
-	protected abstract void setValue(DataType v);
+	public abstract void setValue(DataType v);
 	
 	/**
 	 * @return The value that is currently saved (not the one in the component)
@@ -83,6 +100,14 @@ public abstract class InputField<DataType,ComponentType extends JComponent>{
 	 * @param v: Value to be set
 	 */
 	protected abstract void setSavedValue(DataType v);
+	
+	
+	/**
+	 * Sets the current value to the saved one if existing
+	 */
+	public void loadSavedValue() {
+		if(getSavedValue() != null)setValue(getSavedValue());
+	}
 	
 
 	
@@ -138,18 +163,22 @@ public abstract class InputField<DataType,ComponentType extends JComponent>{
 	 */
 	protected enum ListenerType{
 		/**Property change listener*/
-		PROPERTYCHANGE
+		VALUECHANGE,INSERTREMOVE,ITEM
 		;
 		
 		/**
-		 * Determines which type to use for a given component clas
+		 * Determines which type to use for a given component class
 		 * @param componentClass: Class of component to determine listener type for
 		 * @return An enum representing the needed listener type
 		 */
 		protected static ListenerType of(Class<? extends JComponent> componentClass) {
 			switch(componentClass.getName()) {
 			case "javax.swing.JFormattedTextField": 
-				return PROPERTYCHANGE;
+				return VALUECHANGE;
+			case "javax.swing.JTextField":
+				return INSERTREMOVE;
+			case "javax.swing.JComboBox" :
+				return ITEM;
 			default: 
 				return null;
 			}
@@ -164,6 +193,11 @@ public abstract class InputField<DataType,ComponentType extends JComponent>{
 		
 		return (Class<DataType>)((ParameterizedType)getClass().getGenericSuperclass()).getActualTypeArguments()[0];
 	}
+	
+	public abstract void reset();
+	public abstract void clear();
+	
+	
 
 	
 }

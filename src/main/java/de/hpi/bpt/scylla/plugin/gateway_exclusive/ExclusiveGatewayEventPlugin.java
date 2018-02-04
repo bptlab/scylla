@@ -84,7 +84,7 @@ public class ExclusiveGatewayEventPlugin extends GatewayEventPluggable {
             Set<Integer> idsOfNextNodes = processModel.getIdsOfNextNodes(nodeId);
 
             if (idsOfNextNodes.size() > 1) { // split
-                if (type == GatewayType.DEFAULT || type == GatewayType.EXCLUSIVE || type == GatewayType.EVENT_BASED) {
+                if (type == GatewayType.DEFAULT || type == GatewayType.EXCLUSIVE) {
                     Map<Integer, Object> branchingDistributions = desmojObjects.getExtensionDistributions()
                             .get(getName());
                     DiscreteDistEmpirical<Integer> distribution = (DiscreteDistEmpirical<Integer>) branchingDistributions
@@ -113,48 +113,48 @@ public class ExclusiveGatewayEventPlugin extends GatewayEventPluggable {
                             Object[] outgoingRefs = processModel.getGraph().getTargetObjects(nodeId).toArray();
                             Integer DefaultPath = null;
                             Boolean foundAWay = false;
-                            for (Object or : outgoingRefs) { //go threw all outgoing references
+                            for (Object or : outgoingRefs) { //go through all outgoing references
                                 if (or.equals(getKeyByValue(processModel.getIdentifiers(), processModel.getNodeAttributes().get(desmojEvent.getNodeId()).get("default")))) { //if it's the default path jump it
                                     DefaultPath = (Integer) or;
                                     continue;
                                 }
-                                Object[] conditions = processModel.getDisplayNames().get(or).split("&&");
+                                String[] conditions = processModel.getDisplayNames().get(or).split("&&");
                                 Integer nextFlowId = (Integer) or;
                                 List<Boolean> test = new ArrayList<>();
-                                for (Object condition : conditions) {
-                                    condition = ((String) condition).trim();
+                                for (String condition : conditions) {
+                                    condition = condition.trim();
                                     String field = null;
                                     String value = null;
                                     String comparison = null;
 
-                                    if (((String) condition).contains("==")) {
-                                        field = ((String) condition).split("==")[0];
-                                        value = ((String) condition).split("==")[1];
+                                    if (condition.contains("==")) {
+                                        field = condition.split("==")[0];
+                                        value = condition.split("==")[1];
                                         //value = processModel.getDisplayNames().get(or).substring(2, processModel.getDisplayNames().get(or).length());
                                         comparison = "equal";
-                                    } else if (((String) condition).contains(">=")) {
-                                        field = ((String) condition).split(">=")[0];
-                                        value = ((String) condition).split(">=")[1];
+                                    } else if (condition.contains(">=")) {
+                                        field = condition.split(">=")[0];
+                                        value = condition.split(">=")[1];
                                         comparison = "greaterOrEqual";
-                                    } else if (((String) condition).contains("<=")) {
-                                        field = ((String) condition).split("<=")[0];
-                                        value = ((String) condition).split("<=")[1];
+                                    } else if (condition.contains("<=")) {
+                                        field = condition.split("<=")[0];
+                                        value = condition.split("<=")[1];
                                         comparison = "lessOrEqual";
-                                    } else if (((String) condition).contains("!=")) {
-                                        field = ((String) condition).split("!=")[0];
-                                        value = ((String) condition).split("!=")[1];
+                                    } else if (condition.contains("!=")) {
+                                        field = condition.split("!=")[0];
+                                        value = condition.split("!=")[1];
                                         comparison = "notEqual";
-                                    } else if (((String) condition).contains("=")) {
-                                        field = ((String) condition).split("=")[0];
-                                        value = ((String) condition).split("=")[1];
+                                    } else if (condition.contains("=")) {
+                                        field = condition.split("=")[0];
+                                        value = condition.split("=")[1];
                                         comparison = "equal";
-                                    } else if (((String) condition).contains("<")) {
-                                        field = ((String) condition).split("<")[0];
-                                        value = ((String) condition).split("<")[1];
+                                    } else if (condition.contains("<")) {
+                                        field = condition.split("<")[0];
+                                        value = condition.split("<")[1];
                                         comparison = "less";
-                                    } else if (((String) condition).contains(">")) {
-                                        field = ((String) condition).split(">")[0];
-                                        value = ((String) condition).split(">")[1];
+                                    } else if (condition.contains(">")) {
+                                        field = condition.split(">")[0];
+                                        value = condition.split(">")[1];
                                         comparison = "greater";
                                     } else {
                                         throw new ScyllaValidationException("Condition " + condition + " does not have a comparison-operator");

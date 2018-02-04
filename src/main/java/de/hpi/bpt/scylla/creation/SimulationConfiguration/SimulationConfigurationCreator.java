@@ -147,7 +147,7 @@ public class SimulationConfigurationCreator extends ElementLink{
 	/**@return the random seed of this sc if existing, null otherwise*/
 	public Long getRandomSeed(){
 		if(root.getAttributeValue("randomSeed") == null)return null;
-		return Long.parseLong(root.getAttributeValue("randomSeed"));
+		return Long.valueOf(root.getAttributeValue("randomSeed"));
 	}
 	/**@return the wrapper object for this sc's startevent element*/
 	public StartEvent getStartEvent(){return startEvent;}

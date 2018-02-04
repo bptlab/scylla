@@ -87,7 +87,7 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 	 * Gets the id of the global configuration
 	 */
 	public String getId(){
-		return el.getAttribute("id").getValue();
+		return el.getAttributeValue("id");
 	}
 	
 	/**
@@ -135,9 +135,9 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 	/**
 	 * Gets the GCs seed to a given value
 	 */
-	public Integer getSeed(){
+	public Long getSeed(){
 		if(root.getChild("randomSeed",nsp) == null)return null;
-		return Integer.parseInt(root.getChild("randomSeed",nsp).getText());
+		return Long.parseLong(root.getChild("randomSeed",nsp).getText());
 	}
 	
 	/**

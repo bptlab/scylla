@@ -26,9 +26,9 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.DocumentEvent;
 
 import de.hpi.bpt.scylla.GUI.InsertRemoveListener;
-import de.hpi.bpt.scylla.GUI.NoNegativeDoubleFormat;
 import de.hpi.bpt.scylla.GUI.ExtendedListChooserPanel;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
+import de.hpi.bpt.scylla.GUI.InputFields.NumberField;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel.ComponentHolder;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.ResourceType;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.ResourceType.ResourceInstance;
@@ -42,7 +42,7 @@ import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator
 public class ResourcePanel extends JSplitPane{
 	//Inputs
 	private JSpinner spinnerQuantity;
-	private JFormattedTextField textfieldCost;
+	private NumberField<Double> textfieldCost;
 	private JComboBox<TimeUnit> comboboxTimeunit;
 	private JComboBox<String> comboboxTimetable;
 	
@@ -111,22 +111,37 @@ public class ResourcePanel extends JSplitPane{
 		topPanel.add(labelCost, gbc_labelCost);
 		
 		//Input field for cost
-		textfieldCost = new JFormattedTextField(new NoNegativeDoubleFormat());
-		textfieldCost.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
-			if(formManager.isChangeFlag())return;
-			try{
-				resourceType.setDefaultCost(Double.parseDouble(textfieldCost.getText()));
+//		textfieldCost = new JFormattedTextField(new NoNegativeDoubleFormat());
+//		textfieldCost.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
+//			if(formManager.isChangeFlag())return;
+//			try{
+//				resourceType.setDefaultCost(Double.parseDouble(textfieldCost.getText()));
+//				notifyDefaultChanges();
+//				formManager.setSaved(false);
+//			}catch(NumberFormatException exc){}
+//		}));
+		textfieldCost = new NumberField<Double>(formManager) {
+
+			@Override
+			protected Double getSavedValue() {
+				if(resourceType == null)return null;
+				String cost = resourceType.getDefaultCost();
+				return cost.isEmpty() ? null : Double.valueOf(cost);
+			}
+
+			@Override
+			protected void setSavedValue(Double v) {
+				resourceType.setDefaultCost(v);
 				notifyDefaultChanges();
-				formManager.setSaved(false);
-			}catch(NumberFormatException exc){}
-		}));
+			}
+		};
+		textfieldCost.setMinimum(0.0);
 		GridBagConstraints gbc_textfieldCost = new GridBagConstraints();
 		gbc_textfieldCost.insets = new Insets(0, 0, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
 		gbc_textfieldCost.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textfieldCost.gridx = 1;
 		gbc_textfieldCost.gridy = 1;
-		topPanel.add(textfieldCost, gbc_textfieldCost);
-		textfieldCost.setColumns(10);
+		topPanel.add(textfieldCost.getComponent(), gbc_textfieldCost);
 		
 		//Timeunit label
 		JLabel labelTimeunit = new JLabel();
@@ -249,7 +264,7 @@ public class ResourcePanel extends JSplitPane{
 		formManager.setChangeFlag(true);
 		resourceType = res;
 		spinnerQuantity.setValue(Integer.parseInt(res.getDefaultQuantity()));
-		textfieldCost.setText(res.getDefaultCost());
+		textfieldCost.loadSavedValue();
 		comboboxTimeunit.setSelectedItem(TimeUnit.valueOf(res.getDefaultTimeUnit()));
 		comboboxTimetable.setSelectedItem(res.getDefaultTimetableId());
 		formManager.setChangeFlag(false);

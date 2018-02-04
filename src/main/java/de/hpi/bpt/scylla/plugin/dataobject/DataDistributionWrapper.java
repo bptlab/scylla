@@ -5,7 +5,6 @@ import de.hpi.bpt.scylla.exception.ScyllaValidationException;
 import de.hpi.bpt.scylla.model.configuration.distribution.DistributionWrapper;
 import de.hpi.bpt.scylla.model.configuration.distribution.EmpiricalDistribution;
 import de.hpi.bpt.scylla.model.configuration.distribution.EmpiricalStringDistribution;
-import de.hpi.bpt.scylla.model.configuration.distribution.NormalDistribution;
 import desmoj.core.dist.NumericalDist;
 
 public class DataDistributionWrapper extends DistributionWrapper {

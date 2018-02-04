@@ -59,6 +59,9 @@ public class GatewayEvent extends ScyllaEvent {
             if (type == GatewayType.EXCLUSIVE) {
                 message = "Exclusive " + convergeDivergeName + " Gateway: " + displayName;
             }
+            else if (type == GatewayType.EVENT_BASED) {
+                message = "Eventbased " + convergeDivergeName + " Gateway: " + displayName;
+            }
             else if (type == GatewayType.INCLUSIVE) {
                 message = "Inclusive " + convergeDivergeName + " Gateway: " + displayName;
             }

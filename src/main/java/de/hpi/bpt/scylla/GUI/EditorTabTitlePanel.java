@@ -62,6 +62,7 @@ public class EditorTabTitlePanel extends JPanel implements Observer{
 	private void closeTab() {
 		parentPane.removeTabAt(parentPane.indexOfTabComponent(this));
 	}
+	//TODO: Notifications don't work
 
 	@Override
 	public void update(Observable o, Object arg) {
