@@ -89,13 +89,13 @@ public class BoundarySCParserPlugin extends SimulationConfigurationParserPluggab
                                     "Simulation configuration defines probabilities for boundary events of task "
                                             + identifier + ", exceeding 1 in total.");
                         }
-                        else if (probabilityOfStandardFlow == 0) {
+                        /*else if (probabilityOfStandardFlow == 0) { //does not happen anymore and should not happen semantically correct
                             DebugLogger
                                     .log("Warning: Simulation configuration defines probabilities for boundary events of task "
                                             + identifier + ", but does not allow the normal flow to fire. \n"
                                             + "This may result in an infinite number of firings of boundary events "
                                             + "if none of them is interrupting.");
-                        }
+                        }*/
                         // XXX timer events do not have probabilities
                         // XXX probability of normal flow is stored under nodeId of task
                         probabilities.put(nodeId, probabilityOfStandardFlow);

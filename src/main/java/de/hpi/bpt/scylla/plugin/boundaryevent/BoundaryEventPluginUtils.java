@@ -69,15 +69,17 @@ class BoundaryEventPluginUtils {
         SimulationModel model = (SimulationModel) event.getModel();
 
         if (startOfInterval < endOfInterval) {
-            createBoundaryEvents(model, startOfInterval, endOfInterval);
+            createBoundaryEvents(model, startOfInterval, endOfInterval, event);
             scheduleBoundaryEvents(model, startOfInterval, endOfInterval);
         }
         else { // ==
-            double nextEventTime = getNextEventTime(event);
-            createBoundaryEvents(model, startOfInterval, nextEventTime);
+            //double nextEventTime = getNextEventTime(event); //Why would you take this, better take getTimeSpanToNextEventMap()
+
+            double nextEventTime = startOfInterval+event.getTimeSpanToNextEventMap().get(0).getTimeAsDouble(TimeUnit.SECONDS);
+            createBoundaryEvents(model, startOfInterval, nextEventTime, event);
             scheduleBoundaryEvents(model, startOfInterval, nextEventTime);
         }
-//        Moved to BoundaryIntermediateEventPlugin by Leon Bein on 2018-01-24
+//        Moved to BoundaryIntermediateEventPlugin, events determinate if the should be cancelled
 //        int nodeId = event.getNodeId();
 //        ProcessInstance processInstance = event.getProcessInstance();
 //        ProcessModel processModel = processInstance.getProcessModel();
@@ -87,17 +89,17 @@ class BoundaryEventPluginUtils {
 //        }
     }
 
-    private void createBoundaryEvents(SimulationModel model, double startOfInterval, double endOfInterval)
+    private void createBoundaryEvents(SimulationModel model, double startOfInterval, double endOfInterval, ScyllaEvent event)
             throws ScyllaRuntimeException {
 
-        for (String taskBeginEventName : boundaryObjects.keySet()) {
-            BoundaryObject bo = boundaryObjects.get(taskBeginEventName);
+        //for (String taskBeginEventName : boundaryObjects.keySet()) {
+            BoundaryObject bo = boundaryObjects.get(event.getName());
 
             // step 1
             createTimerBoundaryEvents(model, bo, startOfInterval, endOfInterval);
             // step 2
             createNonTimerBoundaryEvents(model, bo, startOfInterval, endOfInterval);
-        }
+       // }
     }
 
     private void createTimerBoundaryEvents(SimulationModel model, BoundaryObject bo, double startOfInterval,
@@ -268,7 +270,7 @@ class BoundaryEventPluginUtils {
         boolean showInTrace = model.traceIsOn();
 
         int nodeId = bo.getNodeId();
-        while (timeUntilWhenNonTimerEventsAreCreated <= endOfInterval) {
+        while (timeUntilWhenNonTimerEventsAreCreated < endOfInterval) {
             // simulation configuration defines probability of firing boundary events
             Map<Integer, Object> branchingDistributions = desmojObjects.getExtensionDistributions().get(PLUGIN_NAME);
             DiscreteDistEmpirical<Integer> distribution = (DiscreteDistEmpirical<Integer>) branchingDistributions
@@ -456,7 +458,9 @@ class BoundaryEventPluginUtils {
         }
     }
 
-    private double getNextEventTime(ScyllaEvent event) {
+
+    // not needed anymore, is covered by getTimeToNextEventMap()
+    /*private double getNextEventTime(ScyllaEvent event) {
         double nextEventTime = Double.MAX_VALUE;
         List<Entity> entities = event.getModel().getEntities(false);
         for (Entity entity : entities) {
@@ -469,5 +473,5 @@ class BoundaryEventPluginUtils {
             }
         }
         return nextEventTime;
-    }
+    }*/
 }
