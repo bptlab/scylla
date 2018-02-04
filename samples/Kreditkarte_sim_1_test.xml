@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bsim:definitions xmlns:bsim="http://bsim.hpi.uni-potsdam.de/scylla/simModel" targetNamespace="http://www.hpi.de">
+  <bsim:simulationConfiguration id="Kreditkarte_sim_1" startDateTime="2017-10-01T09:00+01:00" processRef="Process_1" processInstances="2">
+
+    <bsim:Task id="UserTask_07b7vqr" name="Auf Vollständigkeit prüfen">
+      <bsim:duration timeUnit="MINUTES">
+        <bsim:exponentialDistribution>
+          <bsim:mean>15</bsim:mean>
+        </bsim:exponentialDistribution>
+      </bsim:duration>
+      <bsim:resources>
+        <bsim:resource id="Sachbearbeiter" amount="5" />
+      </bsim:resources>
+    </bsim:Task>
+
+    <bsim:exclusiveGateway id="ExclusiveGateway_0fdiprc">
+      <bsim:outgoingSequenceFlow id="SequenceFlow_1rwddob">
+        <bsim:branchingProbability>0.2</bsim:branchingProbability>
+      </bsim:outgoingSequenceFlow>
+      <bsim:outgoingSequenceFlow id="SequenceFlow_1ucpl9y">
+        <bsim:branchingProbability>0.8</bsim:branchingProbability>
+      </bsim:outgoingSequenceFlow>
+    </bsim:exclusiveGateway>
+
+    <bsim:Task id="UserTask_1jdy2bz" name="Weitere Informationen einholen">
+      <bsim:duration timeUnit="HOURS">
+        <bsim:normalDistribution>
+          <bsim:mean>2</bsim:mean>
+          <bsim:standardDeviation>1</bsim:standardDeviation>
+        </bsim:normalDistribution>
+      </bsim:duration>
+      <bsim:resources>
+        <bsim:resource id="Sachbearbeiter" amount="5" />
+      </bsim:resources>
+    </bsim:Task>
+
+    <bsim:Task id="UserTask_12gn4u1" name="Antrag prüfen">
+      <bsim:duration timeUnit="MINUTES">
+        <bsim:normalDistribution>
+          <bsim:mean>60</bsim:mean>
+          <bsim:standardDeviation>30</bsim:standardDeviation>
+        </bsim:normalDistribution>
+      </bsim:duration>
+      <bsim:resources>
+        <bsim:resource id="Manager" amount="1" />
+      </bsim:resources>
+    </bsim:Task>
+
+    <bsim:exclusiveGateway id="ExclusiveGateway_1njun59">
+      <bsim:outgoingSequenceFlow id="SequenceFlow_0s080ub">
+        <bsim:branchingProbability>0.6</bsim:branchingProbability>
+      </bsim:outgoingSequenceFlow>
+      <bsim:outgoingSequenceFlow id="SequenceFlow_0p4v4z2">
+        <bsim:branchingProbability>0.4</bsim:branchingProbability>
+      </bsim:outgoingSequenceFlow>
+    </bsim:exclusiveGateway>
+
+    <bsim:Task id="SendTask_060ap9q" name="Antragannahme mittelien">
+      <bsim:duration timeUnit="SECONDS">
+        <bsim:exponentialDistribution>
+          <bsim:mean>60</bsim:mean>
+        </bsim:exponentialDistribution>
+      </bsim:duration>
+      <bsim:resources />
+    </bsim:Task>
+
+    <bsim:Task id="SendTask_1ens7cx" name="Kreditkarte ausliefern">
+      <bsim:duration timeUnit="SECONDS">
+        <bsim:exponentialDistribution>
+          <bsim:mean>60</bsim:mean>
+        </bsim:exponentialDistribution>
+      </bsim:duration>
+      <bsim:resources />
+    </bsim:Task>
+
+    <bsim:Task id="SendTask_060ap9q" name="Antragablehnung mitteilen">
+      <bsim:duration timeUnit="SECONDS">
+        <bsim:exponentialDistribution>
+          <bsim:mean>60</bsim:mean>
+        </bsim:exponentialDistribution>
+      </bsim:duration>
+      <bsim:resources />
+    </bsim:Task>
+
+    <bsim:Task id="Task_0z3btzz" name="Warten">
+      <bsim:duration timeUnit="HOURS">
+        <bsim:constantDistribution>
+          <bsim:constantValue>72</bsim:constantValue>
+        </bsim:constantDistribution>
+      </bsim:duration>
+      <bsim:resources />
+      <bsim:boundaryEvents>
+			<bsim:boundaryEvent id="BoundaryEvent_0ysr33s" name="Antwort">
+        <bsim:eventProbability>1</bsim:eventProbability>
+        <bsim:lifecycle timeUnit="HOURS">
+					<bsim:normalDistribution>
+						<bsim:mean>48</bsim:mean>
+         		<bsim:standardDeviation>12</bsim:standardDeviation>
+					</bsim:normalDistribution>
+        </bsim:lifecycle>
+			</bsim:boundaryEvent>
+		</bsim:boundaryEvents>
+    </bsim:Task>
+
+    <bsim:startEvent id="StartEvent_1vcwaly">
+      <bsim:arrivalRate timeUnit="HOURS">
+        <bsim:constantDistribution>
+          <bsim:constantValue>1</bsim:constantValue>
+        </bsim:constantDistribution>
+      </bsim:arrivalRate>
+    </bsim:startEvent>
+
+  </bsim:simulationConfiguration>
+</bsim:definitions>

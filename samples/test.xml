@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bsim:definitions xmlns:bsim="http://bsim.hpi.uni-potsdam.de/scylla/simModel" targetNamespace="http://www.hpi.de">
+  <bsim:simulationConfiguration id="Kreditkarte_sim_1" startDateTime="2017-10-01T09:00+01:00" processRef="Process_1" processInstances="4">
+
+    <bsim:startEvent id="StartEvent_1">
+      <bsim:arrivalRate timeUnit="HOURS">
+        <bsim:constantDistribution>
+          <bsim:constantValue>1</bsim:constantValue>
+        </bsim:constantDistribution>
+      </bsim:arrivalRate>
+    </bsim:startEvent>
+
+
+    <bsim:Task id="Task_0a9svk3" name="Task 1">
+      <bsim:duration timeUnit="MINUTES">
+        <bsim:constantDistribution>
+          <bsim:constantValue>60</bsim:constantValue>
+        </bsim:constantDistribution>
+      </bsim:duration>
+      <bsim:boundaryEvents>
+          <bsim:boundaryEvent id="BoundaryEvent_1fpwyp1" name="Ablehnung">
+            <bsim:eventProbability>1</bsim:eventProbability>
+            <bsim:arrivalRate timeUnit="MINUTES">
+              <bsim:constantDistribution>
+                <bsim:constantValue>20</bsim:constantValue>
+              </bsim:constantDistribution>
+            </bsim:arrivalRate>
+          </bsim:boundaryEvent>
+        </bsim:boundaryEvents>
+    </bsim:Task>
+  </bsim:simulationConfiguration>
+</bsim:definitions>
