@@ -36,6 +36,7 @@ import de.hpi.bpt.scylla.GUI.ScalingFileChooser;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
 import de.hpi.bpt.scylla.GUI.InputFields.DateField;
 import de.hpi.bpt.scylla.GUI.InputFields.NumberField;
+import de.hpi.bpt.scylla.GUI.InputFields.NumberSpinner;
 import de.hpi.bpt.scylla.GUI.InputFields.StringField;
 import de.hpi.bpt.scylla.GUI.InputFields.TimeField;
 import de.hpi.bpt.scylla.creation.ElementLink;
@@ -58,7 +59,7 @@ public class SimulationConfigurationPane extends EditorPane {
 	
 	private StringField textfieldId;
 	private NumberField<Long> textfieldSeed;
-	private JSpinner spinnerNOI;
+	private NumberSpinner<Integer> spinnerNOI;
 	private DateField textfieldStartDate;
 	private ZonedDateTime startDateTime;
 	private TimeField textfieldStartTime;
@@ -223,7 +224,10 @@ public class SimulationConfigurationPane extends EditorPane {
 		
 		//Id input field
 		textfieldId = new StringField(this) {
-			protected String getSavedValue() {return creator.getId();}
+			protected String getSavedValue() {
+				if(creator == null)return null;
+				return creator.getId();
+			}
 			protected void setSavedValue(String v) {creator.setId(v);}
 		};
 		GridBagConstraints gbc_textfieldId = new GridBagConstraints();
@@ -289,20 +293,27 @@ public class SimulationConfigurationPane extends EditorPane {
 		panelGeneral.add(labelNOI, gbc_labelNOI);
 		
 		//Spinner for number of instances (NOI)
-		spinnerNOI = new JSpinner();
-		spinnerNOI.setModel(new SpinnerNumberModel(new Integer(0), new Integer(0), null, new Integer(1)));
-		spinnerNOI.addChangeListener((ChangeEvent e)->{
-			if(isChangeFlag())return;
-			creator.setProcessInstances((Integer)spinnerNOI.getValue());
-			setSaved(false);
-		});
+		spinnerNOI = new NumberSpinner<Integer>(this,0,0,null,1) {
+			
+			@Override
+			protected void setSavedValue(Integer v) {
+				creator.setProcessInstances(v);
+			}
+			
+			@Override
+			protected Integer getSavedValue() {
+				if(creator == null || creator.getProcessInstances() == null)return null;
+				return Integer.valueOf(creator.getProcessInstances());
+			}
+			
+		};
 		GridBagConstraints gbc_spinnerNOI = new GridBagConstraints();
 		gbc_spinnerNOI.gridwidth = 1;
 		gbc_spinnerNOI.fill = GridBagConstraints.BOTH;
 		gbc_spinnerNOI.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, inset_b);
 		gbc_spinnerNOI.gridx = 1;
 		gbc_spinnerNOI.gridy = 3;
-		panelGeneral.add(spinnerNOI, gbc_spinnerNOI);
+		panelGeneral.add(spinnerNOI.getComponent(), gbc_spinnerNOI);
 		
 		//Start Date label
 		JLabel labelStartDate = new JLabel("Start Date");
@@ -780,7 +791,7 @@ public class SimulationConfigurationPane extends EditorPane {
 		
 		textfieldId.getComponent().setEnabled(b);
 		textfieldSeed.getComponent().setEnabled(b);
-		spinnerNOI.setEnabled(b);
+		spinnerNOI.getComponent().setEnabled(b);
 		textfieldStartTime.getComponent().setEnabled(b);
 		textfieldStartDate.getComponent().setEnabled(b);
 		textfieldEndTime.getComponent().setEnabled(b && !checkboxUnlimited.isSelected());
@@ -809,7 +820,7 @@ public class SimulationConfigurationPane extends EditorPane {
 		labelRefPMshow.setText(" ");
 		textfieldId.reset();
 		textfieldSeed.setValue(null);
-		spinnerNOI.setValue(0);
+		spinnerNOI.reset();
 		textfieldStartTime.reset();
 		textfieldStartDate.reset();
 		textfieldEndTime.reset();
