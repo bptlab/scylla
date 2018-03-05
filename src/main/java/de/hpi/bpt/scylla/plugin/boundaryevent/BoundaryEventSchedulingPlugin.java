@@ -7,6 +7,7 @@ import de.hpi.bpt.scylla.simulation.ProcessInstance;
 import de.hpi.bpt.scylla.simulation.event.ScyllaEvent;
 import desmoj.core.simulator.TimeSpan;
 
+    // This class is not used because it is not needed anymore. Everything is already done in the BoundaryTBPlugin class as you can read in the comment there.
 public class BoundaryEventSchedulingPlugin extends EventSchedulingPluggable {
 
     @Override
@@ -18,7 +19,7 @@ public class BoundaryEventSchedulingPlugin extends EventSchedulingPluggable {
     public boolean scheduleEvent(ScyllaEvent event, TimeSpan timeSpan) throws ScyllaRuntimeException {
 
 //    	BoundaryEventPluginUtils pluginInstance = BoundaryEventPluginUtils.getInstance();
-//        pluginInstance.createAndScheduleBoundaryEvents(event, timeSpan);
+//      pluginInstance.createAndScheduleBoundaryEvents(event, timeSpan);
         return true;
     }
 

@@ -18,6 +18,8 @@ public class BoundaryDistributionConversionPlugin extends DistributionConversion
         return BoundaryEventPluginUtils.PLUGIN_NAME;
     }
 
+    // Took the branching behaviour also used in exclusive gateways. I did not touch it for now, have a look on it later. Should just be needed for event probability...
+    // TODO: Resolve redundancy.
     @SuppressWarnings("unchecked")
     @Override
     public Map<Integer, Object> convertToDesmoJDistributions(ProcessSimulationComponents pSimComponents) {

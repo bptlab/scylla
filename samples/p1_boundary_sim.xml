@@ -21,15 +21,15 @@
 	    	</bsim:resources>
 	    	<bsim:boundaryEvents>
 	    		<bsim:boundaryEvent id="sid-71507C76-09EA-41FF-86AB-004A2447257A" name="error in">
-	    			<bsim:eventProbability>0.1</bsim:eventProbability>
+	    			<bsim:eventProbability>1</bsim:eventProbability>
 			    	<bsim:arrivalRate timeUnit="MINUTES">
 			    		<bsim:constantDistribution>
-			    			<bsim:constantValue>20</bsim:constantValue>
+			    			<bsim:constantValue>5</bsim:constantValue>
 			    		</bsim:constantDistribution>
 			    	</bsim:arrivalRate>
 	    		</bsim:boundaryEvent>
 	    		<bsim:boundaryEvent id="sid-7B837D24-6D92-4EAA-BECD-DA436E6853E5" name="message in" >
-	    			<bsim:eventProbability>0.1</bsim:eventProbability>
+	    			<bsim:eventProbability>0</bsim:eventProbability>
 			    	<bsim:arrivalRate timeUnit="MINUTES">
 			    		<bsim:constantDistribution>
 			    			<bsim:constantValue>30</bsim:constantValue>
@@ -37,7 +37,7 @@
 			    	</bsim:arrivalRate>
 	    		</bsim:boundaryEvent>
 	    		<bsim:boundaryEvent id="sid-17EFE732-CE01-4205-AC11-4AB5B52484D3" name="condition in">
-	    			<bsim:eventProbability>0.1</bsim:eventProbability>
+	    			<bsim:eventProbability>0</bsim:eventProbability>
 			    	<bsim:arrivalRate timeUnit="MINUTES">
 			    		<bsim:constantDistribution>
 			    			<bsim:constantValue>40</bsim:constantValue>

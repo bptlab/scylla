@@ -172,23 +172,12 @@ public class XESLogger extends OutputLoggerPluggable {
 
             if (gzipOn) {
                 serializer = new XesXmlGZIPSerializer();
-                if (System.getProperty("os.name").contains("Linux")) {
-                    File f = new File(outputPathWithoutExtension + fileNameWithoutExtension +  ".tar");
-                    f.getParentFile().mkdirs();
-                    f.createNewFile();
-                }
                 fos = new FileOutputStream(outputPathWithoutExtension + fileNameWithoutExtension +  ".tar");
             }
             else {
                 serializer = new XesXmlSerializer();
-
-                if (System.getProperty("os.name").contains("Linux")) {
-                    File f = new File(outputPathWithoutExtension + fileNameWithoutExtension +  ".xes");
-                    f.getParentFile().mkdirs();
-                    f.createNewFile();
-                }
                 fos = new FileOutputStream(outputPathWithoutExtension + fileNameWithoutExtension + ".xes");
-            }
+            };
             serializer.serialize(log, fos);
             fos.close();
         }

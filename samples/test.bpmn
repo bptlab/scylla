@@ -19,7 +19,7 @@
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="SequenceFlow_1pmljcm" sourceRef="BoundaryEvent_1fpwyp1" targetRef="EndEvent_09q48iz" />
     <bpmn:sequenceFlow id="SequenceFlow_06jxpfs" sourceRef="Task_0a9svk3" targetRef="EndEvent_0up4y8v" />
-    <bpmn:boundaryEvent id="BoundaryEvent_1fpwyp1" name="Ablehnung" cancelActivity="true" attachedToRef="Task_0a9svk3">
+    <bpmn:boundaryEvent id="BoundaryEvent_1fpwyp1" name="Ablehnung" attachedToRef="Task_0a9svk3" cancelActivity="true">
       <bpmn:outgoing>SequenceFlow_1pmljcm</bpmn:outgoing>
       <bpmn:messageEventDefinition id="sid-684bb66e-44e0-44e9-930a-22442bb66ba3" messageRef="sid-49ff666e-c07f-428f-9f70-ecb0a29b882a" />
     </bpmn:boundaryEvent>
@@ -59,7 +59,7 @@
         <di:waypoint xsi:type="dc:Point" x="380" y="218" />
         <di:waypoint xsi:type="dc:Point" x="552" y="218" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="354" y="189.5" width="90" height="12" />
+          <dc:Bounds x="354" y="190" width="90" height="12" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_06jxpfs_di" bpmnElement="SequenceFlow_06jxpfs">

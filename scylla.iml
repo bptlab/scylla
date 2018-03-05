@@ -49,7 +49,5 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="InterfaceTesting" level="project" />
-    <orderEntry type="library" name="StatsLogger" level="project" />
   </component>
 </module>

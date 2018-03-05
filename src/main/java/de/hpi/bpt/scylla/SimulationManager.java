@@ -126,7 +126,7 @@ public class SimulationManager {
                 // parse common process elements from XML (BPMN)
                 CommonProcessElements commonProcessElementsFromFile = cpeParser.parse(pmRootElement);
                 String fileNameWithoutExtension = filename.substring(// filename.lastIndexOf("\\") + 1,
-                        filename.lastIndexOf("\\")+1, filename.lastIndexOf(".bpmn"));
+                        filename.lastIndexOf(Scylla.FILEDELIM)+1, filename.lastIndexOf(".bpmn"));
                 commonProcessElementsFromFile.setBpmnFileNameWithoutExtension(fileNameWithoutExtension);
 
                 // plugins to parse common process elements
