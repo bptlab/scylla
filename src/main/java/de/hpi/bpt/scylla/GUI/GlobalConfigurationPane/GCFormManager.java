@@ -1,7 +1,6 @@
 package de.hpi.bpt.scylla.GUI.GlobalConfigurationPane;
 
 import java.util.List;
-import javax.swing.JComboBox;
 
 import de.hpi.bpt.scylla.GUI.FormManager;
 
@@ -16,7 +15,7 @@ public interface GCFormManager extends FormManager{
 	 * List of comboboxes, that show timetable selection and therefore have to be updated
 	 * @return
 	 */
-	public List<JComboBox<String>> getTimetableObserverList();
+	public List<SetObserver<String>> getTimetableObserverList();
 	
 	/**
 	 * List of current timetable ids, e.g. for creation of new comboboxes
@@ -24,11 +23,6 @@ public interface GCFormManager extends FormManager{
 	 */
 	public List<String> getTimetables();
 	
-	
-	public interface ResourceObserver{
-		public void notifyResourceCreation(String id);
-		public void notifyResourceDeletion(String id);
-		public void notifyResourceRenaming(String id, String newid);
-	}
+
 
 }

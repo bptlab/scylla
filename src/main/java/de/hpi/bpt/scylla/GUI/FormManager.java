@@ -25,5 +25,11 @@ public interface FormManager {
 	 * @param b
 	 */
 	public void setChangeFlag(boolean b);
+	
+	public interface SetObserver<ValueType>{
+		public void notifyCreation(ValueType id);
+		public void notifyDeletion(ValueType id);
+		public void notifyRenaming(ValueType id, ValueType newid);
+	}
 
 }

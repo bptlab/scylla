@@ -9,6 +9,8 @@ import java.util.function.Supplier;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
+import javax.swing.JSpinner;
+import javax.swing.event.ChangeEvent;
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.JTextComponent;
 
@@ -52,7 +54,9 @@ public abstract class InputField<DataType,ComponentType extends JComponent>{
 		case INSERTREMOVE:
 			((JTextComponent) component).getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{onChange();}));return;
 		case ITEM:
-			((JComboBox<?>) getComponent()).addItemListener((ItemEvent e)->{if(e.getStateChange() != ItemEvent.SELECTED)return;onChange();});
+			((JComboBox<?>) getComponent()).addItemListener((ItemEvent e)->{if(e.getStateChange() != ItemEvent.SELECTED)return;onChange();});return;
+		case CHANGE:
+			((JSpinner)getComponent()).addChangeListener((ChangeEvent e)->{onChange();});return;
 		default: return;
 		}
 	}
@@ -163,7 +167,7 @@ public abstract class InputField<DataType,ComponentType extends JComponent>{
 	 */
 	protected enum ListenerType{
 		/**Property change listener*/
-		VALUECHANGE,INSERTREMOVE,ITEM
+		VALUECHANGE,INSERTREMOVE,ITEM, CHANGE
 		;
 		
 		/**
@@ -179,6 +183,8 @@ public abstract class InputField<DataType,ComponentType extends JComponent>{
 				return INSERTREMOVE;
 			case "javax.swing.JComboBox" :
 				return ITEM;
+			case "javax.swing.JSpinner" :
+				return CHANGE;
 			default: 
 				return null;
 			}

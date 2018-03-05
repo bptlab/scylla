@@ -6,7 +6,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.KeyboardFocusManager;
-import java.awt.event.ItemEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -14,22 +13,17 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import javax.swing.JComboBox;
-import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSpinner;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.DocumentEvent;
 
-import de.hpi.bpt.scylla.GUI.InsertRemoveListener;
 import de.hpi.bpt.scylla.GUI.ExtendedListChooserPanel;
+import de.hpi.bpt.scylla.GUI.ListChooserPanel.ComponentHolder;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
 import de.hpi.bpt.scylla.GUI.InputFields.NumberField;
-import de.hpi.bpt.scylla.GUI.ListChooserPanel.ComponentHolder;
+import de.hpi.bpt.scylla.GUI.InputFields.NumberSpinner;
+import de.hpi.bpt.scylla.GUI.InputFields.SelectionField;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.ResourceType;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.ResourceType.ResourceInstance;
 
@@ -41,10 +35,10 @@ import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator
 @SuppressWarnings("serial")
 public class ResourcePanel extends JSplitPane{
 	//Inputs
-	private JSpinner spinnerQuantity;
+	private NumberSpinner<Integer> spinnerQuantity;
 	private NumberField<Double> textfieldCost;
-	private JComboBox<TimeUnit> comboboxTimeunit;
-	private JComboBox<String> comboboxTimetable;
+	private SelectionField<TimeUnit> comboboxTimeunit;
+	private SelectionField<String> comboboxTimetable;
 	
 	/**Panel containing the panels corresponding to this resource*/
 	private ExtendedListChooserPanel listpanelInstances;
@@ -85,20 +79,27 @@ public class ResourcePanel extends JSplitPane{
 		topPanel.add(labelQuantity, gbc_labelQuantity);
 		
 		//Spinner for quantity
-		spinnerQuantity = new JSpinner();
-		spinnerQuantity.setModel(new SpinnerNumberModel(new Integer(0), new Integer(0), null, new Integer(1)));
-		spinnerQuantity.addChangeListener((ChangeEvent e)->{
-			if(formManager.isChangeFlag())return;
-			resourceType.setDefaultQuantity((Integer)spinnerQuantity.getValue());
-			formManager.setSaved(false);
-		});
+		spinnerQuantity = new NumberSpinner<Integer>(formManager,0,0,null,1) {
+
+			@Override
+			protected Integer getSavedValue() {
+				if(resourceType == null || resourceType.getDefaultQuantity() == null)return null;
+				return Integer.valueOf(resourceType.getDefaultQuantity());
+			}
+
+			@Override
+			protected void setSavedValue(Integer v) {
+				resourceType.setDefaultQuantity(v);
+			}
+			
+		};
 		GridBagConstraints gbc_spinnerQuantity = new GridBagConstraints();
 		gbc_spinnerQuantity.gridwidth = 1;
 		gbc_spinnerQuantity.fill = GridBagConstraints.BOTH;
 		gbc_spinnerQuantity.insets = new Insets(ScyllaGUI.STDINSET, 0, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
 		gbc_spinnerQuantity.gridx = 1;
 		gbc_spinnerQuantity.gridy = 0;
-		topPanel.add(spinnerQuantity, gbc_spinnerQuantity);
+		topPanel.add(spinnerQuantity.getComponent(), gbc_spinnerQuantity);
 		
 		//Cost label
 		JLabel labelCost = new JLabel();
@@ -154,20 +155,32 @@ public class ResourcePanel extends JSplitPane{
 		topPanel.add(labelTimeunit, gbc_labelTimeunit);
 		
 		//Timeunit input combobox
-		comboboxTimeunit = new JComboBox<TimeUnit>(TimeUnit.values());
-		comboboxTimeunit.addItemListener((ItemEvent e)->{
-			if(e.getStateChange() != ItemEvent.SELECTED)return;
-			if(formManager.isChangeFlag())return;
-			resourceType.setDefaultTimeUnit((TimeUnit) comboboxTimeunit.getSelectedItem());
-			notifyDefaultChanges();
-			formManager.setSaved(false);
-		});
+		comboboxTimeunit = new SelectionField<TimeUnit>(formManager,TimeUnit.values()) {
+
+			@Override
+			protected TimeUnit getSavedValue() {
+				if(resourceType == null)return null;
+				return TimeUnit.valueOf(resourceType.getDefaultTimeUnit());
+			}
+
+			@Override
+			protected void setSavedValue(TimeUnit v) {
+				resourceType.setDefaultTimeUnit(v);
+			}
+			
+			@Override
+			protected void onChange() {
+				super.onChange();
+				notifyDefaultChanges();
+			}
+			
+		};
 		GridBagConstraints gbc_comboboxTimeunit = new GridBagConstraints();
 		gbc_comboboxTimeunit.insets = new Insets(0, ScyllaGUI.STDINSET,ScyllaGUI.STDINSET,ScyllaGUI.STDINSET);
 		gbc_comboboxTimeunit.fill = GridBagConstraints.HORIZONTAL;
 		gbc_comboboxTimeunit.gridx = 3;
 		gbc_comboboxTimeunit.gridy = 1;
-		topPanel.add(comboboxTimeunit, gbc_comboboxTimeunit);
+		topPanel.add(comboboxTimeunit.getComponent(), gbc_comboboxTimeunit);
 		
 		//Timetable label
 		JLabel labelTimetable = new JLabel();
@@ -180,22 +193,35 @@ public class ResourcePanel extends JSplitPane{
 		topPanel.add(labelTimetable, gbc_textfieldTimetable);
 		
 		//Timetable input combobox
-		comboboxTimetable = new JComboBox<String>(formManager.getTimetables().toArray(new String[formManager.getTimetables().size()]));
+		comboboxTimetable = new SelectionField<String>(formManager,formManager.getTimetables().toArray(new String[formManager.getTimetables().size()])) {
+
+			@Override
+			protected String getSavedValue() {
+				if(resourceType == null)return null;
+				return resourceType.getDefaultTimetableId();
+			}
+
+			@Override
+			protected void setSavedValue(String v) {
+				resourceType.setDefaultTimetableId(v);
+			}
+			
+			@Override
+			protected void onChange() {
+				super.onChange();
+				notifyDefaultChanges();
+			}
+			
+		};
 		fm.getTimetableObserverList().add(comboboxTimetable);
-		comboboxTimetable.addItemListener((ItemEvent e)->{
-			if(e.getStateChange() != ItemEvent.SELECTED)return;
-			if(formManager.isChangeFlag())return;
-			resourceType.setDefaultTimetableId((String) comboboxTimetable.getSelectedItem());
-			notifyDefaultChanges();
-			formManager.setSaved(false);
-		});
+
 		GridBagConstraints gbc_comboboxTimetable = new GridBagConstraints();
 		gbc_comboboxTimetable.gridwidth = 3;
 		gbc_comboboxTimetable.insets = new Insets(0, 0, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
 		gbc_comboboxTimetable.fill = GridBagConstraints.HORIZONTAL;
 		gbc_comboboxTimetable.gridx = 1;
 		gbc_comboboxTimetable.gridy = 2;
-		topPanel.add(comboboxTimetable, gbc_comboboxTimetable);
+		topPanel.add(comboboxTimetable.getComponent(), gbc_comboboxTimetable);
 		
 		//--- General instance panel ---
 		JPanel bottomPanel = new JPanel();
@@ -265,8 +291,8 @@ public class ResourcePanel extends JSplitPane{
 		resourceType = res;
 		spinnerQuantity.setValue(Integer.parseInt(res.getDefaultQuantity()));
 		textfieldCost.loadSavedValue();
-		comboboxTimeunit.setSelectedItem(TimeUnit.valueOf(res.getDefaultTimeUnit()));
-		comboboxTimetable.setSelectedItem(res.getDefaultTimetableId());
+		comboboxTimeunit.loadSavedValue();
+		comboboxTimetable.loadSavedValue();
 		formManager.setChangeFlag(false);
 		importInstances(res);
 	}

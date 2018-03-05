@@ -13,17 +13,14 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
-import javax.swing.event.DocumentEvent;
 
-import de.hpi.bpt.scylla.GUI.InsertRemoveListener;
 import de.hpi.bpt.scylla.GUI.ScalingCheckBoxIcon;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
 import de.hpi.bpt.scylla.GUI.InputFields.NumberField;
+import de.hpi.bpt.scylla.GUI.InputFields.SelectionField;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.ResourceType.ResourceInstance;
 
 /**
@@ -36,8 +33,8 @@ public class InstancePanel extends JPanel{
 	
 	//Input components
 	private NumberField<Double> textfieldCost;
-	private JComboBox<TimeUnit> comboboxTimeunit;
-	private JComboBox<String> comboboxTimetable;
+	private SelectionField<TimeUnit> comboboxTimeunit;
+	private SelectionField<String> comboboxTimetable;
 	private JCheckBox checkboxDefaultTimetable;
 	private JCheckBox checkboxDefaultCost;
 	
@@ -109,18 +106,26 @@ public class InstancePanel extends JPanel{
 		add(labelTimeunit, gbc_labelTimeunit);
 		
 		//Timeunit input combobox
-		comboboxTimeunit = new JComboBox<TimeUnit>(TimeUnit.values());
-		comboboxTimeunit.addItemListener((ItemEvent e)->{
-			if(formManager.isChangeFlag())return;
-			instance.setTimeUnit((TimeUnit) comboboxTimeunit.getSelectedItem());
-			formManager.setSaved(false);
-		});
+		comboboxTimeunit = new SelectionField<TimeUnit>(formManager,TimeUnit.values()) {
+
+			@Override
+			protected TimeUnit getSavedValue() {
+				if(instance== null)return null;
+				return TimeUnit.valueOf(instance.getTimeUnit());
+			}
+
+			@Override
+			protected void setSavedValue(TimeUnit v) {
+				instance.setTimeUnit(v);
+			}
+			
+		};
 		GridBagConstraints gbc_comboboxTimeunit = new GridBagConstraints();
 		gbc_comboboxTimeunit.insets = new Insets(0, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET , ScyllaGUI.STDINSET);
 		gbc_comboboxTimeunit.fill = GridBagConstraints.HORIZONTAL;
 		gbc_comboboxTimeunit.gridx = 3;
 		gbc_comboboxTimeunit.gridy = 0;
-		add(comboboxTimeunit, gbc_comboboxTimeunit);
+		add(comboboxTimeunit.getComponent(), gbc_comboboxTimeunit);
 		
 		//Checkbox whether to use the resources default cost
 		checkboxDefaultCost = new JCheckBox("use default");
@@ -130,13 +135,13 @@ public class InstancePanel extends JPanel{
 				labelCost.setEnabled(false);
 				textfieldCost.getComponent().setEnabled(false);
 				labelTimeunit.setEnabled(false);
-				comboboxTimeunit.setEnabled(false);
+				comboboxTimeunit.getComponent().setEnabled(false);
 			}else{
 				labelCost.setEnabled(true);
 				textfieldCost.getComponent().setEnabled(true);
 				try {textfieldCost.getComponent().commitEdit();} catch (ParseException e1) {e1.printStackTrace();}
 				labelTimeunit.setEnabled(true);
-				comboboxTimeunit.setEnabled(true);
+				comboboxTimeunit.getComponent().setEnabled(true);
 			}
 		});
 		checkboxDefaultCost.setIcon(new ScalingCheckBoxIcon(ScyllaGUI.DEFAULTFONT.getSize()));
@@ -156,12 +161,20 @@ public class InstancePanel extends JPanel{
 		add(labelTimetable, gbc_labelTimetable);
 		
 		//Timetable input combobox
-		comboboxTimetable = new JComboBox<String>(formManager.getTimetables().toArray(new String[formManager.getTimetables().size()]));
-		comboboxTimetable.addItemListener((ItemEvent e)->{
-			if(formManager.isChangeFlag())return;
-			instance.setTimetableId((String) comboboxTimetable.getSelectedItem());
-			formManager.setSaved(false);
-		});
+		comboboxTimetable = new SelectionField<String>(formManager, formManager.getTimetables().toArray(new String[formManager.getTimetables().size()])) {
+
+			@Override
+			protected String getSavedValue() {
+				if(instance == null)return null;
+				return instance.getTimetableId();
+			}
+
+			@Override
+			protected void setSavedValue(String v) {
+				instance.setTimetableId(v);
+			}
+			
+		};
 		formManager.getTimetableObserverList().add(comboboxTimetable);
 		GridBagConstraints gbc_comboboxTimetable = new GridBagConstraints();
 		gbc_comboboxTimetable.gridwidth = 3;
@@ -169,7 +182,7 @@ public class InstancePanel extends JPanel{
 		gbc_comboboxTimetable.fill = GridBagConstraints.HORIZONTAL;
 		gbc_comboboxTimetable.gridx = 1;
 		gbc_comboboxTimetable.gridy = 1;
-		add(comboboxTimetable, gbc_comboboxTimetable);
+		add(comboboxTimetable.getComponent(), gbc_comboboxTimetable);
 		
 		//Checkbox whether to use the resources default timetable
 		checkboxDefaultTimetable = new JCheckBox("use default");
@@ -177,10 +190,10 @@ public class InstancePanel extends JPanel{
 			if(checkboxDefaultTimetable.isSelected()){
 				defaultsChanged();
 				labelTimetable.setEnabled(false);
-				comboboxTimetable.setEnabled(false);
+				comboboxTimetable.getComponent().setEnabled(false);
 			}else{
 				labelTimetable.setEnabled(true);
-				comboboxTimetable.setEnabled(true);
+				comboboxTimetable.getComponent().setEnabled(true);
 			}
 		});
 		checkboxDefaultTimetable.setIcon(new ScalingCheckBoxIcon(ScyllaGUI.DEFAULTFONT.getSize()));
@@ -211,11 +224,11 @@ public class InstancePanel extends JPanel{
 			textfieldCost.getComponent().setText(instance.resourceType.getDefaultCost());
 		}
 		
-		if(inst.getTimeUnit() != null)comboboxTimeunit.setSelectedItem(TimeUnit.valueOf(inst.getTimeUnit()));
-		else comboboxTimeunit.setSelectedItem(TimeUnit.valueOf(inst.resourceType.getDefaultTimeUnit()));
+		if(inst.getTimeUnit() != null)comboboxTimeunit.loadSavedValue();
+		else comboboxTimeunit.setValue(TimeUnit.valueOf(inst.resourceType.getDefaultTimeUnit()));
 		
 		if(inst.getTimetableId() != null){
-			comboboxTimetable.setSelectedItem(inst.getTimetableId());
+			comboboxTimetable.loadSavedValue();
 			checkboxDefaultTimetable.setSelected(false);
 		}
 		else checkboxDefaultTimetable.setSelected(true);
@@ -228,13 +241,13 @@ public class InstancePanel extends JPanel{
 	public void defaultsChanged(){
 		if(checkboxDefaultCost.isSelected()){
 			textfieldCost.getComponent().setText(instance.resourceType.getDefaultCost());
-			comboboxTimeunit.setSelectedItem(TimeUnit.valueOf(instance.resourceType.getDefaultTimeUnit()));
+			comboboxTimeunit.setValue(TimeUnit.valueOf(instance.resourceType.getDefaultTimeUnit()));
 			instance.removeCost();
 			instance.removeTimetUnit();
 		}
 		if(checkboxDefaultTimetable.isSelected()){
 			instance.removeTimetableId();
-			comboboxTimetable.setSelectedItem(instance.resourceType.getDefaultTimetableId());
+			comboboxTimetable.setValue(instance.resourceType.getDefaultTimetableId());
 		}
 	}
 
