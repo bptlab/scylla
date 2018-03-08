@@ -1,0 +1,3 @@
+test, samples, p0_globalconf, test, test
+p1, samples, p0_globalconf, p1_boundary, p1_boundary_sim
+p8, samples, p0_globalconf, p8_normalbpmn_with_dataobject, p8_normalbpmn_with_dataobject_sim

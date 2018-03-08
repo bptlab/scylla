@@ -97,6 +97,21 @@ public class Scylla {
         SimulationManager manager = new SimulationManager(folder, bpmnFilename, simFilenames, resFilename,
                 enableBpsLogging, enableDesmojLogging);
         manager.run();
+
+
+    }
+    public static String mainTestAPI(String folderName, String globalConfigFileName, String bpmnFileName, String simulationFileName) {
+
+        String folder = folderName + FILEDELIM;
+        String resFilename = folder + globalConfigFileName;
+        String[] bpmnFilename = new String[] { folder + bpmnFileName };
+        String[] simFilenames = new String[] { folder + simulationFileName };
+        boolean enableBpsLogging = true;
+        boolean enableDesmojLogging = false;
+
+        SimulationManager manager = new SimulationManager(folder, bpmnFilename , simFilenames, resFilename,
+                enableBpsLogging, enableDesmojLogging);
+        return manager.run();
     }
 
 }

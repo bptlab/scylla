@@ -1,0 +1,251 @@
+Total simulation time: 367201.0
+Reference unit: SECONDS
+
+=== RESOURCE UTILIZATION ===
+
+== Resource type: Professor
+
+-- Gerd
+Time in use / available: 40894 / 367201 (11,1%)
+Costs: 306000.8333333334
+
+-- Franz
+Time in use / available: 41828 / 367201 (11,4%)
+Costs: 612001.6666666667
+
+## Overall: 11,3%
+
+== Resource type: Student
+
+-- Dieter
+Time in use / available: 91627 / 367201 (25%)
+Costs: 30600.083333333332
+
+-- Eva
+Time in use / available: 75783 / 367201 (20,6%)
+Costs: 30600.083333333332
+
+-- Bernd
+Time in use / available: 74343 / 367201 (20,2%)
+Costs: 61200.166666666664
+
+-- Christian
+Time in use / available: 102334 / 367201 (27,9%)
+Costs: 61200.166666666664
+
+-- Anna
+Time in use / available: 136257 / 367201 (37,1%)
+Costs: 122400.33333333333
+
+## Overall: 26,2%
+
+=== STATISTICS PER PROCESS ===
+
+== Process identifier: Process_8
+
+-- 1
+Time effective / total: 17969 / 17969 (100%)
+Off-timetable time (cumulated): 0
+Waiting time (cumulated): 0
+Cost: 4601.833333333334
+
+-- 2
+Time effective / total: 16252 / 16252 (100%)
+Off-timetable time (cumulated): 0
+Waiting time (cumulated): 0
+Cost: 9223.333333333332
+
+-- 3
+Time effective / total: 15808 / 15808 (100%)
+Off-timetable time (cumulated): 0
+Waiting time (cumulated): 0
+Cost: 3990.666666666667
+
+-- 4
+Time effective / total: 19345 / 19345 (100%)
+Off-timetable time (cumulated): 0
+Waiting time (cumulated): 0
+Cost: 9085.666666666666
+
+-- 5
+Time effective / total: 19602 / 19602 (100%)
+Off-timetable time (cumulated): 0
+Waiting time (cumulated): 0
+Cost: 6917.0
+
+-- 6
+Time effective / total: 17951 / 17951 (100%)
+Off-timetable time (cumulated): 0
+Waiting time (cumulated): 0
+Cost: 7027.416666666667
+
+-- 7
+Time effective / total: 17011 / 17011 (100%)
+Off-timetable time (cumulated): 0
+Waiting time (cumulated): 0
+Cost: 4353.75
+
+-- 8
+Time effective / total: 17539 / 17539 (100%)
+Off-timetable time (cumulated): 0
+Waiting time (cumulated): 0
+Cost: 8785.666666666666
+
+-- 9
+Time effective / total: 19984 / 19984 (100%)
+Off-timetable time (cumulated): 0
+Waiting time (cumulated): 0
+Cost: 4853.083333333333
+
+-- 10
+Time effective / total: 16874 / 16874 (100%)
+Off-timetable time (cumulated): 0
+Waiting time (cumulated): 0
+Cost: 5809.666666666667
+
+-- 11
+Time effective / total: 18813 / 18813 (100%)
+Off-timetable time (cumulated): 0
+Waiting time (cumulated): 0
+Cost: 5802.5
+
+-- 12
+Time effective / total: 17350 / 17350 (100%)
+Off-timetable time (cumulated): 0
+Waiting time (cumulated): 0
+Cost: 5334.25
+
+-- 13
+Time effective / total: 17547 / 17547 (100%)
+Off-timetable time (cumulated): 0
+Waiting time (cumulated): 0
+Cost: 8168.666666666667
+
+-- 14
+Time effective / total: 16903 / 16903 (100%)
+Off-timetable time (cumulated): 0
+Waiting time (cumulated): 0
+Cost: 7258.833333333334
+
+-- 15
+Time effective / total: 14688 / 14688 (100%)
+Off-timetable time (cumulated): 0
+Waiting time (cumulated): 0
+Cost: 4137.5
+
+-- 16
+Time effective / total: 17484 / 17484 (100%)
+Off-timetable time (cumulated): 0
+Waiting time (cumulated): 0
+Cost: 5476.25
+
+-- 17
+Time effective / total: 16754 / 16754 (100%)
+Off-timetable time (cumulated): 0
+Waiting time (cumulated): 0
+Cost: 8036.333333333333
+
+-- 18
+Time effective / total: 16547 / 16547 (100%)
+Off-timetable time (cumulated): 0
+Waiting time (cumulated): 0
+Cost: 3524.75
+
+-- 19
+Time effective / total: 15716 / 15716 (100%)
+Off-timetable time (cumulated): 0
+Waiting time (cumulated): 0
+Cost: 4834.333333333333
+
+-- 20
+Time effective / total: 17979 / 17979 (100%)
+Off-timetable time (cumulated): 0
+Waiting time (cumulated): 0
+Cost: 9542.0
+
+-- 21
+Time effective / total: 16358 / 16358 (100%)
+Off-timetable time (cumulated): 0
+Waiting time (cumulated): 0
+Cost: 5741.333333333333
+
+-- 22
+Time effective / total: 17995 / 17995 (100%)
+Off-timetable time (cumulated): 0
+Waiting time (cumulated): 0
+Cost: 9065.0
+
+-- 23
+Time effective / total: 17307 / 17307 (100%)
+Off-timetable time (cumulated): 0
+Waiting time (cumulated): 0
+Cost: 6986.166666666667
+
+-- 24
+Time effective / total: 16570 / 16570 (100%)
+Off-timetable time (cumulated): 0
+Waiting time (cumulated): 0
+Cost: 6441.666666666666
+
+-- 25
+Time effective / total: 15729 / 15729 (100%)
+Off-timetable time (cumulated): 0
+Waiting time (cumulated): 0
+Cost: 8412.5
+
+-- 26
+Time effective / total: 18791 / 18791 (100%)
+Off-timetable time (cumulated): 0
+Waiting time (cumulated): 0
+Cost: 4825.5
+
+-- 27
+Time effective / total: 18852 / 18852 (100%)
+Off-timetable time (cumulated): 0
+Waiting time (cumulated): 0
+Cost: 3128.0
+
+-- 28
+Time effective / total: 18687 / 18687 (100%)
+Off-timetable time (cumulated): 0
+Waiting time (cumulated): 0
+Cost: 11996.0
+
+-- 29
+Time effective / total: 16820 / 16820 (100%)
+Off-timetable time (cumulated): 0
+Waiting time (cumulated): 0
+Cost: 4341.666666666666
+
+-- 30
+Time effective / total: 14719 / 14719 (100%)
+Off-timetable time (cumulated): 0
+Waiting time (cumulated): 0
+Cost: 4906.333333333333
+
+## Overall average: 
+Time effective / total: 17331.466666666667 / 17331.466666666667 (100%)
+Off-timetable time (cumulated): 0.0
+Waiting time (cumulated): 0.0
+Cost: 6420.2555555555555
+
+Total cost: 192607.66666666666
+
+=== STATISTICS PER TASK ===
+
+Note: Tasks with zero duration and zero waiting time are not logged.
+
+== Process identifier: Process_8
+
+-- write paper (2)
+Average duration: 14574.066666666668
+Average waiting time: 0.0
+
+-- write thesis (3)
+Average duration: 1486.965517241379
+Average waiting time: 0.0
+
+-- be happy (4)
+Average duration: 1414.2857142857144
+Average waiting time: 0.0
+
