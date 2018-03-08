@@ -18,8 +18,8 @@ import de.hpi.bpt.scylla.simulation.utils.SimulationUtils;
 import desmoj.core.dist.NumericalDist;
 
 /**
- * This plugin class converts scylla distributions to distribution that can be used by desmoJ,
- * and stores is as distribution extensional.
+ * This plugin class converts scylla distributions to distributions that can be used by desmoJ,
+ * and stores them as distribution extensional.
  * @author Leon Bein
  *
  */

@@ -25,6 +25,10 @@ public class EventbasedGatewayEventPlugin extends GatewayEventPluggable{
 		return EventbasedGatewayPluginUtils.PLUGIN_NAME;
 	}
 
+	/**
+	 * Handles a gateway event, if it is an event based gateway
+	 * Changes scheduling behavior by already scheduling the next events of the given gateway event (if event based)
+	 */
 	@Override
 	public void eventRoutine(GatewayEvent desmojEvent, ProcessInstance processInstance) throws ScyllaRuntimeException {
 
@@ -42,7 +46,6 @@ public class EventbasedGatewayEventPlugin extends GatewayEventPluggable{
 				//and look which is scheduled first.
 				ScyllaEvent first = nextEvents.get(0);
 				for(ScyllaEvent e : nextEvents) {
-//					System.out.println(e.getName()+" "+e.getDisplayName()+" "+e.scheduledNext());
 					if(TimeInstant.isBefore(e.scheduledNext(), first.scheduledNext())) {
 						first = e;
 					}

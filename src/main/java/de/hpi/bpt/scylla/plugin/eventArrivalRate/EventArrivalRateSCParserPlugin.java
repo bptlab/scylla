@@ -16,7 +16,7 @@ import de.hpi.bpt.scylla.plugin_type.parser.SimulationConfigurationParserPluggab
 
 /**
  * This plugin class parses intermediate event arrival rates from the simulation configuration,
- * so they can be put to an extension attribute.
+ * so they can be put to an extension attribute. (To later be converted to desmoJ distributions by {@link EventArrivalRateDistributionConversionPlugin})
  * @author Leon Bein
  *
  */
