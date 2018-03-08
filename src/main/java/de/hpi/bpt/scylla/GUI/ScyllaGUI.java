@@ -28,6 +28,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.ColorUIResource;
 
 import de.hpi.bpt.scylla.GUI.SimulationPane.SimulationPane;
+import de.hpi.bpt.scylla.GUI.WebSwing.WebSwingUtils;
 /**
  * Scylla UI Main class, provides UI constants and starts the UI.
  * @author Leon Bein
@@ -152,6 +153,8 @@ public class ScyllaGUI extends JFrame {
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+		if(args.length != 1)throw new IllegalArgumentException("Internal error: Number of main parameters does not match!");
+		WebSwingUtils.SESSIONID = args[0];
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
