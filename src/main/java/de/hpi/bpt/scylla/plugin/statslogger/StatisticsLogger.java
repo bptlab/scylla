@@ -1,4 +1,4 @@
-package de.hpi.bpt.scylla.plugin.statslogger_nojar;
+package de.hpi.bpt.scylla.plugin.statslogger;
 
 import java.io.IOException;
 import java.io.PrintWriter;
