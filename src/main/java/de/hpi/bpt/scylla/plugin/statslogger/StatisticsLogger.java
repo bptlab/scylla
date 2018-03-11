@@ -265,7 +265,7 @@ public class StatisticsLogger extends OutputLoggerPluggable {
             statsPerTask.put(processId, statsPerTaskOfProcess);
         }
 
-        // print
+        // build xml document
 
         Element resourceUtilization = new Element("resourceUtilization");
         
@@ -282,6 +282,7 @@ public class StatisticsLogger extends OutputLoggerPluggable {
         configuration.addContent(new Element("time_unit")
         		.setText(String.valueOf(DateTimeUtils.getReferenceTimeUnit())));
         
+        // add processes
         for (String processId : statsPerProcess.keySet()) {
         	Map<Integer, StatisticsProcessInstanceObject> statsPerProcessInstance = statsPerProcess.get(processId);
             
@@ -312,6 +313,8 @@ public class StatisticsLogger extends OutputLoggerPluggable {
             StatisticsCalculationObject effectiveStats = new StatisticsCalculationObject();
             StatisticsCalculationObject offTimeStats = new StatisticsCalculationObject();
             StatisticsCalculationObject waitingStats = new StatisticsCalculationObject();
+            
+            // add process instances
             for (Integer processInstanceId : statsPerProcessInstance.keySet()) {
                 StatisticsProcessInstanceObject stats = statsPerProcessInstance.get(processInstanceId);
                 
@@ -352,6 +355,7 @@ public class StatisticsLogger extends OutputLoggerPluggable {
         
             
             Map<String, Map<String, StatisticsTaskInstanceObject>> statsPerTaskOfProcess = statsPerTask.get(processId);
+            // add activities
             for (String processScopeNodeId : statsPerTaskOfProcess.keySet()) {
             	
             	long taskDuration = 0;
@@ -388,6 +392,7 @@ public class StatisticsLogger extends OutputLoggerPluggable {
 	        	activityTime.addContent(activityWaitingTime);
 	        	activityTime.addContent(activityResourcesIdleTime);
 	        	
+	        	// add activity instances
 	        	for (String taskInstanceId : statsPerTaskInstance.keySet()) {
             		StatisticsTaskInstanceObject stats = statsPerTaskInstance.get(taskInstanceId);
 	                
@@ -428,6 +433,7 @@ public class StatisticsLogger extends OutputLoggerPluggable {
 	            activityResourcesIdleTime.addContent(taskResourcesIdleStats.getStatsAsElements());
             }
 
+            // add resources
             for (String resourceType : statsPerResource.keySet()) {
 	            Map<String, StatisticsResourceObject> statsPerResourceInstance = statsPerResource.get(resourceType);
 	            
@@ -450,6 +456,8 @@ public class StatisticsLogger extends OutputLoggerPluggable {
                 StatisticsCalculationObject resourceInUseStats = new StatisticsCalculationObject();
                 StatisticsCalculationObject resourceAvailableStats = new StatisticsCalculationObject();
                 StatisticsCalculationObject resourceWorkloadStats = new StatisticsCalculationObject();
+                
+                // add resource instances
 	            for (String resourceId : statsPerResourceInstance.keySet()) {
 	                StatisticsResourceObject stats = statsPerResourceInstance.get(resourceId);
 	                long durationInUse = stats.getDurationInUse();
@@ -484,6 +492,8 @@ public class StatisticsLogger extends OutputLoggerPluggable {
                 resourceWorkload.addContent(resourceWorkloadStats.getStatsAsElements());
             }
         }
+        
+        // print
         
         String resourceUtilizationFileName = outputPathWithoutExtension + model.getGlobalConfiguration().getFileNameWithoutExtension()+"_resourceutilization.xml";
         FileOutputStream fos = new FileOutputStream(resourceUtilizationFileName);
