@@ -1,14 +1,10 @@
 package de.hpi.bpt.scylla.plugin.statslogger;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.text.DecimalFormat;
 import java.util.HashMap;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import de.hpi.bpt.scylla.logger.DebugLogger;
@@ -16,7 +12,6 @@ import de.hpi.bpt.scylla.logger.ProcessNodeInfo;
 import de.hpi.bpt.scylla.logger.ProcessNodeTransitionType;
 import de.hpi.bpt.scylla.logger.ResourceInfo;
 import de.hpi.bpt.scylla.logger.ResourceStatus;
-import de.hpi.bpt.scylla.model.global.resource.TimetableItem;
 import de.hpi.bpt.scylla.plugin_type.logger.OutputLoggerPluggable;
 import de.hpi.bpt.scylla.simulation.QueueManager;
 import de.hpi.bpt.scylla.simulation.ResourceObject;
@@ -24,32 +19,11 @@ import de.hpi.bpt.scylla.simulation.SimulationModel;
 import de.hpi.bpt.scylla.simulation.utils.DateTimeUtils;
 import desmoj.core.simulator.TimeInstant;
 
-import java.io.File;
 import java.io.FileOutputStream;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
-import org.jdom2.Content;
 import org.jdom2.Document;
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
-import org.jdom2.util.IteratorIterable;
 import org.jdom2.output.XMLOutputter;
-
-//import org.json.JSONObject;
-//import org.json.XML;
-
-import org.w3c.dom.Attr;
-//import org.w3c.dom.Document;
-//import org.w3c.dom.Element;
 
 public class StatisticsLogger extends OutputLoggerPluggable {
 
@@ -178,7 +152,6 @@ public class StatisticsLogger extends OutputLoggerPluggable {
                 Map<TaskInstanceIdentifier, Long> pausedTasks = new HashMap<TaskInstanceIdentifier, Long>();
                 for (int i = 0; i < nodeInfoList.size(); i++) {
                 	
-                	// neu
                 	String taskInstanceId = String.valueOf(i);
                 	long taskDurationEffective = 0;
                     long taskDurationResourcesIdle = 0;
@@ -201,7 +174,6 @@ public class StatisticsLogger extends OutputLoggerPluggable {
                         previousTimestamp = timestamp;
                         timeProcessStart = timestamp;
                     }
-                    //cost, waiting, duration
                     else if (i == nodeInfoList.size() - 1) {
                         durationTotal = timestamp - timeProcessStart;
                     }
@@ -211,27 +183,21 @@ public class StatisticsLogger extends OutputLoggerPluggable {
                     if (begunOrResumedTasks.isEmpty()) {
                         durationInactive += timestamp - previousTimestamp;
                     }
-                    // while transitiontype as below: waiting
                     if (transition == ProcessNodeTransitionType.ENABLE) {
                         enabledTasks.put(taskInstanceIdentifier, timestamp);
                     }
-                    // when is a task waiting?
-                    // duration
                     else if (transition == ProcessNodeTransitionType.BEGIN) {
                         Long enableTimestamp = enabledTasks.get(taskInstanceIdentifier);
                         if (enableTimestamp != null) {
                             long duration = timestamp - enableTimestamp;
                             durationWaiting += duration;
-                            taskDurationWaiting += duration; // new
+                            taskDurationWaiting += duration;
                             enabledTasks.remove(taskInstanceIdentifier);
-
-                            //stio.setDurationWaiting(duration);
                         }
 
                         taskDurations.put(taskInstanceIdentifier, 0L);
                         begunOrResumedTasks.put(taskInstanceIdentifier, timestamp);
                     }
-                    // resourcesIdle
                     else if (transition == ProcessNodeTransitionType.PAUSE) {
                         pausedTasks.put(taskInstanceIdentifier, timestamp);
 
@@ -240,13 +206,11 @@ public class StatisticsLogger extends OutputLoggerPluggable {
                         for (String resourceName : resources) {
                             Double costPerUnit = costPerResourceInstance.get(resourceName);
                             costs += duration * costPerUnit;
-                            taskCosts += duration * costPerUnit; // new
+                            taskCosts += duration * costPerUnit;
                         }
-                        //stio.setCost(taskCosts);
                         taskDurations.put(taskInstanceIdentifier, taskDurations.get(taskInstanceIdentifier) + duration);
                         begunOrResumedTasks.remove(taskInstanceIdentifier);
                     }
-                    // duration
                     else if (transition == ProcessNodeTransitionType.RESUME) {
                         Long pauseTimestamp = pausedTasks.get(taskInstanceIdentifier);
                         long duration = timestamp - pauseTimestamp;
@@ -256,7 +220,6 @@ public class StatisticsLogger extends OutputLoggerPluggable {
 
                         begunOrResumedTasks.put(taskInstanceIdentifier, timestamp);
                     }
-                    // nothing anymore
                     else if (transition == ProcessNodeTransitionType.TERMINATE
                             || transition == ProcessNodeTransitionType.CANCEL) {
                         Long beginOrResumeTimestamp = begunOrResumedTasks.get(taskInstanceIdentifier);
@@ -267,10 +230,7 @@ public class StatisticsLogger extends OutputLoggerPluggable {
                             taskCosts += duration * costPerUnit; // new
                         }
 
-                        // taskDurationEffetive without off timetable hours where resources are idle
-                        // total duration time of task
                         taskDurationEffective = taskDurations.get(taskInstanceIdentifier) + duration;
-                        //stio.setDurationEffective(taskDurationEffective);
                         taskDurations.remove(taskInstanceIdentifier);
                         begunOrResumedTasks.remove(taskInstanceIdentifier);
                     }
@@ -285,9 +245,7 @@ public class StatisticsLogger extends OutputLoggerPluggable {
                     stio.setCost(taskCosts);
                     
                     if (!statsPerTaskOfProcess.containsKey(processScopeNodeId)) {
-                        // hier leere Map, an die geadded wird, wenn ich eine neue TaskInstanz dazufüge
                         statsPerTaskOfProcess.put(processScopeNodeId, new HashMap<String, StatisticsTaskInstanceObject>());
-                        //statsPerTaskOfProcess.put(processScopeNodeId, new StatisticsTaskInstanceObject(taskName));
                     }
                     
                     statsPerTaskOfProcess.get(processScopeNodeId).put(taskInstanceId, stio);
@@ -314,12 +272,11 @@ public class StatisticsLogger extends OutputLoggerPluggable {
         Document doc = new Document(resourceUtilization);
         
         Element configuration = new Element("configuration");
-        doc.getRootElement().addContent(configuration);
-        
         Element processes = new Element("processes");
-        doc.getRootElement().addContent(processes);
-        
         Element resources = new Element("resources");
+        
+        doc.getRootElement().addContent(configuration);
+        doc.getRootElement().addContent(processes);
         doc.getRootElement().addContent(resources);
         
         configuration.addContent(new Element("time_unit")
@@ -329,16 +286,13 @@ public class StatisticsLogger extends OutputLoggerPluggable {
         	Map<Integer, StatisticsProcessInstanceObject> statsPerProcessInstance = statsPerProcess.get(processId);
             
         	Element process = new Element("process");
-        	
         	processes.addContent(process);
         	
         	process.addContent(new Element("id").setText(processId));
-        	
         	Element processCost = new Element("cost");
         	Element processTime = new Element("time");
         	Element processInstances = new Element("instances");
         	Element processActivities = new Element("activities");
-        	
         	process.addContent(processCost);
         	process.addContent(processTime);
         	process.addContent(processInstances);
@@ -348,7 +302,6 @@ public class StatisticsLogger extends OutputLoggerPluggable {
         	Element processEffectiveTime = new Element("effective");
         	Element processWaitingTime = new Element("waiting");
         	Element processOffTime = new Element("off_timetable");
-        	
         	processTime.addContent(processFlowTime);
         	processTime.addContent(processEffectiveTime);
         	processTime.addContent(processWaitingTime);
@@ -364,24 +317,20 @@ public class StatisticsLogger extends OutputLoggerPluggable {
                 
                 long durationTotal = stats.getDurationTotal();
                 long durationEffective = durationTotal - stats.getDurationInactive();
-                double percentageEffective = durationEffective / (double) durationTotal;
                 long durationResourcesIdle = stats.getDurationResourcesIdle();
                 long durationWaiting = stats.getDurationWaiting();
                 double cost = stats.getCosts();
                 
                 Element instance = new Element("instance");
+                processInstances.addContent(instance);
                 
                 instance.addContent(new Element("costs").setText(String.valueOf(cost)));
-
                 Element instanceTime = new Element("time");
                 instanceTime.addContent(new Element("duration").setText(String.valueOf(durationTotal)));
                 instanceTime.addContent(new Element("effective").setText(String.valueOf(durationEffective)));
                 instanceTime.addContent(new Element("waiting").setText(String.valueOf(durationResourcesIdle)));
                 instanceTime.addContent(new Element("offTime").setText(String.valueOf(durationWaiting)));
-                // not used: percentageEffective
                 instance.addContent(instanceTime);
-                
-                processInstances.addContent(instance);
                 
                 costStats.addValue(cost);
                 flowTimeStats.addValue(durationTotal);
@@ -426,7 +375,6 @@ public class StatisticsLogger extends OutputLoggerPluggable {
 	            Element activityName = new Element("name");
 	            Element activityCost = new Element("cost");
 	            Element activityTime = new Element("time");
-	            
 	            activity.addContent(activityName);
 	            activity.addContent(activityCost);
 	            activity.addContent(activityTime);
@@ -434,7 +382,6 @@ public class StatisticsLogger extends OutputLoggerPluggable {
 	        	Element activityDurationTime = new Element("duration");
 	        	Element activityWaitingTime = new Element("waiting");
 	        	Element activityResourcesIdleTime = new Element("resources_idle");
-	        	
 	        	activityTime.addContent(activityDurationTime);
 	        	activityTime.addContent(activityWaitingTime);
 	        	activityTime.addContent(activityResourcesIdleTime);
@@ -482,7 +429,6 @@ public class StatisticsLogger extends OutputLoggerPluggable {
 
             for (String resourceType : statsPerResource.keySet()) {
 	            Map<String, StatisticsResourceObject> statsPerResourceInstance = statsPerResource.get(resourceType);
-	            //double percentageSum = 0;
 	            
 	            Element resource = new Element("resource");
 	            resources.addContent(resource);
@@ -521,8 +467,6 @@ public class StatisticsLogger extends OutputLoggerPluggable {
 	                resourceInstanceTime.addContent(new Element("workload").setText(String.valueOf(percentageInUse)));
 	                resourceInstance.addContent(resourceInstanceTime);
 	                
-	                //percentageSum += percentageInUse;
-	                
 	                resourceCostStats.addValue(cost);
 	                resourceInUseStats.addValue(durationInUse);
 	                resourceAvailableStats.addValue(durationAvailable);
@@ -540,30 +484,11 @@ public class StatisticsLogger extends OutputLoggerPluggable {
             }
         }
         
-/*        
-	        String resourceUtilizationFileName = outputPathWithoutExtension + model.getGlobalConfiguration().getFileNameWithoutExtension()+"_resourceutilization.xml";
-	            
-	        TransformerFactory transformerFactory = TransformerFactory.newInstance();
-	    	Transformer transformer = transformerFactory.newTransformer();
-	    	DOMSource source = new DOMSource(doc);
-	    	StreamResult result = new StreamResult(resourceUtilizationFileName);
-	    	//StreamResult result = new StreamResult(System.out);
-	    	transformer.transform(source, result);
-	
-	        System.out.println("Wrote resource utilization statistics to " + resourceUtilizationFileName);
-        	} catch (ParserConfigurationException pce) {
-        		pce.printStackTrace();
-            } catch (TransformerException tfe) {
-        		tfe.printStackTrace();
-      	  	}
-*/
         String resourceUtilizationFileName = outputPathWithoutExtension + model.getGlobalConfiguration().getFileNameWithoutExtension()+"_resourceutilization.xml";
         FileOutputStream fos = new FileOutputStream(resourceUtilizationFileName);
         
         XMLOutputter xmlOutput = new XMLOutputter();
-        
         xmlOutput.output(doc, System.out);  
-  
         xmlOutput.output(doc, fos);
     }
 
