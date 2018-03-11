@@ -1,5 +1,6 @@
 package de.hpi.bpt.scylla.plugin_type.logger;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;

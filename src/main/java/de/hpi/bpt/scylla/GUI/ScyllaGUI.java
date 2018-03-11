@@ -9,11 +9,13 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Locale;
 
+import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -34,7 +36,10 @@ import de.hpi.bpt.scylla.GUI.SimulationPane.SimulationPane;
 public class ScyllaGUI extends JFrame {
 	
 	/**A Developer variable to suppress e.g. output forwarding*/
-	public static final boolean DEBUG = true;
+	public static final boolean DEBUG = false;
+	
+	/**Tells whether the programm is running in a jar or not*/
+	public static final boolean INJAR = ScyllaGUI.class.getResource(ScyllaGUI.class.getSimpleName()+".class").toString().startsWith("jar:");
 	
 	/** Default path for input and output files*/
 	public static String DEFAULTFILEPATH = "samples\\";
@@ -92,37 +97,37 @@ public class ScyllaGUI extends JFrame {
 	public static final Insets LEFTMARGIN = new Insets(0, WIDTH/48, 0, 0);
 	
 	/**Icon for adding objects*/
-	public static final ImageIcon ICON_PLUS = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/plus.png")),ICONSIZE,ICONSIZE);
+	public static final ImageIcon ICON_PLUS = resizeIcon(new ImageIcon(getResource("/GUI/plus.png")),ICONSIZE,ICONSIZE);
 	/**Icon for deleting/removing objects*/
-	public static final ImageIcon ICON_REMOVE = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/remove.png")),ICONSIZE,ICONSIZE);
+	public static final ImageIcon ICON_REMOVE = resizeIcon(new ImageIcon(getResource("/GUI/remove.png")),ICONSIZE,ICONSIZE);
 	/**Icon to exit or close (can also be used for remove)*/
-	public static final ImageIcon ICON_CLOSE = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/close.png")),TITLEFONT.getSize(),TITLEFONT.getSize());
+	public static final ImageIcon ICON_CLOSE = resizeIcon(new ImageIcon(getResource("/GUI/close.png")),TITLEFONT.getSize(),TITLEFONT.getSize());
 	/**Icon for "further options"*/
-	public static final ImageIcon ICON_MORE = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/more.png")),ICONSIZE,ICONSIZE);
+	public static final ImageIcon ICON_MORE = resizeIcon(new ImageIcon(getResource("/GUI/more.png")),ICONSIZE,ICONSIZE);
 	/**Icon for editing*/
-	public static final ImageIcon ICON_EDIT = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/edit.png")),ICONSIZE,ICONSIZE);
+	public static final ImageIcon ICON_EDIT = resizeIcon(new ImageIcon(getResource("/GUI/edit.png")),ICONSIZE,ICONSIZE);
 	
 	/**Icon for global config*/
-	public static final ImageIcon ICON_GLOBALCONF = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/globalConf.png")),DEFAULTFONT.getSize(),DEFAULTFONT.getSize());
+	public static final ImageIcon ICON_GLOBALCONF = resizeIcon(new ImageIcon(getResource("/GUI/globalConf.png")),DEFAULTFONT.getSize(),DEFAULTFONT.getSize());
 	/**Icon for sim config*/
-	public static final ImageIcon ICON_SIMCONF = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/simConf.png")),DEFAULTFONT.getSize(),DEFAULTFONT.getSize());
+	public static final ImageIcon ICON_SIMCONF = resizeIcon(new ImageIcon(getResource("/GUI/simConf.png")),DEFAULTFONT.getSize(),DEFAULTFONT.getSize());
 	
 	/**Icon to expand*/
-	public static final ImageIcon ICON_EXPAND = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/expand.png")),DEFAULTFONT.getSize(),DEFAULTFONT.getSize());
+	public static final ImageIcon ICON_EXPAND = resizeIcon(new ImageIcon(getResource("/GUI/expand.png")),DEFAULTFONT.getSize(),DEFAULTFONT.getSize());
 	/**Icon to collapse*/
-	public static final ImageIcon ICON_COLLAPSE = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/collapse.png")),DEFAULTFONT.getSize(),DEFAULTFONT.getSize());
+	public static final ImageIcon ICON_COLLAPSE = resizeIcon(new ImageIcon(getResource("/GUI/collapse.png")),DEFAULTFONT.getSize(),DEFAULTFONT.getSize());
 	
 	/**Icon for options*/
-	public static final ImageIcon ICON_OPTIONS = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/options.png")),ICONSIZE,ICONSIZE);
+	public static final ImageIcon ICON_OPTIONS = resizeIcon(new ImageIcon(getResource("/GUI/options.png")),ICONSIZE,ICONSIZE);
 	
 	/**Icon for new file*/
-	public static final ImageIcon ICON_NEW = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/newfile.png")),TITLEFONT.getSize(),TITLEFONT.getSize());
+	public static final ImageIcon ICON_NEW = resizeIcon(new ImageIcon(getResource("/GUI/newfile.png")),TITLEFONT.getSize(),TITLEFONT.getSize());
 	/**Icon for save file*/
-	public static final ImageIcon ICON_SAVE = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/save.png")),TITLEFONT.getSize(),TITLEFONT.getSize());
+	public static final ImageIcon ICON_SAVE = resizeIcon(new ImageIcon(getResource("/GUI/save.png")),TITLEFONT.getSize(),TITLEFONT.getSize());
 	/**Icon for save file as*/
-	public static final ImageIcon ICON_SAVEAS = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/saveas.png")),TITLEFONT.getSize(),TITLEFONT.getSize());
+	public static final ImageIcon ICON_SAVEAS = resizeIcon(new ImageIcon(getResource("/GUI/saveAs.png")),TITLEFONT.getSize(),TITLEFONT.getSize());
 	/**Icon for open file*/
-	public static final ImageIcon ICON_OPEN = resizeIcon(new ImageIcon(ScyllaGUI.class.getResource("/GUI/open.png")),TITLEFONT.getSize(),TITLEFONT.getSize());
+	public static final ImageIcon ICON_OPEN = resizeIcon(new ImageIcon(getResource("/GUI/open.png")),TITLEFONT.getSize(),TITLEFONT.getSize());
 
 	
 	public static final String ACTIONKEY_NEW = "new";
@@ -199,6 +204,7 @@ public class ScyllaGUI extends JFrame {
 		
 		//Scale ScrollBar widths
 		UIManager.put("ScrollBar.width", (int) ((int)UIManager.get("ScrollBar.width") * SCALE));
+		UIManager.put("ScrollPane.border", "");
 		
 		//Set tabpane font
 		UIManager.put("TabbedPane.font", ScyllaGUI.TITLEFONT);
@@ -220,6 +226,16 @@ public class ScyllaGUI extends JFrame {
 		contentPane.addTab("Simulation", simulationPane);
 		
 		if(!DEBUG)System.setOut(simulationPane.getConsole().getOut());
+	}
+	
+	public static Image getResource(String path) {
+		String prefix = INJAR ? "/resources" : "";
+		try {
+			return ImageIO.read(ScyllaGUI.class.getResourceAsStream(prefix+path));
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 	
 	/**
@@ -290,7 +306,7 @@ public class ScyllaGUI extends JFrame {
 	
 	public void addEditor(EditorPane component) {
 		contentPane.addTab("", component);
-		contentPane.setTabComponentAt(contentPane.indexOfComponent(component), new EditorTabTitlePane(contentPane, component));
+		contentPane.setTabComponentAt(contentPane.indexOfComponent(component), new EditorTabTitlePanel(contentPane, component));
 		contentPane.setSelectedComponent(component);
 	}
 	

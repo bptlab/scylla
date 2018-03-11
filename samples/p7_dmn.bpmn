@@ -147,7 +147,7 @@
     <sequenceFlow id="sid-B4C3B835-47F6-46E2-945D-6D916FEFD21C" name="" sourceRef="sid-5B535DD8-20F2-4E40-B636-9733D2E936E1" targetRef="sid-6CB99342-2F2C-4B9B-9E09-1A1DB9BDF8DC" />
     <sequenceFlow id="sid-63B0EDD6-13FB-464C-972C-26A012BE270B" name="" sourceRef="sid-6CB99342-2F2C-4B9B-9E09-1A1DB9BDF8DC" targetRef="sid-661A5287-1938-4DD7-897E-FE9CE04D76B7" />
     <sequenceFlow id="sid-BAE668AA-F19F-48D1-981A-334D8A4FA6A7" name="" sourceRef="sid-661A5287-1938-4DD7-897E-FE9CE04D76B7" targetRef="sid-F71AEBD8-9342-4A08-B648-136E19C3FD5D" />
-    <dataObjectReference id="sid-239741B7-E442-40BD-A153-739033002E0F" name="Discount" dataObjectRef="sid-0dc7a51e-1ed3-4cf2-b68a-dabdde362eb4" />
+    <dataObjectReference id="sid-239741B7-E442-40BD-A153-739033002E0F" name="Discount" />
     <sequenceFlow id="sid-CE13CF6E-33D7-4AE3-AE90-725238F8E297" name="Discount.Type=25&#38;&#38;Discount.Points&#60;1000" sourceRef="sid-85254ABC-6ACE-4339-8A83-C839287B173A" targetRef="sid-9156D59A-DF79-4C05-8EEE-1541C5DA5E40">
       <conditionExpression xsi:type="tFormalExpression">25%</conditionExpression>
     </sequenceFlow>
@@ -292,7 +292,7 @@
         <omgdi:waypoint xsi:type="omgdc:Point" x="638" y="286" />
         <omgdi:waypoint xsi:type="omgdc:Point" x="724" y="286" />
         <bpmndi:BPMNLabel labelStyle="sid-7d42db9e-59d5-4e12-aa7a-4773cf57b13a">
-          <omgdc:Bounds x="594" y="221" width="85" height="36" />
+          <omgdc:Bounds x="594" y="230" width="85" height="36" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="EndEvent_0hgwaio_di" bpmnElement="EndEvent_0hgwaio">

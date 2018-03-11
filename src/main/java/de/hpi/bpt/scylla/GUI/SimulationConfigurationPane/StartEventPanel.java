@@ -3,16 +3,15 @@ package de.hpi.bpt.scylla.GUI.SimulationConfigurationPane;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ItemEvent;
 import java.util.concurrent.TimeUnit;
 
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import de.hpi.bpt.scylla.GUI.FormManager;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
+import de.hpi.bpt.scylla.GUI.InputFields.SelectionField;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.Distribution;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.Distribution.DistributionType;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.StartEvent;
@@ -25,8 +24,8 @@ public class StartEventPanel extends JPanel {
 	
 	private StartEvent startEvent;
 	private GridBagConstraints gbc_panelDistribution;
-	private JComboBox<DistributionType> comboboxDistribution;
-	private JComboBox<TimeUnit> comboboxTimeunit;
+	private SelectionField<DistributionType> comboboxDistribution;
+	private SelectionField<TimeUnit> comboboxTimeunit;
 
 	public StartEventPanel(FormManager f) {
 		fm = f;
@@ -58,26 +57,31 @@ public class StartEventPanel extends JPanel {
 		add(panelDistribution, gbc_panelDistribution);
 		
 		//Distribution combobox
-		comboboxDistribution = new JComboBox<DistributionType>(DistributionType.values());
-		//JComboBox comboboxDistribution = new JComboBox();
-		comboboxDistribution.addItemListener((ItemEvent e)->{
-			if(e.getStateChange() != ItemEvent.SELECTED)return;
-			if(fm.isChangeFlag())return;
-			DistributionType type = (DistributionType) comboboxDistribution.getSelectedItem();
-			if(type != null){
+		comboboxDistribution = new SelectionField<DistributionType>(fm, DistributionType.values()) {
+
+			@Override
+			protected DistributionType getSavedValue() {
+				if(startEvent == null)return null;
+				return startEvent.getArrivalRateDistribution().getType();
+			}
+
+			@Override
+			protected void setSavedValue(DistributionType type) {
 				Distribution d = Distribution.create(type);
 				setPanelDistribution(d);
 				startEvent.setArrivalRateDistribution(d);
-				fm.setSaved(false);
 			}
-		});
-		comboboxDistribution.setSelectedIndex(-1);
+			
+		};
+		//JComboBox comboboxDistribution = new JComboBox();
+
+		comboboxDistribution.clear();
 		GridBagConstraints gbc_comboboxDistribution = new GridBagConstraints();
 		gbc_comboboxDistribution.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
 		gbc_comboboxDistribution.fill = GridBagConstraints.HORIZONTAL;
 		gbc_comboboxDistribution.gridx = 1;
 		gbc_comboboxDistribution.gridy = 0;
-		add(comboboxDistribution, gbc_comboboxDistribution);
+		add(comboboxDistribution.getComponent(), gbc_comboboxDistribution);
 		
 		//Empty fill label for more space
 		JLabel labelFill = new JLabel(" ");
@@ -98,20 +102,27 @@ public class StartEventPanel extends JPanel {
 		add(labelTimeunit, gbc_labelTimeunit);
 		
 		//Time unit combobox
-		comboboxTimeunit = new JComboBox<TimeUnit>(TimeUnit.values());
-		comboboxTimeunit.addItemListener((ItemEvent e)->{
-			if(e.getStateChange() != ItemEvent.SELECTED)return;
-			if(fm.isChangeFlag())return;
-			startEvent.setArrivalTimeUnit((TimeUnit) comboboxTimeunit.getSelectedItem());
-			fm.setSaved(false);
-		});
-		comboboxTimeunit.setSelectedIndex(-1);
+		comboboxTimeunit = new SelectionField<TimeUnit>(fm, TimeUnit.values()) {
+
+			@Override
+			protected TimeUnit getSavedValue() {
+				if(startEvent == null)return null;
+				return TimeUnit.valueOf(startEvent.getArrivalTimeUnit());
+			}
+
+			@Override
+			protected void setSavedValue(TimeUnit v) {
+				startEvent.setArrivalTimeUnit(v);
+			}
+			
+		};
+		comboboxTimeunit.clear();
 		GridBagConstraints gbc_comboboxTimeunit = new GridBagConstraints();
 		gbc_comboboxTimeunit.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
 		gbc_comboboxTimeunit.fill = GridBagConstraints.HORIZONTAL;
 		gbc_comboboxTimeunit.gridx = 1;
 		gbc_comboboxTimeunit.gridy = 2;
-		add(comboboxTimeunit, gbc_comboboxTimeunit);
+		add(comboboxTimeunit.getComponent(), gbc_comboboxTimeunit);
 	}
 	
 	public void setStartEvent(StartEvent startEvent) {
@@ -121,12 +132,12 @@ public class StartEventPanel extends JPanel {
 		Distribution d = startEvent.getArrivalRateDistribution();
 		if(d != null){
 			setPanelDistribution(d);
-			comboboxDistribution.setSelectedItem(d.getType());
+			comboboxDistribution.loadSavedValue();
 		}else{
 			setPanelDistribution(null);
-			comboboxDistribution.setSelectedIndex(-1);
+			comboboxDistribution.clear();
 		}
-		comboboxTimeunit.setSelectedItem(TimeUnit.valueOf(startEvent.getArrivalTimeUnit()));
+		comboboxTimeunit.loadSavedValue();
 				
 		fm.setChangeFlag(false);
 	}
@@ -146,17 +157,17 @@ public class StartEventPanel extends JPanel {
 	
 	@Override
 	public void setEnabled(boolean b) {
-		comboboxDistribution.setEnabled(b);
-		comboboxTimeunit.setEnabled(b);
+		comboboxDistribution.getComponent().setEnabled(b);
+		comboboxTimeunit.getComponent().setEnabled(b);
 		panelDistribution.setEnabled(b);
 	}
 
 	public void clear() {
-		comboboxDistribution.setSelectedIndex(-1);
+		comboboxDistribution.clear();
 		if(panelDistribution != null)remove(panelDistribution);
 		panelDistribution = new JLabel(" ");
 		add(panelDistribution, gbc_panelDistribution);
-		comboboxTimeunit.setSelectedIndex(-1);
+		comboboxTimeunit.clear();
 	}
 
 }

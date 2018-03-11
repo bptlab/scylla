@@ -9,24 +9,18 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.io.File;
 import java.io.IOException;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
-import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
-import javax.swing.event.DocumentEvent;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -35,12 +29,16 @@ import org.jdom2.input.SAXBuilder;
 
 import de.hpi.bpt.scylla.GUI.EditorPane;
 import de.hpi.bpt.scylla.GUI.ExpandPanel;
-import de.hpi.bpt.scylla.GUI.InsertRemoveListener;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel.ComponentHolder;
 import de.hpi.bpt.scylla.GUI.ScalingCheckBoxIcon;
 import de.hpi.bpt.scylla.GUI.ScalingFileChooser;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
+import de.hpi.bpt.scylla.GUI.InputFields.DateField;
+import de.hpi.bpt.scylla.GUI.InputFields.NumberField;
+import de.hpi.bpt.scylla.GUI.InputFields.NumberSpinner;
+import de.hpi.bpt.scylla.GUI.InputFields.StringField;
+import de.hpi.bpt.scylla.GUI.InputFields.TimeField;
 import de.hpi.bpt.scylla.creation.ElementLink;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.ExclusiveGateway;
@@ -59,20 +57,20 @@ public class SimulationConfigurationPane extends EditorPane {
 	
 	private GlobalConfigurationCreator gcc;
 	
-	private JTextField textfieldId;
-	private JFormattedTextField textfieldSeed;
-	private JSpinner spinnerNOI;
-	private JFormattedTextField textfieldStartDate;
+	private StringField textfieldId;
+	private NumberField<Long> textfieldSeed;
+	private NumberSpinner<Integer> spinnerNOI;
+	private DateField textfieldStartDate;
 	private ZonedDateTime startDateTime;
-	private JFormattedTextField textfieldStartTime;
-	private JFormattedTextField textfieldEndTime;
+	private TimeField textfieldStartTime;
+	private TimeField textfieldEndTime;
 	private ZonedDateTime endDateTime;
-	private JFormattedTextField textfieldEndDate;
+	private DateField textfieldEndDate;
 	private JCheckBox checkboxUnlimited;
 	private StartEventPanel startEventPanel;
 	private ListChooserPanel gatewayPanel;
 	private ListChooserPanel taskPanel;
-	private DateTimeFormatter dateFormatter;
+//	private DateTimeFormatter dateFormatter;
 	private JLabel labelRefPMshow;
 	private JLabel labelRefGCshow;
 	private JButton button_openPM;
@@ -225,19 +223,20 @@ public class SimulationConfigurationPane extends EditorPane {
 		panelGeneral.add(labelId, gbc_labelId);
 		
 		//Id input field
-		textfieldId = new JTextField();
-		textfieldId.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
-			if(isChangeFlag())return;
-			creator.setId(textfieldId.getText());
-			setSaved(false);
-		}));
+		textfieldId = new StringField(this) {
+			protected String getSavedValue() {
+				if(creator == null)return null;
+				return creator.getId();
+			}
+			protected void setSavedValue(String v) {creator.setId(v);}
+		};
 		GridBagConstraints gbc_textfieldId = new GridBagConstraints();
 		gbc_textfieldId.gridwidth = 4;
 		gbc_textfieldId.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, inset_b);
 		gbc_textfieldId.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textfieldId.gridx = 1;
 		gbc_textfieldId.gridy = 1;
-		panelGeneral.add(textfieldId, gbc_textfieldId);
+		panelGeneral.add(textfieldId.getComponent(), gbc_textfieldId);
 		
 		//Seed label
 		JLabel labelSeed = new JLabel("Seed");
@@ -249,27 +248,40 @@ public class SimulationConfigurationPane extends EditorPane {
 		panelGeneral.add(labelSeed, gbc_labelSeed);
 		
 		//Seed input field
-		NumberFormat format = NumberFormat.getInstance();
-		format.setGroupingUsed(false);
-		textfieldSeed = new JFormattedTextField(format);
-		textfieldSeed.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
-			if(isChangeFlag())return;
-			try{
-				Long s = creator.getRandomSeed();
-				Long n = Long.parseLong(textfieldSeed.getText());
-				if(!n.equals(s)){
-					creator.setRandomSeed(n);
-					setSaved(false);
-				}
-			}catch(Exception exc){}
-		}));
+//		NumberFormat format = NumberFormat.getInstance();
+//		format.setGroupingUsed(false);
+//		textfieldSeed = new JFormattedTextField(format);
+//		textfieldSeed.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
+//			if(isChangeFlag())return;
+//			try{
+//				Long s = creator.getRandomSeed();
+//				Long n = Long.parseLong(textfieldSeed.getText());
+//				if(!n.equals(s)){
+//					creator.setRandomSeed(n);
+//					setSaved(false);
+//				}
+//			}catch(Exception exc){}
+//		}));
+		textfieldSeed = new NumberField<Long>(this) {
+
+			@Override
+			protected void setSavedValue(Long v) {
+				if(creator != null)creator.setRandomSeed(v);
+			}
+			
+			@Override
+			protected Long getSavedValue() {
+				return creator != null ? creator.getRandomSeed() : null;
+			}
+			
+		};
 		GridBagConstraints gbc_textfieldSeed = new GridBagConstraints();
 		gbc_textfieldSeed.gridwidth = 4;
 		gbc_textfieldSeed.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, inset_b);
 		gbc_textfieldSeed.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textfieldSeed.gridx = 1;
 		gbc_textfieldSeed.gridy = 2;
-		panelGeneral.add(textfieldSeed, gbc_textfieldSeed);
+		panelGeneral.add(textfieldSeed.getComponent(), gbc_textfieldSeed);
 		
 		//Number of instances (NOI) label
 		JLabel labelNOI = new JLabel("Number of instances");
@@ -281,20 +293,27 @@ public class SimulationConfigurationPane extends EditorPane {
 		panelGeneral.add(labelNOI, gbc_labelNOI);
 		
 		//Spinner for number of instances (NOI)
-		spinnerNOI = new JSpinner();
-		spinnerNOI.setModel(new SpinnerNumberModel(new Integer(0), new Integer(0), null, new Integer(1)));
-		spinnerNOI.addChangeListener((ChangeEvent e)->{
-			if(isChangeFlag())return;
-			creator.setProcessInstances((Integer)spinnerNOI.getValue());
-			setSaved(false);
-		});
+		spinnerNOI = new NumberSpinner<Integer>(this,0,0,null,1) {
+			
+			@Override
+			protected void setSavedValue(Integer v) {
+				creator.setProcessInstances(v);
+			}
+			
+			@Override
+			protected Integer getSavedValue() {
+				if(creator == null || creator.getProcessInstances() == null)return null;
+				return Integer.valueOf(creator.getProcessInstances());
+			}
+			
+		};
 		GridBagConstraints gbc_spinnerNOI = new GridBagConstraints();
 		gbc_spinnerNOI.gridwidth = 1;
 		gbc_spinnerNOI.fill = GridBagConstraints.BOTH;
 		gbc_spinnerNOI.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, inset_b);
 		gbc_spinnerNOI.gridx = 1;
 		gbc_spinnerNOI.gridy = 3;
-		panelGeneral.add(spinnerNOI, gbc_spinnerNOI);
+		panelGeneral.add(spinnerNOI.getComponent(), gbc_spinnerNOI);
 		
 		//Start Date label
 		JLabel labelStartDate = new JLabel("Start Date");
@@ -306,28 +325,41 @@ public class SimulationConfigurationPane extends EditorPane {
 		panelGeneral.add(labelStartDate, gbc_labelStartDate);
 		
 		//Startdate input field
-		dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-		SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy");
-		textfieldStartDate = new JFormattedTextField(df);
-		textfieldStartDate.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
-			if(isChangeFlag())return;
-			try{
-				LocalDate d = LocalDate.parse(textfieldStartDate.getText(),dateFormatter);
+//		dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+//		SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+//		textfieldStartDate = new JFormattedTextField(df);
+//		textfieldStartDate.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
+//			if(isChangeFlag())return;
+//			try{
+//				LocalDate d = LocalDate.parse(textfieldStartDate.getText(),dateFormatter);
+//				if(startDateTime == null)startDateTime = ZonedDateTime.now();
+//				if(!d.equals(startDateTime.toLocalDate())){
+//					startDateTime = startDateTime.with(d);
+//					creator.setStartDateTime(startDateTime);
+//					setSaved(false);
+//				}
+//			}catch(Exception exc){}
+//		}));
+//		textfieldStartDate.setText(dateFormatter.format(LocalDate.now()));
+		textfieldStartDate = new DateField(this) {
+			@Override
+			protected void setSavedValue(LocalDate v) {
+				startDateTime = startDateTime.with(v);
+				creator.setStartDateTime(startDateTime);
+			}
+			
+			@Override
+			protected LocalDate getSavedValue() {
 				if(startDateTime == null)startDateTime = ZonedDateTime.now();
-				if(!d.equals(startDateTime.toLocalDate())){
-					startDateTime = startDateTime.with(d);
-					creator.setStartDateTime(startDateTime);
-					setSaved(false);
-				}
-			}catch(Exception exc){}
-		}));
-		textfieldStartDate.setText(dateFormatter.format(LocalDate.now()));
+				return startDateTime.toLocalDate();
+			}
+		};
 		GridBagConstraints gbc_textfieldStartDate = new GridBagConstraints();
 		gbc_textfieldStartDate.insets =   new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET,  ScyllaGUI.STDINSET);
 		gbc_textfieldStartDate.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textfieldStartDate.gridx = 1;
 		gbc_textfieldStartDate.gridy = 4;
-		panelGeneral.add(textfieldStartDate, gbc_textfieldStartDate);
+		panelGeneral.add(textfieldStartDate.getComponent(), gbc_textfieldStartDate);
 		
 		//Start Time label
 		JLabel labelStartTime = new JLabel("at");
@@ -339,27 +371,40 @@ public class SimulationConfigurationPane extends EditorPane {
 		panelGeneral.add(labelStartTime, gbc_labelStartTime);
 		
 		//Start time input field
-		textfieldStartTime = new JFormattedTextField(DateTimeFormatter.ISO_LOCAL_TIME.toFormat());
-		textfieldStartTime.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
-			if(isChangeFlag())return;
-			try{
-				LocalTime l = LocalTime.parse(textfieldStartTime.getText());
+//		textfieldStartTime = new JFormattedTextField(DateTimeFormatter.ISO_LOCAL_TIME.toFormat());
+//		textfieldStartTime.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
+//			if(isChangeFlag())return;
+//			try{
+//				LocalTime l = LocalTime.parse(textfieldStartTime.getText());
+//				if(startDateTime == null)startDateTime = ZonedDateTime.now();
+//				if(!l.equals(startDateTime.toLocalTime())){
+//					startDateTime = startDateTime.with(l);
+//					creator.setStartDateTime(startDateTime);
+//					setSaved(false);
+//				}
+//			}catch(Exception exc){}
+//		}));
+		textfieldStartTime = new TimeField(this) {
+			
+			@Override
+			protected void setSavedValue(LocalTime v) {
+				startDateTime = startDateTime.with(v);
+				creator.setStartDateTime(startDateTime);
+			}
+			
+			@Override
+			protected LocalTime getSavedValue() {
 				if(startDateTime == null)startDateTime = ZonedDateTime.now();
-				if(!l.equals(startDateTime.toLocalTime())){
-					startDateTime = startDateTime.with(l);
-					creator.setStartDateTime(startDateTime);
-					setSaved(false);
-				}
-			}catch(Exception exc){}
-		}));
-		textfieldStartTime.setValue(LocalTime.of(0, 0, 0));//Triggers event!
+				return startDateTime.toLocalTime();
+			}
+		};
 		GridBagConstraints gbc_textfieldStartTime = new GridBagConstraints();
 		gbc_textfieldStartTime.gridwidth = 2;
 		gbc_textfieldStartTime.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, inset_b);
 		gbc_textfieldStartTime.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textfieldStartTime.gridx = 3;
 		gbc_textfieldStartTime.gridy = 4;
-		panelGeneral.add(textfieldStartTime, gbc_textfieldStartTime);
+		panelGeneral.add(textfieldStartTime.getComponent(), gbc_textfieldStartTime);
 		
 		//End Date label
 		JLabel labelEndDate = new JLabel("End Date");
@@ -371,27 +416,40 @@ public class SimulationConfigurationPane extends EditorPane {
 		panelGeneral.add(labelEndDate, gbc_labelEndDate);
 		
 		//Enddate input field
-		textfieldEndDate = new JFormattedTextField(df);
-		textfieldEndDate.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
-			if(isChangeFlag())return;
-			if(textfieldEndDate.getText().equals(""));
-			else try{
-				LocalDate d = LocalDate.parse(textfieldEndDate.getText(),dateFormatter);
+//		textfieldEndDate = new JFormattedTextField(df);
+//		textfieldEndDate.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
+//			if(isChangeFlag())return;
+//			if(textfieldEndDate.getText().equals(""));
+//			else try{
+//				LocalDate d = LocalDate.parse(textfieldEndDate.getText(),dateFormatter);
+//				if(endDateTime == null)endDateTime = ZonedDateTime.now();
+//				if(!d.equals(endDateTime.toLocalDate())){
+//					endDateTime = endDateTime.with(d);
+//					creator.setEndDateTime(endDateTime);
+//					setSaved(false);
+//				}
+//			}catch(Exception exc){}
+//		}));
+//		textfieldEndDate.setText(dateFormatter.format(LocalDate.now()));
+		textfieldEndDate = new DateField(this) {
+			@Override
+			protected void setSavedValue(LocalDate v) {
+				endDateTime = endDateTime.with(v);
+				creator.setEndDateTime(endDateTime);
+			}
+			
+			@Override
+			protected LocalDate getSavedValue() {
 				if(endDateTime == null)endDateTime = ZonedDateTime.now();
-				if(!d.equals(endDateTime.toLocalDate())){
-					endDateTime = endDateTime.with(d);
-					creator.setEndDateTime(endDateTime);
-					setSaved(false);
-				}
-			}catch(Exception exc){}
-		}));
-		textfieldEndDate.setText(dateFormatter.format(LocalDate.now()));
+				return endDateTime.toLocalDate();
+			}
+		};
 		GridBagConstraints gbc_textfieldEndDate = new GridBagConstraints();
 		gbc_textfieldEndDate.insets =   new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
 		gbc_textfieldEndDate.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textfieldEndDate.gridx = 1;
 		gbc_textfieldEndDate.gridy = 5;
-		panelGeneral.add(textfieldEndDate, gbc_textfieldEndDate);
+		panelGeneral.add(textfieldEndDate.getComponent(), gbc_textfieldEndDate);
 		
 		//End Time label
 		JLabel labelEndTime = new JLabel("at");
@@ -403,34 +461,52 @@ public class SimulationConfigurationPane extends EditorPane {
 		panelGeneral.add(labelEndTime, gbc_labelEndTime);
 		
 		//End time input field
-		textfieldEndTime = new JFormattedTextField(DateTimeFormatter.ISO_LOCAL_TIME.toFormat());
-		textfieldEndTime.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
-			if(isChangeFlag())return;
-			try{
-				LocalTime l = LocalTime.parse(textfieldEndTime.getText());
+//		textfieldEndTime = new JFormattedTextField(DateTimeFormatter.ISO_LOCAL_TIME.toFormat());
+//		textfieldEndTime.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
+//			if(isChangeFlag())return;
+//			try{
+//				LocalTime l = LocalTime.parse(textfieldEndTime.getText());
+//				if(endDateTime == null)endDateTime = ZonedDateTime.now();
+//				if(!l.equals(endDateTime.toLocalTime())){
+//					endDateTime = endDateTime.with(l);
+//					creator.setEndDateTime(endDateTime);
+//					setSaved(false);
+//				}
+//			}catch(Exception exc){}
+//		}));
+		textfieldEndTime = new TimeField(this) {
+			
+			@Override
+			protected void setSavedValue(LocalTime v) {
+				endDateTime = endDateTime.with(v);
+				creator.setEndDateTime(endDateTime);
+			}
+			
+			@Override
+			protected LocalTime getSavedValue() {
 				if(endDateTime == null)endDateTime = ZonedDateTime.now();
-				if(!l.equals(endDateTime.toLocalTime())){
-					endDateTime = endDateTime.with(l);
-					creator.setEndDateTime(endDateTime);
-					setSaved(false);
-				}
-			}catch(Exception exc){}
-		}));
-		textfieldEndTime.setValue(LocalTime.of(23, 59, 59));//Triggers event!
+				return endDateTime.toLocalTime();
+			}
+			
+			@Override
+			protected LocalTime defaultValue() {
+				return LocalTime.of(23,59,59);
+			}
+		};
 		GridBagConstraints gbc_textfieldEndTime = new GridBagConstraints();
 		gbc_textfieldEndTime.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
 		gbc_textfieldEndTime.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textfieldEndTime.gridx = 3;
 		gbc_textfieldEndTime.gridy = 5;
-		panelGeneral.add(textfieldEndTime, gbc_textfieldEndTime);
+		panelGeneral.add(textfieldEndTime.getComponent(), gbc_textfieldEndTime);
 		
 		//Check box for unlimited simulation time (= no end time)
 		checkboxUnlimited = new JCheckBox("unlimited");
-		checkboxUnlimited.setIcon(new ScalingCheckBoxIcon(textfieldEndTime.getFont().getSize()));
+		checkboxUnlimited.setIcon(new ScalingCheckBoxIcon(textfieldEndTime.getComponent().getFont().getSize()));
 		checkboxUnlimited.addItemListener((ItemEvent e)->{
 			boolean checked = checkboxUnlimited.isSelected();
-			textfieldEndDate.setEnabled(!checked);
-			textfieldEndTime.setEnabled(!checked);
+			textfieldEndDate.getComponent().setEnabled(!checked);
+			textfieldEndTime.getComponent().setEnabled(!checked);
 			if(isChangeFlag())return;
 			if(checked){
 				creator.removeEndDateTime();
@@ -594,9 +670,9 @@ public class SimulationConfigurationPane extends EditorPane {
 		setEnabled(true);
 		setChangeFlag(false);
 		//Id should be edited right after creation
-		textfieldId.setText("NewSimulationConfiguration");
-		textfieldId.requestFocusInWindow();
-		textfieldId.selectAll();
+		textfieldId.setValue("NewSimulationConfiguration");
+		textfieldId.getComponent().requestFocusInWindow();
+		textfieldId.getComponent().selectAll();
 	}
 
 	@Override
@@ -644,7 +720,7 @@ public class SimulationConfigurationPane extends EditorPane {
 			e.printStackTrace();
 		}
 		setChangeFlag(true);
-		textfieldId.setText(creator.getId());
+		textfieldId.loadSavedValue();
 		if(creator.getRandomSeed() != null){
 			textfieldSeed.setValue(creator.getRandomSeed());
 		}
@@ -653,18 +729,18 @@ public class SimulationConfigurationPane extends EditorPane {
 		if(startDt != null){
 			startDateTime = ZonedDateTime.parse(startDt);
 			textfieldStartTime.setValue(startDateTime.toLocalTime());
-			textfieldStartDate.setText(dateFormatter.format(startDateTime.toLocalDate()));
+			textfieldStartDate.setValue(startDateTime.toLocalDate());
 		}
 		String endDt = creator.getEndDateTime();
 		if(endDt != null){
 			checkboxUnlimited.setSelected(false);
 			endDateTime = ZonedDateTime.parse(endDt);
 			textfieldEndTime.setValue(endDateTime.toLocalTime());
-			textfieldEndDate.setText(dateFormatter.format(endDateTime.toLocalDate()));
+			textfieldEndDate.setValue(endDateTime.toLocalDate());
 		}else {
 			checkboxUnlimited.setSelected(true);
-			textfieldEndDate.setEnabled(false);
-			textfieldEndTime.setEnabled(false);
+			textfieldEndDate.getComponent().setEnabled(false);
+			textfieldEndTime.getComponent().setEnabled(false);
 		}
 		
 		importCreatorElements();
@@ -713,13 +789,13 @@ public class SimulationConfigurationPane extends EditorPane {
 		button_openGC.setEnabled(b);
 		button_openPM.setEnabled(b);
 		
-		textfieldId.setEnabled(b);
-		textfieldSeed.setEnabled(b);
-		spinnerNOI.setEnabled(b);
-		textfieldStartTime.setEnabled(b);
-		textfieldStartDate.setEnabled(b);
-		textfieldEndTime.setEnabled(b && !checkboxUnlimited.isSelected());
-		textfieldEndDate.setEnabled(b && !checkboxUnlimited.isSelected());
+		textfieldId.getComponent().setEnabled(b);
+		textfieldSeed.getComponent().setEnabled(b);
+		spinnerNOI.getComponent().setEnabled(b);
+		textfieldStartTime.getComponent().setEnabled(b);
+		textfieldStartDate.getComponent().setEnabled(b);
+		textfieldEndTime.getComponent().setEnabled(b && !checkboxUnlimited.isSelected());
+		textfieldEndDate.getComponent().setEnabled(b && !checkboxUnlimited.isSelected());
 		checkboxUnlimited.setEnabled(b);
 		
 		startEventPanel.setEnabled(b);
@@ -742,13 +818,13 @@ public class SimulationConfigurationPane extends EditorPane {
 	public void clear() {
 		labelRefGCshow.setText(" ");
 		labelRefPMshow.setText(" ");
-		textfieldId.setText("");
+		textfieldId.reset();
 		textfieldSeed.setValue(null);
-		spinnerNOI.setValue(0);
-		textfieldStartTime.setValue(LocalTime.of(0, 0, 0));
-		textfieldStartDate.setText(dateFormatter.format(LocalDate.now()));
-		textfieldEndTime.setValue(LocalTime.of(23, 59, 59));
-		textfieldEndDate.setText(dateFormatter.format(LocalDate.now()));
+		spinnerNOI.reset();
+		textfieldStartTime.reset();
+		textfieldStartDate.reset();
+		textfieldEndTime.reset();
+		textfieldEndDate.reset();
 		checkboxUnlimited.setSelected(true);
 		
 		startEventPanel.clear();

@@ -94,7 +94,7 @@ public class SimulationManager {
     /**
      * parses input, runs DesmoJ simulation experiment, writes BPS output logs
      */
-    public void run() {
+    public String run() {
 
         try {
             SAXBuilder builder = new SAXBuilder();
@@ -126,7 +126,7 @@ public class SimulationManager {
                 // parse common process elements from XML (BPMN)
                 CommonProcessElements commonProcessElementsFromFile = cpeParser.parse(pmRootElement);
                 String fileNameWithoutExtension = filename.substring(// filename.lastIndexOf("\\") + 1,
-                        filename.lastIndexOf("\\")+1, filename.lastIndexOf(".bpmn"));
+                        filename.lastIndexOf(Scylla.FILEDELIM)+1, filename.lastIndexOf(".bpmn"));
                 commonProcessElementsFromFile.setBpmnFileNameWithoutExtension(fileNameWithoutExtension);
 
                 // plugins to parse common process elements
@@ -234,6 +234,7 @@ public class SimulationManager {
         catch (IOException e) {
             e.printStackTrace();
         }
+        return outputPath;
     }
 
     public GlobalConfiguration getGlobalConfiguration() {

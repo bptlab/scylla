@@ -23,24 +23,24 @@ public class BoundaryTBPlugin extends TaskBeginEventPluggable {
             throws ScyllaRuntimeException {
 
         SimulationModel model = (SimulationModel) desmojEvent.getModel();
-
-        // create attached events
-
         ProcessModel processModel = processInstance.getProcessModel();
         int nodeId = desmojEvent.getNodeId();
-
-        List<Integer> referenceToBoundaryEvents = processModel.getReferencesToBoundaryEvents().get(nodeId);
-
         BoundaryEventPluginUtils pluginInstance = BoundaryEventPluginUtils.getInstance();
+
+        // At the begin of each task check for corresponding boundary events. If there are some, create and schedule them.
+        List<Integer> referenceToBoundaryEvents = processModel.getReferencesToBoundaryEvents().get(nodeId);
 
         if (referenceToBoundaryEvents != null) {
             double startTimeOfTask = model.presentTime().getTimeAsDouble(TimeUnit.SECONDS);
+            // Create the corresponding boundary object for this task, which contains all necessary information.
             pluginInstance.initializeBoundaryObject(startTimeOfTask, desmojEvent, referenceToBoundaryEvents);
-        }
 
-        // we usually do that in the event scheduling part, but in BoundaryEventSchedulingPlugin, it might not be called
-        // if the TaskBeginEvent is put on a queue
-        pluginInstance.createAndScheduleBoundaryEvents(desmojEvent, new TimeSpan(0));
+            // We usually do that in the event scheduling part, but in BoundaryEventSchedulingPlugin, it might not be called, if the TaskBeginEvent is put on a queue.
+            // That is the reason why the eventroutine in the BoundaryEventSchedulingPlugin class is commented out and so on never used. We should not need it anymore and it could be deleted.
+
+            // Create and schedule all boundary events this boundary object has for the current instance.
+            pluginInstance.createAndScheduleBoundaryEvents(desmojEvent, new TimeSpan(0));
+        }
 
     }
 

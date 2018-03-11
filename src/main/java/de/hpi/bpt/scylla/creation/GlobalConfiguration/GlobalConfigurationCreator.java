@@ -18,7 +18,7 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
-import de.hpi.bpt.scylla.GUI.GlobalConfigurationPane.GCFormManager.ResourceObserver;
+import de.hpi.bpt.scylla.GUI.FormManager.SetObserver;
 import de.hpi.bpt.scylla.creation.ElementLink;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.ResourceType.ResourceInstance;
 
@@ -38,7 +38,7 @@ public class GlobalConfigurationCreator extends ElementLink{
 	private List<ResourceType> resourceTypes;
 	
 	/**List of all JComboboxes, that display resource type, in order to update their entries*/
-	private List<ResourceObserver> resourceObserverList;
+	private List<SetObserver<String>> resourceObserverList;
 
 	/**List of all timetables*/
 	private List<Timetable> timetables;
@@ -57,11 +57,11 @@ public class GlobalConfigurationCreator extends ElementLink{
 		resourceTypes = new ArrayList<ResourceType>();
 		timetables = new ArrayList<Timetable>();
 		
-		resourceObserverList = new ArrayList<ResourceObserver>();
+		resourceObserverList = new ArrayList<SetObserver<String>>();
 	}
 	
 	
-	public List<ResourceObserver> getResourceObserverList() {
+	public List<SetObserver<String>> getResourceObserverList() {
 		return resourceObserverList;
 	}
 	
@@ -87,7 +87,7 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 	 * Gets the id of the global configuration
 	 */
 	public String getId(){
-		return el.getAttribute("id").getValue();
+		return el.getAttributeValue("id");
 	}
 	
 	/**
@@ -135,9 +135,9 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 	/**
 	 * Gets the GCs seed to a given value
 	 */
-	public Integer getSeed(){
+	public Long getSeed(){
 		if(root.getChild("randomSeed",nsp) == null)return null;
-		return Integer.parseInt(root.getChild("randomSeed",nsp).getText());
+		return Long.parseLong(root.getChild("randomSeed",nsp).getText());
 	}
 	
 	/**
@@ -201,8 +201,8 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 
 		/**Resets the id to a new value, can cause invalidity by duplicate*/
 		public void setId(String id) {
-			for(ResourceObserver cbm : getResourceObserverList()){
-				cbm.notifyResourceRenaming(this.id, id);
+			for(SetObserver<String> cbm : getResourceObserverList()){
+				cbm.notifyRenaming(this.id, id);
 			}			
 			setAttribute("id",id);
 			this.id = id;
@@ -394,8 +394,8 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 		if(res == null){
 			res = new ResourceType(id);
 			resourceTypes.add(res);
-			for(ResourceObserver cbm : getResourceObserverList()){
-				cbm.notifyResourceCreation(res.getId());
+			for(SetObserver<String> cbm : getResourceObserverList()){
+				cbm.notifyCreation(res.getId());
 			}
 		}//else duplicate
 		return res;
@@ -413,8 +413,8 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 		toRem.removeFrom(resourceData);
 		resourceTypes.remove(toRem);
 		
-		for(ResourceObserver cbm : getResourceObserverList()){
-			cbm.notifyResourceDeletion(id);//TODO is that the id?
+		for(SetObserver<String> cbm : getResourceObserverList()){
+			cbm.notifyDeletion(id);//TODO is that the id?
 		}
 	}
 	
@@ -800,7 +800,7 @@ Document de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreat
 		timetables = new ArrayList<Timetable>();
 		
 		//Resource type initialization
-		resourceObserverList = new ArrayList<ResourceObserver>();
+		resourceObserverList = new ArrayList<SetObserver<String>>();
 		
         for (Element el : root.getChildren(null,nsp)) {
             String elementName = el.getName();

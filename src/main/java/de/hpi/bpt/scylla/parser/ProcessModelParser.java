@@ -452,7 +452,7 @@ public class ProcessModelParser extends Parser<ProcessModel> {
             // attached to?
 
             String attachedTo = boundaryEvent.getAttributeValue("attachedToRef");
-            int nodeIdOfAttachedTo = identifiersToNodeIds.get(attachedTo);
+                int nodeIdOfAttachedTo = identifiersToNodeIds.get(attachedTo);
             if (!referencesToBoundaryEvents.containsKey(nodeIdOfAttachedTo)) {
                 referencesToBoundaryEvents.put(nodeIdOfAttachedTo, new ArrayList<Integer>());
             }

@@ -4,23 +4,17 @@ import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.awt.event.ItemEvent;
 import java.io.File;
 import java.io.IOException;
-import java.text.NumberFormat;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.DefaultListCellRenderer;
-import javax.swing.JComboBox;
-import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
 
 import org.eclipse.wb.swing.FocusTraversalOnArray;
 import org.jdom2.JDOMException;
@@ -28,9 +22,11 @@ import org.jdom2.JDOMException;
 import de.hpi.bpt.scylla.GUI.EditorPane;
 import de.hpi.bpt.scylla.GUI.ExpandPanel;
 import de.hpi.bpt.scylla.GUI.ExtendedListChooserPanel;
-import de.hpi.bpt.scylla.GUI.InsertRemoveListener;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel.ComponentHolder;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
+import de.hpi.bpt.scylla.GUI.InputFields.NumberField;
+import de.hpi.bpt.scylla.GUI.InputFields.SelectionField;
+import de.hpi.bpt.scylla.GUI.InputFields.StringField;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.ResourceType;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.Timetable;
@@ -44,9 +40,9 @@ import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator
 public class GlobalConfigurationPane extends EditorPane implements GCFormManager{
 	
 	//General Information form components
-	private JTextField textfieldId;
-	private JFormattedTextField textfieldSeed;
-	private JComboBox<ZoneId> comboboxTimezone;
+	private StringField textfieldId;
+	private NumberField<Long> textfieldSeed;
+	private SelectionField<ZoneId> comboboxTimezone;
 
 	/**Timetable Panel*/
 	private ExtendedListChooserPanel panelTimetables;
@@ -54,7 +50,7 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 	private ExtendedListChooserPanel panelResources;
 
 	/**List of all JComboboxes, that display timetables, in order to update their entries*/
-	private List<JComboBox<String>> timetableObserverList;
+	private List<SetObserver<String>> timetableObserverList;
 	/**List of all known timetable ids, in order to pass them to newly created displays (e.g. Comboboxes)*/
 	private List<String> timetables;
 	
@@ -95,19 +91,23 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 		panelGeneral.add(labelId, gbc_labelId);
 		
 		//Text input field for id
-		textfieldId = new JTextField();
-		textfieldId.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
-			if(isChangeFlag())return;
-			creator.setId(textfieldId.getText());
-			setSaved(false);
-		}));
+//		textfieldId = new JTextField();
+//		textfieldId.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
+//			if(isChangeFlag())return;
+//			creator.setId(textfieldId.getText());
+//			setSaved(false);
+//		}));
+		textfieldId = new StringField(this) {
+			protected String getSavedValue() {return creator != null ? creator.getId() : null;}
+			protected void setSavedValue(String v) {creator.setId(v);}
+		};
 		GridBagConstraints gbc_textfieldId = new GridBagConstraints();
 		gbc_textfieldId.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, inset_b);
 		gbc_textfieldId.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textfieldId.gridx = 1;
 		gbc_textfieldId.gridy = 0;
-		panelGeneral.add(textfieldId, gbc_textfieldId);
-		textfieldId.setColumns(10);
+		panelGeneral.add(textfieldId.getComponent(), gbc_textfieldId);
+//		textfieldId.setColumns(10);
 		
 		//Label seed
 		JLabel labelSeed = new JLabel();
@@ -120,27 +120,39 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 		panelGeneral.add(labelSeed, gbc_textfieldSeed);
 		
 		//Seed input field
-		NumberFormat format = NumberFormat.getInstance();
-		format.setGroupingUsed(false);
-		textfieldSeed = new JFormattedTextField(format);
-		textfieldSeed.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
-			if(isChangeFlag())return;
-			try{
-				long s = creator.getSeed();
-				long n = Long.parseLong(textfieldSeed.getText());
-				if(s != n){
-					creator.setSeed(n);
-					setSaved(false);
-				}
-			}catch(Exception exc){}
-		}));
+//		NumberFormat format = NumberFormat.getInstance();
+//		format.setGroupingUsed(false);
+//		textfieldSeed = new JFormattedTextField(format);
+//		textfieldSeed.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
+//			if(isChangeFlag())return;
+//			try{
+//				long s = creator.getSeed();
+//				long n = Long.parseLong(textfieldSeed.getText());
+//				if(s != n){
+//					creator.setSeed(n);
+//					setSaved(false);
+//				}
+//			}catch(Exception exc){}
+//		}));
+		textfieldSeed = new NumberField<Long>(this) {
+			
+			@Override
+			protected void setSavedValue(Long v) {
+				if(creator != null)creator.setSeed(v);
+			}
+			
+			@Override
+			protected Long getSavedValue() {
+				return creator != null ? creator.getSeed() : null;
+			}
+		};
+		
 		GridBagConstraints gbc_textfieldSeedEdit = new GridBagConstraints();
 		gbc_textfieldSeedEdit.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, inset_b);
 		gbc_textfieldSeedEdit.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textfieldSeedEdit.gridx = 1;
 		gbc_textfieldSeedEdit.gridy = 1;
-		panelGeneral.add(textfieldSeed, gbc_textfieldSeedEdit);
-		textfieldSeed.setColumns(10);
+		panelGeneral.add(textfieldSeed.getComponent(), gbc_textfieldSeedEdit);
 		
 		//Label timezone
 		JLabel labelTimezone = new JLabel();
@@ -165,8 +177,21 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 				"Western Standard Time", "Japan Standard Time", "Australian Eastern Standard Time", "Vanuatu Time", "New Zealand Standard Time", ""
 		};
 		//Timezone input combobox
-		comboboxTimezone = new JComboBox<ZoneId>(timeZones);
-		comboboxTimezone.setRenderer(new DefaultListCellRenderer(){
+		comboboxTimezone = new SelectionField<ZoneId>(this,timeZones) {
+
+			@Override
+			protected ZoneId getSavedValue() {
+				if(creator == null || creator.getTimeOffset() == null)return null;
+				return ZoneId.ofOffset("UTC",creator.getTimeOffset());
+			}
+
+			@Override
+			protected void setSavedValue(ZoneId v) {
+				creator.setTimeOffset(v.getRules().getStandardOffset(null));
+			}
+			
+		};
+		comboboxTimezone.getComponent().setRenderer(new DefaultListCellRenderer(){
 			@Override 
 			public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 				int i = 0;
@@ -178,19 +203,13 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 			}
 				       
 		});
-		comboboxTimezone.addItemListener((ItemEvent e)->{
-			if(e.getStateChange() == ItemEvent.SELECTED){
-				if(isChangeFlag())return;
-				creator.setTimeOffset(((ZoneId)comboboxTimezone.getSelectedItem()).getRules().getStandardOffset(null));
-				setSaved(false);
-			}
-		});
+
 		GridBagConstraints gbc_comboboxTimezone = new GridBagConstraints();
 		gbc_comboboxTimezone.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, inset_b);
 		gbc_comboboxTimezone.fill = GridBagConstraints.HORIZONTAL;
 		gbc_comboboxTimezone.gridx = 1;
 		gbc_comboboxTimezone.gridy = 2;
-		panelGeneral.add(comboboxTimezone, gbc_comboboxTimezone);
+		panelGeneral.add(comboboxTimezone.getComponent(), gbc_comboboxTimezone);
 		
 		//---Resource Panel---
 		panelResources = new ExtendedListChooserPanel(){
@@ -231,7 +250,7 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 		
 
 		//Timetable initialization
-		timetableObserverList = new ArrayList<JComboBox<String>>();
+		timetableObserverList = new ArrayList<SetObserver<String>>();
 		timetables = new ArrayList<String>();
 		timetables.add("");//"No timetable"-option
 		
@@ -241,10 +260,9 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 			@Override
 			public void onDelete(ComponentHolder toDel) {
 				String toDels = toDel.toString();
-				for(JComboBox<String> cbm : getTimetableObserverList()){
-					String sel = (String)cbm.getSelectedItem();
-					cbm.removeItem(toDels);
-					if(sel != null && sel.equals(toDels))cbm.setSelectedItem("");
+
+				for(SetObserver<String> obs : getTimetableObserverList()) {
+					obs.notifyDeletion(toDels);
 				}
 				timetables.remove(toDels);
 				creator.deleteTimetable(toDels);
@@ -300,7 +318,7 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 		//Disable as no gc is opened
 		setEnabled(false);
 		
-		setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{buttonNewfile, buttonSavefile, buttonSavefileAs, buttonOpenfile, buttonClosefile, textfieldId, textfieldSeed, comboboxTimezone, panelResourcesExpand, panelTimetablesExpand}));
+		setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{buttonNewfile, buttonSavefile, buttonSavefileAs, buttonOpenfile, buttonClosefile, textfieldId.getComponent(), textfieldSeed.getComponent(), comboboxTimezone.getComponent(), panelResourcesExpand, panelTimetablesExpand}));
 		
 	}
 	
@@ -321,9 +339,9 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 		setEnabled(true);
 		setChangeFlag(false);
 		//Id should be edited right after creation
-		textfieldId.setText("NewGlobalConfiguration");
-		textfieldId.requestFocusInWindow();
-		textfieldId.selectAll();
+		textfieldId.setValue("NewGlobalConfiguration");
+		textfieldId.getComponent().requestFocusInWindow();
+		textfieldId.getComponent().selectAll();
 	}
 
 	
@@ -336,9 +354,10 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 	protected void open() throws JDOMException, IOException{
 		creator = GlobalConfigurationCreator.createFromFile(getFile().getPath());
 		setChangeFlag(true);
-		textfieldId.setText(creator.getId());
-		if(creator.getSeed() != null)textfieldSeed.setValue(creator.getSeed());
-		if(creator.getTimeOffset() != null)comboboxTimezone.setSelectedItem(ZoneId.ofOffset("UTC",creator.getTimeOffset()));
+		textfieldId.loadSavedValue();
+		textfieldSeed.loadSavedValue();
+		comboboxTimezone.loadSavedValue();
+//		if(creator.getTimeOffset() != null)comboboxTimezone.setSelectedItem(ZoneId.ofOffset("UTC",creator.getTimeOffset()));
 		
 		for(Timetable t : creator.getTimetables()){
 			importTimetable(t);
@@ -371,9 +390,9 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 		setChangeFlag(true);
 		creator = null;
 		setFile(null);
-		textfieldId.setText("");
-		textfieldSeed.setValue(null);
-		comboboxTimezone.setSelectedItem(null);
+		textfieldId.reset();
+		textfieldSeed.clear();
+		comboboxTimezone.clear();
 		
 		panelResources.clear();
 		panelTimetables.clear();
@@ -387,7 +406,7 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 	
 
 	@Override
-	public List<JComboBox<String>> getTimetableObserverList() {
+	public List<SetObserver<String>> getTimetableObserverList() {
 		return timetableObserverList;
 	}
 
@@ -402,9 +421,9 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 	 */
 	@Override
 	public void setEnabled(boolean b){
-		textfieldId.setEnabled(b);
-		textfieldSeed.setEnabled(b);
-		comboboxTimezone.setEnabled(b);
+		textfieldId.getComponent().setEnabled(b);
+		textfieldSeed.getComponent().setEnabled(b);
+		comboboxTimezone.getComponent().setEnabled(b);
 		panelTimetables.setEnabled(b);
 		panelResources.setEnabled(b);
 		super.setEnabled(b);
@@ -464,8 +483,8 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 	 */
 	public void importTimetable(Timetable t){
 		panelTimetables.add(newTimetable(t));
-		for(JComboBox<String> cbm : getTimetableObserverList()){
-			cbm.addItem(t.getId());
+		for(SetObserver<String> obs : getTimetableObserverList()) {
+			obs.notifyCreation(t.getId());
 		}
 		timetables.add(t.getId());
 	}
@@ -492,32 +511,25 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 			}
 			@Override
 			public void setName(String n){
-				String s = n;
+				String newId = n;
 				//If the name has changed, but is already given,
 				//it will be serially numbered, and the first free number is chosen
 				int i = 2;
 				if(!t.getId().equals(n)){
-					while(creator.getTimetable(s) != null){
-						s = n+"("+i+")";
+					while(creator.getTimetable(newId) != null){
+						newId = n+"("+i+")";
 						i++;
 					}
 				}
 				//Notify timetable observer
-				for(JComboBox<String> cbm : getTimetableObserverList()){
-					String sel = (String) cbm.getSelectedItem();
-					cbm.removeItem(t.getId());
-					cbm.addItem(s);
-					//Reset combobox selection to null, as it will automatically change when the set is changed
-					if(sel == null || sel.equals(""))cbm.setSelectedItem("");
-					//If the current item is the selected one, it is also renamed in the box
-					else if(sel.equals(t.getId()))cbm.setSelectedItem(s);
-					
+				for(SetObserver<String> obs : getTimetableObserverList()) {
+					obs.notifyRenaming(t.getId(), newId);
 				}
 				//Update timetable list
 				timetables.remove(t.getId());
-				timetables.add(s);
+				timetables.add(newId);
 				//Set id
-				t.setId(s);
+				t.setId(newId);
 				setSaved(false);
 			}
 		};

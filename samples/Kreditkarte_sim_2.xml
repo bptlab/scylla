@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scy:definitions xmlns:scy="http://scy.hpi.uni-potsdam.de/scylla/simModel" id="Simulation_6" targetNamespace="http://www.hpi.de">
+	<scy:simulationConfiguration id="SimulationConfiguration_6" processRef="returnProcess" processInstances="2" startDateTime="2016-07-04T14:20:00.000" endDateTime="2016-07-04T17:00:00.000" randomSeed="9280" ><!--resourceAssignmentOrder="priority,simulationTime">-->
+		<scy:startEvent id="StartEvent_1">
+	    	<scy:arrivalRate timeUnit="MINUTES">
+	    		<scy:exponentialDistribution>
+	    			<scy:mean>2</scy:mean>
+	    		</scy:exponentialDistribution>
+	    	</scy:arrivalRate>
+	    </scy:startEvent>
+	    <scy:task id="Task_0zs8ai5" name="Handle return request">
+	    	<scy:duration timeUnit="MINUTES">
+	    		<scy:normalDistribution>
+					<scy:mean>5</scy:mean>
+					<scy:standardDeviation>2</scy:standardDeviation>
+				</scy:normalDistribution>
+	    	</scy:duration>
+	    	<scy:resources>
+	    		<scy:resource id="Customer Care" amount="1"/>
+	    	</scy:resources>
+	    </scy:task>
+
+	    <scy:exclusiveGateway id="ExclusiveGateway_0p7geoo">
+	    	<scy:outgoingSequenceFlow id="SequenceFlow_0swbeu0">
+        		<scy:branchingProbability>0.2</scy:branchingProbability>
+      		</scy:outgoingSequenceFlow>
+      		<scy:outgoingSequenceFlow id="SequenceFlow_1oboyc9">
+        		<scy:branchingProbability>0.8</scy:branchingProbability>
+      		</scy:outgoingSequenceFlow>
+	    </scy:exclusiveGateway>
+
+	    <scy:task id="Task_1g5l68i" name="Warten">
+	    	<scy:duration timeUnit="MINUTES">
+	    		<scy:arbitraryFiniteProbabilityDistribution>
+	    			<scy:entry value="8" frequency="1"/>
+	    			<scy:entry value="12" frequency="1"/>
+	    			<scy:entry value="160" frequency="1"/>
+	    		</scy:arbitraryFiniteProbabilityDistribution>
+	    	</scy:duration>
+	    	<scy:resources>
+	    		<scy:resource id="Warehouse" amount="1"/>
+	    	</scy:resources>
+	    	<scy:boundaryEvents>
+				<scy:boundaryEvent id="BoundaryEvent_0zy3ci9" name="Ablehnung">
+					<scy:eventProbability>1</scy:eventProbability>
+					<scy:arrivalRate timeUnit="MINUTES">
+						<scy:constantDistribution>
+							<scy:constantValue>20</scy:constantValue>
+						</scy:constantDistribution>
+					</scy:arrivalRate>
+				</scy:boundaryEvent>
+			</scy:boundaryEvents>
+	    </scy:task>
+	</scy:simulationConfiguration>
+</scy:definitions>

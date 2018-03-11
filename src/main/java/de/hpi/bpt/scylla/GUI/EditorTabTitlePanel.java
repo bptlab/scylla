@@ -16,7 +16,7 @@ import de.hpi.bpt.scylla.GUI.GlobalConfigurationPane.GlobalConfigurationPane;
 import de.hpi.bpt.scylla.GUI.SimulationConfigurationPane.SimulationConfigurationPane;
 
 @SuppressWarnings("serial")
-public class EditorTabTitlePane extends JPanel implements Observer{
+public class EditorTabTitlePanel extends JPanel implements Observer{
 	
 	private JTabbedPane parentPane;
 	private EditorPane childPane;
@@ -26,7 +26,7 @@ public class EditorTabTitlePane extends JPanel implements Observer{
 	/**
 	 * Create the panel.
 	 */
-	public EditorTabTitlePane(JTabbedPane parent, EditorPane child) {
+	public EditorTabTitlePanel(JTabbedPane parent, EditorPane child) {
 		parentPane = parent;
 		childPane = child;
 		JLabel labelIcon = new JLabel();
@@ -62,6 +62,7 @@ public class EditorTabTitlePane extends JPanel implements Observer{
 	private void closeTab() {
 		parentPane.removeTabAt(parentPane.indexOfTabComponent(this));
 	}
+	//TODO: Notifications don't work
 
 	@Override
 	public void update(Observable o, Object arg) {

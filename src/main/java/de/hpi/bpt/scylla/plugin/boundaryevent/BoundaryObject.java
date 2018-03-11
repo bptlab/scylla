@@ -7,6 +7,7 @@ import de.hpi.bpt.scylla.simulation.ProcessInstance;
 import de.hpi.bpt.scylla.simulation.ProcessSimulationComponents;
 import de.hpi.bpt.scylla.simulation.event.BPMNIntermediateEvent;
 
+// This is just the data class for boundary events/ objects.
 class BoundaryObject {
 
     private String source;
@@ -21,7 +22,7 @@ class BoundaryObject {
     private List<Integer> referenceToBoundaryEvents;
     private boolean generateMoreBoundaryEvents = true;
 
-    // ordered by Double
+    // Ordered by Double.
     private TreeMap<Double, List<BPMNIntermediateEvent>> boundaryEventsToSchedule = new TreeMap<Double, List<BPMNIntermediateEvent>>();
     // for scheduling boundary events
     private TreeMap<Double, List<String>> messagesOfBoundaryEventsToSchedule = new TreeMap<Double, List<String>>();
@@ -82,6 +83,7 @@ class BoundaryObject {
         return generateMoreBoundaryEvents;
     }
 
+    // Will there ever be a use case where it will be set one true again? At the moment, generateMoreNonTimerBoundaryEvents is always false...
     void setGenerateMoreNonTimerBoundaryEvents(boolean generateMoreNonTimerBoundaryEvents) {
         this.generateMoreBoundaryEvents = generateMoreNonTimerBoundaryEvents;
     }

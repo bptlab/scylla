@@ -1,7 +1,6 @@
 package de.hpi.bpt.scylla.simulation.event;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import co.paralleluniverse.fibers.SuspendExecution;
 import de.hpi.bpt.scylla.logger.ProcessNodeInfo;
@@ -45,7 +44,22 @@ public abstract class BPMNEvent extends ScyllaEvent {
         info = new ProcessNodeInfo(nodeId, processScopeNodeId, source, timestamp, taskName, resources,
                 ProcessNodeTransitionType.EVENT_TERMINATE);
         model.addNodeInfo(processModel, processInstance, info);
-    };
+    }
+
+    public void addToLogAsCanceled(ProcessInstance processInstance) {
+        long timestamp = Math.round(getModel().presentTime().getTimeRounded(DateTimeUtils.getReferenceTimeUnit()));
+        String taskName = displayName;
+        Set<String> resources = new HashSet<String>();
+
+        SimulationModel model = (SimulationModel) getModel();
+        ProcessModel processModel = processInstance.getProcessModel();
+        String processScopeNodeId = SimulationUtils.getProcessScopeNodeId(processModel, nodeId);
+
+        ProcessNodeInfo info;
+        info = new ProcessNodeInfo(nodeId, processScopeNodeId, source, timestamp, taskName, resources,
+                ProcessNodeTransitionType.CANCEL);
+        model.addNodeInfo(processModel, processInstance, info);
+    }
 
     @Override
     public void eventRoutine(ProcessInstance processInstance) throws SuspendExecution {

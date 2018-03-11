@@ -22,8 +22,8 @@ public class Scylla {
          */
 
         String folder = "samples" + FILEDELIM;
-        String resFilename = folder + "p0_globalconf_without.xml";
-//    	String resFilename = folder + "p56_conf.xml";
+//      String resFilename = folder + "EmptyGC.xml";
+    	String resFilename = folder + "p0_globalconf.xml";
 
 
 //        String[] bpmnFilename = new String[] { folder + "p1_boundary.bpmn", folder + "p2_normal.bpmn",
@@ -37,12 +37,11 @@ public class Scylla {
          */
 
 
-//      String[] bpmnFilename = new String[] { folder + "p1_boundary.bpmn"};
-//      String[] simFilenames = new String[] { folder + "p1_boundary_sim.xml"};
+      String[] bpmnFilename = new String[] { folder + "p1_boundary.bpmn"};
+      String[] simFilenames = new String[] { folder + "p1_boundary_sim.xml"};
 
-
-//        String[] bpmnFilename = new String[] { folder + "p2_normal.bpmn"};
-//        String[] simFilenames = new String[] { folder + "p2_normal_sim.xml"};
+//        String[] bpmnFilename = new String[] { folder + "old\\p2_normal.bpmn"};
+//        String[] simFilenames = new String[] { folder + "old\\p2_normal_sim.xml"};
 
 
 //         String[] bpmnFilename = new String[] { folder + "p4_parallel.bpmn" };
@@ -53,8 +52,10 @@ public class Scylla {
 //      String[] simFilenames = new String[] { folder + "p6_return_sim.xml" };
 
 
-        String[] bpmnFilename = new String[] { folder + "p7_dmn.bpmn" };
-        String[] simFilenames = new String[] { folder + "p7_dmn_sim.xml" };
+//        String[] bpmnFilename = new String[] { folder + "Projekt_Event_Based_Gateway.bpmn" };
+//        String[] simFilenames = new String[] { folder + "EmptySC.xml" };
+//        String[] bpmnFilename = new String[] { folder + "test.bpmn" };
+//        String[] simFilenames = new String[] { folder + "test.xml" };
 
 
 //      String[] bpmnFilename = new String[] { folder + "p8_normalbpmn_with_dataobject.bpmn"};
@@ -96,6 +97,21 @@ public class Scylla {
         SimulationManager manager = new SimulationManager(folder, bpmnFilename, simFilenames, resFilename,
                 enableBpsLogging, enableDesmojLogging);
         manager.run();
+
+
+    }
+    public static String mainTestAPI(String folderName, String globalConfigFileName, String bpmnFileName, String simulationFileName) {
+
+        String folder = folderName + FILEDELIM;
+        String resFilename = folder + globalConfigFileName;
+        String[] bpmnFilename = new String[] { folder + bpmnFileName };
+        String[] simFilenames = new String[] { folder + simulationFileName };
+        boolean enableBpsLogging = true;
+        boolean enableDesmojLogging = false;
+
+        SimulationManager manager = new SimulationManager(folder, bpmnFilename , simFilenames, resFilename,
+                enableBpsLogging, enableDesmojLogging);
+        return manager.run();
     }
 
 }

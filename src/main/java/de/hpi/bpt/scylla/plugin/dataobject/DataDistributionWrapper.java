@@ -57,7 +57,7 @@ public class DataDistributionWrapper extends DistributionWrapper {
 		value = desmojDistribution.sample().doubleValue();
 		
 		// handle LONG samples
-		
+
 		if( type == DataDistributionType.LONG ) {
 			return Math.round(value);
 		} 

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bsim:globalConfiguration xmlns:bsim="http://bsim.hpi.uni-potsdam.de/scylla/simModel" targetNamespace="http://www.hpi.de" id="Kreditkarte_global_1">
+  <bsim:zoneOffset>+01:00</bsim:zoneOffset>
+  <bsim:resourceData>
+    <bsim:dynamicResource id="Sachbearbeiter" defaultQuantity="5" defaultCost="0.0" defaultTimeUnit="HOURS" defaultTimetableId="Default" />
+    <bsim:dynamicResource id="Manager" defaultQuantity="1" defaultCost="0.0" defaultTimeUnit="HOURS" defaultTimetableId="Default" />
+  </bsim:resourceData>
+  <bsim:timetables>
+    <bsim:timetable id="Default">
+      <bsim:timetableItem from="MONDAY" to="MONDAY" beginTime="09:00" endTime="17:00" />
+      <bsim:timetableItem from="TUESDAY" to="TUESDAY" beginTime="09:00" endTime="17:00" />
+      <bsim:timetableItem from="WEDNESDAY" to="WEDNESDAY" beginTime="09:00" endTime="17:00" />
+      <bsim:timetableItem from="THURSDAY" to="THURSDAY" beginTime="09:00" endTime="17:00" />
+      <bsim:timetableItem from="FRIDAY" to="FRIDAY" beginTime="09:00" endTime="17:00" />
+    </bsim:timetable>
+  </bsim:timetables>
+</bsim:globalConfiguration>

@@ -7,19 +7,15 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
@@ -28,14 +24,14 @@ import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.border.MatteBorder;
-import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
-import de.hpi.bpt.scylla.GUI.InsertRemoveListener;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
+import de.hpi.bpt.scylla.GUI.InputFields.SelectionField;
+import de.hpi.bpt.scylla.GUI.InputFields.TimeField;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.Timetable;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.Timetable.TimetableItem;
 
@@ -54,10 +50,10 @@ public class TimetablePanel extends JSplitPane {
 	private TimetableSelectionModel selectionModel;
 
 	//Item editing user input components
-	private JFormattedTextField textfieldStartTime;
-	private JFormattedTextField textfieldEndTime;
-	private JComboBox<DayOfWeek> comboboxStartDay;
-	private JComboBox<DayOfWeek> comboboxEndDay;
+	private TimeField textfieldBeginTime;
+	private TimeField textfieldEndTime;
+	private SelectionField<DayOfWeek> comboboxStartDay;
+	private SelectionField<DayOfWeek> comboboxEndDay;
 	private JButton buttonDelete;
 	
 	//Item editing labels (for enableing and disableing)
@@ -210,27 +206,48 @@ public class TimetablePanel extends JSplitPane {
 		panelBottom.add(labelStart, gbc_labelStart);
 		
 		//Start time input field
-		textfieldStartTime = new JFormattedTextField(DateTimeFormatter.ISO_LOCAL_TIME.toFormat());
-		textfieldStartTime.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
-			if(formManager.isChangeFlag())return;
-			if(selected == null)return;
-			try{
-				LocalTime l = LocalTime.parse(textfieldStartTime.getText());
-				if(!l.equals(selected.getBeginTime())){
-					selected.setBeginTime(l);
-					//Display changes
-					selectionModel.displayItem(selected);
-					formManager.setSaved(false);
-				}
-			}catch(Exception exc){}
-		}));
-		GridBagConstraints gbc_textfieldTime = new GridBagConstraints();
-		gbc_textfieldTime.weightx = 8.0;
-		gbc_textfieldTime.insets = new Insets(0, 0, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
-		gbc_textfieldTime.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textfieldTime.gridx = 1;
-		gbc_textfieldTime.gridy = 1;
-		panelBottom.add(textfieldStartTime, gbc_textfieldTime);
+//		textfieldStartTime = new JFormattedTextField(DateTimeFormatter.ISO_LOCAL_TIME.toFormat());
+//		textfieldStartTime.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
+//			if(formManager.isChangeFlag())return;
+//			if(selected == null)return;
+//			try{
+//				LocalTime l = LocalTime.parse(textfieldStartTime.getText());
+//				if(!l.equals(selected.getBeginTime())){
+//					selected.setBeginTime(l);
+//					//Display changes
+//					selectionModel.displayItem(selected);
+//					formManager.setSaved(false);
+//				}
+//			}catch(Exception exc){}
+//		}));
+		textfieldBeginTime = new TimeField(formManager) {
+			
+			@Override
+			protected void onChange() {
+				if(selected == null)return;
+				super.onChange();
+			}
+			
+			@Override
+			protected void setSavedValue(LocalTime v) {
+				selected.setBeginTime(v);
+				selectionModel.displayItem(selected);
+			}
+			
+			@Override
+			protected LocalTime getSavedValue() {
+				if(selected == null)return null;
+				return selected.getBeginTime();
+			}
+			
+		};
+		GridBagConstraints gbc_textfieldBeginTime = new GridBagConstraints();
+		gbc_textfieldBeginTime.weightx = 8.0;
+		gbc_textfieldBeginTime.insets = new Insets(0, 0, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
+		gbc_textfieldBeginTime.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textfieldBeginTime.gridx = 1;
+		gbc_textfieldBeginTime.gridy = 1;
+		panelBottom.add(textfieldBeginTime.getComponent(), gbc_textfieldBeginTime);
 		
 		//Label start time at
 		labelStartAt = new JLabel("at");
@@ -242,24 +259,40 @@ public class TimetablePanel extends JSplitPane {
 		panelBottom.add(labelStartAt, gbc_labelStartAt);
 		
 		//Startday input combobox
-		comboboxStartDay = new JComboBox<DayOfWeek>(DayOfWeek.values());
-		comboboxStartDay.addItemListener((ItemEvent e)->{
-			if(e.getStateChange() == ItemEvent.SELECTED){
-				if(formManager.isChangeFlag())return;
+		comboboxStartDay = new SelectionField<DayOfWeek>(formManager, DayOfWeek.values()) {
+
+			@Override
+			protected DayOfWeek getSavedValue() {
+				if(selected == null)return null;
+				return selected.getFrom();
+			}
+
+			@Override
+			protected void setSavedValue(DayOfWeek v) {
+				selected.setFrom(v);
+			}
+			
+			@Override
+			protected void onChange() {
 				if(selected == null)return;
-				selected.setFrom((DayOfWeek) comboboxStartDay.getSelectedItem());
+				super.onChange();
+			}
+			
+			@Override
+			protected void onEdit(DayOfWeek value) {
+				super.onEdit(value);
 				//Display changes
 				selectionModel.displayItem(selected);
-				formManager.setSaved(false);
 			}
-		});
+			
+		};
 		GridBagConstraints gbc_comboboxStartDay = new GridBagConstraints();
 		gbc_comboboxStartDay.weightx = 8.0;
 		gbc_comboboxStartDay.insets = new Insets(0, 0, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
 		gbc_comboboxStartDay.fill = GridBagConstraints.HORIZONTAL;
 		gbc_comboboxStartDay.gridx = 3;
 		gbc_comboboxStartDay.gridy = 1;
-		panelBottom.add(comboboxStartDay, gbc_comboboxStartDay);
+		panelBottom.add(comboboxStartDay.getComponent(), gbc_comboboxStartDay);
 		
 		//Delete selected item button
 		buttonDelete = new JButton();
@@ -289,27 +322,48 @@ public class TimetablePanel extends JSplitPane {
 		panelBottom.add(labelEnd, gbc_labelEnd);
 		
 		//End time input field
-		textfieldEndTime = new JFormattedTextField(DateTimeFormatter.ISO_LOCAL_TIME.toFormat());
-		textfieldEndTime.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
-			if(formManager.isChangeFlag())return;
-			if(selected == null)return;
-			try{
-				LocalTime l = LocalTime.parse(textfieldEndTime.getText());
-				if(!l.equals(selected.getEndTime())){
-					selected.setEndTime(l);
-					//Display changes
-					selectionModel.displayItem(selected);
-					formManager.setSaved(false);
-				}
-			}catch(Exception exc){}
-		}));
+//		textfieldEndTime = new JFormattedTextField(DateTimeFormatter.ISO_LOCAL_TIME.toFormat());
+//		textfieldEndTime.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
+//			if(formManager.isChangeFlag())return;
+//			if(selected == null)return;
+//			try{
+//				LocalTime l = LocalTime.parse(textfieldEndTime.getText());
+//				if(!l.equals(selected.getEndTime())){
+//					selected.setEndTime(l);
+//					//Display changes
+//					selectionModel.displayItem(selected);
+//					formManager.setSaved(false);
+//				}
+//			}catch(Exception exc){}
+//		}));
+		textfieldEndTime = new TimeField(formManager) {
+			
+			@Override
+			protected void onChange() {
+				if(selected == null)return;
+				super.onChange();
+			}
+			
+			@Override
+			protected void setSavedValue(LocalTime v) {
+				selected.setEndTime(v);
+				selectionModel.displayItem(selected);
+			}
+			
+			@Override
+			protected LocalTime getSavedValue() {
+				if(selected == null)return null;
+				return selected.getEndTime();
+			}
+			
+		};
 		GridBagConstraints gbc_comboBoxEndTime = new GridBagConstraints();
 		gbc_comboBoxEndTime.weightx = 8.0;
 		gbc_comboBoxEndTime.insets = new Insets(0, 0, 0, 5);
 		gbc_comboBoxEndTime.fill = GridBagConstraints.HORIZONTAL;
 		gbc_comboBoxEndTime.gridx = 1;
 		gbc_comboBoxEndTime.gridy = 2;
-		panelBottom.add(textfieldEndTime, gbc_comboBoxEndTime);
+		panelBottom.add(textfieldEndTime.getComponent(), gbc_comboBoxEndTime);
 		
 		//Ent time at label
 		labelEndAt = new JLabel("at");
@@ -321,24 +375,39 @@ public class TimetablePanel extends JSplitPane {
 		panelBottom.add(labelEndAt, gbc_labelEndAt);
 		
 		//End day input combobox
-		comboboxEndDay = new JComboBox<DayOfWeek>(DayOfWeek.values());
-		comboboxEndDay.addItemListener((ItemEvent e)->{
-			if(e.getStateChange() == ItemEvent.SELECTED){
-				if(formManager.isChangeFlag())return;
+		comboboxEndDay = new SelectionField<DayOfWeek>(formManager,DayOfWeek.values()) {
+			@Override
+			protected DayOfWeek getSavedValue() {
+				if(selected == null)return null;
+				return selected.getTo();
+			}
+
+			@Override
+			protected void setSavedValue(DayOfWeek v) {
+				selected.setTo(v);
+			}
+			
+			@Override
+			protected void onChange() {
 				if(selected == null)return;
-				selected.setTo((DayOfWeek) comboboxEndDay.getSelectedItem());
+				super.onChange();
+			}
+			
+			@Override
+			protected void onEdit(DayOfWeek value) {
+				super.onEdit(value);
 				//Display changes
 				selectionModel.displayItem(selected);
-				formManager.setSaved(false);
 			}
-		});
+		};
+
 		GridBagConstraints gbc_comboboxEndDay = new GridBagConstraints();
 		gbc_comboboxEndDay.weightx = 8.0;
 		gbc_comboboxEndDay.insets = new Insets(0, 0, 0, ScyllaGUI.STDINSET);
 		gbc_comboboxEndDay.fill = GridBagConstraints.HORIZONTAL;
 		gbc_comboboxEndDay.gridx = 3;
 		gbc_comboboxEndDay.gridy = 2;
-		panelBottom.add(comboboxEndDay, gbc_comboboxEndDay);
+		panelBottom.add(comboboxEndDay.getComponent(), gbc_comboboxEndDay);
 		
 		select(null);
 	}
@@ -369,10 +438,10 @@ public class TimetablePanel extends JSplitPane {
 		selected = item;
 		boolean enabled = item != null;
 		
-		textfieldStartTime.setEnabled(enabled);
-		textfieldEndTime.setEnabled(enabled);
-		comboboxStartDay.setEnabled(enabled);
-		comboboxEndDay.setEnabled(enabled);
+		textfieldBeginTime.getComponent().setEnabled(enabled);
+		textfieldEndTime.getComponent().setEnabled(enabled);
+		comboboxStartDay.getComponent().setEnabled(enabled);
+		comboboxEndDay.getComponent().setEnabled(enabled);
 		
 		labelItemTitle.setEnabled(enabled);
 		labelStart.setEnabled(enabled);
@@ -382,10 +451,10 @@ public class TimetablePanel extends JSplitPane {
 		buttonDelete.setEnabled(enabled);
 		
 		if(enabled){
-			textfieldStartTime.setValue(item.getBeginTime());
-			textfieldEndTime.setValue(item.getEndTime());
-			comboboxStartDay.setSelectedItem(item.getFrom());
-			comboboxEndDay.setSelectedItem(item.getTo());
+			textfieldBeginTime.loadSavedValue();
+			textfieldEndTime.loadSavedValue();
+			comboboxStartDay.loadSavedValue();
+			comboboxEndDay.loadSavedValue();
 		}else{
 			resetForm();
 		}
@@ -419,10 +488,10 @@ public class TimetablePanel extends JSplitPane {
 	 * Reset the formula to its default values
 	 */
 	private void resetForm(){
-		textfieldStartTime.setValue(LocalTime.of(0, 0, 0));
-		textfieldEndTime.setValue(LocalTime.of(0, 0, 0));
-		comboboxStartDay.setSelectedItem(null);
-		comboboxEndDay.setSelectedItem(null);
+		textfieldBeginTime.reset();
+		textfieldEndTime.reset();
+		comboboxStartDay.clear();
+		comboboxEndDay.clear();
 	}
 
 	/**
