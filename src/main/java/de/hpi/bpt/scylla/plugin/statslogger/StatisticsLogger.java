@@ -444,9 +444,9 @@ public class StatisticsLogger extends OutputLoggerPluggable {
 	            Element resourceCost = new Element("cost");
 	            Element resourceTime = new Element("time");
 	            Element resourceInstances = new Element("instances");
-	            
 	            resource.addContent(resourceCost);
 	            resource.addContent(resourceTime);
+	            resource.addContent(resourceInstances);
 	            
 	            Element resourceInUse = new Element("in_use");
 	            Element resourceAvailable = new Element("available");
