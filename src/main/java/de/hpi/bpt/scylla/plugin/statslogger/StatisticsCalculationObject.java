@@ -1,10 +1,11 @@
 package de.hpi.bpt.scylla.plugin.statslogger;
 
 import java.util.ArrayList;
+import org.jdom2.Element;
 
 public class StatisticsCalculationObject {
 	
-	 ArrayList<Double> values = new ArrayList<Double>();
+	ArrayList<Double> values = new ArrayList<Double>();
 	private double min; // defaultwerte?
 	private double max;
 	private double median;
@@ -28,6 +29,18 @@ public class StatisticsCalculationObject {
 			for(double value : values) this.total += value;
 			this.average = total / values.size();
 		}
+	}
+	
+	public ArrayList<Element> getStatsAsElements() {
+    	ArrayList<Element> elements = new ArrayList<Element>();
+    	elements.add(new Element("min").setText(String.valueOf(min)));
+    	elements.add(new Element("max").setText(String.valueOf(max)));
+    	elements.add(new Element("median").setText(String.valueOf(median)));
+    	elements.add(new Element("Q1").setText(String.valueOf(q1)));
+    	elements.add(new Element("Q3").setText(String.valueOf(q3)));
+    	elements.add(new Element("avg").setText(String.valueOf(average)));
+    	elements.add(new Element("total").setText(String.valueOf(total)));
+    	return elements;
 	}
 	
     public double getMin() {
