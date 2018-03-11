@@ -3,10 +3,17 @@ package de.hpi.bpt.scylla.plugin.statslogger;
 import java.util.ArrayList;
 import org.jdom2.Element;
 
+/**
+ * 
+ * This class calculates all necessary values for boxplot diagrams.
+ * 
+ * @author Leonard Pabst
+ *
+ */
 public class StatisticsCalculationObject {
 	
 	ArrayList<Double> values = new ArrayList<Double>();
-	private double min; // defaultwerte?
+	private double min;
 	private double max;
 	private double median;
 	private double q1;
@@ -14,10 +21,19 @@ public class StatisticsCalculationObject {
 	private double total = 0.0;
 	private double average;
 
+	/**
+	 * This method is used to fill the values-container little by little.
+	 * 
+	 * @param value
+	 *			  input value
+	 */
 	public void addValue(double value) {
 		this.values.add(value);
 	}
 	
+	/**
+	 * This method calculates all boxplot-necessary information based on the recent input values.
+	 */
 	public void calculateStatistics() {
 		if (!values.isEmpty()) {			
 			values.sort(null);
@@ -31,6 +47,10 @@ public class StatisticsCalculationObject {
 		}
 	}
 	
+	/**
+	 * This method returns the boxplot-necessary information collected in an ArrayList.
+	 * @return ArrayList of Elements, which are processible by the StatisticsLogger to create XML-output.
+	 */
 	public ArrayList<Element> getStatsAsElements() {
     	ArrayList<Element> elements = new ArrayList<Element>();
     	elements.add(new Element("min").setText(String.valueOf(min)));
