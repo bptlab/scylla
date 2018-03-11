@@ -2,16 +2,6 @@ package de.hpi.bpt.scylla.plugin.statslogger;
 
 class StatisticsTaskInstanceObject {
 
-    /*
-	String taskName;
-    double avgWaitingTime = 0;
-    int updatesAvgWaitingTime = 1;
-    double avgDuration = 0;
-    int updatesAvgDuration = 1;
-    */
-    // ToDo: Change this class to an instanceObject like StatisticsProcessInstanceObject
-    
-	// den Namen nehmen wir noch mit rein, ansonsten alles, was wir unten weiterverarbeiten wollen, um es auszugeben
 	String taskName;
     long durationEffective = 0;
     long durationResourcesIdle = 0;
@@ -57,33 +47,4 @@ class StatisticsTaskInstanceObject {
     public void setCost(double cost) {
         this.cost = cost;
     }
-    
-    /*
-    public StatisticsTaskInstanceObject(String taskName) {
-        this.taskName = taskName;
-    }
-
-    public String getTaskName() {
-        return taskName;
-    }
-
-    public double getAvgWaitingTime() {
-        return avgWaitingTime;
-    }
-
-    public void updateAvgWaitingTime(long waitingTime) {
-        this.avgWaitingTime += (waitingTime - this.avgWaitingTime) / updatesAvgWaitingTime;
-        ++updatesAvgWaitingTime;
-    }
-
-    public double getAvgDuration() {
-        return avgDuration;
-    }
-
-    public void updateAvgDuration(long duration) {
-        this.avgDuration += (duration - this.avgDuration) / updatesAvgDuration;
-        ++updatesAvgDuration;
-    }
-	*/
-
 }

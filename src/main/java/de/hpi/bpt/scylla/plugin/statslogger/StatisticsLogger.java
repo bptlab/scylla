@@ -215,7 +215,7 @@ public class StatisticsLogger extends OutputLoggerPluggable {
                         Long pauseTimestamp = pausedTasks.get(taskInstanceIdentifier);
                         long duration = timestamp - pauseTimestamp;
                         durationResourcesIdle += duration;
-                        taskDurationResourcesIdle += duration; // new
+                        taskDurationResourcesIdle += duration;
                         pausedTasks.remove(taskInstanceIdentifier);
 
                         begunOrResumedTasks.put(taskInstanceIdentifier, timestamp);
@@ -227,7 +227,7 @@ public class StatisticsLogger extends OutputLoggerPluggable {
                         for (String resourceName : resources) {
                             Double costPerUnit = costPerResourceInstance.get(resourceName);
                             costs += duration * costPerUnit;
-                            taskCosts += duration * costPerUnit; // new
+                            taskCosts += duration * costPerUnit;
                         }
 
                         taskDurationEffective = taskDurations.get(taskInstanceIdentifier) + duration;
@@ -328,8 +328,8 @@ public class StatisticsLogger extends OutputLoggerPluggable {
                 Element instanceTime = new Element("time");
                 instanceTime.addContent(new Element("duration").setText(String.valueOf(durationTotal)));
                 instanceTime.addContent(new Element("effective").setText(String.valueOf(durationEffective)));
-                instanceTime.addContent(new Element("waiting").setText(String.valueOf(durationResourcesIdle)));
-                instanceTime.addContent(new Element("offTime").setText(String.valueOf(durationWaiting)));
+                instanceTime.addContent(new Element("waiting").setText(String.valueOf(durationWaiting)));
+                instanceTime.addContent(new Element("offTime").setText(String.valueOf(durationResourcesIdle)));
                 instance.addContent(instanceTime);
                 
                 costStats.addValue(cost);
@@ -375,9 +375,11 @@ public class StatisticsLogger extends OutputLoggerPluggable {
 	            Element activityName = new Element("name");
 	            Element activityCost = new Element("cost");
 	            Element activityTime = new Element("time");
-	            activity.addContent(activityName);
+	            Element activityInstances = new Element("instances");
+	        	activity.addContent(activityName);
 	            activity.addContent(activityCost);
 	            activity.addContent(activityTime);
+	            activity.addContent(activityInstances);
 	            
 	        	Element activityDurationTime = new Element("duration");
 	        	Element activityWaitingTime = new Element("waiting");
@@ -385,8 +387,6 @@ public class StatisticsLogger extends OutputLoggerPluggable {
 	        	activityTime.addContent(activityDurationTime);
 	        	activityTime.addContent(activityWaitingTime);
 	        	activityTime.addContent(activityResourcesIdleTime);
-	        	
-	        	Element activityInstances = new Element("instances");
 	        	
 	        	for (String taskInstanceId : statsPerTaskInstance.keySet()) {
             		StatisticsTaskInstanceObject stats = statsPerTaskInstance.get(taskInstanceId);
@@ -407,6 +407,7 @@ public class StatisticsLogger extends OutputLoggerPluggable {
             	    activityInstanceTime.addContent(new Element("effective").setText(String.valueOf(durationEffective)));
             	    activityInstanceTime.addContent(new Element("waiting").setText(String.valueOf(durationWaiting)));
             	    activityInstanceTime.addContent(new Element("resources_idle").setText(String.valueOf(durationResourcesIdle)));
+            	    activityInstance.addContent(activityInstanceTime);
             	                	    
             	    taskCostStats.addValue(cost);
             	    taskDurationStats.addValue(durationEffective);
@@ -488,7 +489,6 @@ public class StatisticsLogger extends OutputLoggerPluggable {
         FileOutputStream fos = new FileOutputStream(resourceUtilizationFileName);
         
         XMLOutputter xmlOutput = new XMLOutputter();
-        xmlOutput.output(doc, System.out);  
         xmlOutput.output(doc, fos);
     }
 
