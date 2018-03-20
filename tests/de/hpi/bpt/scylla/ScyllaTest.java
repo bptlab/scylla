@@ -75,12 +75,12 @@ class ScyllaTest {
     //Does have to run with all pug ins activated
     @ParameterizedTest
     @CsvFileSource(resources = "/test-data.csv")
-    void batchregionstatsTest(String pathToSavedFile, String folder, String globalConfigName, String bpmnFileName, String simulationFileName) {
+    void batchactivitystatsTest(String pathToSavedFile, String folder, String globalConfigName, String bpmnFileName, String simulationFileName) {
         pathToSavedFile = fullPathToSavedFile(pathToSavedFile);
         String outputFolder = getOutputFolder(pathToSavedFile, folder, globalConfigName, bpmnFileName, simulationFileName);
         try {
-            String savedContent = new String(Files.readAllBytes(Paths.get(pathToSavedFile + globalConfigName + "_batchregionstats.txt")));
-            String contentToCheck = new String(Files.readAllBytes(Paths.get(outputFolder + Scylla.FILEDELIM + globalConfigName + "_batchregionstats.txt")));
+            String savedContent = new String(Files.readAllBytes(Paths.get(pathToSavedFile + globalConfigName + "_batchactivitystats.txt")));
+            String contentToCheck = new String(Files.readAllBytes(Paths.get(outputFolder + Scylla.FILEDELIM + globalConfigName + "_batchactivitystats.txt")));
             Assertions.assertEquals(savedContent, contentToCheck);
         } catch (IOException exception) {
             exception.printStackTrace();

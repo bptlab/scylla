@@ -1,5 +1,6 @@
 package de.hpi.bpt.scylla.model.configuration;
 
+import java.sql.Time;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Map;
@@ -25,6 +26,7 @@ public class SimulationConfiguration extends SimulationInput {
 
     private Map<Integer, TimeDistributionWrapper> arrivalRates;
     private Map<Integer, TimeDistributionWrapper> durations;
+    private Map<Integer, TimeDistributionWrapper> setUpDurations;
 
     private Map<Integer, Set<ResourceReference>> resourceReferences;
     private Map<Integer, SimulationConfiguration> configurationsOfSubProcesses;
@@ -55,7 +57,8 @@ public class SimulationConfiguration extends SimulationInput {
      */
     public SimulationConfiguration(String id, ProcessModel processModel, Integer numberOfProcessInstances,
             ZonedDateTime startDateTime, ZonedDateTime endDateTime, Long randomSeed,
-            Map<Integer, TimeDistributionWrapper> arrivalRates, Map<Integer, TimeDistributionWrapper> durations,
+            Map<Integer, TimeDistributionWrapper> arrivalRates, Map<Integer, TimeDistributionWrapper> durations, Map<Integer,
+            TimeDistributionWrapper> setUpDurations,
             Map<Integer, Set<ResourceReference>> resourceReferences,
             Map<Integer, SimulationConfiguration> configurationsOfSubProcesses) {
         super(id);
@@ -66,6 +69,7 @@ public class SimulationConfiguration extends SimulationInput {
         this.randomSeed = randomSeed;
         this.arrivalRates = arrivalRates;
         this.durations = durations;
+        this.setUpDurations = setUpDurations;
         this.resourceReferences = resourceReferences;
         this.configurationsOfSubProcesses = configurationsOfSubProcesses;
     }
@@ -108,6 +112,10 @@ public class SimulationConfiguration extends SimulationInput {
             resourceRefSet = new HashSet<ResourceReference>();
         }
         return resourceRefSet;
+    }
+
+    public Map<Integer, TimeDistributionWrapper> getSetUpDurations() {
+        return setUpDurations;
     }
 
     public Map<Integer, SimulationConfiguration> getConfigurationsOfSubProcesses() {

@@ -15,7 +15,7 @@ import de.hpi.bpt.scylla.model.configuration.SimulationConfiguration;
 import de.hpi.bpt.scylla.model.process.ProcessModel;
 import de.hpi.bpt.scylla.plugin_type.parser.SimulationConfigurationParserPluggable;
 
-public class BatchSCParserPlugin extends SimulationConfigurationParserPluggable {
+/*public class BatchSCParserPlugin extends SimulationConfigurationParserPluggable {
 
 	@Override
     public String getName() {
@@ -26,7 +26,7 @@ public class BatchSCParserPlugin extends SimulationConfigurationParserPluggable 
     public Map<String, Object> parse(SimulationConfiguration simulationInput, Element sim)
             throws ScyllaValidationException {
 
-        Map<Integer, BatchRegion> batchRegions = new HashMap<Integer, BatchRegion>();
+        Map<Integer, BatchActivity> batchActivities = new HashMap<Integer, BatchActivity>();
 
         Namespace simNamespace = sim.getNamespace();
 
@@ -49,7 +49,7 @@ public class BatchSCParserPlugin extends SimulationConfigurationParserPluggable 
             }
 
             if (elementName.equals("subProcess")) {
-                Element elem = el.getChild("batchRegion", simNamespace);
+                Element elem = el.getChild("batchActivity", simNamespace);
                 if (elem != null) {
                     // maximum batch size
                     Integer maxBatchSize = null;
@@ -64,7 +64,7 @@ public class BatchSCParserPlugin extends SimulationConfigurationParserPluggable 
                         List<Element> ruleElements = activationRuleElement.getChildren();
                         if (ruleElements.size() != 1) {
                             throw new ScyllaValidationException(
-                                    "There must be exactly one activation rule for batch region " + identifier
+                                    "There must be exactly one activation rule for batch activity " + identifier
                                             + ", but there are " + ruleElements.size());
                         }
                         Element ruleElement = ruleElements.get(0);
@@ -108,7 +108,7 @@ public class BatchSCParserPlugin extends SimulationConfigurationParserPluggable 
                             
                         }else{
                             throw new ScyllaValidationException("Activation rule type" + ruleElementName
-                                    + " for batch region " + identifier + " not supported.");
+                                    + " for batch activity " + identifier + " not supported.");
                         }
                     }
                     // grouping characteristic TODO not supported in simulation until data views are supported
@@ -121,17 +121,19 @@ public class BatchSCParserPlugin extends SimulationConfigurationParserPluggable 
                             }
                         };
                     }
-                    BatchRegion br = new BatchRegion(processModel, nodeId, maxBatchSize, activationRule,
+
+                    BatchActivity br = new BatchActivity(processModel, nodeId, maxBatchSize, activationRule,
                             groupingCharacteristic);
-                    batchRegions.put(nodeId, br);
+                    batchActivities.put(nodeId, br);
                 }
             }
         }
 
         HashMap<String, Object> extensionAttributes = new HashMap<String, Object>();
-        extensionAttributes.put("batchRegions", batchRegions);
+        extensionAttributes.put("batchActivities", batchActivities);
 
         return extensionAttributes;
     }
 
 }
+*/

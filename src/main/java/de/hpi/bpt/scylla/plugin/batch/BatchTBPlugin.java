@@ -24,6 +24,9 @@ public class BatchTBPlugin extends TaskBeginEventPluggable {
     @SuppressWarnings("unchecked")
     @Override
     public void eventRoutine(TaskBeginEvent event, ProcessInstance processInstance) throws ScyllaRuntimeException {
+
+        // System.out.println(event + " with display name " + event.getDisplayName() + " || " + event.getNextEventMap() + " and source " + event.getSource());
+
         BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
         pluginInstance.logTaskEventForNonResponsiblePI(event, processInstance);
 
@@ -32,9 +35,10 @@ public class BatchTBPlugin extends TaskBeginEventPluggable {
         int nodeId = event.getNodeId();
         ProcessModel processModel = processInstance.getProcessModel();
         SimulationConfiguration simulationConfiguration = desmojObjects.getSimulationConfiguration();
-        Map<Integer, BatchRegion> batchRegions = (Map<Integer, BatchRegion>) simulationConfiguration
-                .getExtensionValue(getName(), "batchRegions");
-        if (batchRegions.containsKey(nodeId) && processModel.getSubProcesses().containsKey(nodeId)) {
+        /*Map<Integer, BatchActivity> batchActivities = (Map<Integer, BatchActivity>) simulationConfiguration
+                .getExtensionValue(getName(), "batchActivities");*/
+        Map<Integer, BatchActivity> batchActivities = processModel.getBatchActivities();
+        if (batchActivities.containsKey(nodeId) && processModel.getSubProcesses().containsKey(nodeId)) {
 
             // subprocess plugin wants to schedule BPMNStartEvents for subprocess
             // we prevent it

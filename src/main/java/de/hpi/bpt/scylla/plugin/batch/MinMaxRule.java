@@ -5,14 +5,14 @@ import java.time.Duration;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
 import de.hpi.bpt.scylla.simulation.event.TaskBeginEvent;
 
-class MinMaxRule implements ActivationRule{
+public class MinMaxRule implements ActivationRule{
 
     private int minInstances;
     private Duration minTimeout;
     private int maxInstances;
     private Duration maxTimeout;
 
-    MinMaxRule(int minInstances, Duration minTimeout, int maxInstances, Duration maxTimeout) {
+    public MinMaxRule(int minInstances, Duration minTimeout, int maxInstances, Duration maxTimeout) {
         this.minInstances = minInstances;
         this.minTimeout = minTimeout;
         this.maxInstances = maxInstances;

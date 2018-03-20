@@ -22,18 +22,14 @@ import de.hpi.bpt.scylla.simulation.ProcessInstance;
 import de.hpi.bpt.scylla.simulation.ProcessSimulationComponents;
 import de.hpi.bpt.scylla.simulation.ResourceObject;
 import de.hpi.bpt.scylla.simulation.SimulationModel;
-import de.hpi.bpt.scylla.simulation.event.BPMNEvent;
-import de.hpi.bpt.scylla.simulation.event.TaskBeginEvent;
-import de.hpi.bpt.scylla.simulation.event.TaskCancelEvent;
-import de.hpi.bpt.scylla.simulation.event.TaskEnableEvent;
-import de.hpi.bpt.scylla.simulation.event.TaskEvent;
-import de.hpi.bpt.scylla.simulation.event.TaskTerminateEvent;
+import de.hpi.bpt.scylla.simulation.event.*;
 import de.hpi.bpt.scylla.simulation.utils.DateTimeUtils;
 import de.hpi.bpt.scylla.simulation.utils.SimulationUtils;
 import desmoj.core.simulator.EventAbstract;
 import desmoj.core.simulator.Model;
 import desmoj.core.simulator.TimeInstant;
 import desmoj.core.simulator.TimeSpan;
+import org.javatuples.Pair;
 
 public class BatchPluginUtils {
 
@@ -80,9 +76,11 @@ public class BatchPluginUtils {
 
         ProcessModel processModel = processInstance.getProcessModel();
         ProcessSimulationComponents pSimComponents = parentalBeginEvent.getDesmojObjects();
-        Map<Integer, BatchRegion> batchRegions = (Map<Integer, BatchRegion>) pSimComponents.getSimulationConfiguration()
-                .getExtensionValue(PLUGIN_NAME, "batchRegions");
-        BatchRegion region = batchRegions.get(nodeId);
+        /*Map<Integer, BatchActivity> batchActivities_old = (Map<Integer, BatchActivity>) pSimComponents.getSimulationConfiguration()
+                .getExtensionValue(PLUGIN_NAME, "batchActivities");*/
+
+        Map<Integer, BatchActivity> batchActivities = processModel.getBatchActivities();
+        BatchActivity activity = batchActivities.get(nodeId);
 
         BatchCluster cluster = null;
 
@@ -108,16 +106,16 @@ public class BatchPluginUtils {
         if (cluster == null) {
             Model model = processInstance.getModel();
             boolean showInTrace = processInstance.traceIsOn();
-            Map<String, Object> dataView = this.getDataViewOfInstance(parentalBeginEvent, processInstance, region);
+            Map<String, Object> dataView = this.getDataViewOfInstance(parentalBeginEvent, processInstance, activity);
             TimeInstant currentSimulationTime = processInstance.presentTime();
-            cluster = new BatchCluster(model, currentSimulationTime, pSimComponents, region, nodeId, dataView,
+            cluster = new BatchCluster(model, currentSimulationTime, pSimComponents, activity, nodeId, dataView,
                     showInTrace);
 
             // schedule BatchClusterStart at current time plus maximum timeout
             BatchClusterStartEvent clusterStartEvent = new BatchClusterStartEvent(model, cluster.getName(),
                     showInTrace);
 
-            Duration timeout = region.getActivationRule().getTimeOut(parentalBeginEvent, processInstance);
+            Duration timeout = activity.getActivationRule().getTimeOut(parentalBeginEvent, processInstance);
             cluster.setCurrentTimeOut(timeout);
             long timeoutInSeconds = timeout.get(ChronoUnit.SECONDS);
             TimeSpan timeSpan = new TimeSpan(timeoutInSeconds, TimeUnit.SECONDS);
@@ -149,7 +147,7 @@ public class BatchPluginUtils {
         if (cluster.getState() == BatchClusterState.INIT && cluster.getProcessInstances().size()>1) {
 	        
         	// if the dueDate of the current instance is earlier as of the instances added before, the cluster begin event is rescheduled
-    		Duration timeoutForCurrentInstance = region.getActivationRule().getTimeOut(parentalBeginEvent, processInstance);
+    		Duration timeoutForCurrentInstance = activity.getActivationRule().getTimeOut(parentalBeginEvent, processInstance);
     		//testing
     		TimeUnit epsilon = TimeUnit.SECONDS;
     		Duration durationBtwClusterStartAndInstanceTaskBegin = Duration.ofSeconds((long) (parentalBeginEvent.getSimulationTimeOfSource().getTimeAsDouble(epsilon)-cluster.getCreationTime().getTimeAsDouble(epsilon)));
@@ -189,28 +187,28 @@ public class BatchPluginUtils {
             BatchCluster batchCluster) {
 
 		Map<String, Object> bcDataView = batchCluster.getDataView();
-		Map<String, Object> instanceDataView = getDataViewOfInstance(desmojEvent, processInstance, batchCluster.getBatchRegion());
-	
+		Map<String, Object> instanceDataView = getDataViewOfInstance(desmojEvent, processInstance, batchCluster.getBatchActivity());
+
 		if ((bcDataView == null && instanceDataView == null) || instanceDataView.entrySet().equals(bcDataView.entrySet())){
 			return true;
 		}else{
-			
+
 //			// only for the manual use case
 //			long instanceValue = (long) instanceDataView.get("RoomRequest.Date");
 //			long bcValue = (long) bcDataView.get("RoomRequest.Date");
 //			if(instanceValue>bcValue-5 || instanceValue<bcValue+5){
 //				return true;
 //			}
-//			
+//
 			return false;
 		}
 
 	}
     
     
-    Map<String,Object> getDataViewOfInstance(TaskBeginEvent desmojEvent, ProcessInstance processInstance, BatchRegion batchRegion){
+    Map<String,Object> getDataViewOfInstance(TaskBeginEvent desmojEvent, ProcessInstance processInstance, BatchActivity batchActivity){
     			
-    if (batchRegion.getGroupingCharacteristic().isEmpty()){
+    if (batchActivity.getGroupingCharacteristic().isEmpty()){
     	return null;
     }else{
     			//***********
@@ -268,7 +266,7 @@ public class BatchPluginUtils {
     					
     				Map<String, Object> dataView = new HashMap<String,Object>();
     	            
-    				for (String dataViewElement:batchRegion.getGroupingCharacteristic()){
+    				for (String dataViewElement:batchActivity.getGroupingCharacteristic()){
     					dataView.put(dataViewElement, simulationInput.get(dataViewElement));
     				}
     				
@@ -306,15 +304,15 @@ public class BatchPluginUtils {
     }
 
     void setClusterToRunning(BatchCluster bc) {
-        // BatchRegion region = bc.getBatchRegion();
-        // String processId = region.getProcessModel().getId();
-        // int nodeId = region.getNodeId();
+        // BatchActivity activity = bc.getBatchActivity();
+        // String processId = activity.getProcessModel().getId();
+        // int nodeId = activity.getNodeId();
         // List<BatchCluster> clusters= batchClusters.get(processId).get(nodeId);
 
         // // remove from not started
-        // BatchRegion region = bc.getBatchRegion();
-        // String processId = region.getProcessModel().getId();
-        // int nodeId = region.getNodeId();
+        // BatchActivity activity = bc.getBatchActivity();
+        // String processId = activity.getProcessModel().getId();
+        // int nodeId = activity.getNodeId();
         // batchClustersNotStarted.get(processId).get(nodeId).remove(bc);
         //
         // // move to running
@@ -340,7 +338,7 @@ public class BatchPluginUtils {
             bc.getParentalEndEvents().add(taskTerminateEvent);
 
         }
-        parentalStartEvents.clear();
+        // parentalStartEvents.clear();
 
         // batchClustersOfProcess.get(nodeId).add(bc);
     }
@@ -386,7 +384,7 @@ public class BatchPluginUtils {
             BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
             BatchCluster cluster = pluginInstance.getRunningCluster(parentProcessInstance, parentNodeId);
 
-            if (cluster != null) {
+            if (cluster != null && cluster.getBatchActivity().getExecutionType().equals("parallel")) {
                 SimulationModel model = (SimulationModel) event.getModel();
 
                 long timestamp = Math.round(model.presentTime().getTimeRounded(DateTimeUtils.getReferenceTimeUnit()));
@@ -401,7 +399,7 @@ public class BatchPluginUtils {
                 List<ProcessInstance> processInstances = cluster.getProcessInstances();
                 for (ProcessInstance pi : processInstances) {
 
-                    if (!processInstance.getParent().equals(pi)) {
+                   if (!processInstance.getParent().equals(pi)) {
 
                         // the source attribute comes from an event, but we did not really simulate the events for the
                         // non-responsible process instances, so we mock a source attribute value
@@ -433,7 +431,7 @@ public class BatchPluginUtils {
             BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
             BatchCluster cluster = pluginInstance.getRunningCluster(parentProcessInstance, parentNodeId);
 
-            if (cluster != null) {
+            if (cluster != null && cluster.getBatchActivity().getExecutionType().equals("parallel")) {
                 SimulationModel model = (SimulationModel) event.getModel();
 
                 long timestamp = Math.round(model.presentTime().getTimeRounded(DateTimeUtils.getReferenceTimeUnit()));
@@ -474,9 +472,12 @@ public class BatchPluginUtils {
 
                 int sourceSuffix = 0;
                 List<ProcessInstance> processInstances = cluster.getProcessInstances();
-                for (ProcessInstance pi : processInstances) {
 
-                    if (!processInstance.getParent().equals(pi)) {
+
+
+                  for (ProcessInstance pi : processInstances) {
+
+                  if (!processInstance.getParent().equals(pi)) {
 
                         // the source attribute comes from an event, but we did not really simulate the events for the
                         // non-responsible process instances, so we mock a source attribute value
@@ -491,4 +492,60 @@ public class BatchPluginUtils {
             }
         }
     }
+
+    /*void scheduleNextEventInBatchProcess(TaskEvent event, ProcessInstance processInstance)
+            throws ScyllaRuntimeException {
+
+        ProcessInstance parentProcessInstance = processInstance.getParent();
+        if (parentProcessInstance != null) {
+
+            ProcessModel processModel = processInstance.getProcessModel();
+            int parentNodeId = processModel.getNodeIdInParent();
+
+            BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
+            BatchCluster cluster = pluginInstance.getRunningCluster(parentProcessInstance, parentNodeId);
+
+            if (cluster != null) {
+                Integer nodeId = event.getNodeId();
+                Pair<ScyllaEvent, ProcessInstance> eventToSchedule = cluster.getNotPIEvents(nodeId);
+                if (eventToSchedule != null){
+                    eventToSchedule.getValue0().schedule(eventToSchedule.getValue1());
+                }
+            }
+        }
+    }*/
+
+
+        void scheduleNextEventInBatchProcess(ScyllaEvent event, ProcessInstance processInstance)
+            throws ScyllaRuntimeException {
+
+            ProcessInstance parentProcessInstance = processInstance.getParent();
+            if (parentProcessInstance != null) {
+
+                ProcessModel processModel = processInstance.getProcessModel();
+                int parentNodeId = processModel.getNodeIdInParent();
+
+                BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
+                BatchCluster cluster = pluginInstance.getRunningCluster(parentProcessInstance, parentNodeId);
+
+                if (cluster != null && cluster.getBatchActivity().getExecutionType().equals("sequential")) {
+                    // Get the other events or tasks from this batch to be scheduled after the current one
+                    Integer nodeId = event.getNodeId();
+                    Pair<ScyllaEvent, ProcessInstance> eventToSchedule = cluster.getNotPIEvents(nodeId);
+                    if (eventToSchedule != null){
+                        eventToSchedule.getValue0().schedule(eventToSchedule.getValue1());
+                        //System.out.println("Scheduled " + eventToSchedule.getValue0().getDisplayName() + " for process instance " + eventToSchedule.getValue1());
+                    }
+
+                    if (parentProcessInstance != cluster.getResponsibleProcessInstance()) {
+                        ScyllaEvent nextEvent = event.getNextEventMap().get(0);
+                        Integer nodeIdOfNextElement = nextEvent.getNodeId();
+                        cluster.addPIEvent(nodeIdOfNextElement, nextEvent, processInstance);
+                        //System.out.println("Added " + nextEvent.getDisplayName() + " to cluster queue for process instance " + processInstance);
+                    }
+                }
+            }
+
+
+        }
 }

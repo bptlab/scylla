@@ -8,19 +8,19 @@ import de.hpi.bpt.scylla.simulation.SimulationModel;
 import de.hpi.bpt.scylla.simulation.event.TaskBeginEvent;
 
 
-class ThresholdRule implements ActivationRule{
+public class ThresholdRule implements ActivationRule{
 
     private int threshold;
     private Duration timeOut;
     private String dueDate;
     
-    ThresholdRule (int threshold, Duration timeout) {
+    public ThresholdRule (int threshold, Duration timeout) {
         this.threshold = threshold;
         this.timeOut = timeout;
         this.dueDate = null;
     }
     
-    ThresholdRule (int threshold, String dueDate) {
+    public ThresholdRule (int threshold, String dueDate) {
         this.threshold = threshold;
         this.timeOut = null;
         this.dueDate = dueDate;

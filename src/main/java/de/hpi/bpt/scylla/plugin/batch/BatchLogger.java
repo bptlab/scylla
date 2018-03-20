@@ -32,14 +32,14 @@ public class BatchLogger extends OutputLoggerPluggable {
         StringBuffer sb = new StringBuffer();
 
         BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
-        Map<String, Map<Integer, List<BatchCluster>>> clusters = pluginInstance.getBatchClusters();
+            Map<String, Map<Integer, List<BatchCluster>>> clusters = pluginInstance.getBatchClusters();
 
         TimeUnit referenceTimeUnit = DateTimeUtils.getReferenceTimeUnit();
 
         sb.append("BATCH REPORT" + System.lineSeparator());
         sb.append("Reference unit: " + referenceTimeUnit + System.lineSeparator());
         sb.append(
-                "Please note: Duration and cost of batch region execution can be found in output file of statslogger plug-in."
+                "Please note: Duration and cost of batch activity execution can be found in output file of statslogger plug-in."
                         + System.lineSeparator());
         sb.append(System.lineSeparator());
 
@@ -49,8 +49,8 @@ public class BatchLogger extends OutputLoggerPluggable {
             for (Integer nodeId : clustersOfProcess.keySet()) {
                 sb.append("== Node " + nodeId + System.lineSeparator());
 
-                double waitingTimeMaximumAllRegions = -1;
-                List<Double> waitingTimeAveragesAllRegions = new ArrayList<Double>();
+                double waitingTimeMaximumAllActivities = -1;
+                List<Double> waitingTimeAveragesAllActivities = new ArrayList<Double>();
 
                 List<BatchCluster> bcs = clustersOfProcess.get(nodeId);
                 for (BatchCluster bc : bcs) {
@@ -60,8 +60,8 @@ public class BatchLogger extends OutputLoggerPluggable {
                     double startTimeInRefUnit = bc.getStartTime().getTimeAsDouble(referenceTimeUnit);
                     double maximumWaitingTime = startTimeInRefUnit
                             - bc.getCreationTime().getTimeAsDouble(referenceTimeUnit);
-                    if (maximumWaitingTime > waitingTimeMaximumAllRegions) {
-                        waitingTimeMaximumAllRegions = maximumWaitingTime;
+                    if (maximumWaitingTime > waitingTimeMaximumAllActivities) {
+                        waitingTimeMaximumAllActivities = maximumWaitingTime;
                     }
                     sb.append("Maximum waiting time: " + maximumWaitingTime + System.lineSeparator());
 
@@ -71,7 +71,7 @@ public class BatchLogger extends OutputLoggerPluggable {
                         waitingTimes.add(startTimeInRefUnit - et.getTimeAsDouble(referenceTimeUnit));
                     }
                     double avgWaitingTime = DateTimeUtils.mean(waitingTimes);
-                    waitingTimeAveragesAllRegions.add(avgWaitingTime);
+                    waitingTimeAveragesAllActivities.add(avgWaitingTime);
                     sb.append("Average waiting time: " + avgWaitingTime + System.lineSeparator());
 
                     List<ProcessInstance> processInstances = bc.getProcessInstances();
@@ -83,9 +83,9 @@ public class BatchLogger extends OutputLoggerPluggable {
                             + " process instance(s))" + System.lineSeparator());
                 }
                 sb.append(System.lineSeparator());
-                sb.append("Maximum waiting time of all regions: " + waitingTimeMaximumAllRegions
+                sb.append("Maximum waiting time of all activities: " + waitingTimeMaximumAllActivities
                         + System.lineSeparator());
-                sb.append("Average waiting time of all regions: " + DateTimeUtils.mean(waitingTimeAveragesAllRegions)
+                sb.append("Average waiting time of all activities: " + DateTimeUtils.mean(waitingTimeAveragesAllActivities)
                         + System.lineSeparator());
             }
             sb.append(System.lineSeparator());
@@ -97,7 +97,7 @@ public class BatchLogger extends OutputLoggerPluggable {
             System.out.println(sb.toString());
         }
         else {
-            String resourceUtilizationFileName = outputPathWithoutExtension + model.getGlobalConfiguration().getFileNameWithoutExtension() + "_batchregionstats.txt";
+            String resourceUtilizationFileName = outputPathWithoutExtension + model.getGlobalConfiguration().getFileNameWithoutExtension() + "_batchactivitystats.txt";
 
             if ((Scylla.OS.contains("Linux") || Scylla.OS.contains("Mac OS"))) {
                 File f = new File(resourceUtilizationFileName);
@@ -109,7 +109,7 @@ public class BatchLogger extends OutputLoggerPluggable {
             writer.println(sb.toString());
             writer.close();
 
-            System.out.println("Wrote batch region statistics to " + resourceUtilizationFileName);
+            System.out.println("Wrote batch activity statistics to " + resourceUtilizationFileName);
         }
 
     }
