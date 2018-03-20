@@ -24,6 +24,7 @@ public class BatchTEPlugin extends TaskEnableEventPluggable {
     @Override
     public void eventRoutine(TaskEnableEvent event, ProcessInstance processInstance) throws ScyllaRuntimeException {
 
+
         BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
         pluginInstance.logTaskEventForNonResponsiblePI(event, processInstance);
 
@@ -32,9 +33,11 @@ public class BatchTEPlugin extends TaskEnableEventPluggable {
         int nodeId = event.getNodeId();
         ProcessModel processModel = processInstance.getProcessModel();
         SimulationConfiguration simulationConfiguration = desmojObjects.getSimulationConfiguration();
-        Map<Integer, BatchRegion> batchRegions = (Map<Integer, BatchRegion>) simulationConfiguration
-                .getExtensionValue(getName(), "batchRegions");
-        if (batchRegions.containsKey(nodeId) && processModel.getSubProcesses().containsKey(nodeId)) {
+        /*Map<Integer, BatchActivity> batchActivities = (Map<Integer, BatchActivity>) simulationConfiguration
+                .getExtensionValue(getName(), "batchActivities");*/
+        Map<Integer, BatchActivity> batchActivities = processModel.getBatchActivities();
+
+        if (batchActivities.containsKey(nodeId) && processModel.getSubProcesses().containsKey(nodeId)) {
 
             // in any case: put taskbeginevent of subprocess container on hold
             // String source = desmojEvent.getSource();

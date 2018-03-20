@@ -28,15 +28,11 @@ public class BatchClusterStartEvent extends Event<BatchCluster> {
     @Override
     public void eventRoutine(BatchCluster bc) throws SuspendExecution {
 
-        BatchRegion region = bc.getBatchRegion();
-        int nodeId = region.getNodeId();
+        BatchActivity activity = bc.getBatchActivity();
+        int nodeId = activity.getNodeId();
 
         List<TaskBeginEvent> parentalStartEvents = bc.getParentalStartEvents();
-        TaskBeginEvent parentalStartEvent = parentalStartEvents.get(0); // first one by default
-        ProcessInstance responsibleProcessInstance = parentalStartEvent.getProcessInstance(); // first one by default
 
-        // schedule subprocess start events for all process instances in parent
-        // processInstances and parentalStartEvents are ordered the same way
 
         for (int i = 0; i < parentalStartEvents.size(); i++) {
             TaskBeginEvent pse = parentalStartEvents.get(i);
@@ -44,35 +40,49 @@ public class BatchClusterStartEvent extends Event<BatchCluster> {
             pse.schedule(pi);
         }
 
-        // schedule first event of responsible process instance
+        // schedule subprocess start events for all process instances in parent
+        // processInstances and parentalStartEvents are ordered the same way
+        bc.setResponsibleProcessInstance(parentalStartEvents.get(0).getProcessInstance());
 
-        int processInstanceId = responsibleProcessInstance.getId();
-        boolean showInTrace = responsibleProcessInstance.traceIsOn();
-        SimulationModel model = (SimulationModel) responsibleProcessInstance.getModel();
-        String source = parentalStartEvent.getSource();
-        TimeInstant currentSimulationTime = bc.presentTime();
+        for (int j = 0; j < parentalStartEvents.size(); j++) {
+            TaskBeginEvent startEvent = parentalStartEvents.get(j); // first one by default
+            ProcessInstance responsibleProcessInstance = startEvent.getProcessInstance(); // first one by default
 
-        ProcessSimulationComponents pSimComponentsOfSubprocess = bc.getProcessSimulationComponents().getChildren()
-                .get(nodeId);
-        ProcessModel subprocess = pSimComponentsOfSubprocess.getProcessModel();
+            // schedule first event of responsible process instance
 
-        try {
-            Integer startNodeId = subprocess.getStartNode();
-            ProcessInstance subprocessInstance = new ProcessInstance(model, subprocess, processInstanceId, showInTrace);
-            subprocessInstance.setParent(responsibleProcessInstance);
-            ScyllaEvent subprocessEvent = new BPMNStartEvent(model, source, currentSimulationTime,
-                    pSimComponentsOfSubprocess, subprocessInstance, startNodeId);
-          System.out.println("Created BPMNStartEvent for PI " + subprocessInstance.getId() + " / "+responsibleProcessInstance.getId()+" in Batch Cluster");
-            subprocessEvent.schedule(subprocessInstance);
+
+            int processInstanceId = responsibleProcessInstance.getId();
+            boolean showInTrace = responsibleProcessInstance.traceIsOn();
+            SimulationModel model = (SimulationModel) responsibleProcessInstance.getModel();
+            String source = startEvent.getSource();
+            TimeInstant currentSimulationTime = bc.presentTime();
+
+            ProcessSimulationComponents pSimComponentsOfSubprocess = bc.getProcessSimulationComponents().getChildren()
+                    .get(nodeId);
+            ProcessModel subprocess = pSimComponentsOfSubprocess.getProcessModel();
+
+            try {
+                Integer startNodeId = subprocess.getStartNode();
+                ProcessInstance subprocessInstance = new ProcessInstance(model, subprocess, processInstanceId, showInTrace);
+                subprocessInstance.setParent(responsibleProcessInstance);
+
+                ScyllaEvent subprocessEvent = new BPMNStartEvent(model, source, currentSimulationTime,
+                        pSimComponentsOfSubprocess, subprocessInstance, startNodeId);
+                System.out.println("Created BPMNStartEvent for PI " + subprocessInstance.getId() + " / " + responsibleProcessInstance.getId() + " in Batch Cluster");
+                if (j == 0) {
+                    subprocessEvent.schedule(subprocessInstance);
+                } else {
+                    bc.addPIEvent(startNodeId, subprocessEvent, subprocessInstance);
+                }
+
+            } catch (NodeNotFoundException | MultipleStartNodesException | NoStartNodeException e) {
+                DebugLogger.log("Start node of process model " + subprocess.getId() + " not found.");
+                System.err.println(e.getMessage());
+                e.printStackTrace();
+                SimulationUtils.abort(model, responsibleProcessInstance, nodeId, traceIsOn());
+                return;
+            }
         }
-        catch (NodeNotFoundException | MultipleStartNodesException | NoStartNodeException e) {
-            DebugLogger.log("Start node of process model " + subprocess.getId() + " not found.");
-            System.err.println(e.getMessage());
-            e.printStackTrace();
-            SimulationUtils.abort(model, responsibleProcessInstance, nodeId, traceIsOn());
-            return;
-        }
-
         // move batch cluster from list of not started ones to running ones
         BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
         pluginInstance.setClusterToRunning(bc);

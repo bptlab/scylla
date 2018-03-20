@@ -130,6 +130,7 @@ public class SimulationConfigurationParser extends Parser<SimulationConfiguratio
 
         Map<Integer, TimeDistributionWrapper> arrivalRates = new HashMap<Integer, TimeDistributionWrapper>();
         Map<Integer, TimeDistributionWrapper> durations = new HashMap<Integer, TimeDistributionWrapper>();
+        Map<Integer, TimeDistributionWrapper> setUpDurations = new HashMap<Integer, TimeDistributionWrapper>();
         Map<Integer, Set<ResourceReference>> resourceReferences = new HashMap<Integer, Set<ResourceReference>>();
         // gateways and events
         // Map<Integer, BranchingBehavior> branchingBehaviors = new HashMap<Integer, BranchingBehavior>();
@@ -187,6 +188,12 @@ public class SimulationConfigurationParser extends Parser<SimulationConfiguratio
                     	TimeDistributionWrapper distribution = getTimeDistributionWrapper(durationElem, simNamespace);
                         durations.put(nodeId, distribution);
                     }
+                    Element setUpDurationElem = el.getChild("setUpDuration", simNamespace);
+                    if (setUpDurationElem != null) {
+                        TimeDistributionWrapper distribution = getTimeDistributionWrapper(setUpDurationElem, simNamespace);
+                        setUpDurations.put(nodeId, distribution);
+                    }
+
                     Element resourcesElem = el.getChild("resources", simNamespace);
                     if (resourcesElem != null) {
                         List<Element> resourceElements = resourcesElem.getChildren("resource", simNamespace);
@@ -247,7 +254,7 @@ public class SimulationConfigurationParser extends Parser<SimulationConfiguratio
         }
 
         SimulationConfiguration simulationConfiguration = new SimulationConfiguration(simId, processModel,
-                numberOfProcessInstances, startDateTime, endDateTime, randomSeed, arrivalRates, durations,
+                numberOfProcessInstances, startDateTime, endDateTime, randomSeed, arrivalRates, durations, setUpDurations,
                 resourceReferences, configurationsOfSubProcesses);
 
         return simulationConfiguration;

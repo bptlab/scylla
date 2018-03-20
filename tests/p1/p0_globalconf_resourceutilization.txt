@@ -10,11 +10,11 @@ Time in use / available: 12600 / 85500 (14,7%)
 Costs: 7125.0
 
 -- Eva
-Time in use / available: 12600 / 85500 (14,7%)
+Time in use / available: 14100 / 85500 (16,5%)
 Costs: 7125.0
 
 -- Bernd
-Time in use / available: 11100 / 85500 (13%)
+Time in use / available: 12600 / 85500 (14,7%)
 Costs: 14250.0
 
 -- Christian
@@ -22,7 +22,7 @@ Time in use / available: 12600 / 85500 (14,7%)
 Costs: 14250.0
 
 -- Anna
-Time in use / available: 14100 / 85500 (16,5%)
+Time in use / available: 11100 / 85500 (13%)
 Costs: 28500.0
 
 ## Overall: 14,7%
@@ -41,183 +41,183 @@ Cost: 200.0
 Time effective / total: 2100 / 2700 (77,8%)
 Off-timetable time (cumulated): 0
 Waiting time (cumulated): 600
-Cost: 650.0
+Cost: 250.0
 
 -- 3
 Time effective / total: 2100 / 2100 (100%)
 Off-timetable time (cumulated): 0
 Waiting time (cumulated): 0
-Cost: 325.0
+Cost: 350.0
 
 -- 4
 Time effective / total: 2100 / 2100 (100%)
 Off-timetable time (cumulated): 0
 Waiting time (cumulated): 0
-Cost: 650.0
+Cost: 250.0
 
 -- 5
 Time effective / total: 2100 / 2100 (100%)
 Off-timetable time (cumulated): 0
 Waiting time (cumulated): 0
-Cost: 175.0
+Cost: 325.0
 
 -- 6
 Time effective / total: 2100 / 2100 (100%)
 Off-timetable time (cumulated): 0
 Waiting time (cumulated): 0
-Cost: 350.0
+Cost: 650.0
 
 -- 7
 Time effective / total: 2100 / 2100 (100%)
 Off-timetable time (cumulated): 0
 Waiting time (cumulated): 0
-Cost: 250.0
+Cost: 175.0
 
 -- 8
 Time effective / total: 2100 / 2100 (100%)
 Off-timetable time (cumulated): 0
 Waiting time (cumulated): 0
-Cost: 325.0
+Cost: 350.0
 
 -- 9
 Time effective / total: 2100 / 2100 (100%)
 Off-timetable time (cumulated): 0
 Waiting time (cumulated): 0
-Cost: 650.0
+Cost: 250.0
 
 -- 10
 Time effective / total: 2100 / 2100 (100%)
 Off-timetable time (cumulated): 0
 Waiting time (cumulated): 0
-Cost: 175.0
+Cost: 325.0
 
 -- 11
 Time effective / total: 2100 / 2100 (100%)
 Off-timetable time (cumulated): 0
 Waiting time (cumulated): 0
-Cost: 350.0
+Cost: 650.0
 
 -- 12
 Time effective / total: 2100 / 2100 (100%)
 Off-timetable time (cumulated): 0
 Waiting time (cumulated): 0
-Cost: 250.0
+Cost: 175.0
 
 -- 13
 Time effective / total: 2100 / 2100 (100%)
 Off-timetable time (cumulated): 0
 Waiting time (cumulated): 0
-Cost: 325.0
+Cost: 350.0
 
 -- 14
 Time effective / total: 2100 / 2100 (100%)
 Off-timetable time (cumulated): 0
 Waiting time (cumulated): 0
-Cost: 650.0
+Cost: 250.0
 
 -- 15
 Time effective / total: 2100 / 2100 (100%)
 Off-timetable time (cumulated): 0
 Waiting time (cumulated): 0
-Cost: 175.0
+Cost: 325.0
 
 -- 16
 Time effective / total: 2100 / 2100 (100%)
 Off-timetable time (cumulated): 0
 Waiting time (cumulated): 0
-Cost: 350.0
+Cost: 650.0
 
 -- 17
 Time effective / total: 2100 / 2100 (100%)
 Off-timetable time (cumulated): 0
 Waiting time (cumulated): 0
-Cost: 250.0
+Cost: 175.0
 
 -- 18
 Time effective / total: 2100 / 2100 (100%)
 Off-timetable time (cumulated): 0
 Waiting time (cumulated): 0
-Cost: 325.0
+Cost: 350.0
 
 -- 19
 Time effective / total: 2100 / 2100 (100%)
 Off-timetable time (cumulated): 0
 Waiting time (cumulated): 0
-Cost: 650.0
+Cost: 250.0
 
 -- 20
 Time effective / total: 2100 / 2100 (100%)
 Off-timetable time (cumulated): 0
 Waiting time (cumulated): 0
-Cost: 175.0
+Cost: 325.0
 
 -- 21
 Time effective / total: 2100 / 2100 (100%)
 Off-timetable time (cumulated): 0
 Waiting time (cumulated): 0
-Cost: 350.0
+Cost: 650.0
 
 -- 22
 Time effective / total: 2100 / 2100 (100%)
 Off-timetable time (cumulated): 0
 Waiting time (cumulated): 0
-Cost: 250.0
+Cost: 175.0
 
 -- 23
 Time effective / total: 2100 / 2100 (100%)
 Off-timetable time (cumulated): 0
 Waiting time (cumulated): 0
-Cost: 325.0
+Cost: 350.0
 
 -- 24
 Time effective / total: 2100 / 2100 (100%)
 Off-timetable time (cumulated): 0
 Waiting time (cumulated): 0
-Cost: 650.0
+Cost: 250.0
 
 -- 25
 Time effective / total: 2100 / 2100 (100%)
 Off-timetable time (cumulated): 0
 Waiting time (cumulated): 0
-Cost: 175.0
+Cost: 325.0
 
 -- 26
 Time effective / total: 2100 / 2100 (100%)
 Off-timetable time (cumulated): 0
 Waiting time (cumulated): 0
-Cost: 350.0
+Cost: 650.0
 
 -- 27
 Time effective / total: 2100 / 2100 (100%)
 Off-timetable time (cumulated): 0
 Waiting time (cumulated): 0
-Cost: 250.0
+Cost: 175.0
 
 -- 28
 Time effective / total: 2100 / 2100 (100%)
 Off-timetable time (cumulated): 0
 Waiting time (cumulated): 0
-Cost: 325.0
+Cost: 350.0
 
 -- 29
 Time effective / total: 2100 / 2100 (100%)
 Off-timetable time (cumulated): 0
 Waiting time (cumulated): 0
-Cost: 650.0
+Cost: 250.0
 
 -- 30
 Time effective / total: 2100 / 2100 (100%)
 Off-timetable time (cumulated): 0
 Waiting time (cumulated): 0
-Cost: 175.0
+Cost: 325.0
 
 ## Overall average: 
 Time effective / total: 2100.0 / 2240.0 (97,2%)
 Off-timetable time (cumulated): 0.0
 Waiting time (cumulated): 140.00000000000003
-Cost: 358.33333333333337
+Cost: 337.50000000000006
 
-Total cost: 10750.000000000002
+Total cost: 10125.000000000002
 
 === STATISTICS PER TASK ===
 
