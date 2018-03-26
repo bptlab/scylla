@@ -25,10 +25,10 @@
       <bpmn:extensionElements>
         <camunda:properties>
           <camunda:property name="maxBatchSize" value="100" />
-          <camunda:property name="executionType" value="parallel" />
+          <camunda:property name="executionType" value="sequential-casebased" />
           <camunda:property name="groupingCharacteristic">
           	<!--camunda:property name="minMaxRule" minInstances="1" minTimeout="PT0S" maxInstances="2" maxTimeout="PT30M"/-->
-           	<camunda:property name="processVariable" value="RoomRequest.Date"/>
+           	<!--camunda:property name="processVariable" value="RoomRequest.Date"/-->
           </camunda:property>
           <camunda:property name="activationRule">
             <camunda:property name="thresholdRule" duedate="RoomRequest.Date"/>

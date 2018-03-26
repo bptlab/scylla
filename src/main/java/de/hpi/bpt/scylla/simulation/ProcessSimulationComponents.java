@@ -36,6 +36,7 @@ public class ProcessSimulationComponents {
     private Map<Integer, NumericalDist<?>> distributions = new HashMap<Integer, NumericalDist<?>>();
     private Map<Integer, NumericalDist<?>> setUpDistributions = new HashMap<Integer, NumericalDist<?>>();
     private Map<Integer, TimeUnit> distributionTimeUnits = new HashMap<Integer, TimeUnit>();
+    private Map<Integer, TimeUnit> setUpDistributionTimeUnits = new HashMap<Integer, TimeUnit>();
 
     private boolean showInReport;
     private boolean showInTrace;
@@ -120,7 +121,6 @@ public class ProcessSimulationComponents {
         	TimeDistributionWrapper distWrapper = arrivalRatesAndDurations.get(nodeId);
             TimeUnit distTimeUnit = distWrapper.getTimeUnit();
             Distribution dist = distWrapper.getDistribution();
-            distributionTimeUnits.put(nodeId, distTimeUnit);
             String name = processModel.getModelScopeId() + "_" + nodeId.toString();
             NumericalDist<?> desmojDist = SimulationUtils.getDistribution(dist, model, name, nodeId, showInReport, showInTrace);
 
@@ -129,8 +129,10 @@ public class ProcessSimulationComponents {
             // all
             if (!setUp) {
                 distributions.put(nodeId, desmojDist);
+                distributionTimeUnits.put(nodeId, distTimeUnit);
             } else {
                 setUpDistributions.put(nodeId, desmojDist);
+                setUpDistributionTimeUnits.put(nodeId, distTimeUnit);
             }
         }
     }
@@ -221,9 +223,9 @@ public class ProcessSimulationComponents {
         }
         double value = distribution.sample().doubleValue();
 
-        if (setUpDistributions.containsKey(nodeId)) {
+        /*if (setUpDistributions.containsKey(nodeId)) {
             value+=setUpDistribution.sample().doubleValue();
-        }
+        }*/
 
         if (value < 0){
             value = 0; //negative values are not allowed, DESMOJ can't handle negative event times
@@ -265,6 +267,14 @@ public class ProcessSimulationComponents {
             distributionTimeUnit = TimeUnit.DAYS;
         }
         return distributionTimeUnit;
+    }
+
+    public TimeUnit getSetUpDistributionTimeUnit(Integer nodeId) {
+        TimeUnit setUpdistributionTimeUnit = setUpDistributionTimeUnits.get(nodeId);
+        if (setUpdistributionTimeUnit == null) {
+            setUpdistributionTimeUnit = TimeUnit.DAYS;
+        }
+        return setUpdistributionTimeUnit;
     }
 
     public Map<Integer, TimeUnit> getDistributionTimeUnits() {

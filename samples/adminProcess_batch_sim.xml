@@ -24,14 +24,14 @@
  		</bsim:batchActivity>
 		<bsim:Task id="Task_1pqdkju" name="Prepare printouts;">
 		 <bsim:setUpDuration timeUnit="MINUTES">
-        	<bsim:exponentialDistribution>
-          		<bsim:mean>30</bsim:mean>
-        	</bsim:exponentialDistribution>
+        	<bsim:constantDistribution>
+          		<bsim:constantValue>10</bsim:constantValue>
+        	</bsim:constantDistribution>
      	 </bsim:setUpDuration>
 		  <bsim:duration timeUnit="MINUTES">
-			<bsim:exponentialDistribution>
-			  <bsim:mean>6</bsim:mean>
-			</bsim:exponentialDistribution>
+			<bsim:constantDistribution>
+			  <bsim:constantValue>6</bsim:constantValue>
+			</bsim:constantDistribution>
 		  </bsim:duration>
 		  <bsim:resources>
 			<bsim:resource id="Clerk" amount="1" />

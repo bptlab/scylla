@@ -493,28 +493,6 @@ public class BatchPluginUtils {
         }
     }
 
-    /*void scheduleNextEventInBatchProcess(TaskEvent event, ProcessInstance processInstance)
-            throws ScyllaRuntimeException {
-
-        ProcessInstance parentProcessInstance = processInstance.getParent();
-        if (parentProcessInstance != null) {
-
-            ProcessModel processModel = processInstance.getProcessModel();
-            int parentNodeId = processModel.getNodeIdInParent();
-
-            BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
-            BatchCluster cluster = pluginInstance.getRunningCluster(parentProcessInstance, parentNodeId);
-
-            if (cluster != null) {
-                Integer nodeId = event.getNodeId();
-                Pair<ScyllaEvent, ProcessInstance> eventToSchedule = cluster.getNotPIEvents(nodeId);
-                if (eventToSchedule != null){
-                    eventToSchedule.getValue0().schedule(eventToSchedule.getValue1());
-                }
-            }
-        }
-    }*/
-
 
         void scheduleNextEventInBatchProcess(ScyllaEvent event, ProcessInstance processInstance)
             throws ScyllaRuntimeException {
@@ -528,7 +506,7 @@ public class BatchPluginUtils {
                 BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
                 BatchCluster cluster = pluginInstance.getRunningCluster(parentProcessInstance, parentNodeId);
 
-                if (cluster != null && cluster.getBatchActivity().getExecutionType().equals("sequential")) {
+                if (cluster != null && cluster.getBatchActivity().getExecutionType().equals("sequential-taskbased")) {
                     // Get the other events or tasks from this batch to be scheduled after the current one
                     Integer nodeId = event.getNodeId();
                     Pair<ScyllaEvent, ProcessInstance> eventToSchedule = cluster.getNotPIEvents(nodeId);
@@ -545,7 +523,26 @@ public class BatchPluginUtils {
                     }
                 }
             }
-
-
         }
+
+    void scheduleNextCaseInBatchProcess(ScyllaEvent event, ProcessInstance processInstance) {
+        ProcessInstance parentProcessInstance = processInstance.getParent();
+        if (parentProcessInstance != null) {
+
+            ProcessModel processModel = processInstance.getProcessModel();
+            int parentNodeId = processModel.getNodeIdInParent();
+
+            BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
+            BatchCluster cluster = pluginInstance.getRunningCluster(parentProcessInstance, parentNodeId);
+
+            if (cluster != null && cluster.getBatchActivity().getExecutionType().equals("sequential-casebased")) {
+                // Get the start event of the next process instance and schedule it
+                Pair<ScyllaEvent, ProcessInstance> eventToSchedule = cluster.getNotPIEvents(cluster.getStartNodeId());
+                if (eventToSchedule != null) {
+                    eventToSchedule.getValue0().schedule(eventToSchedule.getValue1());
+                    //System.out.println("Scheduled " + eventToSchedule.getValue0().getDisplayName() + " for process instance " + eventToSchedule.getValue1());
+                }
+            }
+        }
+    }
 }

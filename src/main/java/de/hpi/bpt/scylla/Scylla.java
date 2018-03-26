@@ -23,8 +23,8 @@ public class Scylla {
 
         String folder = "samples" + FILEDELIM;
 //      String resFilename = folder + "EmptyGC.xml";
-//    	String resFilename = folder + "adminProcess_global.xml";
-        String resFilename = folder + "retailer_global.xml";
+    	String resFilename = folder + "adminProcess_global.xml";
+//        String resFilename = folder + "retailer_global.xml";
 
 
 //        String[] bpmnFilename = new String[] { folder + "p1_boundary.bpmn", folder + "p2_normal.bpmn",
@@ -62,11 +62,11 @@ public class Scylla {
 //      String[] bpmnFilename = new String[] { folder + "p8_normalbpmn_with_dataobject.bpmn"};
 //      String[] simFilenames = new String[] { folder + "p8_normalbpmn_with_dataobject_sim.xml"};
 
-//        String[] bpmnFilename = new String[] { folder + "adminProcess_batch.bpmn"};
-//        String[] simFilenames = new String[] { folder + "adminProcess_batch_sim.xml"};
+        String[] bpmnFilename = new String[] { folder + "adminProcess_batch.bpmn"};
+        String[] simFilenames = new String[] { folder + "adminProcess_batch_sim.xml"};
 
-        String[] bpmnFilename = new String[] { folder + "retailer_batch_bpmn.bpmn"};
-        String[] simFilenames = new String[] { folder + "retailer_batch_sim.xml"};
+//        String[] bpmnFilename = new String[] { folder + "retailer_batch_bpmn.bpmn"};
+//        String[] simFilenames = new String[] { folder + "retailer_batch_sim.xml"};
 
 //        String[] bpmnFilename = new String[] { folder + "p5_batch.bpmn", folder + "p6_return.bpmn" };
 //        String[] simFilenames = new String[] { folder + "p5_batch_sim.xml", folder + "p6_return_sim.xml" };

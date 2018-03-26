@@ -30,11 +30,60 @@ class BatchCluster extends Entity {
 
     private ProcessInstance responsibleProcessInstance;
     private List<TaskTerminateEvent> parentalEndEvents;
+    private Integer startNodeId;
 
     private List<TimeInstant> processInstanceEntranceTimes;
     private TimeInstant startTime;
     private Map<Integer,List<Pair<ScyllaEvent, ProcessInstance>>> notPIEvents;
-    private Integer finishedProcessInstances;
+    private Integer finishedProcessInstances = 0;
+    private Integer processInstancesTriedToSchedule = 0;
+
+    BatchCluster(Model owner, TimeInstant creationTime, ProcessSimulationComponents pSimComponents,
+            BatchActivity batchActivity, int nodeId, Map<String, Object> dataView, boolean showInTrace) {
+        super(owner, buildBatchClusterName(pSimComponents, nodeId), showInTrace);
+        this.creationTime = creationTime;
+        this.pSimComponents = pSimComponents;
+        this.batchActivity = batchActivity;
+        this.nodeId = nodeId;
+
+        this.processInstances = new ArrayList<ProcessInstance>();
+        this.parentalStartEvents = new ArrayList<TaskBeginEvent>();
+        this.dataView = dataView;
+        this.state = BatchClusterState.INIT;
+
+        this.responsibleProcessInstance = null;
+        this.parentalEndEvents = new ArrayList<TaskTerminateEvent>();
+
+        this.processInstanceEntranceTimes = new ArrayList<TimeInstant>();
+        this.startTime = null;
+        this.notPIEvents = new HashMap<Integer,List<Pair<ScyllaEvent, ProcessInstance>>>();
+    }
+
+    private static String buildBatchClusterName(ProcessSimulationComponents pSimComponents, int nodeId) {
+        ProcessModel processModel = pSimComponents.getProcessModel();
+        return prependProcessModelIds(processModel) + nodeId;
+    }
+
+    private static String prependProcessModelIds(ProcessModel processModel) {
+        if (processModel.getParent() == null) {
+            return "BatchCluster_" + processModel.getId() + "_";
+        }
+        return prependProcessModelIds(processModel.getParent()) + processModel.getId() + "_";
+    }
+
+    public Integer increaseCounterofProcessInstancesAlreadyScheuled(){
+        return ++processInstancesTriedToSchedule;
+    }
+
+
+    public Integer getStartNodeId() {
+        return startNodeId;
+    }
+
+    public void setStartNodeId(Integer startNodeId) {
+        this.startNodeId = startNodeId;
+    }
+
     public void setProcessInstanceToFinished(){
         finishedProcessInstances++;
     }
@@ -60,40 +109,6 @@ class BatchCluster extends Entity {
             return null;
     }
 
-    BatchCluster(Model owner, TimeInstant creationTime, ProcessSimulationComponents pSimComponents,
-            BatchActivity batchActivity, int nodeId, Map<String, Object> dataView, boolean showInTrace) {
-        super(owner, buildBatchClusterName(pSimComponents, nodeId), showInTrace);
-        this.creationTime = creationTime;
-        this.pSimComponents = pSimComponents;
-        this.batchActivity = batchActivity;
-        this.nodeId = nodeId;
-
-        this.processInstances = new ArrayList<ProcessInstance>();
-        this.parentalStartEvents = new ArrayList<TaskBeginEvent>();
-        this.dataView = dataView;
-        this.state = BatchClusterState.INIT;
-
-        this.responsibleProcessInstance = null;
-        this.parentalEndEvents = new ArrayList<TaskTerminateEvent>();
-
-        this.processInstanceEntranceTimes = new ArrayList<TimeInstant>();
-        this.startTime = null;
-        this.notPIEvents = new HashMap<Integer,List<Pair<ScyllaEvent, ProcessInstance>>>();
-
-        this.finishedProcessInstances = 0;
-    }
-
-    private static String buildBatchClusterName(ProcessSimulationComponents pSimComponents, int nodeId) {
-        ProcessModel processModel = pSimComponents.getProcessModel();
-        return prependProcessModelIds(processModel) + nodeId;
-    }
-
-    private static String prependProcessModelIds(ProcessModel processModel) {
-        if (processModel.getParent() == null) {
-            return "BatchCluster_" + processModel.getId() + "_";
-        }
-        return prependProcessModelIds(processModel.getParent()) + processModel.getId() + "_";
-    }
 
     TimeInstant getCreationTime() {
         return creationTime;
