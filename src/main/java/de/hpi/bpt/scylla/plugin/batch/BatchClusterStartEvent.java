@@ -34,8 +34,7 @@ public class BatchClusterStartEvent extends Event<BatchCluster> {
         List<TaskBeginEvent> parentalStartEvents = bc.getParentalStartEvents();
 
 
-        for (int i = 0; i < parentalStartEvents.size(); i++) {
-            TaskBeginEvent pse = parentalStartEvents.get(i);
+        for (TaskBeginEvent pse : parentalStartEvents) {
             ProcessInstance pi = pse.getProcessInstance();
             pse.schedule(pi);
         }
@@ -71,6 +70,7 @@ public class BatchClusterStartEvent extends Event<BatchCluster> {
                 System.out.println("Created BPMNStartEvent for PI " + subprocessInstance.getId() + " / " + responsibleProcessInstance.getId() + " in Batch Cluster");
                 if (j == 0) {
                     subprocessEvent.schedule(subprocessInstance);
+                    bc.setStartNodeId(startNodeId);
                 } else {
                     bc.addPIEvent(startNodeId, subprocessEvent, subprocessInstance);
                 }

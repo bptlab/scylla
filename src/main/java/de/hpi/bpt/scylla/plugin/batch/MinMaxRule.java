@@ -5,6 +5,7 @@ import java.time.Duration;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
 import de.hpi.bpt.scylla.simulation.event.TaskBeginEvent;
 
+// This is the data class, which holds all the relevant information for a minMax activation rule for batch activities
 public class MinMaxRule implements ActivationRule{
 
     private int minInstances;

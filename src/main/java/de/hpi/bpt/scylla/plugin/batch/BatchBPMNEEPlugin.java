@@ -42,8 +42,7 @@ public class BatchBPMNEEPlugin extends BPMNEndEventPluggable {
 
                     if (pluginInstance.isProcessInstanceCompleted(processInstance)) {
                         List<TaskTerminateEvent> parentalEndEvents = cluster.getParentalEndEvents();
-                        for (int i = 0; i < parentalEndEvents.size(); i++) {
-                            TaskTerminateEvent pee = parentalEndEvents.get(i);
+                        for (TaskTerminateEvent pee : parentalEndEvents) {
                             ProcessInstance pi = pee.getProcessInstance();
                             pee.schedule(pi);
                         }
@@ -63,6 +62,15 @@ public class BatchBPMNEEPlugin extends BPMNEndEventPluggable {
                         nextEventMap.remove(indexOfParentalTaskTerminateEvent);
                         timeSpanToNextEventMap.remove(indexOfParentalTaskTerminateEvent);
                     }
+                } else if (cluster.getBatchActivity().getExecutionType().equals("sequential-casebased")) {
+                    /*ScyllaEvent nextProcessInstanceStartEvent = cluster.getParentalStartEvents().remove(1);
+                    if (nextProcessInstanceStartEvent != null){
+                        nextProcessInstanceStartEvent.schedule(nextProcessInstanceStartEvent.getProcessInstance());
+
+                    } else {
+                        throw new ScyllaRuntimeException("This should not have happend!");
+                    }*/
+                    pluginInstance.scheduleNextCaseInBatchProcess(event, processInstance);
                 }
             }
         }

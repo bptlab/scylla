@@ -18,7 +18,6 @@ public class BatchTTPlugin extends TaskTerminateEventPluggable {
     public void eventRoutine(TaskTerminateEvent event, ProcessInstance processInstance) throws ScyllaRuntimeException {
         BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
         pluginInstance.logTaskEventForNonResponsiblePI(event, processInstance);
-        // schedule other tasks of batch here
     }
 
 }

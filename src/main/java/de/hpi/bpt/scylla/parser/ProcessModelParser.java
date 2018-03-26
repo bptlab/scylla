@@ -576,8 +576,8 @@ public class ProcessModelParser extends Parser<ProcessModel> {
                      // execution type. if none is defined, take parallel as default
                     case "executionType":
                         String tmpExecutionType = property.getAttributeValue("value");
-                        if (!(tmpExecutionType.equals("parallel") || tmpExecutionType.equals("sequential"))){
-                            throw new ScyllaValidationException("Execution type " + tmpExecutionType + " not supported. Pleause us either parallel or sequential");
+                        if (!(tmpExecutionType.equals("parallel") || tmpExecutionType.equals("sequential-taskbased") || tmpExecutionType.equals("sequential-casebased"))){
+                            throw new ScyllaValidationException("Execution type " + tmpExecutionType + " not supported. Pleause us either parallel or sequential (either task or case-based)");
                         }
                         executionType = property.getAttributeValue("value");
                         break;

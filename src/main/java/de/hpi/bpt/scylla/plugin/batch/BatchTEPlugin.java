@@ -28,11 +28,11 @@ public class BatchTEPlugin extends TaskEnableEventPluggable {
         BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
         pluginInstance.logTaskEventForNonResponsiblePI(event, processInstance);
 
-        ProcessSimulationComponents desmojObjects = event.getDesmojObjects();
+        //ProcessSimulationComponents desmojObjects = event.getDesmojObjects();
         // SimulationModel model = (SimulationModel) desmojEvent.getModel();
         int nodeId = event.getNodeId();
         ProcessModel processModel = processInstance.getProcessModel();
-        SimulationConfiguration simulationConfiguration = desmojObjects.getSimulationConfiguration();
+        //SimulationConfiguration simulationConfiguration = desmojObjects.getSimulationConfiguration();
         /*Map<Integer, BatchActivity> batchActivities = (Map<Integer, BatchActivity>) simulationConfiguration
                 .getExtensionValue(getName(), "batchActivities");*/
         Map<Integer, BatchActivity> batchActivities = processModel.getBatchActivities();

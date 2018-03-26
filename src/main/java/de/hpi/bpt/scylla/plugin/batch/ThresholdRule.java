@@ -7,7 +7,7 @@ import de.hpi.bpt.scylla.simulation.ProcessInstance;
 import de.hpi.bpt.scylla.simulation.SimulationModel;
 import de.hpi.bpt.scylla.simulation.event.TaskBeginEvent;
 
-
+// This is the data class, which holds all the relevant information for a thresholdRule activation rule for batch activities
 public class ThresholdRule implements ActivationRule{
 
     private int threshold;
