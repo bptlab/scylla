@@ -25,7 +25,7 @@ public class BatchBPMNEEPlugin extends BPMNEndEventPluggable {
         BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
         pluginInstance.logBPMNEventForNonResponsiblePI(event, processInstance);
 
-        // schedule parental end events
+        // Schedule parental end events
 
         ProcessInstance parentProcessInstance = processInstance.getParent();
         if (parentProcessInstance != null) {
@@ -38,7 +38,8 @@ public class BatchBPMNEEPlugin extends BPMNEndEventPluggable {
             if (cluster != null) {
 
                 cluster.setProcessInstanceToFinished();
-                if (cluster.areAllProcessInstancesFinished() || cluster.getBatchActivity().getExecutionType().equals("parallel")) {
+                // Schedule them only if either all process instances has passed the last event of the batch activity or the execution type is parallel
+                if (cluster.areAllProcessInstancesFinished() || cluster.hasExecutionType(BatchClusterExecutionType.PARALLEL)) {
 
                     if (pluginInstance.isProcessInstanceCompleted(processInstance)) {
                         List<TaskTerminateEvent> parentalEndEvents = cluster.getParentalEndEvents();
@@ -52,7 +53,7 @@ public class BatchBPMNEEPlugin extends BPMNEndEventPluggable {
                         pluginInstance.setClusterToTerminated(parentProcessInstance, parentNodeId);
                     }
 
-                    // prevent parental task terminate event from scheduling, if there is any (from subprocess plugin)
+                    // Prevent parental task terminate event from scheduling, if there is any (from subprocess plugin)
 
                     Map<Integer, ScyllaEvent> nextEventMap = event.getNextEventMap();
                     if (!nextEventMap.isEmpty()) {
@@ -62,15 +63,9 @@ public class BatchBPMNEEPlugin extends BPMNEndEventPluggable {
                         nextEventMap.remove(indexOfParentalTaskTerminateEvent);
                         timeSpanToNextEventMap.remove(indexOfParentalTaskTerminateEvent);
                     }
-                } else if (cluster.getBatchActivity().getExecutionType().equals("sequential-casebased")) {
-                    /*ScyllaEvent nextProcessInstanceStartEvent = cluster.getParentalStartEvents().remove(1);
-                    if (nextProcessInstanceStartEvent != null){
-                        nextProcessInstanceStartEvent.schedule(nextProcessInstanceStartEvent.getProcessInstance());
-
-                    } else {
-                        throw new ScyllaRuntimeException("This should not have happend!");
-                    }*/
-                    pluginInstance.scheduleNextCaseInBatchProcess(event, processInstance);
+                } else if (cluster.hasExecutionType(BatchClusterExecutionType.SEQUENTIAL_CASEBASED)) {
+                    // Schedule the next start event
+                    pluginInstance.scheduleNextCaseInBatchProcess(cluster);
                 }
             }
         }

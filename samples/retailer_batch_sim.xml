@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bsim:definitions xmlns:bsim="http://bsim.hpi.uni-potsdam.de/scylla/simModel" targetNamespace="http://www.hpi.de">
+  <bsim:simulationConfiguration id="retailerProcess_sim" processRef="sid-84e84226-d31d-4a97-a17b-c02ece90946f" processInstances="150" startDateTime="2017-07-10T00:00+02:00" randomSeed="280">
+    <bsim:startEvent id="sid-04B854FC-4737-4C01-BB39-9875957363E3">
+      <bsim:arrivalRate timeUnit="MINUTES">
+        <bsim:exponentialDistribution>
+          <bsim:mean>30</bsim:mean>
+        </bsim:exponentialDistribution>
+      </bsim:arrivalRate>
+    </bsim:startEvent>
+
+    <bsim:Task id="sid-6D861654-615E-4A8D-B318-A56A3B85CA9D" name="Prepare order for shipment">
+       <bsim:setUpDuration timeUnit="MINUTES">
+        <bsim:exponentialDistribution>
+          <bsim:mean>30</bsim:mean>
+        </bsim:exponentialDistribution>
+      </bsim:setUpDuration>
+      <bsim:duration timeUnit="MINUTES">
+        <bsim:exponentialDistribution>
+          <bsim:mean>30</bsim:mean>
+        </bsim:exponentialDistribution>
+      </bsim:duration>
+      <bsim:resources>
+        <bsim:resource id="Robot" amount="1" />
+      </bsim:resources>
+    </bsim:Task>
+	<bsim:subProcess id="Task_0hqu3vf" name="Batch Activity">
+		<bsim:batchActivity	>
+			<bsim:maxBatchSize>3</bsim:maxBatchSize>
+			<bsim:activationRule>
+				<!--bsim:thresholdRule threshold="2" timeout="PT30M"/-->
+				<bsim:minMaxRule minInstances="1" minTimeout="PT0S" maxInstances="2" maxTimeout="PT30M"/>
+			</bsim:activationRule>
+			<bsim:groupingCharacteristic>
+				<bsim:processVariable>Order.CustID</bsim:processVariable>
+			</bsim:groupingCharacteristic>
+		</bsim:batchActivity>
+		<bsim:Task id="sid-0B137946-FA8D-4D7A-A0E2-877E3E2965E7" name="Pack order">
+		  <bsim:duration timeUnit="MINUTES">
+			<bsim:uniformDistribution>
+			  <bsim:lower>5</bsim:lower>
+			  <bsim:upper>15</bsim:upper>
+			</bsim:uniformDistribution>
+		  </bsim:duration>
+		  <bsim:resources>
+			<bsim:resource id="Worker" amount="1" />
+		  </bsim:resources>
+		</bsim:Task>
+		<bsim:Task id="sid-9802B38D-B836-415C-B346-724CB5592BBC" name="Ship order">
+		  <bsim:duration timeUnit="MINUTES">
+			<bsim:exponentialDistribution>
+			  <bsim:mean>7</bsim:mean>
+			</bsim:exponentialDistribution>
+		  </bsim:duration>
+		  <bsim:resources>
+			<bsim:resource id="Worker" amount="1" />
+		  </bsim:resources>
+		</bsim:Task>
+	</bsim:subProcess>
+    <bsim:Task id="sid-F3575A76-8539-4B47-9C0D-93CE802D1159" name="Archive order">
+      <bsim:duration timeUnit="SECONDS">
+        <bsim:exponentialDistribution>
+          <bsim:mean>10</bsim:mean>
+        </bsim:exponentialDistribution>
+      </bsim:duration>
+      <bsim:resources>
+        <bsim:resource id="System" amount="1" />
+      </bsim:resources>
+    </bsim:Task>
+	<bsim:dataInput id="DataObjectReference_04zmr4a" name="Order" >
+		<bsim:field name="CustID" type="string">
+			<bsim:arbitraryFiniteProbabilityDistribution>
+				<bsim:entry value="A" frequency="1"></bsim:entry>
+				<bsim:entry value="B" frequency="1"></bsim:entry>
+				<bsim:entry value="C" frequency="1"></bsim:entry>
+				<bsim:entry value="D" frequency="1"></bsim:entry>
+				<bsim:entry value="E" frequency="1"></bsim:entry>
+				<bsim:entry value="F" frequency="1"></bsim:entry>
+				<bsim:entry value="G" frequency="1"></bsim:entry>
+				<bsim:entry value="H" frequency="1"></bsim:entry>
+				<bsim:entry value="I" frequency="1"></bsim:entry>
+				<bsim:entry value="J" frequency="1"></bsim:entry>
+				<bsim:entry value="K" frequency="1"></bsim:entry>
+				<bsim:entry value="L" frequency="1"></bsim:entry>
+				<bsim:entry value="M" frequency="1"></bsim:entry>
+				<bsim:entry value="N" frequency="1"></bsim:entry>
+				<bsim:entry value="O" frequency="1"></bsim:entry>
+				<bsim:entry value="P" frequency="1"></bsim:entry>
+				<bsim:entry value="Q" frequency="1"></bsim:entry>
+				<bsim:entry value="R" frequency="1"></bsim:entry>
+				<bsim:entry value="S" frequency="1"></bsim:entry>
+				<bsim:entry value="T" frequency="1"></bsim:entry>
+				<bsim:entry value="U" frequency="1"></bsim:entry>
+				<bsim:entry value="V" frequency="1"></bsim:entry>
+				<bsim:entry value="W" frequency="1"></bsim:entry>
+				<bsim:entry value="X" frequency="1"></bsim:entry>
+				<bsim:entry value="Y" frequency="1"></bsim:entry>
+				<bsim:entry value="Z" frequency="1"></bsim:entry>
+				<bsim:entry value="AA" frequency="1"></bsim:entry>
+				<bsim:entry value="BB" frequency="1"></bsim:entry>
+				<bsim:entry value="CC" frequency="1"></bsim:entry>
+				<bsim:entry value="DD" frequency="1"></bsim:entry>
+				<bsim:entry value="EE" frequency="1"></bsim:entry>
+				<bsim:entry value="FF" frequency="1"></bsim:entry>
+				<bsim:entry value="GG" frequency="1"></bsim:entry>
+				<bsim:entry value="HH" frequency="1"></bsim:entry>
+				<bsim:entry value="II" frequency="1"></bsim:entry>
+				<bsim:entry value="JJ" frequency="1"></bsim:entry>
+				<bsim:entry value="KK" frequency="1"></bsim:entry>
+				<bsim:entry value="LL" frequency="1"></bsim:entry>
+				<bsim:entry value="MM" frequency="1"></bsim:entry>
+				<bsim:entry value="NN" frequency="1"></bsim:entry>
+				<bsim:entry value="OO" frequency="1"></bsim:entry>
+				<bsim:entry value="PP" frequency="1"></bsim:entry>
+				<bsim:entry value="QQ" frequency="1"></bsim:entry>
+				<bsim:entry value="RR" frequency="1"></bsim:entry>
+				<bsim:entry value="SS" frequency="1"></bsim:entry>
+				<bsim:entry value="TT" frequency="1"></bsim:entry>
+				<bsim:entry value="UU" frequency="1"></bsim:entry>
+				<bsim:entry value="VV" frequency="1"></bsim:entry>
+				<bsim:entry value="WW" frequency="1"></bsim:entry>
+				<bsim:entry value="XX" frequency="1"></bsim:entry>
+				<bsim:entry value="YY" frequency="1"></bsim:entry>
+				<bsim:entry value="ZZ" frequency="1"></bsim:entry>
+				<bsim:entry value="AAA" frequency="1"></bsim:entry>
+				<bsim:entry value="BBB" frequency="1"></bsim:entry>
+			</bsim:arbitraryFiniteProbabilityDistribution>
+		</bsim:field>
+	</bsim:dataInput>
+  </bsim:simulationConfiguration>
+</bsim:definitions>

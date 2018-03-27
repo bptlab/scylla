@@ -19,7 +19,7 @@ public class BatchBPMNIEPlugin extends BPMNIntermediateEventPluggable {
         BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
         pluginInstance.logBPMNEventForNonResponsiblePI(event, processInstance);
 
-        pluginInstance.scheduleNextEventInBatchProcess(event, processInstance);
+        //pluginInstance.scheduleNextEventInBatchProcess(event, processInstance);
     }
 
 }

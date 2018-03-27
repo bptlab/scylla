@@ -500,7 +500,7 @@ public class StatisticsLogger extends OutputLoggerPluggable {
         
         String resourceUtilizationFileName = outputPathWithoutExtension + model.getGlobalConfiguration().getFileNameWithoutExtension()+"_resourceutilization.xml";
         FileOutputStream fos = new FileOutputStream(resourceUtilizationFileName);
-        
+
         XMLOutputter xmlOutput = new XMLOutputter();
         xmlOutput.output(doc, fos);
     }

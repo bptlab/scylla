@@ -8,53 +8,50 @@ import de.hpi.bpt.scylla.simulation.SimulationModel;
 import de.hpi.bpt.scylla.simulation.event.TaskBeginEvent;
 
 // This is the data class, which holds all the relevant information for a thresholdRule activation rule for batch activities
-public class ThresholdRule implements ActivationRule{
+public class ThresholdRule implements ActivationRule {
 
     private int threshold;
     private Duration timeOut;
     private String dueDate;
-    
-    public ThresholdRule (int threshold, Duration timeout) {
+
+    public ThresholdRule(int threshold, Duration timeout) {
         this.threshold = threshold;
         this.timeOut = timeout;
         this.dueDate = null;
     }
-    
-    public ThresholdRule (int threshold, String dueDate) {
+
+    public ThresholdRule(int threshold, String dueDate) {
         this.threshold = threshold;
         this.timeOut = null;
         this.dueDate = dueDate;
     }
 
-	public int getThreshold(TaskBeginEvent desmojEvent, ProcessInstance processInstance) {
-		return threshold;
-	}
+    public int getThreshold(TaskBeginEvent desmojEvent, ProcessInstance processInstance) {
+        return threshold;
+    }
 
-	public Duration getTimeOut(TaskBeginEvent desmojEvent, ProcessInstance processInstance){
-		if (timeOut != null){
-			return timeOut;
-		}else{
-			
-			return Duration.ofDays(getDurationForCurrentInstance(desmojEvent, processInstance));
-	}
-		
-	}
-	
-	private long getDurationForCurrentInstance(TaskBeginEvent desmojEvent, ProcessInstance processInstance){
-		long numberOfDays = 0;
-		
-		//***********
-		// get the value of the dataObject  
-		//***********
+    public Duration getTimeOut(TaskBeginEvent desmojEvent, ProcessInstance processInstance) {
+        if (timeOut != null) {
+            return timeOut;
+        } else {
+            return Duration.ofDays(getDurationForCurrentInstance(desmojEvent, processInstance));
+        }
+    }
 
-        SimulationModel model = (SimulationModel) desmojEvent.getModel();
+    private long getDurationForCurrentInstance(TaskBeginEvent desmojEvent, ProcessInstance processInstance) {
 
-        numberOfDays = (long) DataObjectField.getDataObjectValue(processInstance.getId(),dueDate);
+        //***********
+        // get the value of the dataObject
+        //***********
 
-        System.out.println("Due Date for "+ desmojEvent+" in: "+ numberOfDays);
+        // SimulationModel model = (SimulationModel) desmojEvent.getModel();
 
-		return numberOfDays;
-	}
+        long numberOfDays = (long) DataObjectField.getDataObjectValue(processInstance.getId(), dueDate);
+
+        System.out.println("Due Date for " + desmojEvent + " in: " + numberOfDays);
+
+        return numberOfDays;
+    }
 
 
 }

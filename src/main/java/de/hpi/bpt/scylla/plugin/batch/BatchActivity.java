@@ -9,11 +9,11 @@ public class BatchActivity {
     private ProcessModel processModel;
     private int nodeId;
     private Integer maxBatchSize;
-    private String executionType;
+    private BatchClusterExecutionType executionType;
     private ActivationRule activationRule;
     private List<String> groupingCharacteristic;
 
-    public BatchActivity(ProcessModel processModel, int nodeId, Integer maxBatchSize, String executionType, ActivationRule activationRule,
+    public BatchActivity(ProcessModel processModel, int nodeId, Integer maxBatchSize, BatchClusterExecutionType executionType, ActivationRule activationRule,
             List<String> groupingCharacteristic) {
         this.processModel = processModel;
         this.nodeId = nodeId;
@@ -23,7 +23,7 @@ public class BatchActivity {
         this.groupingCharacteristic = groupingCharacteristic;
     }
 
-    public BatchActivity(int nodeId, Integer maxBatchSize, String executionType, ActivationRule activationRule,
+    public BatchActivity(int nodeId, Integer maxBatchSize, BatchClusterExecutionType executionType, ActivationRule activationRule,
                          List<String> groupingCharacteristic) {
         this.nodeId = nodeId;
         this.maxBatchSize = maxBatchSize;
@@ -49,7 +49,7 @@ public class BatchActivity {
         return maxBatchSize;
     }
 
-    public String getExecutionType() {
+    public BatchClusterExecutionType getExecutionType() {
         return executionType;
     }
 
