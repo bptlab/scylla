@@ -120,28 +120,35 @@ public class PluginLoader {
 							packURL.getProtocol().equals("jar") ?
 							getJarClassPaths(packURL, pack_slash) :
 							getFilePaths(packURL, pack);
-					for(int i = 0; i < classPaths.length; i++){
-						String c = classPaths[i];
-						if(!c.endsWith(".class"))continue;
-						c = c.substring(0,c.lastIndexOf(".class"));
-						
-						try{
+					for (String classPath : classPaths) {
+						String c = classPath;
+						if (!c.endsWith(".class")) continue;
+						c = c.substring(0, c.lastIndexOf(".class"));
+
+						try {
 							Class<?> plugin = Class.forName(c);
-							if(plugin == null){
-								try{throw new Exception(plugin+" not found");}catch(Exception e){e.printStackTrace();continue;}
+							if (plugin == null) {
+								try {
+									throw new Exception(plugin + " not found");
+								} catch (Exception e) {
+									e.printStackTrace();
+									continue;
+								}
 							}
 							Class<?> entry_point = plugin.getSuperclass();
-							if(entry_point == null || !IPluggable.class.isAssignableFrom(entry_point)){
+							if (entry_point == null || !IPluggable.class.isAssignableFrom(entry_point)) {
 								//try{throw new Exception(plugin+" is not a valid extension of an entry point");}catch(Exception e){e.printStackTrace();continue;}
-							}else{
-								if(!extensions.containsKey(entry_point))extensions.put(entry_point, new ArrayList<PluginWrapper>());
-								if(!extensions.get(entry_point).contains(plugin))extensions.get(entry_point).add(new PluginWrapper(plugin,true));
+							} else {
+								if (!extensions.containsKey(entry_point))
+									extensions.put(entry_point, new ArrayList<PluginWrapper>());
+								if (!extensions.get(entry_point).contains(plugin))
+									extensions.get(entry_point).add(new PluginWrapper(plugin, true));
 							}
-						}catch(ClassNotFoundException e){
+						} catch (ClassNotFoundException e) {
 							e.printStackTrace();
 							continue;
 						}
-	
+
 					}
 				}catch (IllegalArgumentException e){
 					e.printStackTrace();

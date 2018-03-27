@@ -45,7 +45,7 @@ public class BatchTBPlugin extends TaskBeginEventPluggable {
         if (parentProcessInstance != null) {
             int parentNodeId = processModel.getNodeIdInParent();
             BatchCluster cluster = pluginInstance.getRunningCluster(parentProcessInstance, parentNodeId);
-            // if we are the representative (first executed) process instance and the execution type is sequential we add the setUp time for this task
+            // If we are the representative (first executed) process instance we add the setUp time for this task
             if (cluster != null && parentProcessInstance == cluster.getResponsibleProcessInstance()) {
 
                 // therefore we fist take a sample of the setUp distribution
@@ -64,15 +64,8 @@ public class BatchTBPlugin extends TaskBeginEventPluggable {
         //SimulationConfiguration simulationConfiguration = desmojObjects.getSimulationConfiguration();
         /*Map<Integer, BatchActivity> batchActivities = (Map<Integer, BatchActivity>) simulationConfiguration
                 .getExtensionValue(getName(), "batchActivities");*/
+
         Map<Integer, BatchActivity> batchActivities = processModel.getBatchActivities();
-
-
-        BatchCluster cluster = pluginInstance.getRunningCluster(processInstance, event.getNodeId());
-        boolean enoughScheuled = false;
-        if (cluster != null) {
-            enoughScheuled = cluster.increaseCounterofProcessInstancesAlreadyScheuled() > cluster.getProcessInstances().size();
-        }
-
         if (batchActivities.containsKey(nodeId) && processModel.getSubProcesses().containsKey(nodeId)) {
 
             // subprocess plugin wants to schedule BPMNStartEvents for subprocess
@@ -81,10 +74,9 @@ public class BatchTBPlugin extends TaskBeginEventPluggable {
             Map<Integer, ScyllaEvent> nextEventMap = event.getNextEventMap();
             Map<Integer, TimeSpan> timeSpanToNextEventMap = event.getTimeSpanToNextEventMap();
 
-            for (Integer eventIndex : nextEventMap.keySet()) {
-                ScyllaEvent eventToSchedule = nextEventMap.get(eventIndex);
+            for (Integer indexOfSubprocessBPMNStartEvent : nextEventMap.keySet()) {
+                ScyllaEvent eventToSchedule = nextEventMap.get(indexOfSubprocessBPMNStartEvent);
                 if (eventToSchedule instanceof BPMNStartEvent || eventToSchedule instanceof TaskTerminateEvent) {
-                    Integer indexOfSubprocessBPMNStartEvent = eventIndex;
 
                     nextEventMap.remove(indexOfSubprocessBPMNStartEvent);
                     timeSpanToNextEventMap.remove(indexOfSubprocessBPMNStartEvent);

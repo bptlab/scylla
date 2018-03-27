@@ -4,10 +4,7 @@ import java.time.Duration;
 import java.util.*;
 import java.util.function.Predicate;
 
-import de.hpi.bpt.scylla.plugin.batch.ActivationRule;
-import de.hpi.bpt.scylla.plugin.batch.BatchActivity;
-import de.hpi.bpt.scylla.plugin.batch.MinMaxRule;
-import de.hpi.bpt.scylla.plugin.batch.ThresholdRule;
+import de.hpi.bpt.scylla.plugin.batch.*;
 import org.jdom2.Attribute;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
@@ -557,7 +554,7 @@ public class ProcessModelParser extends Parser<ProcessModel> {
 
 
         Integer maxBatchSize = null;
-        String executionType = "parallel";
+        BatchClusterExecutionType executionType = BatchClusterExecutionType.PARALLEL;
         ActivationRule activationRule = null;
         List<String> groupingCharacteristic = new ArrayList<String>();
 
@@ -576,10 +573,19 @@ public class ProcessModelParser extends Parser<ProcessModel> {
                      // execution type. if none is defined, take parallel as default
                     case "executionType":
                         String tmpExecutionType = property.getAttributeValue("value");
-                        if (!(tmpExecutionType.equals("parallel") || tmpExecutionType.equals("sequential-taskbased") || tmpExecutionType.equals("sequential-casebased"))){
+                        /*if (!(tmpExecutionType.equals("parallel") || tmpExecutionType.equals("sequential-taskbased") || tmpExecutionType.equals("sequential-casebased"))){
                             throw new ScyllaValidationException("Execution type " + tmpExecutionType + " not supported. Pleause us either parallel or sequential (either task or case-based)");
                         }
-                        executionType = property.getAttributeValue("value");
+                        BatchClusterExecutionType bce = BatchClusterExecutionType.PARALLEL;
+                        executionType = property.getAttributeValue("value");*/
+                        switch (property.getAttributeValue("value")){
+                            case "parallel":
+                                executionType = BatchClusterExecutionType.PARALLEL;
+                            case "sequential-taskbased":
+                                executionType = BatchClusterExecutionType.SEQUENTIAL_TASKBASED;
+                            case "sequential-casebased":
+                                executionType = BatchClusterExecutionType.SEQUENTIAL_CASEBASED;
+                        }
                         break;
 
                     // grouping characteristic

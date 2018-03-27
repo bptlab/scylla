@@ -26,14 +26,15 @@ public class BatchClusterStartEvent extends Event<BatchCluster> {
     }
 
     @Override
-    public void eventRoutine(BatchCluster bc) throws SuspendExecution {
+    public void eventRoutine(BatchCluster cluster) throws SuspendExecution {
 
-        BatchActivity activity = bc.getBatchActivity();
+        BatchActivity activity = cluster.getBatchActivity();
         int nodeId = activity.getNodeId();
 
-        List<TaskBeginEvent> parentalStartEvents = bc.getParentalStartEvents();
+        List<TaskBeginEvent> parentalStartEvents = cluster.getParentalStartEvents();
 
 
+        // Schedule all task begin events of the process instance
         for (TaskBeginEvent pse : parentalStartEvents) {
             ProcessInstance pi = pse.getProcessInstance();
             pse.schedule(pi);
@@ -41,22 +42,23 @@ public class BatchClusterStartEvent extends Event<BatchCluster> {
 
         // schedule subprocess start events for all process instances in parent
         // processInstances and parentalStartEvents are ordered the same way
-        bc.setResponsibleProcessInstance(parentalStartEvents.get(0).getProcessInstance());
 
+        // Set the responsible process instance in the batch cluster, first one by default
+        cluster.setResponsibleProcessInstance(parentalStartEvents.get(0).getProcessInstance());
+
+        // Go through all process instances. If it's the first one, schedule it. If not, save it to be scheduled later on
         for (int j = 0; j < parentalStartEvents.size(); j++) {
-            TaskBeginEvent startEvent = parentalStartEvents.get(j); // first one by default
-            ProcessInstance responsibleProcessInstance = startEvent.getProcessInstance(); // first one by default
-
-            // schedule first event of responsible process instance
+            TaskBeginEvent startEvent = parentalStartEvents.get(j);
+            ProcessInstance responsibleProcessInstance = startEvent.getProcessInstance();
 
 
             int processInstanceId = responsibleProcessInstance.getId();
             boolean showInTrace = responsibleProcessInstance.traceIsOn();
             SimulationModel model = (SimulationModel) responsibleProcessInstance.getModel();
             String source = startEvent.getSource();
-            TimeInstant currentSimulationTime = bc.presentTime();
+            TimeInstant currentSimulationTime = cluster.presentTime();
 
-            ProcessSimulationComponents pSimComponentsOfSubprocess = bc.getProcessSimulationComponents().getChildren()
+            ProcessSimulationComponents pSimComponentsOfSubprocess = cluster.getProcessSimulationComponents().getChildren()
                     .get(nodeId);
             ProcessModel subprocess = pSimComponentsOfSubprocess.getProcessModel();
 
@@ -68,11 +70,12 @@ public class BatchClusterStartEvent extends Event<BatchCluster> {
                 ScyllaEvent subprocessEvent = new BPMNStartEvent(model, source, currentSimulationTime,
                         pSimComponentsOfSubprocess, subprocessInstance, startNodeId);
                 System.out.println("Created BPMNStartEvent for PI " + subprocessInstance.getId() + " / " + responsibleProcessInstance.getId() + " in Batch Cluster");
-                if (j == 0) {
+
+                if (j == 0) { // If it is the first process instance, schedule it...
                     subprocessEvent.schedule(subprocessInstance);
-                    bc.setStartNodeId(startNodeId);
-                } else {
-                    bc.addPIEvent(startNodeId, subprocessEvent, subprocessInstance);
+                    cluster.setStartNodeId(startNodeId);
+                } else { // ...if not, save them for later
+                    cluster.addPIEvent(startNodeId, subprocessEvent, subprocessInstance);
                 }
 
             } catch (NodeNotFoundException | MultipleStartNodesException | NoStartNodeException e) {
@@ -85,7 +88,7 @@ public class BatchClusterStartEvent extends Event<BatchCluster> {
         }
         // move batch cluster from list of not started ones to running ones
         BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
-        pluginInstance.setClusterToRunning(bc);
+        pluginInstance.setClusterToRunning(cluster);
 
         // next node and timespan to next event determined by responsible process instance
         // tasks resources only assigned to responsible subprocess instance

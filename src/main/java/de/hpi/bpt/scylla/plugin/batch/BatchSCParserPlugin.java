@@ -15,6 +15,9 @@ import de.hpi.bpt.scylla.model.configuration.SimulationConfiguration;
 import de.hpi.bpt.scylla.model.process.ProcessModel;
 import de.hpi.bpt.scylla.plugin_type.parser.SimulationConfigurationParserPluggable;
 
+// This class is not needed anymore. The parsing is done in the process model parser, because the batch activities are now defined as extension attributes in the BPMN file
+
+
 /*public class BatchSCParserPlugin extends SimulationConfigurationParserPluggable {
 
 	@Override

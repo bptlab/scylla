@@ -35,8 +35,8 @@ class BatchCluster extends Entity {
     private List<TimeInstant> processInstanceEntranceTimes;
     private TimeInstant startTime;
     private Map<Integer,List<Pair<ScyllaEvent, ProcessInstance>>> notPIEvents;
+    // this is needed for all types of sequential execution to determine when to schedule the completion of the batch actvity
     private Integer finishedProcessInstances = 0;
-    private Integer processInstancesTriedToSchedule = 0;
 
     BatchCluster(Model owner, TimeInstant creationTime, ProcessSimulationComponents pSimComponents,
             BatchActivity batchActivity, int nodeId, Map<String, Object> dataView, boolean showInTrace) {
@@ -71,11 +71,9 @@ class BatchCluster extends Entity {
         return prependProcessModelIds(processModel.getParent()) + processModel.getId() + "_";
     }
 
-    public Integer increaseCounterofProcessInstancesAlreadyScheuled(){
-        return ++processInstancesTriedToSchedule;
+    public boolean hasExecutionType(BatchClusterExecutionType executionType){
+        return this.getBatchActivity().getExecutionType().equals(executionType);
     }
-
-
     public Integer getStartNodeId() {
         return startNodeId;
     }
@@ -95,10 +93,10 @@ class BatchCluster extends Entity {
     public void addPIEvent(Integer startNodeId, ScyllaEvent notPIEvent, ProcessInstance subprocessInstance) {
         if (this.notPIEvents.get(startNodeId) == null){
             List<Pair<ScyllaEvent, ProcessInstance>> notPIEvents = new ArrayList<Pair<ScyllaEvent, ProcessInstance>>();
-            notPIEvents.add(new Pair(notPIEvent, subprocessInstance));
+            notPIEvents.add(new Pair<>(notPIEvent, subprocessInstance));
             this.notPIEvents.put(startNodeId, notPIEvents);
         } else {
-            this.notPIEvents.get(startNodeId).add(new Pair(notPIEvent, subprocessInstance));
+            this.notPIEvents.get(startNodeId).add(new Pair<>(notPIEvent, subprocessInstance));
         }
     }
 
