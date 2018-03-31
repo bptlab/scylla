@@ -1,12 +1,13 @@
 package de.hpi.bpt.scylla.plugin.statslogger;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import de.hpi.bpt.scylla.logger.DebugLogger;
 import de.hpi.bpt.scylla.logger.ProcessNodeInfo;
 import de.hpi.bpt.scylla.logger.ProcessNodeTransitionType;
@@ -19,12 +20,18 @@ import de.hpi.bpt.scylla.simulation.SimulationModel;
 import de.hpi.bpt.scylla.simulation.utils.DateTimeUtils;
 import desmoj.core.simulator.TimeInstant;
 
-import java.io.FileOutputStream;
-
+import org.apache.xml.serialize.XMLSerializer;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 public class StatisticsLogger extends OutputLoggerPluggable {
 
@@ -501,11 +508,16 @@ public class StatisticsLogger extends OutputLoggerPluggable {
         
         String resourceUtilizationFileName = outputPathWithoutExtension + model.getGlobalConfiguration().getFileNameWithoutExtension()+"_resourceutilization.xml";
         FileOutputStream fos = new FileOutputStream(resourceUtilizationFileName);
-        
+
+
+
         XMLOutputter xmlOutput = new XMLOutputter();
-	xmlOutput.setFormat(Format.getPrettyFormat());
+	    xmlOutput.setFormat(Format.getPrettyFormat());
         xmlOutput.output(doc, fos);
     }
+
+
+
 
     class TaskInstanceIdentifier {
 

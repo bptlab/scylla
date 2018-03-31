@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
 public class StatisticsLogger extends OutputLoggerPluggable {
@@ -502,6 +503,7 @@ public class StatisticsLogger extends OutputLoggerPluggable {
         FileOutputStream fos = new FileOutputStream(resourceUtilizationFileName);
 
         XMLOutputter xmlOutput = new XMLOutputter();
+        xmlOutput.setFormat(Format.getPrettyFormat());
         xmlOutput.output(doc, fos);
     }
 
