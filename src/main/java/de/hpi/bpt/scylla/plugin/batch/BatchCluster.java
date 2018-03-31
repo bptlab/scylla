@@ -10,7 +10,6 @@ import de.hpi.bpt.scylla.simulation.event.ScyllaEvent;
 import de.hpi.bpt.scylla.simulation.event.TaskBeginEvent;
 import de.hpi.bpt.scylla.simulation.event.TaskTerminateEvent;
 import desmoj.core.simulator.Entity;
-import desmoj.core.simulator.Event;
 import desmoj.core.simulator.Model;
 import desmoj.core.simulator.TimeInstant;
 import org.javatuples.Pair;

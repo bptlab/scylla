@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import de.hpi.bpt.scylla.exception.ScyllaRuntimeException;
-import de.hpi.bpt.scylla.model.configuration.SimulationConfiguration;
 import de.hpi.bpt.scylla.model.process.ProcessModel;
 import de.hpi.bpt.scylla.plugin_type.simulation.event.TaskBeginEventPluggable;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
