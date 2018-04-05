@@ -36,7 +36,8 @@ public class BatchPluginUtils {
     static final String PLUGIN_NAME = "batch";
     private static BatchPluginUtils singleton;
 
-    // private Map<String, TaskBeginEvent> subprocessStartEventsOnHold = new HashMap<String, TaskBeginEvent>();
+    //Map of running instances
+    public Map<Integer,TaskEnableEvent> runningInstances = new HashMap<Integer, TaskEnableEvent>();
     // processID:[nodeId:batchClusters]
     private Map<String, Map<Integer, List<BatchCluster>>> batchClusters = new HashMap<String, Map<Integer, List<BatchCluster>>>();
 
@@ -63,6 +64,11 @@ public class BatchPluginUtils {
         return singleton;
     }
 
+    static public void clear()
+    {
+        singleton = null;
+    }
+
     // Map<String, TaskBeginEvent> getSubprocessStartEventsOnHold() {
     // return subprocessStartEventsOnHold;
     // }
@@ -76,11 +82,10 @@ public class BatchPluginUtils {
 
         ProcessModel processModel = processInstance.getProcessModel();
         ProcessSimulationComponents pSimComponents = parentalBeginEvent.getDesmojObjects();
-        /*Map<Integer, BatchActivity> batchActivities_old = (Map<Integer, BatchActivity>) pSimComponents.getSimulationConfiguration()
+        /*Map<Integer, BatchActivity> batchActivities = (Map<Integer, BatchActivity>) pSimComponents.getSimulationConfiguration()
                 .getExtensionValue(PLUGIN_NAME, "batchActivities");*/
-
         Map<Integer, BatchActivity> batchActivities = processModel.getBatchActivities();
-        BatchActivity activity = batchActivities.get(nodeId);
+        BatchActivity batchActivity = batchActivities.get(nodeId);
 
         BatchCluster cluster = null;
 
@@ -92,11 +97,32 @@ public class BatchPluginUtils {
             List<BatchCluster> clusters = batchClustersOfProcess.get(nodeId);
             if (clusters != null) {
                 for (BatchCluster bc : clusters) {
-                    if (batchClusterHasNotStarted(bc.getState())
-                            && isProcessInstanceMatchingToDataView(parentalBeginEvent, processInstance, bc)) {
-                        cluster = bc;
-                        // clusters.remove(bc);
-                        break;
+
+
+
+
+                    if (batchClusterHasNotStarted(bc.getState())){
+                        if( isProcessInstanceMatchingToDataView(parentalBeginEvent, processInstance, bc)) {
+                            cluster = bc;
+                            // clusters.remove(bc);
+                            break;
+
+                        }else{
+                            //for MinMax-Rule --> check whether similar instance exists
+
+                            //set new timeout for the cluster for comparison
+//                    	Duration timeout = bc.getBatchRegion().getActivationRule()
+//                    			.getTimeOut(parentalBeginEvent, bc.getProcessInstances().get(0));
+//
+//                		//reschedule the cluster beginEvent
+//            	        long timeoutInSeconds = timeout.get(ChronoUnit.SECONDS);
+//            	        TimeSpan timeSpan = new TimeSpan(timeoutInSeconds, TimeUnit.SECONDS);
+//
+//                        BatchClusterStartEvent clusterStartEvent = (BatchClusterStartEvent) bc.getScheduledEvents().get(0);
+//                        bc.cancel();
+//                        clusterStartEvent.schedule(bc, timeSpan);
+                        }
+
                     }
                 }
             }
@@ -106,16 +132,16 @@ public class BatchPluginUtils {
         if (cluster == null) {
             Model model = processInstance.getModel();
             boolean showInTrace = processInstance.traceIsOn();
-            Map<String, Object> dataView = this.getDataViewOfInstance(parentalBeginEvent, processInstance, activity);
+            String dataView = this.getDataViewOfInstance(processInstance.getId(), batchActivity);
             TimeInstant currentSimulationTime = processInstance.presentTime();
-            cluster = new BatchCluster(model, currentSimulationTime, pSimComponents, activity, nodeId, dataView,
+            cluster = new BatchCluster(model, currentSimulationTime, pSimComponents, batchActivity, nodeId, dataView,
                     showInTrace);
 
             // schedule BatchClusterStart at current time plus maximum timeout
             BatchClusterStartEvent clusterStartEvent = new BatchClusterStartEvent(model, cluster.getName(),
                     showInTrace);
 
-            Duration timeout = activity.getActivationRule().getTimeOut(parentalBeginEvent, processInstance);
+            Duration timeout = batchActivity.getActivationRule().getTimeOut(parentalBeginEvent, processInstance);
             cluster.setCurrentTimeOut(timeout);
             long timeoutInSeconds = timeout.get(ChronoUnit.SECONDS);
             TimeSpan timeSpan = new TimeSpan(timeoutInSeconds, TimeUnit.SECONDS);
@@ -144,15 +170,15 @@ public class BatchPluginUtils {
         // (3) check if bc can be started
 
         //TODO check whether timeout should be updated
-        if (cluster.getState() == BatchClusterState.INIT && cluster.getProcessInstances().size() > 1) {
+        if (cluster.getState() == BatchClusterState.INIT && cluster.getProcessInstances().size()>1) {
 
             // if the dueDate of the current instance is earlier as of the instances added before, the cluster begin event is rescheduled
-            Duration timeoutForCurrentInstance = activity.getActivationRule().getTimeOut(parentalBeginEvent, processInstance);
+            Duration timeoutForCurrentInstance = batchActivity.getActivationRule().getTimeOut(parentalBeginEvent, processInstance);
             //testing
             TimeUnit epsilon = TimeUnit.SECONDS;
-            Duration durationBtwClusterStartAndInstanceTaskBegin = Duration.ofSeconds((long) (parentalBeginEvent.getSimulationTimeOfSource().getTimeAsDouble(epsilon) - cluster.getCreationTime().getTimeAsDouble(epsilon)));
+            Duration durationBtwClusterStartAndInstanceTaskBegin = Duration.ofSeconds((long) (parentalBeginEvent.getSimulationTimeOfSource().getTimeAsDouble(epsilon)-cluster.getCreationTime().getTimeAsDouble(epsilon)));
             //System.out.println("InstanceEnable: "+parentalBeginEvent.getSimulationTimeOfSource().getTimeAsDouble(epsilon)+" ClusterCreation: "+cluster.getCreationTime().getTimeAsDouble(epsilon)+" Duration "+durationBtwClusterStartAndInstanceTaskBegin);
-            if (timeoutForCurrentInstance.plus(durationBtwClusterStartAndInstanceTaskBegin).compareTo(cluster.getCurrentTimeOut()) < 0) {
+            if (timeoutForCurrentInstance.plus(durationBtwClusterStartAndInstanceTaskBegin).compareTo(cluster.getCurrentTimeOut()) < 0){
 
                 //set new timeout for the cluster for comparison
                 cluster.setCurrentTimeOut(timeoutForCurrentInstance);
@@ -186,100 +212,52 @@ public class BatchPluginUtils {
     private boolean isProcessInstanceMatchingToDataView(TaskBeginEvent desmojEvent, ProcessInstance processInstance,
                                                         BatchCluster batchCluster) {
 
-        Map<String, Object> bcDataView = batchCluster.getDataView();
-        Map<String, Object> instanceDataView = getDataViewOfInstance(desmojEvent, processInstance, batchCluster.getBatchActivity());
+        String bcDataView = batchCluster.getDataView();
+        String instanceDataView = getDataViewOfInstance(processInstance.getId(), batchCluster.getBatchActivity());
 
-        if ((bcDataView == null && instanceDataView == null) || instanceDataView.entrySet().equals(bcDataView.entrySet())) {
+        if ((bcDataView == null && instanceDataView == null) || instanceDataView.equals(bcDataView)){
             return true;
-        } else {
+        }else{
 
 //			// only for the manual use case
-//			long instanceValue = (long) instanceDataView.get("RoomRequest.Date");
-//			long bcValue = (long) bcDataView.get("RoomRequest.Date");
-//			if(instanceValue>bcValue-5 || instanceValue<bcValue+5){
-//				return true;
-//			}
+
+//		     long numberOfDays = (long) DataObjectField.getDataObjectValue(processInstance.getId(),"RoomRequest.Date");
+//		     Duration timeoutForCurrentInstance = Duration.ofDays(numberOfDays);
+//		     TimeUnit epsilon = TimeUnit.SECONDS;
+//		     Duration threeDaysInSeconds = Duration.ofSeconds(3*24*60*60);
+//	    	 Duration durationBtwClusterStartAndInstanceTaskBegin = Duration.ofSeconds((long) (desmojEvent.getSimulationTimeOfSource().getTimeAsDouble(epsilon)-batchCluster.getCreationTime().getTimeAsDouble(epsilon)));
+//	    	 //System.out.println("InstanceEnable: "+parentalBeginEvent.getSimulationTimeOfSource().getTimeAsDouble(epsilon)+" ClusterCreation: "+cluster.getCreationTime().getTimeAsDouble(epsilon)+" Duration "+durationBtwClusterStartAndInstanceTaskBegin);
 //
+//	    	 Duration differenceBtwClusterInst = batchCluster.getCurrentTimeOut().minus(timeoutForCurrentInstance.plus(durationBtwClusterStartAndInstanceTaskBegin));
+//
+//	    	 //if differenceBtwClusterInst is less than three days
+//	    	 if (threeDaysInSeconds.compareTo(differenceBtwClusterInst.abs())>0){
+//	        	  return true;
+//	         }
+
+
+
             return false;
         }
 
     }
 
 
-    private Map<String, Object> getDataViewOfInstance(TaskBeginEvent desmojEvent, ProcessInstance processInstance, BatchActivity batchActivity) {
+    String getDataViewOfInstance(Integer processInstanceID, BatchActivity batchRegion){
 
-        if (batchActivity.getGroupingCharacteristic().isEmpty()) {
+        if (batchRegion.getGroupingCharacteristic().isEmpty()){
             return null;
-        } else {
-            //***********
-            // get the value of the dataObject
-            //***********
+        }else{
 
-            ProcessModel processModel = processInstance.getProcessModel();
-            ProcessSimulationComponents desmojObjects = desmojEvent.getDesmojObjects();
-            int nodeId = desmojEvent.getNodeId();
-            boolean showInTrace = desmojEvent.traceIsOn();
-            SimulationModel model = (SimulationModel) desmojEvent.getModel();
-
-            try {
-
-                // ***************************
-                // GET INPUT
-                // ***************************
-
-
-                // fetch all available data objects
-                Map<Integer, Object> dataObjects =
-                        (Map<Integer, Object>) desmojObjects.getExtensionDistributions()
-                                .get(DataObjectPluginUtils.PLUGIN_NAME);
-
-                Map<String, Object> simulationInput = new HashMap<String, Object>();
-
-                // iterate over all available data objects
-                for (int dataObjectId : dataObjects.keySet()) {
-
-                    // fetch all data fields
-                    Map<String, DataObjectField> dataObjectFields =
-                            (Map<String, DataObjectField>) dataObjects.get(dataObjectId);
-                    String dataObjectName = processModel.getDisplayNames().get(dataObjectId);
-
-
-                    for (String fieldName : dataObjectFields.keySet()) {
-
-                        // create the key by concatenating dataObjectName + fieldName and assure that the first letter is lower case
-                        String key = dataObjectName + "." + fieldName;
-
-                        // handle the distribution of every data field
-                        DataObjectField dataObjectField = dataObjectFields.get(fieldName);
-                        DataDistributionWrapper distWrapper = dataObjectField.getDataDistributionWrapper();
-                        try {
-                            simulationInput.put(key, distWrapper.getSample());
-                        } catch (ScyllaRuntimeException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-
-                    }
-
-
-                }
-
-                Map<String, Object> dataView = new HashMap<String, Object>();
-
-                for (String dataViewElement : batchActivity.getGroupingCharacteristic()) {
-                    dataView.put(dataViewElement, simulationInput.get(dataViewElement));
-                }
-
-                return dataView;
-
-            } catch (ScyllaValidationException e) {
-                System.err.println(e.getMessage());
-                e.printStackTrace();
-                SimulationUtils.abort(model, processInstance, nodeId, showInTrace);
-                return null;
-
+            String dataView = "";
+            for (String dataViewElement:batchRegion.getGroupingCharacteristic()){
+                //TODO is currently only programmed for one Data View Element
+                dataView = (String) DataObjectField.getDataObjectValue(processInstanceID,dataViewElement);
             }
+
+            return dataView;
         }
+
     }
 
 

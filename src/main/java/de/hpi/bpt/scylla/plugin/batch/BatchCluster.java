@@ -23,7 +23,7 @@ class BatchCluster extends Entity {
 
     private List<ProcessInstance> processInstances;
     private List<TaskBeginEvent> parentalStartEvents;
-    private Map<String, Object> dataView;
+    private String dataView;
     private BatchClusterState state;
     private Duration currentTimeOut;
 
@@ -38,7 +38,7 @@ class BatchCluster extends Entity {
     private Integer finishedProcessInstances = 0;
 
     BatchCluster(Model owner, TimeInstant creationTime, ProcessSimulationComponents pSimComponents,
-            BatchActivity batchActivity, int nodeId, Map<String, Object> dataView, boolean showInTrace) {
+                 BatchActivity batchActivity, int nodeId, String dataView, boolean showInTrace) {
         super(owner, buildBatchClusterName(pSimComponents, nodeId), showInTrace);
         this.creationTime = creationTime;
         this.pSimComponents = pSimComponents;
@@ -55,7 +55,6 @@ class BatchCluster extends Entity {
 
         this.processInstanceEntranceTimes = new ArrayList<TimeInstant>();
         this.startTime = null;
-        this.notPIEvents = new HashMap<Integer,List<Pair<ScyllaEvent, ProcessInstance>>>();
     }
 
     private static String buildBatchClusterName(ProcessSimulationComponents pSimComponents, int nodeId) {
@@ -123,7 +122,7 @@ class BatchCluster extends Entity {
         return nodeId;
     }
 
-    Map<String, Object> getDataView() {
+    String getDataView() {
         return dataView;
     }
 

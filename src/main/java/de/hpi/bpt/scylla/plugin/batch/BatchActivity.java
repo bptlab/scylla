@@ -27,7 +27,6 @@ public class BatchActivity {
                          List<String> groupingCharacteristic) {
         this.nodeId = nodeId;
         this.maxBatchSize = maxBatchSize;
-
         this.executionType = executionType;
         this.activationRule = activationRule;
         this.groupingCharacteristic = groupingCharacteristic;

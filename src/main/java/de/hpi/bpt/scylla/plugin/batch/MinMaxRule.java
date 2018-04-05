@@ -1,11 +1,16 @@
 package de.hpi.bpt.scylla.plugin.batch;
 
 import java.time.Duration;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
+import de.hpi.bpt.scylla.logger.ProcessNodeInfo;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
+import de.hpi.bpt.scylla.simulation.ProcessSimulationComponents;
 import de.hpi.bpt.scylla.simulation.event.TaskBeginEvent;
+import de.hpi.bpt.scylla.simulation.event.TaskEnableEvent;
 
-// This is the data class, which holds all the relevant information for a minMax activation rule for batch activities
 public class MinMaxRule implements ActivationRule{
 
     private int minInstances;
@@ -21,16 +26,59 @@ public class MinMaxRule implements ActivationRule{
     }
 
     public int getThreshold(TaskBeginEvent desmojEvent, ProcessInstance processInstance) {
+
+
+        BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
+        for (Integer key : pluginInstance.runningInstances.keySet()) {
+            TaskEnableEvent currentEventOfInst = pluginInstance.runningInstances.get(key);
+
+
+            if (processInstance.getId() != key && currentEventOfInst.getNodeId() <= desmojEvent.getNodeId()) {
+
+
+                BatchActivity batchActivity = pluginInstance.getBatchClusters().get(processInstance.getProcessModel().getId()).get(desmojEvent.getNodeId()).get(0).getBatchActivity();
+
+                String dataView = pluginInstance.getDataViewOfInstance(processInstance.getId(), batchActivity);
+                String dataViewOfOther = pluginInstance.getDataViewOfInstance(key, batchActivity);
+
+
+                if (dataView.equals(dataViewOfOther)) {
+                    return maxInstances;
+                }
+            }
+        }
+
+
         return minInstances;
-        //TODO if similar instances exists then maxInstances
-        // TODO implement ExistingEqualPI() --> check all Instances which has not yet reached the batch activity, 
-        //whether one exists with the same data view, if yes, provide maxInstances!!!! 
-        
+
     }
 
     public Duration getTimeOut(TaskBeginEvent desmojEvent, ProcessInstance processInstance) {
+        BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
+        for (Integer instance : pluginInstance.runningInstances.keySet()) {
+            TaskEnableEvent currentEventOfInst = pluginInstance.runningInstances.get(instance);
+
+
+            if (processInstance.getId() != instance && currentEventOfInst.getNodeId() <= desmojEvent.getNodeId()) {
+
+                if (!pluginInstance.getBatchClusters().isEmpty()) {
+                    BatchActivity batchActivity = pluginInstance.getBatchClusters().get(processInstance.getProcessModel().getId()).get(desmojEvent.getNodeId()).get(0).getBatchActivity();
+
+                    String dataView = pluginInstance.getDataViewOfInstance(processInstance.getId(), batchActivity);
+                    String dataViewOfOther = pluginInstance.getDataViewOfInstance(instance, batchActivity);
+
+
+                    if (dataView.equals(dataViewOfOther)) {
+                        return maxTimeout;
+                    }
+                }
+
+            }
+        }
+
+
         return minTimeout;
-      //TODO if similar instances exists then minInstances
+        //TODO if similar instances exists then minInstances
         // TODO implement ExistingEqualPI()
     }
 

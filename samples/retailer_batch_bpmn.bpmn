@@ -52,7 +52,7 @@
       <extensionElements>
         <camunda:properties>
           <camunda:property name="maxBatchSize" value="3" />
-          <camunda:property name="executionType" value="sequential" />
+          <camunda:property name="executionType" value="parallel" />
           <camunda:property name="groupingCharacteristics">
             	<!--camunda:property name="processVariable" value="Order.CustID"/-->
           </camunda:property>

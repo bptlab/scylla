@@ -97,7 +97,6 @@ public class BatchLogger extends OutputLoggerPluggable {
 
             System.out.println("Wrote batch activity statistics to " + resourceUtilizationFileName);
         }
-
     }
 
 }
