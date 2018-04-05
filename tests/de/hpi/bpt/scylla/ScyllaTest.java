@@ -7,6 +7,8 @@ package de.hpi.bpt.scylla;
  */
 
 
+import de.hpi.bpt.scylla.plugin.batch.BatchPluginUtils;
+import org.junit.Before;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.provider.*;
 import org.junit.runner.RunWith;
@@ -23,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @RunWith(Parameterized.class)
 class ScyllaTest {
+
 
     private static Map<String, String> outputPathes = new HashMap();
 
@@ -64,10 +67,14 @@ class ScyllaTest {
         pathToSavedFile = fullPathToSavedFile(pathToSavedFile);
         String outputFolder = getOutputFolder(pathToSavedFile, folder, globalConfigName, bpmnFileName, simulationFileName);
         try {
-            String savedContent = new String(Files.readAllBytes(Paths.get(pathToSavedFile + globalConfigName + "_resourceutilization.txt")));
-            String contentToCheck = new String(Files.readAllBytes(Paths.get(outputFolder + Scylla.FILEDELIM + globalConfigName + "_resourceutilization.txt")));
+            String savedContent = new String(Files.readAllBytes(Paths.get(pathToSavedFile + globalConfigName + "_resourceutilization.xml")));
+            String contentToCheck = new String(Files.readAllBytes(Paths.get(outputFolder + Scylla.FILEDELIM + globalConfigName + "_resourceutilization.xml")));
             Assertions.assertEquals(savedContent, contentToCheck);
-        } catch (IOException exception) {
+            Thread.sleep(1000);
+            // needed in the first time simulated, to avoid the plugin instance keeping old date making weird Batch Logger results.
+            // TODO: Rethink the singleton design pattern
+            BatchPluginUtils.clear();
+        } catch (IOException | InterruptedException exception) {
             exception.printStackTrace();
         }
     }

@@ -601,51 +601,58 @@ public class ProcessModelParser extends Parser<ProcessModel> {
                     // threshold capacity (minimum batch size) & timeout of activation rule
                     case "activationRule":
                         List<Element> ruleElements = property.getChildren("property", namespace);
-                        if (ruleElements.size() != 1) {
+                        if (ruleElements.size() > 1) {
                             throw new ScyllaValidationException(
-                                    "There must be exactly one activation rule for batch activity " + id + ", but there are " + ruleElements.size() + ".");
-                        }
-                        Element ruleElement = property.getChild("property", namespace);
-                        String ruleElementName = ruleElement.getName();
-                        switch (ruleElement.getAttributeValue("name")) {
-                            case "thresholdRule":
-                                // parsing threshold, if it is defined
-                                int threshold = 0;
-                                String thresholdString = ruleElement.getAttributeValue("threshold");
-                                if (thresholdString != null && !thresholdString.isEmpty()) {
-                                    threshold = Integer.parseInt(thresholdString);
-                                }
+                                    "There must be one or zero activation rules for batch activity " + id + ", but there are " + ruleElements.size() + ".");
+                        } else if (ruleElements.size() == 0){
+                            int minInstances = 1;
+                            Duration minTimeout = Duration.ZERO;
+                            int maxInstances = 1;
+                            Duration maxTimeout = Duration.ZERO;
+                            activationRule = new MinMaxRule(minInstances, minTimeout, maxInstances, maxTimeout);
+                        } else {
+                            Element ruleElement = property.getChild("property", namespace);
+                            String ruleElementName = ruleElement.getName();
+                            switch (ruleElement.getAttributeValue("name")) {
+                                case "thresholdRule":
+                                    // parsing threshold, if it is defined
+                                    int threshold = 0;
+                                    String thresholdString = ruleElement.getAttributeValue("threshold");
+                                    if (thresholdString != null && !thresholdString.isEmpty()) {
+                                        threshold = Integer.parseInt(thresholdString);
+                                    }
 
-                                //parsing timeout, if it is defined
-                                Duration timeout = null;
-                                String timeoutString = ruleElement.getAttributeValue("timeout");
-                                if (timeoutString != null) {
-                                    timeout = Duration.parse(timeoutString);
-                                }
+                                    //parsing timeout, if it is defined
+                                    Duration timeout = null;
+                                    String timeoutString = ruleElement.getAttributeValue("timeout");
+                                    if (timeoutString != null) {
+                                        timeout = Duration.parse(timeoutString);
+                                    }
 
-                                //parsing dueDate, if it is defined
-                                String dueDate = ruleElement.getAttributeValue("duedate");
+                                    //parsing dueDate, if it is defined
+                                    String dueDate = ruleElement.getAttributeValue("duedate");
 
-                                //either timeout or dueDate should not be null --> two different Constructors for the ThresholdRule
-                                if (timeout != null) {
-                                    activationRule = new ThresholdRule(threshold, timeout);
-                                } else if (dueDate != null) {
-                                    activationRule = new ThresholdRule(threshold, dueDate);
-                                } else {
-                                    throw new ScyllaValidationException("A threshold rule was selected for" + ruleElementName
-                                            + " then either timeout or duedate must be specified.");
-                                }
-                                break;
-                            case "minMaxRule":
-                                int minInstances = Integer.parseInt(ruleElement.getAttributeValue("minInstances"));
-                                Duration minTimeout = Duration.parse(ruleElement.getAttributeValue("minTimeout"));
-                                int maxInstances = Integer.parseInt(ruleElement.getAttributeValue("maxInstances"));
-                                Duration maxTimeout = Duration.parse(ruleElement.getAttributeValue("maxTimeout"));
-                                activationRule = new MinMaxRule(minInstances, minTimeout, maxInstances, maxTimeout);
-                                break;
-                            default:
-                                throw new ScyllaValidationException("Activation rule type" + ruleElementName
-                                        + " for batch activity " + id + " not supported.");
+                                    //either timeout or dueDate should not be null --> two different Constructors for the ThresholdRule
+                                    if (timeout != null) {
+                                        activationRule = new ThresholdRule(threshold, timeout);
+                                    } else if (dueDate != null) {
+                                        activationRule = new ThresholdRule(threshold, dueDate);
+                                    } else {
+                                        throw new ScyllaValidationException("A threshold rule was selected for" + ruleElementName
+                                                + " then either timeout or duedate must be specified.");
+                                    }
+                                    break;
+                                case "minMaxRule":
+                                    int minInstances = Integer.parseInt(ruleElement.getAttributeValue("minInstances"));
+                                    Duration minTimeout = Duration.parse(ruleElement.getAttributeValue("minTimeout"));
+                                    int maxInstances = Integer.parseInt(ruleElement.getAttributeValue("maxInstances"));
+                                    Duration maxTimeout = Duration.parse(ruleElement.getAttributeValue("maxTimeout"));
+                                    activationRule = new MinMaxRule(minInstances, minTimeout, maxInstances, maxTimeout);
+                                    break;
+                                default:
+                                    throw new ScyllaValidationException("Activation rule type" + ruleElementName
+                                            + " for batch activity " + id + " not supported.");
+                            }
                         }
                         break;
                 }
