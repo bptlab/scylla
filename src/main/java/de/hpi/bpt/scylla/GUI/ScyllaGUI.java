@@ -154,7 +154,7 @@ public class ScyllaGUI extends JFrame {
 	 */
 	public static void main(String[] args) {
 		if(args.length != 1)throw new IllegalArgumentException("Internal error: Number of main parameters does not match!");
-		WebSwingUtils.SESSIONID = args[0];
+		WebSwingUtils.init(args[0]);
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -229,6 +229,7 @@ public class ScyllaGUI extends JFrame {
 		contentPane.addTab("Simulation", simulationPane);
 		
 		if(!DEBUG)System.setOut(simulationPane.getConsole().getOut());
+		setUndecorated(true);
 	}
 	
 	public static Image getResource(String path) {

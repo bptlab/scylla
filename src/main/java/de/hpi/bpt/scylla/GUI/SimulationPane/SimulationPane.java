@@ -37,10 +37,10 @@ import de.hpi.bpt.scylla.GUI.Console;
 import de.hpi.bpt.scylla.GUI.EditorPane;
 import de.hpi.bpt.scylla.GUI.ListPanel;
 import de.hpi.bpt.scylla.GUI.ScalingCheckBoxIcon;
-import de.hpi.bpt.scylla.GUI.ScalingFileChooser;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
 import de.hpi.bpt.scylla.GUI.GlobalConfigurationPane.GlobalConfigurationPane;
 import de.hpi.bpt.scylla.GUI.SimulationConfigurationPane.SimulationConfigurationPane;
+import de.hpi.bpt.scylla.GUI.fileDialog.FileDialog;
 import de.hpi.bpt.scylla.logger.DebugLogger;
 import de.hpi.bpt.scylla.plugin_loader.PluginLoader;
 import javax.swing.filechooser.FileFilter;
@@ -157,15 +157,16 @@ public class SimulationPane extends JPanel{
 		button_openglobalconfig.setToolTipText("Choose other file");
 		button_openglobalconfig.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				ScalingFileChooser chooser = new ScalingFileChooser(ScyllaGUI.DEFAULTFILEPATH);
+				FileDialog chooser = FileDialog.request(ScyllaGUI.DEFAULTFILEPATH);
 				chooser.setDialogTitle("Choose global config");
 				chooser.addChoosableFileFilter(FILEFILTER_XML);
 				chooser.setFileFilter(FILEFILTER_XML);
 				int c = chooser.showDialog(null,"Open");
-				if(c == ScalingFileChooser.APPROVE_OPTION){
-					displayCurrentGlobalConfigChosen.setText(chooser.getSelectedFile().getPath());
+				if(c == FileDialog.APPROVE_OPTION){
+					//TODO chnage to normal single file
+					displayCurrentGlobalConfigChosen.setText(chooser.getSelectedFilePaths()[0]);
 					displayCurrentGlobalConfigChosen.buttonEdit.setVisible(true);
-					ScyllaGUI.DEFAULTFILEPATH = chooser.getSelectedFile().getPath();
+					ScyllaGUI.DEFAULTFILEPATH = chooser.getSelectedFilePaths()[0];
 				}
 			}
 		});
@@ -226,15 +227,16 @@ public class SimulationPane extends JPanel{
 		button_openBpmnFile.setIcon(ScyllaGUI.ICON_OPEN);
 		button_openBpmnFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ScalingFileChooser chooser = new ScalingFileChooser(ScyllaGUI.DEFAULTFILEPATH);
+				FileDialog chooser = FileDialog.request(ScyllaGUI.DEFAULTFILEPATH);
 				chooser.addChoosableFileFilter(FILEFILTER_BPMN);
 				chooser.setFileFilter(FILEFILTER_BPMN);
 				chooser.setDialogTitle("Add business process diagram");
 				int c = chooser.showDialog(null,"Open");
-				if(c == ScalingFileChooser.APPROVE_OPTION){
-					chooser.getSelectedFile();
-					list_CurrentBpmnFiles.addElement(new FileListEntry(list_CurrentBpmnFiles,chooser.getSelectedFile().getPath(),null, true));
-					ScyllaGUI.DEFAULTFILEPATH = chooser.getSelectedFile().getPath();
+				if(c == FileDialog.APPROVE_OPTION){
+					for(String s : chooser.getSelectedFilePaths()) {
+						list_CurrentBpmnFiles.addElement(new FileListEntry(list_CurrentBpmnFiles,s,null, true));
+						ScyllaGUI.DEFAULTFILEPATH = s;
+					}
 				}
 			}
 		});
@@ -299,19 +301,21 @@ public class SimulationPane extends JPanel{
 		button_openSimfile.setToolTipText("Add simulation file");
 		button_openSimfile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ScalingFileChooser chooser = new ScalingFileChooser(ScyllaGUI.DEFAULTFILEPATH);
+				FileDialog chooser = FileDialog.request(ScyllaGUI.DEFAULTFILEPATH);
 				chooser.setDialogTitle("Add simulation file");
 				chooser.addChoosableFileFilter(FILEFILTER_XML);
 				chooser.setFileFilter(FILEFILTER_XML);
 				int c = chooser.showDialog(null,"Open");
-				if(c == ScalingFileChooser.APPROVE_OPTION){
-					list_CurrentSimFiles.addElement(new FileListEntry(list_CurrentSimFiles,chooser.getSelectedFile().getPath(),(s)->{
-						EditorPane ep =  new SimulationConfigurationPane();
-						File f = new File(s);
-						ep.openFile(f);
-						parent.addEditor(ep);
-					},true));
-					ScyllaGUI.DEFAULTFILEPATH = chooser.getSelectedFile().getPath();
+				if(c == FileDialog.APPROVE_OPTION){
+					for(String path : chooser.getSelectedFilePaths()) {
+						list_CurrentSimFiles.addElement(new FileListEntry(list_CurrentSimFiles,path,(s)->{
+							EditorPane ep =  new SimulationConfigurationPane();
+							File f = new File(s);
+							ep.openFile(f);
+							parent.addEditor(ep);
+						},true));
+						ScyllaGUI.DEFAULTFILEPATH = path;
+					}
 				}
 				
 			}

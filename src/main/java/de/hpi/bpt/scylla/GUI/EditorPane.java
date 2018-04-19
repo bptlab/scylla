@@ -28,6 +28,9 @@ import javax.swing.ScrollPaneConstants;
 
 import org.jdom2.JDOMException;
 
+import de.hpi.bpt.scylla.GUI.fileDialog.FileDialog;
+import de.hpi.bpt.scylla.GUI.fileDialog.ScalingFileChooser;
+
 
 
 @SuppressWarnings("serial")
@@ -300,7 +303,7 @@ public abstract class EditorPane extends JPanel implements FormManager{
 		else if(!getId().equals("")) chooser.setSelectedFile(new File(ScyllaGUI.DEFAULTFILEPATH+"\\"+getId()+".xml"));
 		chooser.setDialogTitle("Save");
 		int c = chooser.showDialog(null,"Save");
-		if(c == ScalingFileChooser.APPROVE_OPTION){
+		if(c == FileDialog.APPROVE_OPTION){
 			setFile(chooser.getSelectedFile());
 			if(getFile() != null){
 				ScyllaGUI.DEFAULTFILEPATH = chooser.getSelectedFile().getPath();
@@ -325,7 +328,7 @@ public abstract class EditorPane extends JPanel implements FormManager{
 		chooser.setDialogTitle("Open");
 		int c = chooser.showDialog(this,"Open");
 		//if the process is canceled, nothing happens
-		if(c == ScalingFileChooser.APPROVE_OPTION){
+		if(c == FileDialog.APPROVE_OPTION){
 			if(chooser.getSelectedFile() != null){
 				//Close current opened file
 				close();

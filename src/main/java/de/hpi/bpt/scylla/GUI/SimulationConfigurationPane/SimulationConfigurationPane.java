@@ -31,8 +31,9 @@ import de.hpi.bpt.scylla.GUI.EditorPane;
 import de.hpi.bpt.scylla.GUI.ExpandPanel;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel.ComponentHolder;
+import de.hpi.bpt.scylla.GUI.fileDialog.FileDialog;
+import de.hpi.bpt.scylla.GUI.fileDialog.ScalingFileChooser;
 import de.hpi.bpt.scylla.GUI.ScalingCheckBoxIcon;
-import de.hpi.bpt.scylla.GUI.ScalingFileChooser;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
 import de.hpi.bpt.scylla.GUI.InputFields.DateField;
 import de.hpi.bpt.scylla.GUI.InputFields.NumberField;
@@ -608,7 +609,7 @@ public class SimulationConfigurationPane extends EditorPane {
 		chooser.setDialogTitle("Open Process Model File");
 		int c = chooser.showDialog(SimulationConfigurationPane.this,"Open");
 		//if the process is canceled, nothing happens
-		if(c == ScalingFileChooser.APPROVE_OPTION){
+		if(c == FileDialog.APPROVE_OPTION){
 			if(chooser.getSelectedFile() != null){
 				try {
 					boolean success = true;
@@ -635,7 +636,7 @@ public class SimulationConfigurationPane extends EditorPane {
 		chooser.setDialogTitle("Open Global Configuration File");
 		int c = chooser.showDialog(SimulationConfigurationPane.this,"Open");
 		//if the process is canceled, nothing happens
-		if(c == ScalingFileChooser.APPROVE_OPTION){
+		if(c == FileDialog.APPROVE_OPTION){
 			if(chooser.getSelectedFile() != null){
 				try {
 					globalPath = chooser.getSelectedFile().getPath();
