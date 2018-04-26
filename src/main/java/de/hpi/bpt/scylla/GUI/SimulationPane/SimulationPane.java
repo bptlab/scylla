@@ -483,7 +483,7 @@ public class SimulationPane extends JPanel{
 		panelBottom.add(button_StartSimulation, gbc_button_StartSimulation);
 		
 		
-		button_OpenLastOutput = new JButton("Open Last Output Path");
+		button_OpenLastOutput = new JButton("Download last output files");
 		button_OpenLastOutput.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try (Stream<Path> paths = Files.walk(Paths.get(lastOutPutFolder))) {
@@ -717,10 +717,6 @@ public class SimulationPane extends JPanel{
 			return labelText.getText();
 		}
 
-	}
-	
-	public void mampf(Object o) {
-		
 	}
 
 }
