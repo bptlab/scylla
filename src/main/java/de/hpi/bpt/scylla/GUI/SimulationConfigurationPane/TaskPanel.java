@@ -278,6 +278,7 @@ public class TaskPanel extends JPanel implements ComponentHolder,SetObserver<Str
 		task = t;
 		Distribution d = task.getDurationDistribution();
 		if(d != null){
+			setPanelDistribution(d);
 			comboboxDistribution.loadSavedValue();
 		}else{
 			comboboxDistribution.clear();
