@@ -53,7 +53,6 @@ public final class WebSwingUtils {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		// StandardCharsets.UTF_8.name() > JDK 7
 		return result.toString();
 	}
 

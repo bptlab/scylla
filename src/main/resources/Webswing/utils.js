@@ -2,8 +2,8 @@ function openFileDialog(callback,fileFilters){
     showOverlay();
     new Promise((resolve, reject)=>{
         initCancel(resolve);
-        initFileInput(resolve,fileFilters);
         initDropInput(resolve);
+        initFileInput(resolve,fileFilters);
     }).then(function(result){
         hideOverlay();
         callback.accept(result.join("|"));
@@ -63,7 +63,7 @@ function initCancel(callback){
 
 function initFileInput(callback, fileFilters){
     function handleFileSelect(evt) {
-        var files = evt.target.files; 
+        var files = evt.target.files;
         uploadFiles(files).then((result)=>{callback(result)});     
     }
     var fileInput = document.getElementById('fileInput');
@@ -74,6 +74,7 @@ function initFileInput(callback, fileFilters){
         }
     }
     fileInput.addEventListener('change', handleFileSelect, false);
+    fileInput.click();
 }
 
 function initDropInput(callback){
