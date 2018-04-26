@@ -55,6 +55,7 @@ class BatchCluster extends Entity {
 
         this.processInstanceEntranceTimes = new ArrayList<TimeInstant>();
         this.startTime = null;
+        this.notPIEvents = new HashMap<Integer,List<Pair<ScyllaEvent, ProcessInstance>>>();
     }
 
     private static String buildBatchClusterName(ProcessSimulationComponents pSimComponents, int nodeId) {

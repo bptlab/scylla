@@ -61,7 +61,7 @@ public class StartEventPanel extends JPanel {
 
 			@Override
 			protected DistributionType getSavedValue() {
-				if(startEvent == null)return null;
+				if(startEvent == null || startEvent.getArrivalRateDistribution() == null)return null;
 				return startEvent.getArrivalRateDistribution().getType();
 			}
 

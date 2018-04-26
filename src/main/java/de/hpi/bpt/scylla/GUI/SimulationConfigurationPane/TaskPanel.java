@@ -101,7 +101,7 @@ public class TaskPanel extends JPanel implements ComponentHolder,SetObserver<Str
 
 			@Override
 			protected DistributionType getSavedValue() {
-				if(task == null)return null;
+				if(task == null || task.getDurationDistribution() == null)return null;
 				return task.getDurationDistribution().getType();
 			}
 
