@@ -13,12 +13,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -482,8 +486,17 @@ public class SimulationPane extends JPanel{
 		button_OpenLastOutput = new JButton("Open Last Output Path");
 		button_OpenLastOutput.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				try {
-					Desktop.getDesktop().open(new File(lastOutPutFolder));
+				try (Stream<Path> paths = Files.walk(Paths.get(lastOutPutFolder))) {
+				    paths
+				        .filter(Files::isRegularFile)
+				        .forEach((Path p)->{
+							try {
+								System.err.println(Desktop.isDesktopSupported() + " " + Desktop.getDesktop().isSupported(Desktop.Action.OPEN));
+								Desktop.getDesktop().print(p.toFile());
+							} catch (IOException e1) {
+								e1.printStackTrace();
+							}
+				        });
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
@@ -704,6 +717,10 @@ public class SimulationPane extends JPanel{
 			return labelText.getText();
 		}
 
+	}
+	
+	public void mampf(Object o) {
+		
 	}
 
 }

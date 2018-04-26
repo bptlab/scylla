@@ -7,7 +7,6 @@ import java.util.concurrent.Semaphore;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
-import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -34,10 +33,10 @@ public class WebFileChooser implements FileDialog{
 			semaphore.acquire();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-			return JFileChooser.ERROR_OPTION;
+			return ERROR_OPTION;
 		}
-		if(getSelectedFilePaths() == null || getSelectedFilePaths().length == 0)return JFileChooser.CANCEL_OPTION;
-		return JFileChooser.APPROVE_OPTION;
+		if(getSelectedFilePaths() == null || getSelectedFilePaths().length == 0)return CANCEL_OPTION;
+		return APPROVE_OPTION;
 	}
 	
 	public String[] getSelectedFilePaths() {
@@ -49,7 +48,8 @@ public class WebFileChooser implements FileDialog{
 
 		@Override
 		public void accept(String t) {
-			selectedFilePaths = t.split(Pattern.quote("|"));
+			//Empty string should give no results but would give String[]#{""}
+			selectedFilePaths = !t.isEmpty() ? t.split(Pattern.quote("|")) : new String[0];
 			semaphore.release();
 		}
 		
