@@ -23,8 +23,8 @@
       <bsim:Task id="Task_0hyoyrr" name="B">
         <bsim:duration timeUnit="MINUTES">
           <bsim:uniformDistribution>
-            <bsim:lower>2.0</bsim:lower>
-            <bsim:upper>10.0</bsim:upper>
+            <bsim:lower>1.0</bsim:lower>
+            <bsim:upper>5.0</bsim:upper>
           </bsim:uniformDistribution>
         </bsim:duration>
         <bsim:resources>
@@ -34,7 +34,7 @@
       <bsim:Task id="Task_0zm0o8g" name="C">
         <bsim:duration timeUnit="MINUTES">
           <bsim:exponentialDistribution>
-            <bsim:mean>10.0</bsim:mean>
+            <bsim:mean>5.0</bsim:mean>
           </bsim:exponentialDistribution>
         </bsim:duration>
         <bsim:resources>
