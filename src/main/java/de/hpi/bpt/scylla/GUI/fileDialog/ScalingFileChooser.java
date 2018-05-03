@@ -45,6 +45,7 @@ public class ScalingFileChooser extends JFileChooser implements FileDialog{
 	@Override
 	public String[] getSelectedFilePaths() {
 		File[] selectedFiles = getSelectedFiles();
+		if(selectedFiles == null)return null;
 		String[] filePaths = new String[selectedFiles.length];
 		for(int i = 0; i < selectedFiles.length; i++) {
 			filePaths[i] = selectedFiles[i].getPath();

@@ -59,8 +59,7 @@ import javax.swing.filechooser.FileFilter;
 public class SimulationPane extends JPanel{
 	
 
-	private static final FileFilter FILEFILTER_XML = new FileNameExtensionFilter("XML files","xml");
-	private static final FileFilter FILEFILTER_BPMN = new FileNameExtensionFilter("BPMN files","bpmn");
+
 	
 	//Global config components
 	private JLabel lblCurrentGlobalConfig;
@@ -163,8 +162,8 @@ public class SimulationPane extends JPanel{
 			public void actionPerformed(ActionEvent arg0) {
 				FileDialog chooser = FileDialog.request(ScyllaGUI.DEFAULTFILEPATH);
 				chooser.setDialogTitle("Choose global config");
-				chooser.addChoosableFileFilter(FILEFILTER_XML);
-				chooser.setFileFilter(FILEFILTER_XML);
+				chooser.addChoosableFileFilter(ScyllaGUI.FILEFILTER_XML);
+				chooser.setFileFilter(ScyllaGUI.FILEFILTER_XML);
 				int c = chooser.showDialog(null,"Open");
 				if(c == FileDialog.APPROVE_OPTION){
 					//TODO chnage to normal single file
@@ -232,8 +231,8 @@ public class SimulationPane extends JPanel{
 		button_openBpmnFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				FileDialog chooser = FileDialog.request(ScyllaGUI.DEFAULTFILEPATH);
-				chooser.addChoosableFileFilter(FILEFILTER_BPMN);
-				chooser.setFileFilter(FILEFILTER_BPMN);
+				chooser.addChoosableFileFilter(ScyllaGUI.FILEFILTER_BPMN);
+				chooser.setFileFilter(ScyllaGUI.FILEFILTER_BPMN);
 				chooser.setDialogTitle("Add business process diagram");
 				int c = chooser.showDialog(null,"Open");
 				if(c == FileDialog.APPROVE_OPTION){
@@ -307,8 +306,8 @@ public class SimulationPane extends JPanel{
 			public void actionPerformed(ActionEvent e) {
 				FileDialog chooser = FileDialog.request(ScyllaGUI.DEFAULTFILEPATH);
 				chooser.setDialogTitle("Add simulation file");
-				chooser.addChoosableFileFilter(FILEFILTER_XML);
-				chooser.setFileFilter(FILEFILTER_XML);
+				chooser.addChoosableFileFilter(ScyllaGUI.FILEFILTER_XML);
+				chooser.setFileFilter(ScyllaGUI.FILEFILTER_XML);
 				int c = chooser.showDialog(null,"Open");
 				if(c == FileDialog.APPROVE_OPTION){
 					for(String path : chooser.getSelectedFilePaths()) {
@@ -491,8 +490,7 @@ public class SimulationPane extends JPanel{
 				        .filter(Files::isRegularFile)
 				        .forEach((Path p)->{
 							try {
-								System.err.println(Desktop.isDesktopSupported() + " " + Desktop.getDesktop().isSupported(Desktop.Action.OPEN));
-								Desktop.getDesktop().print(p.toFile());
+								Desktop.getDesktop().open(p.toFile());
 							} catch (IOException e1) {
 								e1.printStackTrace();
 							}

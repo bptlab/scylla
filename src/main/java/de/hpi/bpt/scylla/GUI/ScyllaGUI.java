@@ -25,6 +25,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.plaf.ColorUIResource;
 
 import de.hpi.bpt.scylla.GUI.SimulationPane.SimulationPane;
@@ -129,12 +131,17 @@ public class ScyllaGUI extends JFrame {
 	public static final ImageIcon ICON_SAVEAS = resizeIcon(new ImageIcon(getResource("/GUI/saveAs.png")),TITLEFONT.getSize(),TITLEFONT.getSize());
 	/**Icon for open file*/
 	public static final ImageIcon ICON_OPEN = resizeIcon(new ImageIcon(getResource("/GUI/open.png")),TITLEFONT.getSize(),TITLEFONT.getSize());
+	/**Icon for download file*/
+	public static final ImageIcon ICON_DOWNLOAD = resizeIcon(new ImageIcon(getResource("/GUI/download.png")),TITLEFONT.getSize(),TITLEFONT.getSize());
 
 	
 	public static final String ACTIONKEY_NEW = "new";
 	public static final String ACTIONKEY_OPEN = "open";
 	public static final String ACTIONKEY_SAVE = "save";
-	public static final String ACTIONKEY_SAVEAS = "saveas";
+	public static final String ACTIONKEY_DOWNLOAD = "download";
+	
+	public static final FileFilter FILEFILTER_XML = new FileNameExtensionFilter("XML files","xml");
+	public static final FileFilter FILEFILTER_BPMN = new FileNameExtensionFilter("BPMN files","bpmn");
 	
 	
 	
@@ -285,11 +292,11 @@ public class ScyllaGUI extends JFrame {
 				((JComponent)contentPane.getSelectedComponent()).getActionMap().get(ACTIONKEY_SAVE).actionPerformed(e);
 			}
 		});
-		contentPane.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_S,InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK),ACTIONKEY_SAVEAS);
-		contentPane.getActionMap().put(ACTIONKEY_SAVEAS, new AbstractAction() {
+		contentPane.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_S,InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK),ACTIONKEY_DOWNLOAD);
+		contentPane.getActionMap().put(ACTIONKEY_DOWNLOAD, new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				((JComponent)contentPane.getSelectedComponent()).getActionMap().get(ACTIONKEY_SAVEAS).actionPerformed(e);
+				((JComponent)contentPane.getSelectedComponent()).getActionMap().get(ACTIONKEY_DOWNLOAD).actionPerformed(e);
 			}
 		});
 		contentPane.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_O,InputEvent.CTRL_DOWN_MASK),ACTIONKEY_OPEN);

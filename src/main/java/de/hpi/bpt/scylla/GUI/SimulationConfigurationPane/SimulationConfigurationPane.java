@@ -605,15 +605,17 @@ public class SimulationConfigurationPane extends EditorPane {
 
 	private void be_openPM() {
 		//Choose file to be opened
-		ScalingFileChooser chooser = new ScalingFileChooser(ScyllaGUI.DEFAULTFILEPATH);
+		FileDialog chooser = FileDialog.request(ScyllaGUI.DEFAULTFILEPATH);
 		chooser.setDialogTitle("Open Process Model File");
+		chooser.addChoosableFileFilter(ScyllaGUI.FILEFILTER_BPMN);
+		chooser.setFileFilter(ScyllaGUI.FILEFILTER_BPMN);
 		int c = chooser.showDialog(SimulationConfigurationPane.this,"Open");
 		//if the process is canceled, nothing happens
 		if(c == FileDialog.APPROVE_OPTION){
-			if(chooser.getSelectedFile() != null){
+			if(chooser.getSelectedFilePath() != null){
 				try {
 					boolean success = true;
-					bpmnPath = chooser.getSelectedFile().getPath();
+					bpmnPath = chooser.getSelectedFilePath();
 					if(creator != null)success = updateModel();
 					if(!success) {
 						clearBpmnPath();
@@ -623,7 +625,7 @@ public class SimulationConfigurationPane extends EditorPane {
 				} catch (JDOMException | IOException e1) {
 					e1.printStackTrace();
 				}
-				ScyllaGUI.DEFAULTFILEPATH = chooser.getSelectedFile().getPath();
+				ScyllaGUI.DEFAULTFILEPATH = chooser.getSelectedFilePath();
 			}else{
 				System.err.println("Could not open file");
 			}
@@ -632,21 +634,23 @@ public class SimulationConfigurationPane extends EditorPane {
 	
 	private void be_openGC() {
 		//Choose file to be opened
-		ScalingFileChooser chooser = new ScalingFileChooser(ScyllaGUI.DEFAULTFILEPATH);
+		FileDialog chooser = FileDialog.request(ScyllaGUI.DEFAULTFILEPATH);
 		chooser.setDialogTitle("Open Global Configuration File");
+		chooser.addChoosableFileFilter(ScyllaGUI.FILEFILTER_XML);
+		chooser.setFileFilter(ScyllaGUI.FILEFILTER_XML);
 		int c = chooser.showDialog(SimulationConfigurationPane.this,"Open");
 		//if the process is canceled, nothing happens
 		if(c == FileDialog.APPROVE_OPTION){
-			if(chooser.getSelectedFile() != null){
+			if(chooser.getSelectedFilePath() != null){
 				try {
-					globalPath = chooser.getSelectedFile().getPath();
+					globalPath = chooser.getSelectedFilePath();
 					gcc = GlobalConfigurationCreator.createFromFile(globalPath);
 					if(creator != null)updateGCC();
 					labelRefGCshow.setText(globalPath);
 				} catch (JDOMException | IOException e1) {
 					e1.printStackTrace();
 				}
-				ScyllaGUI.DEFAULTFILEPATH = chooser.getSelectedFile().getPath();
+				ScyllaGUI.DEFAULTFILEPATH = chooser.getSelectedFilePath();
 			}else{
 				System.err.println("Could not open file");
 			}
