@@ -18,7 +18,7 @@
       <bpmn:extensionElements>
         <camunda:properties>
           <camunda:property name="maxBatchSize" value="5" />
-          <camunda:property name="executionType" value="parallel" />
+          <camunda:property name="executionType" value="sequential-taskbased" />
           <camunda:property name="groupingCharacteristic" />
           <camunda:property name="activationRule">
           	<camunda:property name="thresholdRule" threshold="3" timeout="PT30M"/>

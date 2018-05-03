@@ -69,7 +69,7 @@ public class BatchClusterStartEvent extends Event<BatchCluster> {
 
                 ScyllaEvent subprocessEvent = new BPMNStartEvent(model, source, currentSimulationTime,
                         pSimComponentsOfSubprocess, subprocessInstance, startNodeId);
-                System.out.println("Created BPMNStartEvent for PI " + subprocessInstance.getId() + " / " + responsibleProcessInstance.getId() + " in Batch Cluster");
+                //System.out.println("Created BPMNStartEvent for PI " + subprocessInstance.getId() + " / " + responsibleProcessInstance.getId() + " in Batch Cluster");
 
                 if (j == 0) { // If it is the first process instance, schedule it...
                     subprocessEvent.schedule(subprocessInstance);
