@@ -17,7 +17,10 @@ public interface FileDialog {
 	public int showDialog(Component parent, String approveButtonText);
 	
 	public String[] getSelectedFilePaths();
-	public default String getSelectedFilePath(){return getSelectedFilePaths()[0];}
+	public default String getSelectedFilePath(){
+		String[] filePaths = getSelectedFilePaths();
+		return filePaths != null ? getSelectedFilePaths()[0] : null;
+	}
 	
 	public static FileDialog request(String currentDirectoryPath) {
 		return new WebFileChooser();
