@@ -1,5 +1,7 @@
 package de.hpi.bpt.scylla.GUI.WebSwing;
 
+import java.awt.AWTException;
+import java.awt.Robot;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,6 +16,7 @@ public final class WebSwingUtils {
 	public static JSObject JSGLOBAL;
 	
 	private static FileWriter FILEWRITER;
+	private static ScrollBot SCROLLBOT;
 	
 	
 	static String overlay = getResource("/Webswing/overlay.html");
@@ -35,6 +38,12 @@ public final class WebSwingUtils {
 		JSGLOBAL.setMember("overlayNode",overlay);
 		//Initializes util methods
 		JSGLOBAL.eval(upload_utils);
+		try {
+			SCROLLBOT = new ScrollBot();
+		} catch (AWTException e) {
+			e.printStackTrace();
+		}
+		JSGLOBAL.call("setUp", SCROLLBOT);
 	}
 	
 	public static FileWriter getDefaultFileWriter() {
@@ -54,6 +63,17 @@ public final class WebSwingUtils {
 			e.printStackTrace();
 		}
 		return result.toString();
+	}
+	
+	public static class ScrollBot{
+		private Robot scrollBot;
+		private ScrollBot() throws AWTException{
+			scrollBot = new Robot();
+		}
+		public synchronized void notifyScroll(int i) {
+			scrollBot.mouseWheel(i);
+			//System.err.println("Scrolling: "+i+" "+scrollBot);
+		}
 	}
 
 }

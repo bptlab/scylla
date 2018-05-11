@@ -33,7 +33,6 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import de.hpi.bpt.scylla.SimulationManager;
 import de.hpi.bpt.scylla.GUI.CheckboxListPanel;
@@ -47,7 +46,6 @@ import de.hpi.bpt.scylla.GUI.SimulationConfigurationPane.SimulationConfiguration
 import de.hpi.bpt.scylla.GUI.fileDialog.FileDialog;
 import de.hpi.bpt.scylla.logger.DebugLogger;
 import de.hpi.bpt.scylla.plugin_loader.PluginLoader;
-import javax.swing.filechooser.FileFilter;
 
 
 /**

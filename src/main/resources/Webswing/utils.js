@@ -1,3 +1,9 @@
+function setUp(scrollBot){
+    document.addEventListener("wheel", function(e){
+        scrollBot.notifyScroll(1000);
+    },true);
+}
+
 function openFileDialog(callback,fileFilters){
     showOverlay();
     new Promise((resolve, reject)=>{
