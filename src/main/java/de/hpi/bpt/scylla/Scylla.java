@@ -23,7 +23,7 @@ public class Scylla {
 
         String folder = "samples" + FILEDELIM;
 //      String resFilename = folder + "EmptyGC.xml";
-    	String resFilename = folder + "adminProcess_global.xml";
+//    	String resFilename = folder + "adminProcess_global.xml";
 //        String resFilename = folder + "retailer_global.xml";
 //        String resFilename = folder + "p0_globalconf.xml";
 
@@ -62,8 +62,8 @@ public class Scylla {
 //      String[] bpmnFilename = new String[] { folder + "p8_normalbpmn_with_dataobject.bpmn"};
 //      String[] simFilenames = new String[] { folder + "p8_normalbpmn_with_dataobject_sim.xml"};
 
-        String[] bpmnFilename = new String[] { folder + "adminProcess_batch_parallel.bpmn"};
-        String[] simFilenames = new String[] { folder + "adminProcess_batch_sim.xml"};
+//        String[] bpmnFilename = new String[] { folder + "adminProcess_batch_parallel.bpmn"};
+//        String[] simFilenames = new String[] { folder + "adminProcess_batch_sim.xml"};
 
 //        String[] bpmnFilename = new String[] { folder + "retailer_batch_bpmn.bpmn"};
 //        String[] simFilenames = new String[] { folder + "retailer_batch_sim.xml"};
@@ -95,7 +95,11 @@ public class Scylla {
 //        String[] bpmnFilename = new String[] { folder + "p61_return_batch.bpmn" };
 //        String[] simFilenames = new String[] { folder + "p61_return_batch_sim.xml" };
 //        String resFilename = folder + "p61_conf_batch.xml";
+        
+        String resFilename = folder + "batch_tests"+FILEDELIM+"BatchTestGlobalConfiguration.xml";
 
+      String[] bpmnFilename = new String[] { folder + "batch_tests"+FILEDELIM+"ProcessModel.bpmn" };
+      String[] simFilenames = new String[] { folder + "batch_tests"+FILEDELIM+"BatchTestSimulationConfiguration.xml" };
 
         boolean enableBpsLogging = true;
         boolean enableDesmojLogging = false;
