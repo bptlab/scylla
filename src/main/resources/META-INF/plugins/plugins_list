@@ -11,3 +11,4 @@ de.hpi.bpt.scylla.plugin.batch
 de.hpi.bpt.scylla.plugin.xeslogger
 de.hpi.bpt.scylla.plugin.eventArrivalRate
 de.hpi.bpt.scylla.plugin.gateway_eventbased
+de.hpi.bpt.scylla.plugin.guiPluginPrototypes

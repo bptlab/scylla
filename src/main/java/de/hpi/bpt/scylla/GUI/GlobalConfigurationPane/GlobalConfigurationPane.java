@@ -69,8 +69,7 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 		panelGeneral.setFocusable(true);
 		GridBagConstraints gbc_panelGeneral = new GridBagConstraints();
 		gbc_panelGeneral.anchor = GridBagConstraints.PAGE_START;
-		int inset_b = (int)(25.0*ScyllaGUI.SCALE);
-		gbc_panelGeneral.insets = new Insets(inset_b,inset_b,inset_b,inset_b);
+		gbc_panelGeneral.insets = new Insets(INSET_B,INSET_B,INSET_B,INSET_B);
 		gbc_panelGeneral.gridx = 0;
 		gbc_panelGeneral.gridy = 0;
 		gbc_panelGeneral.fill = GridBagConstraints.HORIZONTAL;
@@ -102,7 +101,7 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 			protected void setSavedValue(String v) {creator.setId(v);}
 		};
 		GridBagConstraints gbc_textfieldId = new GridBagConstraints();
-		gbc_textfieldId.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, inset_b);
+		gbc_textfieldId.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, INSET_B);
 		gbc_textfieldId.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textfieldId.gridx = 1;
 		gbc_textfieldId.gridy = 0;
@@ -148,7 +147,7 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 		};
 		
 		GridBagConstraints gbc_textfieldSeedEdit = new GridBagConstraints();
-		gbc_textfieldSeedEdit.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, inset_b);
+		gbc_textfieldSeedEdit.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, INSET_B);
 		gbc_textfieldSeedEdit.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textfieldSeedEdit.gridx = 1;
 		gbc_textfieldSeedEdit.gridy = 1;
@@ -205,7 +204,7 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 		});
 
 		GridBagConstraints gbc_comboboxTimezone = new GridBagConstraints();
-		gbc_comboboxTimezone.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, inset_b);
+		gbc_comboboxTimezone.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, INSET_B);
 		gbc_comboboxTimezone.fill = GridBagConstraints.HORIZONTAL;
 		gbc_comboboxTimezone.gridx = 1;
 		gbc_comboboxTimezone.gridy = 2;
@@ -229,22 +228,10 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 			}
 			
 		};
-		GridBagConstraints gbc_panelResources = new GridBagConstraints();
-		gbc_panelResources.anchor = GridBagConstraints.PAGE_START;
-		gbc_panelResources.fill = GridBagConstraints.HORIZONTAL;
-		gbc_panelResources.weightx = 1.0;
-		gbc_panelResources.weighty = 1.0;
-		gbc_panelResources.insets = new Insets(0, inset_b, inset_b, inset_b);
-		gbc_panelResources.gridx = 0;
-		gbc_panelResources.gridy = 1;
+		GridBagConstraints gbc_panelResources = createTabConstraints(1);
 
 		//Resource title label
-		JLabel resourceLabel = new JLabel("Resources");
-		resourceLabel.setBackground(ScyllaGUI.ColorField0);
-		resourceLabel.setForeground(ScyllaGUI.TITLEFONT_COLOR);
-		resourceLabel.setFont(ScyllaGUI.TITLEFONT);
-		resourceLabel.setOpaque(true);
-		ExpandPanel panelResourcesExpand = new ExpandPanel(resourceLabel, panelResources);
+		ExpandPanel panelResourcesExpand = createTab("Resources", panelResources);
 		panelResourcesExpand.expand();
 		panelMain.add(panelResourcesExpand, gbc_panelResources);
 		
@@ -283,22 +270,10 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 			}
 			
 		};
-		GridBagConstraints gbc_panelTimetables = new GridBagConstraints();
-		gbc_panelTimetables.anchor = GridBagConstraints.PAGE_START;
-		gbc_panelTimetables.fill = GridBagConstraints.HORIZONTAL;
-		gbc_panelTimetables.weightx = 1.0;
-		gbc_panelTimetables.weighty = 1.0;
-		gbc_panelTimetables.insets = new Insets(0, inset_b, inset_b, inset_b);
-		gbc_panelTimetables.gridx = 0;
-		gbc_panelTimetables.gridy = 2;
+		GridBagConstraints gbc_panelTimetables = createTabConstraints(2);
 		
 		//Timetable title label
-		JLabel timetableLabel = new JLabel("Timetables");
-		timetableLabel.setBackground(ScyllaGUI.ColorField0);
-		timetableLabel.setForeground(ScyllaGUI.TITLEFONT_COLOR);
-		timetableLabel.setFont(ScyllaGUI.TITLEFONT);
-		timetableLabel.setOpaque(true);
-		ExpandPanel panelTimetablesExpand = new ExpandPanel(timetableLabel, panelTimetables);
+		ExpandPanel panelTimetablesExpand = createTab("Timetables", panelTimetables);
 		panelTimetablesExpand.expand();
 		panelMain.add(panelTimetablesExpand, gbc_panelTimetables);
 		
@@ -315,7 +290,7 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 		gbc_panelBuffer.gridy = 3;
 		panelMain.add(panelBuffer,gbc_panelBuffer);
 		
-		//Disable as no gc is opened
+		//Disable, as no gc is opened
 		setEnabled(false);
 		
 		setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{buttonNewfile, buttonSavefile, buttonSavefileAs, buttonOpenfile, buttonClosefile, textfieldId.getComponent(), textfieldSeed.getComponent(), comboboxTimezone.getComponent(), panelResourcesExpand, panelTimetablesExpand}));

@@ -2,6 +2,7 @@ package de.hpi.bpt.scylla.GUI;
 
 import java.awt.AWTKeyStroke;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -484,6 +485,36 @@ public abstract class EditorPane extends JPanel implements FormManager{
 	 */
 	protected void showNoEditorLabel() {
 		labelFiletitle.setText("<no file>");
+	}
+	
+	
+//=====================Static======================
+
+	protected static final int INSET_B = (int)(25.0*ScyllaGUI.SCALE);
+	
+	public static GridBagConstraints createTabConstraints(int index) {
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.anchor = GridBagConstraints.PAGE_START;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.weightx = 1.0;
+		gbc.weighty = 1.0;
+		gbc.insets = new Insets(0, INSET_B, INSET_B, INSET_B);
+		gbc.gridx = 0;
+		gbc.gridy = index;
+		return gbc;
+	}
+	
+	public static JLabel createTabLabel(String text) {
+		JLabel newLabel = new JLabel(text);
+		newLabel.setBackground(ScyllaGUI.ColorField0);
+		newLabel.setForeground(ScyllaGUI.TITLEFONT_COLOR);
+		newLabel.setFont(ScyllaGUI.TITLEFONT);
+		newLabel.setOpaque(true);
+		return newLabel;
+	}
+	
+	public static ExpandPanel createTab(String text, Component body) {
+		return new ExpandPanel(createTabLabel(text), body);
 	}
 
 }

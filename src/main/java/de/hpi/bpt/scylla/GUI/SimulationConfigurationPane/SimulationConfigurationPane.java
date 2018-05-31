@@ -39,6 +39,7 @@ import de.hpi.bpt.scylla.GUI.InputFields.NumberField;
 import de.hpi.bpt.scylla.GUI.InputFields.NumberSpinner;
 import de.hpi.bpt.scylla.GUI.InputFields.StringField;
 import de.hpi.bpt.scylla.GUI.InputFields.TimeField;
+import de.hpi.bpt.scylla.GUI.plugin.EditorTabPluggable;
 import de.hpi.bpt.scylla.creation.ElementLink;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.ExclusiveGateway;
@@ -83,15 +84,13 @@ public class SimulationConfigurationPane extends EditorPane {
 	 * Create the panel.
 	 */
 	public SimulationConfigurationPane() {
-
-		int inset_b = 25;//TODO (int)(25.0*ScyllaGUI.SCALE);
 		
 		// -- Reference Panel --
 		JPanel panelReference = new JPanel();
 		panelReference.setFocusable(true);
 		GridBagConstraints gbc_panelReference = new GridBagConstraints();
 		gbc_panelReference.anchor = GridBagConstraints.PAGE_START;
-		gbc_panelReference.insets = new Insets(inset_b,inset_b,inset_b,inset_b);
+		gbc_panelReference.insets = new Insets(INSET_B,INSET_B,INSET_B,INSET_B);
 		gbc_panelReference.gridx = 0;
 		gbc_panelReference.gridy = 0;
 		gbc_panelReference.fill = GridBagConstraints.HORIZONTAL;
@@ -102,11 +101,7 @@ public class SimulationConfigurationPane extends EditorPane {
 		panelReference.setLayout(gbl_panelReference);
 		
 		//Referenced files title label
-		JLabel labelReferenceTitle = new JLabel("Referenced files");
-		labelReferenceTitle.setBackground(ScyllaGUI.ColorField0);
-		labelReferenceTitle.setForeground(ScyllaGUI.TITLEFONT_COLOR);
-		labelReferenceTitle.setFont(ScyllaGUI.TITLEFONT);
-		labelReferenceTitle.setOpaque(true);
+		JLabel labelReferenceTitle = createTabLabel("Referenced files");
 		GridBagConstraints gbc_labelReferenceTitle = new GridBagConstraints();
 		gbc_labelReferenceTitle.fill = GridBagConstraints.HORIZONTAL;
 		gbc_labelReferenceTitle.gridx = 0;
@@ -189,7 +184,7 @@ public class SimulationConfigurationPane extends EditorPane {
 		panelGeneral.setFocusable(true);
 		GridBagConstraints gbc_panelGeneral = new GridBagConstraints();
 		gbc_panelGeneral.anchor = GridBagConstraints.PAGE_START;
-		gbc_panelGeneral.insets = new Insets(0 ,inset_b,inset_b,inset_b);
+		gbc_panelGeneral.insets = new Insets(0 ,INSET_B,INSET_B,INSET_B);
 		gbc_panelGeneral.gridx = 0;
 		gbc_panelGeneral.gridy = 1;
 		gbc_panelGeneral.fill = GridBagConstraints.HORIZONTAL;
@@ -200,11 +195,7 @@ public class SimulationConfigurationPane extends EditorPane {
 		panelGeneral.setLayout(gbl_panelGeneral);
 		
 		//General panel title label
-		JLabel labelGeneralTitle = new JLabel("General");
-		labelGeneralTitle.setBackground(ScyllaGUI.ColorField0);
-		labelGeneralTitle.setForeground(ScyllaGUI.TITLEFONT_COLOR);
-		labelGeneralTitle.setFont(ScyllaGUI.TITLEFONT);
-		labelGeneralTitle.setOpaque(true);
+		JLabel labelGeneralTitle = createTabLabel("General");
 		GridBagConstraints gbc_labelGeneralTitle = new GridBagConstraints();
 		gbc_labelGeneralTitle.insets = new Insets(0, 0, 0, 0);
 		gbc_labelGeneralTitle.fill = GridBagConstraints.HORIZONTAL;
@@ -232,7 +223,7 @@ public class SimulationConfigurationPane extends EditorPane {
 		};
 		GridBagConstraints gbc_textfieldId = new GridBagConstraints();
 		gbc_textfieldId.gridwidth = 4;
-		gbc_textfieldId.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, inset_b);
+		gbc_textfieldId.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, INSET_B);
 		gbc_textfieldId.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textfieldId.gridx = 1;
 		gbc_textfieldId.gridy = 1;
@@ -277,7 +268,7 @@ public class SimulationConfigurationPane extends EditorPane {
 		};
 		GridBagConstraints gbc_textfieldSeed = new GridBagConstraints();
 		gbc_textfieldSeed.gridwidth = 4;
-		gbc_textfieldSeed.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, inset_b);
+		gbc_textfieldSeed.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, INSET_B);
 		gbc_textfieldSeed.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textfieldSeed.gridx = 1;
 		gbc_textfieldSeed.gridy = 2;
@@ -310,7 +301,7 @@ public class SimulationConfigurationPane extends EditorPane {
 		GridBagConstraints gbc_spinnerNOI = new GridBagConstraints();
 		gbc_spinnerNOI.gridwidth = 1;
 		gbc_spinnerNOI.fill = GridBagConstraints.BOTH;
-		gbc_spinnerNOI.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, inset_b);
+		gbc_spinnerNOI.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, INSET_B);
 		gbc_spinnerNOI.gridx = 1;
 		gbc_spinnerNOI.gridy = 3;
 		panelGeneral.add(spinnerNOI.getComponent(), gbc_spinnerNOI);
@@ -400,7 +391,7 @@ public class SimulationConfigurationPane extends EditorPane {
 		};
 		GridBagConstraints gbc_textfieldStartTime = new GridBagConstraints();
 		gbc_textfieldStartTime.gridwidth = 2;
-		gbc_textfieldStartTime.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, inset_b);
+		gbc_textfieldStartTime.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, INSET_B);
 		gbc_textfieldStartTime.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textfieldStartTime.gridx = 3;
 		gbc_textfieldStartTime.gridy = 4;
@@ -515,7 +506,7 @@ public class SimulationConfigurationPane extends EditorPane {
 			}
 		});
 		GridBagConstraints gbc_checkboxUnlimited = new GridBagConstraints();
-		gbc_checkboxUnlimited.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, inset_b);
+		gbc_checkboxUnlimited.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, INSET_B);
 		gbc_checkboxUnlimited.gridx = 4;
 		gbc_checkboxUnlimited.gridy = 5;
 		panelGeneral.add(checkboxUnlimited, gbc_checkboxUnlimited);
@@ -524,61 +515,27 @@ public class SimulationConfigurationPane extends EditorPane {
 		
 		
 		//------ Start Event Panel -----
-		GridBagConstraints gbc_panelStartevent = new GridBagConstraints();
-		gbc_panelStartevent.anchor = GridBagConstraints.PAGE_START;
-		gbc_panelStartevent.fill = GridBagConstraints.HORIZONTAL;
-		gbc_panelStartevent.weightx = 1.0;
-		gbc_panelStartevent.weighty = 1.0;
-		gbc_panelStartevent.insets = new Insets(0, inset_b, inset_b, inset_b);
-		gbc_panelStartevent.gridx = 0;
-		gbc_panelStartevent.gridy = 2;
-		JLabel starteventLabel = new JLabel("Start Arrival");
-		starteventLabel.setBackground(ScyllaGUI.ColorField0);
-		starteventLabel.setForeground(ScyllaGUI.TITLEFONT_COLOR);
-		starteventLabel.setFont(ScyllaGUI.TITLEFONT);
-		starteventLabel.setOpaque(true);
+		GridBagConstraints gbc_panelStartevent = createTabConstraints(2);
 		startEventPanel = new StartEventPanel(this);
-		panelStarteventExpand = new ExpandPanel(starteventLabel, createPMErrorLabel());
+		panelStarteventExpand = createTab("Start Arrival", createPMErrorLabel());
 		panelMain.add(panelStarteventExpand, gbc_panelStartevent);
 		
 		//------ Task Panel ------
 		taskPanel = new ListChooserPanel();
 		
-		GridBagConstraints gbc_panelTasks = new GridBagConstraints();
-		gbc_panelTasks.anchor = GridBagConstraints.PAGE_START;
-		gbc_panelTasks.fill = GridBagConstraints.HORIZONTAL;
-		gbc_panelTasks.weightx = 1.0;
-		gbc_panelTasks.weighty = 1.0;
-		gbc_panelTasks.insets = new Insets(0, inset_b, inset_b, inset_b);
-		gbc_panelTasks.gridx = 0;
-		gbc_panelTasks.gridy = 3;
-		JLabel tasksLabel = new JLabel("Tasks");
-		tasksLabel.setBackground(ScyllaGUI.ColorField0);
-		tasksLabel.setForeground(ScyllaGUI.TITLEFONT_COLOR);
-		tasksLabel.setFont(ScyllaGUI.TITLEFONT);
-		tasksLabel.setOpaque(true);
-		panelTasksExpand = new ExpandPanel(tasksLabel, createPMErrorLabel());
+		GridBagConstraints gbc_panelTasks = createTabConstraints(3);
+		panelTasksExpand = createTab("Tasks", createPMErrorLabel());
 		panelMain.add(panelTasksExpand, gbc_panelTasks);
 		
 		// ----- Gateway Panel -----
 		gatewayPanel = new ListChooserPanel();
 		
 		
-		GridBagConstraints gbc_panelGateways = new GridBagConstraints();
-		gbc_panelGateways.anchor = GridBagConstraints.PAGE_START;
-		gbc_panelGateways.fill = GridBagConstraints.HORIZONTAL;
-		gbc_panelGateways.weightx = 1.0;
-		gbc_panelGateways.weighty = 1.0;
-		gbc_panelGateways.insets = new Insets(0, inset_b, inset_b, inset_b);
-		gbc_panelGateways.gridx = 0;
-		gbc_panelGateways.gridy = 4;
-		JLabel gatewaysLabel = new JLabel("Gateways");
-		gatewaysLabel.setBackground(ScyllaGUI.ColorField0);
-		gatewaysLabel.setForeground(ScyllaGUI.TITLEFONT_COLOR);
-		gatewaysLabel.setFont(ScyllaGUI.TITLEFONT);
-		gatewaysLabel.setOpaque(true);
-		panelGatewaysExpand = new ExpandPanel(gatewaysLabel, createPMErrorLabel());
+		GridBagConstraints gbc_panelGateways = createTabConstraints(4);
+		panelGatewaysExpand = createTab("Gateways", createPMErrorLabel());
 		panelMain.add(panelGatewaysExpand, gbc_panelGateways);
+		
+		int lastIndex = EditorTabPluggable.runPlugins(panelMain, 5);
 		
 		//Layout fixing empty buffer panel
 		JPanel panelBuffer = new JPanel();
@@ -590,7 +547,7 @@ public class SimulationConfigurationPane extends EditorPane {
 		gbc_panelBuffer.weighty = 100;
 		gbc_panelBuffer.weightx = 1;
 		gbc_panelBuffer.gridx = 0;
-		gbc_panelBuffer.gridy = 5;
+		gbc_panelBuffer.gridy = lastIndex;
 		panelMain.add(panelBuffer,gbc_panelBuffer);
 		
 		setEnabled(false);
