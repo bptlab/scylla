@@ -137,7 +137,7 @@ public class SimulationPane extends JPanel{
 		displayCurrentGlobalConfigChosen.buttonEdit.setVisible(false);
 		//textfield_CurrentGlobalConfig_chosen.setMargin(ScyllaGUI.LEFTMARGIN);
 		displayCurrentGlobalConfigChosen.setFont(ScyllaGUI.DEFAULTFONT);
-		displayCurrentGlobalConfigChosen.setToolTipText("Path for current global configuarition file");
+		displayCurrentGlobalConfigChosen.setToolTipText("Path for current global configuaration file");
 		GridBagConstraints gbc_displayCurrentGlobalConfigChosenWrap = new GridBagConstraints();
 		gbc_displayCurrentGlobalConfigChosenWrap.fill = GridBagConstraints.BOTH;
 		gbc_displayCurrentGlobalConfigChosenWrap.insets = new Insets(0, COL1, 0, 0);
