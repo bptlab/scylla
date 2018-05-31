@@ -18,6 +18,9 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -29,13 +32,13 @@ import de.hpi.bpt.scylla.GUI.ExpandPanel;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel.ComponentHolder;
 import de.hpi.bpt.scylla.GUI.ScalingCheckBoxIcon;
+import de.hpi.bpt.scylla.GUI.ScalingFileChooser;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
 import de.hpi.bpt.scylla.GUI.InputFields.DateField;
 import de.hpi.bpt.scylla.GUI.InputFields.NumberField;
 import de.hpi.bpt.scylla.GUI.InputFields.NumberSpinner;
 import de.hpi.bpt.scylla.GUI.InputFields.StringField;
 import de.hpi.bpt.scylla.GUI.InputFields.TimeField;
-import de.hpi.bpt.scylla.GUI.fileDialog.FileDialog;
 import de.hpi.bpt.scylla.creation.ElementLink;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator;
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.ExclusiveGateway;
@@ -601,17 +604,15 @@ public class SimulationConfigurationPane extends EditorPane {
 
 	private void be_openPM() {
 		//Choose file to be opened
-		FileDialog chooser = FileDialog.request(ScyllaGUI.DEFAULTFILEPATH);
+		ScalingFileChooser chooser = new ScalingFileChooser(ScyllaGUI.DEFAULTFILEPATH);
 		chooser.setDialogTitle("Open Process Model File");
-		chooser.addChoosableFileFilter(ScyllaGUI.FILEFILTER_BPMN);
-		chooser.setFileFilter(ScyllaGUI.FILEFILTER_BPMN);
 		int c = chooser.showDialog(SimulationConfigurationPane.this,"Open");
 		//if the process is canceled, nothing happens
-		if(c == FileDialog.APPROVE_OPTION){
-			if(chooser.getSelectedFilePath() != null){
+		if(c == ScalingFileChooser.APPROVE_OPTION){
+			if(chooser.getSelectedFile() != null){
 				try {
 					boolean success = true;
-					bpmnPath = chooser.getSelectedFilePath();
+					bpmnPath = chooser.getSelectedFile().getPath();
 					if(creator != null)success = updateModel();
 					if(!success) {
 						clearBpmnPath();
@@ -621,7 +622,7 @@ public class SimulationConfigurationPane extends EditorPane {
 				} catch (JDOMException | IOException e1) {
 					e1.printStackTrace();
 				}
-				ScyllaGUI.DEFAULTFILEPATH = chooser.getSelectedFilePath();
+				ScyllaGUI.DEFAULTFILEPATH = chooser.getSelectedFile().getPath();
 			}else{
 				System.err.println("Could not open file");
 			}
@@ -630,23 +631,21 @@ public class SimulationConfigurationPane extends EditorPane {
 	
 	private void be_openGC() {
 		//Choose file to be opened
-		FileDialog chooser = FileDialog.request(ScyllaGUI.DEFAULTFILEPATH);
+		ScalingFileChooser chooser = new ScalingFileChooser(ScyllaGUI.DEFAULTFILEPATH);
 		chooser.setDialogTitle("Open Global Configuration File");
-		chooser.addChoosableFileFilter(ScyllaGUI.FILEFILTER_XML);
-		chooser.setFileFilter(ScyllaGUI.FILEFILTER_XML);
 		int c = chooser.showDialog(SimulationConfigurationPane.this,"Open");
 		//if the process is canceled, nothing happens
-		if(c == FileDialog.APPROVE_OPTION){
-			if(chooser.getSelectedFilePath() != null){
+		if(c == ScalingFileChooser.APPROVE_OPTION){
+			if(chooser.getSelectedFile() != null){
 				try {
-					globalPath = chooser.getSelectedFilePath();
+					globalPath = chooser.getSelectedFile().getPath();
 					gcc = GlobalConfigurationCreator.createFromFile(globalPath);
 					if(creator != null)updateGCC();
 					labelRefGCshow.setText(globalPath);
 				} catch (JDOMException | IOException e1) {
 					e1.printStackTrace();
 				}
-				ScyllaGUI.DEFAULTFILEPATH = chooser.getSelectedFilePath();
+				ScyllaGUI.DEFAULTFILEPATH = chooser.getSelectedFile().getPath();
 			}else{
 				System.err.println("Could not open file");
 			}
