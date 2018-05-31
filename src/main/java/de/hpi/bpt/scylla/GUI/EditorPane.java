@@ -2,7 +2,6 @@ package de.hpi.bpt.scylla.GUI;
 
 import java.awt.AWTKeyStroke;
 import java.awt.Color;
-import java.awt.Desktop;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -28,9 +27,6 @@ import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
 
 import org.jdom2.JDOMException;
-
-import de.hpi.bpt.scylla.GUI.fileDialog.FileDialog;
-import de.hpi.bpt.scylla.GUI.fileDialog.ScalingFileChooser;
 
 
 
@@ -67,7 +63,7 @@ public abstract class EditorPane extends JPanel implements FormManager{
 	/**Button for override saving files, accessible for subclasses*/
 	protected JButton buttonSavefile;
 	/**Button for saving file with new name, accessible for subclasses*/
-	protected JButton buttonDownload;
+	protected JButton buttonSavefileAs;
 	/**Button to open a new file, accessible for subclasses*/
 	protected JButton buttonOpenfile;
 	/**Label displaying the file title or any other title, accessible for subclasses*/
@@ -123,7 +119,7 @@ public abstract class EditorPane extends JPanel implements FormManager{
 		
 		// Button "Save file"
 		buttonSavefile = new JButton();
-		buttonSavefile.setToolTipText("Save changes on Server (Ctrl + S)");
+		buttonSavefile.setToolTipText("Save (Ctrl + S)");
 		setSaved(true);
 		buttonSavefile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -137,14 +133,18 @@ public abstract class EditorPane extends JPanel implements FormManager{
 		panelHeader.add(buttonSavefile, gbc_buttonSavefile);
 		
 		// Button "Save file as"
-		buttonDownload = new JButton("");
-		buttonDownload.setToolTipText("Download (Ctrl + Shift + S)");
-		buttonDownload.addActionListener(this::be_download);
-		buttonDownload.setIcon(ScyllaGUI.ICON_DOWNLOAD);
+		buttonSavefileAs = new JButton("");
+		buttonSavefileAs.setToolTipText("Save as (Ctrl + Shift + S)");
+		buttonSavefileAs.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				be_saveAs();
+			}
+		});
+		buttonSavefileAs.setIcon(ScyllaGUI.ICON_SAVEAS);
 		GridBagConstraints gbc_buttonSavefileAs = new GridBagConstraints();
 		gbc_buttonSavefileAs.weightx = 0;
 		gbc_buttonSavefileAs.fill = GridBagConstraints.BOTH;
-		panelHeader.add(buttonDownload, gbc_buttonSavefileAs);
+		panelHeader.add(buttonSavefileAs, gbc_buttonSavefileAs);
 		
 		// Button "Open file"
 		buttonOpenfile = new JButton();
@@ -228,10 +228,10 @@ public abstract class EditorPane extends JPanel implements FormManager{
 				be_save();
 			}
 		});
-		getActionMap().put(ScyllaGUI.ACTIONKEY_DOWNLOAD, new AbstractAction() {
+		getActionMap().put(ScyllaGUI.ACTIONKEY_SAVEAS, new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				be_download(e);
+				be_saveAs();
 			}
 		});
 		getActionMap().put(ScyllaGUI.ACTIONKEY_OPEN, new AbstractAction() {
@@ -266,14 +266,14 @@ public abstract class EditorPane extends JPanel implements FormManager{
 	 */
 	public void be_save(){
 		if(isSaved())return;
-		if(!(getFile() != null && getFile().exists()))createFile();
-		save();
+		if(getFile() != null && getFile().exists())save();
+		else be_saveAs();
 	}
 	
 	/**
 	 * Button event for "save as" button
 	 */
-	/*public void be_saveAs(){
+	public void be_saveAs(){
 		//Select file and confirm override if file is already existing
 		ScalingFileChooser chooser = new ScalingFileChooser(ScyllaGUI.DEFAULTFILEPATH){
 			@Override
@@ -297,11 +297,10 @@ public abstract class EditorPane extends JPanel implements FormManager{
 			}
 		};
 		if(getFile() != null && getFile().exists())chooser.setSelectedFile(getFile());
-		//TODO default file format is not necessarily .xml
 		else if(!getId().equals("")) chooser.setSelectedFile(new File(ScyllaGUI.DEFAULTFILEPATH+"\\"+getId()+".xml"));
 		chooser.setDialogTitle("Save");
 		int c = chooser.showDialog(null,"Save");
-		if(c == FileDialog.APPROVE_OPTION){
+		if(c == ScalingFileChooser.APPROVE_OPTION){
 			setFile(chooser.getSelectedFile());
 			if(getFile() != null){
 				ScyllaGUI.DEFAULTFILEPATH = chooser.getSelectedFile().getPath();
@@ -310,7 +309,7 @@ public abstract class EditorPane extends JPanel implements FormManager{
 				System.err.println("Could not find file");//TODO
 			}
 		}
-	}*/
+	}
 	
 	/**
 	 * Button event for opening existing gcs
@@ -322,17 +321,17 @@ public abstract class EditorPane extends JPanel implements FormManager{
 			if(i != 1)return;
 		}
 		//Choose file to be opened
-		FileDialog chooser = FileDialog.request(ScyllaGUI.DEFAULTFILEPATH);
+		ScalingFileChooser chooser = new ScalingFileChooser(ScyllaGUI.DEFAULTFILEPATH);
 		chooser.setDialogTitle("Open");
 		int c = chooser.showDialog(this,"Open");
 		//if the process is canceled, nothing happens
-		if(c == FileDialog.APPROVE_OPTION){
-			if(chooser.getSelectedFilePath() != null){
+		if(c == ScalingFileChooser.APPROVE_OPTION){
+			if(chooser.getSelectedFile() != null){
 				//Close current opened file
 				close();
 				//Update default file path
-				setFile(new File(chooser.getSelectedFilePath()));
-				ScyllaGUI.DEFAULTFILEPATH = chooser.getSelectedFilePath();
+				setFile(chooser.getSelectedFile());
+				ScyllaGUI.DEFAULTFILEPATH = chooser.getSelectedFile().getPath();
 				try {
 					open();
 				} catch (JDOMException | IOException e) {
@@ -344,10 +343,6 @@ public abstract class EditorPane extends JPanel implements FormManager{
 		}
 	}	
 	
-	private void createFile() {
-		setFile(new File(getId()+".xml"));
-	}
-	
 	/**
 	 * Button event close
 	 * Closes gc but asks to save unsaved changes if existing
@@ -357,15 +352,6 @@ public abstract class EditorPane extends JPanel implements FormManager{
 		if(isSaved() || showUnsavedChangesDialog() == 1) {
 			close();
 			notifyTitleObservers(this);
-		}
-	}
-	
-	public void be_download(ActionEvent event) {
-		save();
-		try {
-			Desktop.getDesktop().open(getFile());
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 	
@@ -490,7 +476,7 @@ public abstract class EditorPane extends JPanel implements FormManager{
 	@Override
 	public void setEnabled(boolean b){
 		buttonClosefile.setEnabled(b);
-		buttonDownload.setEnabled(b);
+		buttonSavefileAs.setEnabled(b);
 	}
 	
 	/**

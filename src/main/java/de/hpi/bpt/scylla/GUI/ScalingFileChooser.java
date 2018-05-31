@@ -1,14 +1,11 @@
-package de.hpi.bpt.scylla.GUI.fileDialog;
+package de.hpi.bpt.scylla.GUI;
 
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.io.File;
 
 import javax.swing.JFileChooser;
-
-import de.hpi.bpt.scylla.GUI.ScyllaGUI;
 
 /**
  * Utility filechooser for large displays
@@ -16,7 +13,7 @@ import de.hpi.bpt.scylla.GUI.ScyllaGUI;
  *
  */
 @SuppressWarnings("serial")
-public class ScalingFileChooser extends JFileChooser implements FileDialog{
+public class ScalingFileChooser extends JFileChooser{
 	
 	/**
 	 * Constructor, automatically sets dimension and font <br>
@@ -38,19 +35,6 @@ public class ScalingFileChooser extends JFileChooser implements FileDialog{
 			if(c[i] instanceof Container)setFont(((Container)c[i]).getComponents(),f);
 			try{c[i].setFont(f);}catch(Exception e){};
 		}
-	}
-	
-	//====================Interface======================
-
-	@Override
-	public String[] getSelectedFilePaths() {
-		File[] selectedFiles = getSelectedFiles();
-		if(selectedFiles == null)return null;
-		String[] filePaths = new String[selectedFiles.length];
-		for(int i = 0; i < selectedFiles.length; i++) {
-			filePaths[i] = selectedFiles[i].getPath();
-		}
-		return filePaths;
 	}
 	
 

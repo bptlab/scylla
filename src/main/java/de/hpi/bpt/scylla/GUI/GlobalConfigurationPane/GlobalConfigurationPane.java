@@ -318,7 +318,7 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 		//Disable as no gc is opened
 		setEnabled(false);
 		
-		setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{buttonNewfile, buttonSavefile, buttonDownload, buttonOpenfile, buttonClosefile, textfieldId.getComponent(), textfieldSeed.getComponent(), comboboxTimezone.getComponent(), panelResourcesExpand, panelTimetablesExpand}));
+		setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{buttonNewfile, buttonSavefile, buttonSavefileAs, buttonOpenfile, buttonClosefile, textfieldId.getComponent(), textfieldSeed.getComponent(), comboboxTimezone.getComponent(), panelResourcesExpand, panelTimetablesExpand}));
 		
 	}
 	
