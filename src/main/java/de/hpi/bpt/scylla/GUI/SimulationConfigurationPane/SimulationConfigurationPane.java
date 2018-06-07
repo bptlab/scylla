@@ -18,9 +18,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.event.ChangeEvent;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -79,6 +76,8 @@ public class SimulationConfigurationPane extends EditorPane {
 	private ExpandPanel panelTasksExpand;
 	private ExpandPanel panelGatewaysExpand;
 	private ExpandPanel panelStarteventExpand;
+	
+	public enum Tabs {FILEREFERENCE, GENERAL, STARTARRIVAL, TASKS, GATEWAYS}
 
 	/**
 	 * Create the panel.
@@ -92,10 +91,10 @@ public class SimulationConfigurationPane extends EditorPane {
 		gbc_panelReference.anchor = GridBagConstraints.PAGE_START;
 		gbc_panelReference.insets = new Insets(INSET_B,INSET_B,INSET_B,INSET_B);
 		gbc_panelReference.gridx = 0;
-		gbc_panelReference.gridy = 0;
+		gbc_panelReference.gridy = GridBagConstraints.RELATIVE;
 		gbc_panelReference.fill = GridBagConstraints.HORIZONTAL;
 		gbc_panelReference.weightx = 1;
-		panelMain.add(panelReference, gbc_panelReference);
+		addTab(Tabs.FILEREFERENCE, panelReference, gbc_panelReference);
 		GridBagLayout gbl_panelReference = new GridBagLayout();
 		gbl_panelReference.columnWeights = new double[]{0.1,4.0,0};
 		panelReference.setLayout(gbl_panelReference);
@@ -186,10 +185,10 @@ public class SimulationConfigurationPane extends EditorPane {
 		gbc_panelGeneral.anchor = GridBagConstraints.PAGE_START;
 		gbc_panelGeneral.insets = new Insets(0 ,INSET_B,INSET_B,INSET_B);
 		gbc_panelGeneral.gridx = 0;
-		gbc_panelGeneral.gridy = 1;
+		gbc_panelGeneral.gridy = GridBagConstraints.RELATIVE;
 		gbc_panelGeneral.fill = GridBagConstraints.HORIZONTAL;
 		gbc_panelGeneral.weightx = 1;
-		panelMain.add(panelGeneral, gbc_panelGeneral);
+		addTab(Tabs.GENERAL, panelGeneral, gbc_panelGeneral);
 		GridBagLayout gbl_panelGeneral = new GridBagLayout();
 		gbl_panelGeneral.columnWeights = new double[]{1.0,1.0,0.0,1.0, 0.0};
 		panelGeneral.setLayout(gbl_panelGeneral);
@@ -239,20 +238,6 @@ public class SimulationConfigurationPane extends EditorPane {
 		panelGeneral.add(labelSeed, gbc_labelSeed);
 		
 		//Seed input field
-//		NumberFormat format = NumberFormat.getInstance();
-//		format.setGroupingUsed(false);
-//		textfieldSeed = new JFormattedTextField(format);
-//		textfieldSeed.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
-//			if(isChangeFlag())return;
-//			try{
-//				Long s = creator.getRandomSeed();
-//				Long n = Long.parseLong(textfieldSeed.getText());
-//				if(!n.equals(s)){
-//					creator.setRandomSeed(n);
-//					setSaved(false);
-//				}
-//			}catch(Exception exc){}
-//		}));
 		textfieldSeed = new NumberField<Long>(this) {
 
 			@Override
@@ -316,22 +301,6 @@ public class SimulationConfigurationPane extends EditorPane {
 		panelGeneral.add(labelStartDate, gbc_labelStartDate);
 		
 		//Startdate input field
-//		dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-//		SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy");
-//		textfieldStartDate = new JFormattedTextField(df);
-//		textfieldStartDate.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
-//			if(isChangeFlag())return;
-//			try{
-//				LocalDate d = LocalDate.parse(textfieldStartDate.getText(),dateFormatter);
-//				if(startDateTime == null)startDateTime = ZonedDateTime.now();
-//				if(!d.equals(startDateTime.toLocalDate())){
-//					startDateTime = startDateTime.with(d);
-//					creator.setStartDateTime(startDateTime);
-//					setSaved(false);
-//				}
-//			}catch(Exception exc){}
-//		}));
-//		textfieldStartDate.setText(dateFormatter.format(LocalDate.now()));
 		textfieldStartDate = new DateField(this) {
 			@Override
 			protected void setSavedValue(LocalDate v) {
@@ -362,19 +331,6 @@ public class SimulationConfigurationPane extends EditorPane {
 		panelGeneral.add(labelStartTime, gbc_labelStartTime);
 		
 		//Start time input field
-//		textfieldStartTime = new JFormattedTextField(DateTimeFormatter.ISO_LOCAL_TIME.toFormat());
-//		textfieldStartTime.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
-//			if(isChangeFlag())return;
-//			try{
-//				LocalTime l = LocalTime.parse(textfieldStartTime.getText());
-//				if(startDateTime == null)startDateTime = ZonedDateTime.now();
-//				if(!l.equals(startDateTime.toLocalTime())){
-//					startDateTime = startDateTime.with(l);
-//					creator.setStartDateTime(startDateTime);
-//					setSaved(false);
-//				}
-//			}catch(Exception exc){}
-//		}));
 		textfieldStartTime = new TimeField(this) {
 			
 			@Override
@@ -407,21 +363,6 @@ public class SimulationConfigurationPane extends EditorPane {
 		panelGeneral.add(labelEndDate, gbc_labelEndDate);
 		
 		//Enddate input field
-//		textfieldEndDate = new JFormattedTextField(df);
-//		textfieldEndDate.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
-//			if(isChangeFlag())return;
-//			if(textfieldEndDate.getText().equals(""));
-//			else try{
-//				LocalDate d = LocalDate.parse(textfieldEndDate.getText(),dateFormatter);
-//				if(endDateTime == null)endDateTime = ZonedDateTime.now();
-//				if(!d.equals(endDateTime.toLocalDate())){
-//					endDateTime = endDateTime.with(d);
-//					creator.setEndDateTime(endDateTime);
-//					setSaved(false);
-//				}
-//			}catch(Exception exc){}
-//		}));
-//		textfieldEndDate.setText(dateFormatter.format(LocalDate.now()));
 		textfieldEndDate = new DateField(this) {
 			@Override
 			protected void setSavedValue(LocalDate v) {
@@ -452,19 +393,6 @@ public class SimulationConfigurationPane extends EditorPane {
 		panelGeneral.add(labelEndTime, gbc_labelEndTime);
 		
 		//End time input field
-//		textfieldEndTime = new JFormattedTextField(DateTimeFormatter.ISO_LOCAL_TIME.toFormat());
-//		textfieldEndTime.getDocument().addDocumentListener(new InsertRemoveListener((DocumentEvent e)->{
-//			if(isChangeFlag())return;
-//			try{
-//				LocalTime l = LocalTime.parse(textfieldEndTime.getText());
-//				if(endDateTime == null)endDateTime = ZonedDateTime.now();
-//				if(!l.equals(endDateTime.toLocalTime())){
-//					endDateTime = endDateTime.with(l);
-//					creator.setEndDateTime(endDateTime);
-//					setSaved(false);
-//				}
-//			}catch(Exception exc){}
-//		}));
 		textfieldEndTime = new TimeField(this) {
 			
 			@Override
@@ -515,27 +443,18 @@ public class SimulationConfigurationPane extends EditorPane {
 		
 		
 		//------ Start Event Panel -----
-		GridBagConstraints gbc_panelStartevent = createTabConstraints(2);
 		startEventPanel = new StartEventPanel(this);
-		panelStarteventExpand = createTab("Start Arrival", createPMErrorLabel());
-		panelMain.add(panelStarteventExpand, gbc_panelStartevent);
+		panelStarteventExpand = addTab(Tabs.STARTARRIVAL, "Start Arrival", createPMErrorLabel());
 		
 		//------ Task Panel ------
 		taskPanel = new ListChooserPanel();
-		
-		GridBagConstraints gbc_panelTasks = createTabConstraints(3);
-		panelTasksExpand = createTab("Tasks", createPMErrorLabel());
-		panelMain.add(panelTasksExpand, gbc_panelTasks);
+		panelTasksExpand = addTab(Tabs.TASKS, "Tasks", createPMErrorLabel());
 		
 		// ----- Gateway Panel -----
 		gatewayPanel = new ListChooserPanel();
+		panelGatewaysExpand = addTab(Tabs.GATEWAYS, "Gateways", createPMErrorLabel());
 		
-		
-		GridBagConstraints gbc_panelGateways = createTabConstraints(4);
-		panelGatewaysExpand = createTab("Gateways", createPMErrorLabel());
-		panelMain.add(panelGatewaysExpand, gbc_panelGateways);
-		
-		int lastIndex = EditorTabPluggable.runPlugins(panelMain, 5);
+		EditorTabPluggable.runPlugins(this);
 		
 		//Layout fixing empty buffer panel
 		JPanel panelBuffer = new JPanel();
@@ -547,18 +466,13 @@ public class SimulationConfigurationPane extends EditorPane {
 		gbc_panelBuffer.weighty = 100;
 		gbc_panelBuffer.weightx = 1;
 		gbc_panelBuffer.gridx = 0;
-		gbc_panelBuffer.gridy = lastIndex;
-		panelMain.add(panelBuffer,gbc_panelBuffer);
+		gbc_panelBuffer.gridy = GridBagConstraints.RELATIVE;
+		addTab(null, panelBuffer,gbc_panelBuffer);
 		
 		setEnabled(false);
-		
-		{//TODO delete
-			setBounds(100, 100, 1475, 902);
-		}
-		
 
 	}
-
+	
 	private void be_openPM() {
 		//Choose file to be opened
 		ScalingFileChooser chooser = new ScalingFileChooser(ScyllaGUI.DEFAULTFILEPATH);

@@ -55,8 +55,7 @@ public class InstancePanel extends JPanel{
 		setLayout(gbl_topPanel);
 		
 		//Cost label
-		JLabel labelCost = new JLabel();
-		labelCost.setText("Cost");
+		JLabel labelCost = new JLabel("Cost");
 		GridBagConstraints gbc_labelCost = new GridBagConstraints();
 		gbc_labelCost.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
 		gbc_labelCost.fill = GridBagConstraints.HORIZONTAL;
@@ -96,8 +95,7 @@ public class InstancePanel extends JPanel{
 		add(textfieldCost.getComponent(), gbc_textfieldCost);
 		
 		//Timeunit label
-		JLabel labelTimeunit = new JLabel();
-		labelTimeunit.setText("per");
+		JLabel labelTimeunit = new JLabel("per");
 		GridBagConstraints gbc_labelTimeunit = new GridBagConstraints();
 		gbc_labelTimeunit.insets = new Insets(0, ScyllaGUI.STDINSET+(int)(10.0*ScyllaGUI.SCALE),ScyllaGUI.STDINSET, ScyllaGUI.STDINSET+(int)(10.0*ScyllaGUI.SCALE));
 		gbc_labelTimeunit.fill = GridBagConstraints.HORIZONTAL;
@@ -151,8 +149,7 @@ public class InstancePanel extends JPanel{
 		add(checkboxDefaultCost, gbc_checkboxDefaultCost);
 		
 		//Timetable label
-		JLabel labelTimetable = new JLabel();
-		labelTimetable.setText("Timetable");
+		JLabel labelTimetable = new JLabel("Timetable");
 		GridBagConstraints gbc_labelTimetable = new GridBagConstraints();
 		gbc_labelTimetable.insets = new Insets(0, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
 		gbc_labelTimetable.fill = GridBagConstraints.HORIZONTAL;

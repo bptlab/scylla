@@ -4,6 +4,8 @@ import java.awt.Color;
 
 import javax.swing.JPanel;
 
+import de.hpi.bpt.scylla.GUI.EditorPane;
+import de.hpi.bpt.scylla.GUI.GlobalConfigurationPane.GlobalConfigurationPane;
 import de.hpi.bpt.scylla.GUI.plugin.EditorTabPluggable;
 
 public class PrototypeEditorTabPlugin extends EditorTabPluggable<JPanel>{
@@ -29,5 +31,11 @@ public class PrototypeEditorTabPlugin extends EditorTabPluggable<JPanel>{
 	public String getTitle() {
 		return "Editor Tab Prototype";
 	}
+
+	@Override
+	protected Class<? extends EditorPane> targetClass() {
+		return GlobalConfigurationPane.class;
+	}
+	
 
 }

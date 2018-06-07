@@ -3,6 +3,7 @@ package de.hpi.bpt.scylla.GUI;
 import java.awt.AWTKeyStroke;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -13,7 +14,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Observer;
 import java.util.Set;
 
@@ -80,6 +83,9 @@ public abstract class EditorPane extends JPanel implements FormManager{
 	/**Observers for file title changes*/
 	protected Set<Observer> titleObservers;
 	
+	protected Map<Object, Container> tabs;
+	
+	
 	/**
 	 * Plain constructor, mainly initializes the header bar, keybindings etc.
 	 */
@@ -96,6 +102,8 @@ public abstract class EditorPane extends JPanel implements FormManager{
 				return b;
 			}
 		};
+		
+		tabs = new HashMap<>();
 		
 		//---Header panel---
 		panelHeader = new JPanel();
@@ -487,12 +495,30 @@ public abstract class EditorPane extends JPanel implements FormManager{
 		labelFiletitle.setText("<no file>");
 	}
 	
+	protected Container getMainPanel() {return panelMain;}
+	
+	public Container addTab(Object identifier, Container component, GridBagConstraints gbc) {
+    	getMainPanel().add(component, gbc);
+    	tabs.put(identifier, component);
+    	return component;
+	}
+	
+	public Container addTab(Object identifier, Container component) {
+		GridBagConstraints gbc = createTabConstraints();
+    	return addTab(identifier, component, gbc);
+	}
+	
+	public ExpandPanel addTab(Object identifier, String title, Container component) {
+		return (ExpandPanel) addTab(identifier, createTab(title,component));
+	}
+	
+
 	
 //=====================Static======================
 
 	protected static final int INSET_B = (int)(25.0*ScyllaGUI.SCALE);
 	
-	public static GridBagConstraints createTabConstraints(int index) {
+	public static GridBagConstraints createTabConstraints() {
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.anchor = GridBagConstraints.PAGE_START;
 		gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -500,7 +526,7 @@ public abstract class EditorPane extends JPanel implements FormManager{
 		gbc.weighty = 1.0;
 		gbc.insets = new Insets(0, INSET_B, INSET_B, INSET_B);
 		gbc.gridx = 0;
-		gbc.gridy = index;
+		gbc.gridy = GridBagConstraints.RELATIVE;
 		return gbc;
 	}
 	

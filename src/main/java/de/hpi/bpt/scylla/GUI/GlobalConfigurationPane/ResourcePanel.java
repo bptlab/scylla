@@ -69,8 +69,7 @@ public class ResourcePanel extends JSplitPane{
 		topPanel.setLayout(gbl_topPanel);
 		
 		//Label for quantity
-		JLabel labelQuantity = new JLabel();
-		labelQuantity.setText("Quantity");
+		JLabel labelQuantity = new JLabel("Quantity");
 		GridBagConstraints gbc_labelQuantity = new GridBagConstraints();
 		gbc_labelQuantity.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
 		gbc_labelQuantity.fill = GridBagConstraints.HORIZONTAL;
@@ -102,8 +101,7 @@ public class ResourcePanel extends JSplitPane{
 		topPanel.add(spinnerQuantity.getComponent(), gbc_spinnerQuantity);
 		
 		//Cost label
-		JLabel labelCost = new JLabel();
-		labelCost.setText("Cost");
+		JLabel labelCost = new JLabel("Cost");
 		GridBagConstraints gbc_labelCost = new GridBagConstraints();
 		gbc_labelCost.insets = new Insets(0, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
 		gbc_labelCost.fill = GridBagConstraints.HORIZONTAL;
@@ -145,8 +143,7 @@ public class ResourcePanel extends JSplitPane{
 		topPanel.add(textfieldCost.getComponent(), gbc_textfieldCost);
 		
 		//Timeunit label
-		JLabel labelTimeunit = new JLabel();
-		labelTimeunit.setText("per");
+		JLabel labelTimeunit = new JLabel("per");
 		GridBagConstraints gbc_labelTimeunit = new GridBagConstraints();
 		gbc_labelTimeunit.insets = new Insets(0, ScyllaGUI.STDINSET+(int)(10.0*ScyllaGUI.SCALE),ScyllaGUI.STDINSET, ScyllaGUI.STDINSET+(int)(10.0*ScyllaGUI.SCALE));
 		gbc_labelTimeunit.fill = GridBagConstraints.HORIZONTAL;
@@ -183,8 +180,7 @@ public class ResourcePanel extends JSplitPane{
 		topPanel.add(comboboxTimeunit.getComponent(), gbc_comboboxTimeunit);
 		
 		//Timetable label
-		JLabel labelTimetable = new JLabel();
-		labelTimetable.setText("Default Timetable");
+		JLabel labelTimetable = new JLabel("Default Timetable");
 		GridBagConstraints gbc_textfieldTimetable = new GridBagConstraints();
 		gbc_textfieldTimetable.insets = new Insets(0, ScyllaGUI.STDINSET,ScyllaGUI.STDINSET,ScyllaGUI.STDINSET);
 		gbc_textfieldTimetable.fill = GridBagConstraints.HORIZONTAL;
@@ -230,8 +226,7 @@ public class ResourcePanel extends JSplitPane{
 		bottomPanel.setLayout(gbl_bottomPanel);
 		
 		//Instance label
-		JLabel labelInstancesTitle = new JLabel();
-		labelInstancesTitle.setText("Instances");
+		JLabel labelInstancesTitle = new JLabel("Instances");
 		labelInstancesTitle.setBackground(ScyllaGUI.ColorField0);
 		labelInstancesTitle.setForeground(ScyllaGUI.TITLEFONT_COLOR);
 		labelInstancesTitle.setFont(ScyllaGUI.TITLEFONT);

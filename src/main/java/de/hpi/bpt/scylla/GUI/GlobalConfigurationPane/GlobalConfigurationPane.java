@@ -27,6 +27,7 @@ import de.hpi.bpt.scylla.GUI.ScyllaGUI;
 import de.hpi.bpt.scylla.GUI.InputFields.NumberField;
 import de.hpi.bpt.scylla.GUI.InputFields.SelectionField;
 import de.hpi.bpt.scylla.GUI.InputFields.StringField;
+import de.hpi.bpt.scylla.GUI.plugin.EditorTabPluggable;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.ResourceType;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.Timetable;
@@ -56,7 +57,8 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 	
 	/**Central XML-Link object*/
 	private GlobalConfigurationCreator creator;
-
+	
+	public enum Tabs {GENERAL, RESOURCES, TIMETABLES}
 
 
 	/**
@@ -71,17 +73,16 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 		gbc_panelGeneral.anchor = GridBagConstraints.PAGE_START;
 		gbc_panelGeneral.insets = new Insets(INSET_B,INSET_B,INSET_B,INSET_B);
 		gbc_panelGeneral.gridx = 0;
-		gbc_panelGeneral.gridy = 0;
+		gbc_panelGeneral.gridy = GridBagConstraints.RELATIVE;
 		gbc_panelGeneral.fill = GridBagConstraints.HORIZONTAL;
 		gbc_panelGeneral.weightx = 1;
-		panelMain.add(panelGeneral, gbc_panelGeneral);
+		addTab(Tabs.GENERAL, panelGeneral, gbc_panelGeneral);
 		GridBagLayout gbl_panelGeneral = new GridBagLayout();
 		gbl_panelGeneral.columnWeights = new double[]{1.0,3.0};
 		panelGeneral.setLayout(gbl_panelGeneral);
 		
 		//Label id
-		JLabel labelId = new JLabel();
-		labelId.setText("ID");
+		JLabel labelId = new JLabel("ID");
 		GridBagConstraints gbc_labelId = new GridBagConstraints();
 		gbc_labelId.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
 		gbc_labelId.fill = GridBagConstraints.HORIZONTAL;
@@ -109,8 +110,7 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 //		textfieldId.setColumns(10);
 		
 		//Label seed
-		JLabel labelSeed = new JLabel();
-		labelSeed.setText("Seed");
+		JLabel labelSeed = new JLabel("Seed");
 		GridBagConstraints gbc_textfieldSeed = new GridBagConstraints();
 		gbc_textfieldSeed.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
 		gbc_textfieldSeed.fill = GridBagConstraints.HORIZONTAL;
@@ -154,8 +154,7 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 		panelGeneral.add(textfieldSeed.getComponent(), gbc_textfieldSeedEdit);
 		
 		//Label timezone
-		JLabel labelTimezone = new JLabel();
-		labelTimezone.setText("Timezone");
+		JLabel labelTimezone = new JLabel("Timezone");
 		GridBagConstraints gbc_textfieldTimezone = new GridBagConstraints();
 		gbc_textfieldTimezone.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
 		gbc_textfieldTimezone.fill = GridBagConstraints.HORIZONTAL;
@@ -228,12 +227,9 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 			}
 			
 		};
-		GridBagConstraints gbc_panelResources = createTabConstraints(1);
-
 		//Resource title label
-		ExpandPanel panelResourcesExpand = createTab("Resources", panelResources);
+		ExpandPanel panelResourcesExpand = addTab(Tabs.RESOURCES, "Resources", panelResources);
 		panelResourcesExpand.expand();
-		panelMain.add(panelResourcesExpand, gbc_panelResources);
 		
 
 		//Timetable initialization
@@ -270,12 +266,12 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 			}
 			
 		};
-		GridBagConstraints gbc_panelTimetables = createTabConstraints(2);
 		
 		//Timetable title label
-		ExpandPanel panelTimetablesExpand = createTab("Timetables", panelTimetables);
+		ExpandPanel panelTimetablesExpand = addTab(Tabs.TIMETABLES, "Timetables", panelTimetables);
 		panelTimetablesExpand.expand();
-		panelMain.add(panelTimetablesExpand, gbc_panelTimetables);
+		
+		EditorTabPluggable.runPlugins(this);
 		
 		//Layout fixing empty buffer panel
 		JPanel panelBuffer = new JPanel();
@@ -288,7 +284,7 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 		gbc_panelBuffer.weightx = 1;
 		gbc_panelBuffer.gridx = 0;
 		gbc_panelBuffer.gridy = 3;
-		panelMain.add(panelBuffer,gbc_panelBuffer);
+		addTab(null, panelBuffer,gbc_panelBuffer);
 		
 		//Disable, as no gc is opened
 		setEnabled(false);
