@@ -79,7 +79,7 @@ public class TaskPanel extends JPanel implements ComponentHolder,SetObserver<Str
 		
 		//Distribution label
 		JLabel labelDistribution = new JLabel("Distribution");
-		GridBagConstraints gbc_labelDistribution = EditorPane.createInputLabelConstraints(1);
+		GridBagConstraints gbc_labelDistribution = EditorPane.createInputLabelConstraints();
 		add(labelDistribution, gbc_labelDistribution);
 		
 		//Distribution Panel layout constraints and empty "panel"
@@ -132,7 +132,7 @@ public class TaskPanel extends JPanel implements ComponentHolder,SetObserver<Str
 		
 		//Time unit label
 		JLabel labelTimeunit = new JLabel("Timeunit");
-		GridBagConstraints gbc_labelTimeunit = EditorPane.createInputLabelConstraints(3);
+		GridBagConstraints gbc_labelTimeunit = EditorPane.createInputLabelConstraints();
 		add(labelTimeunit, gbc_labelTimeunit);
 		
 		//Time unit combobox

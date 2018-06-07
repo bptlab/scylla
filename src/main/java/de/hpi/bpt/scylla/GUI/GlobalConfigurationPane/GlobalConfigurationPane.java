@@ -28,6 +28,7 @@ import de.hpi.bpt.scylla.GUI.InputFields.NumberField;
 import de.hpi.bpt.scylla.GUI.InputFields.SelectionField;
 import de.hpi.bpt.scylla.GUI.InputFields.StringField;
 import de.hpi.bpt.scylla.GUI.plugin.EditorTabPluggable;
+import de.hpi.bpt.scylla.GUI.plugin.InputFieldPluggable;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.ResourceType;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator.Timetable;
@@ -83,7 +84,7 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 		
 		//Label id
 		JLabel labelId = new JLabel("ID");
-		GridBagConstraints gbc_labelId = createInputLabelConstraints(0);
+		GridBagConstraints gbc_labelId = createInputLabelConstraints();
 		panelGeneral.add(labelId, gbc_labelId);
 		
 		//Text input field for id
@@ -97,17 +98,13 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 			protected String getSavedValue() {return creator != null ? creator.getId() : null;}
 			protected void setSavedValue(String v) {creator.setId(v);}
 		};
-		GridBagConstraints gbc_textfieldId = new GridBagConstraints();
-		gbc_textfieldId.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, INSET_B);
-		gbc_textfieldId.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textfieldId.gridx = 1;
-		gbc_textfieldId.gridy = 0;
+		GridBagConstraints gbc_textfieldId = createInputFieldConstraints();
 		panelGeneral.add(textfieldId.getComponent(), gbc_textfieldId);
 //		textfieldId.setColumns(10);
 		
 		//Label seed
 		JLabel labelSeed = new JLabel("Seed");
-		GridBagConstraints gbc_textfieldSeed = createInputLabelConstraints(1);
+		GridBagConstraints gbc_textfieldSeed = createInputLabelConstraints();
 		panelGeneral.add(labelSeed, gbc_textfieldSeed);
 		
 		//Seed input field
@@ -138,16 +135,12 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 			}
 		};
 		
-		GridBagConstraints gbc_textfieldSeedEdit = new GridBagConstraints();
-		gbc_textfieldSeedEdit.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, INSET_B);
-		gbc_textfieldSeedEdit.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textfieldSeedEdit.gridx = 1;
-		gbc_textfieldSeedEdit.gridy = 1;
+		GridBagConstraints gbc_textfieldSeedEdit = createInputFieldConstraints();
 		panelGeneral.add(textfieldSeed.getComponent(), gbc_textfieldSeedEdit);
 		
 		//Label timezone
 		JLabel labelTimezone = new JLabel("Timezone");
-		GridBagConstraints gbc_textfieldTimezone = createInputLabelConstraints(2);
+		GridBagConstraints gbc_textfieldTimezone = createInputLabelConstraints();
 		panelGeneral.add(labelTimezone, gbc_textfieldTimezone);
 		
 		//25 Timezone from -12 to +12 (which are indeed equal)
@@ -190,11 +183,7 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 				       
 		});
 
-		GridBagConstraints gbc_comboboxTimezone = new GridBagConstraints();
-		gbc_comboboxTimezone.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, INSET_B);
-		gbc_comboboxTimezone.fill = GridBagConstraints.HORIZONTAL;
-		gbc_comboboxTimezone.gridx = 1;
-		gbc_comboboxTimezone.gridy = 2;
+		GridBagConstraints gbc_comboboxTimezone = createInputFieldConstraints();
 		panelGeneral.add(comboboxTimezone.getComponent(), gbc_comboboxTimezone);
 		
 		//---Resource Panel---
@@ -260,6 +249,7 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 		panelTimetablesExpand.expand();
 		
 		EditorTabPluggable.runPlugins(this);
+		InputFieldPluggable.runPlugins(this);
 		
 		//Layout fixing empty buffer panel
 		JPanel panelBuffer = new JPanel();

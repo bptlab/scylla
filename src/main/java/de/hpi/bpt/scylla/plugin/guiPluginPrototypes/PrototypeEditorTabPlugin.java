@@ -33,7 +33,7 @@ public class PrototypeEditorTabPlugin extends EditorTabPluggable<JPanel>{
 	}
 
 	@Override
-	protected Class<? extends EditorPane> targetClass() {
+	public Class<GlobalConfigurationPane> targetClass() {
 		return GlobalConfigurationPane.class;
 	}
 	

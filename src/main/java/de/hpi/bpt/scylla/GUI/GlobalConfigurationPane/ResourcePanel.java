@@ -71,7 +71,7 @@ public class ResourcePanel extends JSplitPane{
 		
 		//Label for quantity
 		JLabel labelQuantity = new JLabel("Quantity");
-		GridBagConstraints gbc_labelQuantity = EditorPane.createInputLabelConstraints(0);
+		GridBagConstraints gbc_labelQuantity = EditorPane.createInputLabelConstraints();
 		topPanel.add(labelQuantity, gbc_labelQuantity);
 		
 		//Spinner for quantity
@@ -99,7 +99,7 @@ public class ResourcePanel extends JSplitPane{
 		
 		//Cost label
 		JLabel labelCost = new JLabel("Cost");
-		GridBagConstraints gbc_labelCost = EditorPane.createInputLabelConstraints(1);
+		GridBagConstraints gbc_labelCost = EditorPane.createInputLabelConstraints();
 		topPanel.add(labelCost, gbc_labelCost);
 		
 		//Input field for cost
@@ -174,7 +174,7 @@ public class ResourcePanel extends JSplitPane{
 		
 		//Timetable label
 		JLabel labelTimetable = new JLabel("Default Timetable");
-		GridBagConstraints gbc_textfieldTimetable = EditorPane.createInputLabelConstraints(2);
+		GridBagConstraints gbc_textfieldTimetable = EditorPane.createInputLabelConstraints();
 		topPanel.add(labelTimetable, gbc_textfieldTimetable);
 		
 		//Timetable input combobox

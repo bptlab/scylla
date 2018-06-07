@@ -57,7 +57,7 @@ public class InstancePanel extends JPanel{
 		
 		//Cost label
 		JLabel labelCost = new JLabel("Cost");
-		GridBagConstraints gbc_labelCost = EditorPane.createInputLabelConstraints(0);
+		GridBagConstraints gbc_labelCost = EditorPane.createInputLabelConstraints();
 		add(labelCost, gbc_labelCost);
 		
 		//Cost input field
@@ -147,7 +147,7 @@ public class InstancePanel extends JPanel{
 		
 		//Timetable label
 		JLabel labelTimetable = new JLabel("Timetable");
-		GridBagConstraints gbc_labelTimetable = EditorPane.createInputLabelConstraints(1);
+		GridBagConstraints gbc_labelTimetable = EditorPane.createInputLabelConstraints();
 		add(labelTimetable, gbc_labelTimetable);
 		
 		//Timetable input combobox

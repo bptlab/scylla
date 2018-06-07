@@ -512,6 +512,12 @@ public abstract class EditorPane extends JPanel implements FormManager{
 		return (ExpandPanel) addTab(identifier, createTab(title,component));
 	}
 	
+	public void addInputField(Object tabIdentifier, String label, Component fieldComponent) {
+		Container tab = tabs.get(tabIdentifier);
+		if(tab == null)return;
+		tab.add(new JLabel(label), createInputLabelConstraints());
+		tab.add(fieldComponent, createInputFieldConstraints());
+	}
 
 	
 //=====================Static======================
@@ -543,12 +549,20 @@ public abstract class EditorPane extends JPanel implements FormManager{
 		return new ExpandPanel(createTabLabel(text), body);
 	}
 	
-	public static GridBagConstraints createInputLabelConstraints(int index) {
+	public static GridBagConstraints createInputLabelConstraints() {
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 		gbc.gridx = 0;
-		gbc.gridy = index;
+		return gbc;
+	}
+	
+	public static GridBagConstraints createInputFieldConstraints() {
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, INSET_B);
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.gridx = GridBagConstraints.RELATIVE;
+		gbc.gridwidth = GridBagConstraints.REMAINDER;
 		return gbc;
 	}
 

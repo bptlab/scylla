@@ -8,7 +8,6 @@ import de.hpi.bpt.scylla.plugin_loader.PluginLoader;
 
 public abstract class EditorTabPluggable<T extends Container> implements IGUIPlugin<T>{
 
-	public abstract String getTitle();
 	
 	public static <EditorType extends EditorPane> void runPlugins(EditorType editor) {
 		Iterator<EditorTabPluggable> editorTabExtensions = PluginLoader.dGetPlugins(EditorTabPluggable.class);
@@ -16,14 +15,9 @@ public abstract class EditorTabPluggable<T extends Container> implements IGUIPlu
         while (editorTabExtensions.hasNext()) {
         	EditorTabPluggable<?> editorTabExtension = editorTabExtensions.next();
         	if(!editorTabExtension.isTarget(editor))continue;
-        	Object key = new Object(); //TODO   
-        	editor.addTab(key, editorTabExtension.getTitle(), editorTabExtension.getComponent());
+        	editor.addTab(editorTabExtension.getClass(), editorTabExtension.getTitle(), editorTabExtension.getComponent());
         }
 	}
 	
-	protected boolean isTarget(EditorPane editor) {
-		return targetClass().isInstance(editor);
-	}
-	
-	protected abstract Class<? extends EditorPane> targetClass();
+	protected abstract String getTitle();
 }
