@@ -83,11 +83,7 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 		
 		//Label id
 		JLabel labelId = new JLabel("ID");
-		GridBagConstraints gbc_labelId = new GridBagConstraints();
-		gbc_labelId.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
-		gbc_labelId.fill = GridBagConstraints.HORIZONTAL;
-		gbc_labelId.gridx = 0;
-		gbc_labelId.gridy = 0;
+		GridBagConstraints gbc_labelId = createInputLabelConstraints(0);
 		panelGeneral.add(labelId, gbc_labelId);
 		
 		//Text input field for id
@@ -111,11 +107,7 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 		
 		//Label seed
 		JLabel labelSeed = new JLabel("Seed");
-		GridBagConstraints gbc_textfieldSeed = new GridBagConstraints();
-		gbc_textfieldSeed.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
-		gbc_textfieldSeed.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textfieldSeed.gridx = 0;
-		gbc_textfieldSeed.gridy = 1;
+		GridBagConstraints gbc_textfieldSeed = createInputLabelConstraints(1);
 		panelGeneral.add(labelSeed, gbc_textfieldSeed);
 		
 		//Seed input field
@@ -155,11 +147,7 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 		
 		//Label timezone
 		JLabel labelTimezone = new JLabel("Timezone");
-		GridBagConstraints gbc_textfieldTimezone = new GridBagConstraints();
-		gbc_textfieldTimezone.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
-		gbc_textfieldTimezone.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textfieldTimezone.gridx = 0;
-		gbc_textfieldTimezone.gridy = 2;
+		GridBagConstraints gbc_textfieldTimezone = createInputLabelConstraints(2);
 		panelGeneral.add(labelTimezone, gbc_textfieldTimezone);
 		
 		//25 Timezone from -12 to +12 (which are indeed equal)

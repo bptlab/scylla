@@ -17,6 +17,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
+import de.hpi.bpt.scylla.GUI.EditorPane;
 import de.hpi.bpt.scylla.GUI.ScalingCheckBoxIcon;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
 import de.hpi.bpt.scylla.GUI.InputFields.NumberField;
@@ -56,11 +57,7 @@ public class InstancePanel extends JPanel{
 		
 		//Cost label
 		JLabel labelCost = new JLabel("Cost");
-		GridBagConstraints gbc_labelCost = new GridBagConstraints();
-		gbc_labelCost.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
-		gbc_labelCost.fill = GridBagConstraints.HORIZONTAL;
-		gbc_labelCost.gridx = 0;
-		gbc_labelCost.gridy = 0;
+		GridBagConstraints gbc_labelCost = EditorPane.createInputLabelConstraints(0);
 		add(labelCost, gbc_labelCost);
 		
 		//Cost input field
@@ -150,11 +147,7 @@ public class InstancePanel extends JPanel{
 		
 		//Timetable label
 		JLabel labelTimetable = new JLabel("Timetable");
-		GridBagConstraints gbc_labelTimetable = new GridBagConstraints();
-		gbc_labelTimetable.insets = new Insets(0, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
-		gbc_labelTimetable.fill = GridBagConstraints.HORIZONTAL;
-		gbc_labelTimetable.gridx = 0;
-		gbc_labelTimetable.gridy = 1;
+		GridBagConstraints gbc_labelTimetable = EditorPane.createInputLabelConstraints(1);
 		add(labelTimetable, gbc_labelTimetable);
 		
 		//Timetable input combobox

@@ -110,11 +110,7 @@ public class SimulationConfigurationPane extends EditorPane {
 		
 		//Label referenced Process Model
 		JLabel labelRefPM = new JLabel("Referenced process model file");
-		GridBagConstraints gbc_labelRefPM = new GridBagConstraints();
-		gbc_labelRefPM.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
-		gbc_labelRefPM.fill = GridBagConstraints.HORIZONTAL;
-		gbc_labelRefPM.gridx = 0;
-		gbc_labelRefPM.gridy = 1;
+		GridBagConstraints gbc_labelRefPM = createInputLabelConstraints(1);
 		panelReference.add(labelRefPM, gbc_labelRefPM);
 		
 		//Label to show ref PM
@@ -145,11 +141,7 @@ public class SimulationConfigurationPane extends EditorPane {
 		
 		//Label referenced global configuration
 		JLabel labelRefGC = new JLabel("Referenced global configuration file");
-		GridBagConstraints gbc_labelRefGC = new GridBagConstraints();
-		gbc_labelRefGC.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
-		gbc_labelRefGC.fill = GridBagConstraints.HORIZONTAL;
-		gbc_labelRefGC.gridx = 0;
-		gbc_labelRefGC.gridy = 2;
+		GridBagConstraints gbc_labelRefGC = createInputLabelConstraints(2);
 		panelReference.add(labelRefGC, gbc_labelRefGC);
 		
 		//Label to show ref gc
@@ -205,11 +197,7 @@ public class SimulationConfigurationPane extends EditorPane {
 		
 		//Id label
 		JLabel labelId = new JLabel("Id");
-		GridBagConstraints gbc_labelId = new GridBagConstraints();
-		gbc_labelId.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
-		gbc_labelId.fill = GridBagConstraints.HORIZONTAL;
-		gbc_labelId.gridx = 0;
-		gbc_labelId.gridy = 1;
+		GridBagConstraints gbc_labelId = createInputLabelConstraints(1);
 		panelGeneral.add(labelId, gbc_labelId);
 		
 		//Id input field
@@ -230,11 +218,7 @@ public class SimulationConfigurationPane extends EditorPane {
 		
 		//Seed label
 		JLabel labelSeed = new JLabel("Seed");
-		GridBagConstraints gbc_labelSeed = new GridBagConstraints();
-		gbc_labelSeed.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
-		gbc_labelSeed.fill = GridBagConstraints.HORIZONTAL;
-		gbc_labelSeed.gridx = 0;
-		gbc_labelSeed.gridy = 2;
+		GridBagConstraints gbc_labelSeed = createInputLabelConstraints(2);
 		panelGeneral.add(labelSeed, gbc_labelSeed);
 		
 		//Seed input field
@@ -261,11 +245,7 @@ public class SimulationConfigurationPane extends EditorPane {
 		
 		//Number of instances (NOI) label
 		JLabel labelNOI = new JLabel("Number of instances");
-		GridBagConstraints gbc_labelNOI = new GridBagConstraints();
-		gbc_labelNOI.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
-		gbc_labelNOI.fill = GridBagConstraints.HORIZONTAL;
-		gbc_labelNOI.gridx = 0;
-		gbc_labelNOI.gridy = 3;
+		GridBagConstraints gbc_labelNOI = createInputLabelConstraints(3);
 		panelGeneral.add(labelNOI, gbc_labelNOI);
 		
 		//Spinner for number of instances (NOI)
@@ -293,11 +273,7 @@ public class SimulationConfigurationPane extends EditorPane {
 		
 		//Start Date label
 		JLabel labelStartDate = new JLabel("Start Date");
-		GridBagConstraints gbc_labelStartDate = new GridBagConstraints();
-		gbc_labelStartDate.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
-		gbc_labelStartDate.fill = GridBagConstraints.HORIZONTAL;
-		gbc_labelStartDate.gridx = 0;
-		gbc_labelStartDate.gridy = 4;
+		GridBagConstraints gbc_labelStartDate = createInputLabelConstraints(4);
 		panelGeneral.add(labelStartDate, gbc_labelStartDate);
 		
 		//Startdate input field
@@ -355,11 +331,7 @@ public class SimulationConfigurationPane extends EditorPane {
 		
 		//End Date label
 		JLabel labelEndDate = new JLabel("End Date");
-		GridBagConstraints gbc_labelEndDate = new GridBagConstraints();
-		gbc_labelEndDate.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
-		gbc_labelEndDate.fill = GridBagConstraints.HORIZONTAL;
-		gbc_labelEndDate.gridx = 0;
-		gbc_labelEndDate.gridy = 5;
+		GridBagConstraints gbc_labelEndDate = createInputLabelConstraints(5);
 		panelGeneral.add(labelEndDate, gbc_labelEndDate);
 		
 		//Enddate input field

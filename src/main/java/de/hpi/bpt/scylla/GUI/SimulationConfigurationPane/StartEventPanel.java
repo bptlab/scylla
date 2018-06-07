@@ -9,6 +9,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import de.hpi.bpt.scylla.GUI.EditorPane;
 import de.hpi.bpt.scylla.GUI.FormManager;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
 import de.hpi.bpt.scylla.GUI.InputFields.SelectionField;
@@ -38,11 +39,7 @@ public class StartEventPanel extends JPanel {
 		
 		//Distribution label
 		JLabel labelDistribution = new JLabel("Distribution");
-		GridBagConstraints gbc_labelDistribution = new GridBagConstraints();
-		gbc_labelDistribution.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
-		gbc_labelDistribution.fill = GridBagConstraints.HORIZONTAL;
-		gbc_labelDistribution.gridx = 0;
-		gbc_labelDistribution.gridy = 0;
+		GridBagConstraints gbc_labelDistribution = EditorPane.createInputLabelConstraints(0);
 		add(labelDistribution, gbc_labelDistribution);
 		
 		//Distribution Panel layout constraints and empty "panel"
@@ -94,11 +91,7 @@ public class StartEventPanel extends JPanel {
 		
 		//Time unit label
 		JLabel labelTimeunit = new JLabel("Timeunit");
-		GridBagConstraints gbc_labelTimeunit = new GridBagConstraints();
-		gbc_labelTimeunit.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
-		gbc_labelTimeunit.fill = GridBagConstraints.HORIZONTAL;
-		gbc_labelTimeunit.gridx = 0;
-		gbc_labelTimeunit.gridy = 2;
+		GridBagConstraints gbc_labelTimeunit = EditorPane.createInputLabelConstraints(2);
 		add(labelTimeunit, gbc_labelTimeunit);
 		
 		//Time unit combobox

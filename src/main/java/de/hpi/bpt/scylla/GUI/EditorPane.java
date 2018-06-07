@@ -542,5 +542,14 @@ public abstract class EditorPane extends JPanel implements FormManager{
 	public static ExpandPanel createTab(String text, Component body) {
 		return new ExpandPanel(createTabLabel(text), body);
 	}
+	
+	public static GridBagConstraints createInputLabelConstraints(int index) {
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.gridx = 0;
+		gbc.gridy = index;
+		return gbc;
+	}
 
 }

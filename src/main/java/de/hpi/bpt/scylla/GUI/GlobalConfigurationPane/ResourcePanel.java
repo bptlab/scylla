@@ -18,6 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
 
+import de.hpi.bpt.scylla.GUI.EditorPane;
 import de.hpi.bpt.scylla.GUI.ExtendedListChooserPanel;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel.ComponentHolder;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
@@ -70,11 +71,7 @@ public class ResourcePanel extends JSplitPane{
 		
 		//Label for quantity
 		JLabel labelQuantity = new JLabel("Quantity");
-		GridBagConstraints gbc_labelQuantity = new GridBagConstraints();
-		gbc_labelQuantity.insets = new Insets(ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
-		gbc_labelQuantity.fill = GridBagConstraints.HORIZONTAL;
-		gbc_labelQuantity.gridx = 0;
-		gbc_labelQuantity.gridy = 0;
+		GridBagConstraints gbc_labelQuantity = EditorPane.createInputLabelConstraints(0);
 		topPanel.add(labelQuantity, gbc_labelQuantity);
 		
 		//Spinner for quantity
@@ -102,11 +99,7 @@ public class ResourcePanel extends JSplitPane{
 		
 		//Cost label
 		JLabel labelCost = new JLabel("Cost");
-		GridBagConstraints gbc_labelCost = new GridBagConstraints();
-		gbc_labelCost.insets = new Insets(0, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET, ScyllaGUI.STDINSET);
-		gbc_labelCost.fill = GridBagConstraints.HORIZONTAL;
-		gbc_labelCost.gridx = 0;
-		gbc_labelCost.gridy = 1;
+		GridBagConstraints gbc_labelCost = EditorPane.createInputLabelConstraints(1);
 		topPanel.add(labelCost, gbc_labelCost);
 		
 		//Input field for cost
@@ -181,11 +174,7 @@ public class ResourcePanel extends JSplitPane{
 		
 		//Timetable label
 		JLabel labelTimetable = new JLabel("Default Timetable");
-		GridBagConstraints gbc_textfieldTimetable = new GridBagConstraints();
-		gbc_textfieldTimetable.insets = new Insets(0, ScyllaGUI.STDINSET,ScyllaGUI.STDINSET,ScyllaGUI.STDINSET);
-		gbc_textfieldTimetable.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textfieldTimetable.gridx = 0;
-		gbc_textfieldTimetable.gridy = 2;
+		GridBagConstraints gbc_textfieldTimetable = EditorPane.createInputLabelConstraints(2);
 		topPanel.add(labelTimetable, gbc_textfieldTimetable);
 		
 		//Timetable input combobox
