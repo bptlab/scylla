@@ -310,6 +310,7 @@ public class GlobalConfigurationPane extends EditorPane<GlobalConfigurationCreat
 		for(ResourceType res : creator.getResourceTypes()){
 			importResource(res);
 		}
+		InputFieldPluggable.notifyPluginsOnLoad(this);
 		setChangeFlag(false);
 		setEnabled(true);
 	}

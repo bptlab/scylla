@@ -1,7 +1,10 @@
 package de.hpi.bpt.scylla.plugin.guiPluginPrototypes;
 
+import java.util.List;
+
 import de.hpi.bpt.scylla.GUI.EditorPane;
 import de.hpi.bpt.scylla.GUI.GlobalConfigurationPane.GlobalConfigurationPane;
+import de.hpi.bpt.scylla.GUI.InputFields.InputField;
 import de.hpi.bpt.scylla.GUI.InputFields.StringField;
 import de.hpi.bpt.scylla.GUI.plugin.InputFieldPluggable;
 import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator;
@@ -39,6 +42,7 @@ public class PrototypeInputFieldPluggable extends InputFieldPluggable<GlobalConf
 				@Override
 				protected String getSavedValue() {
 					if(editor.getCreator() == null)return null;
+					System.out.println("I tried ");
 					return editor.getCreator().getId();
 				}
 				
@@ -49,6 +53,10 @@ public class PrototypeInputFieldPluggable extends InputFieldPluggable<GlobalConf
 				}
 			};
 		fieldsToLoad.add(field);
+	}
+	
+	protected List<InputField<?, ?>> fieldsToLoad(){
+		return fieldsToLoad;
 	}
 
 	protected String getLabel() {

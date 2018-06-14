@@ -575,6 +575,8 @@ public class SimulationConfigurationPane extends EditorPane<SimulationConfigurat
 				gatewayPanel.add((ComponentHolder)new ExclusiveGatewayPanel((ExclusiveGateway) el, this, creator));
 			}
 		}
+		
+		InputFieldPluggable.notifyPluginsOnLoad(this);
 	}
 
 	@Override
