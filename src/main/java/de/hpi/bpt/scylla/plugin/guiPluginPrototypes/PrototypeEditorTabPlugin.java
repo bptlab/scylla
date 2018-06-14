@@ -4,11 +4,10 @@ import java.awt.Color;
 
 import javax.swing.JPanel;
 
-import de.hpi.bpt.scylla.GUI.EditorPane;
 import de.hpi.bpt.scylla.GUI.GlobalConfigurationPane.GlobalConfigurationPane;
 import de.hpi.bpt.scylla.GUI.plugin.EditorTabPluggable;
 
-public class PrototypeEditorTabPlugin extends EditorTabPluggable<JPanel>{
+public class PrototypeEditorTabPlugin extends EditorTabPluggable<GlobalConfigurationPane, JPanel>{
 	
 	private JPanel panel;
 	

@@ -23,7 +23,6 @@ import de.hpi.bpt.scylla.GUI.EditorPane;
 import de.hpi.bpt.scylla.GUI.ExpandPanel;
 import de.hpi.bpt.scylla.GUI.ExtendedListChooserPanel;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel.ComponentHolder;
-import de.hpi.bpt.scylla.GUI.ScyllaGUI;
 import de.hpi.bpt.scylla.GUI.InputFields.NumberField;
 import de.hpi.bpt.scylla.GUI.InputFields.SelectionField;
 import de.hpi.bpt.scylla.GUI.InputFields.StringField;
@@ -39,7 +38,7 @@ import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator
  *
  */
 @SuppressWarnings("serial")
-public class GlobalConfigurationPane extends EditorPane implements GCFormManager{
+public class GlobalConfigurationPane extends EditorPane<GlobalConfigurationCreator> implements GCFormManager{
 	
 	//General Information form components
 	private StringField textfieldId;
@@ -55,9 +54,6 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 	private List<SetObserver<String>> timetableObserverList;
 	/**List of all known timetable ids, in order to pass them to newly created displays (e.g. Comboboxes)*/
 	private List<String> timetables;
-	
-	/**Central XML-Link object*/
-	private GlobalConfigurationCreator creator;
 	
 	public enum Tabs {GENERAL, RESOURCES, TIMETABLES}
 

@@ -49,9 +49,8 @@ import de.hpi.bpt.scylla.creation.SimulationConfiguration.SimulationConfiguratio
 import de.hpi.bpt.scylla.creation.SimulationConfiguration.Task;
 
 @SuppressWarnings("serial")
-public class SimulationConfigurationPane extends EditorPane {
+public class SimulationConfigurationPane extends EditorPane<SimulationConfigurationCreator> {
 	
-	private SimulationConfigurationCreator creator;
 	private String bpmnPath;
 	private String globalPath;
 	

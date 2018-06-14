@@ -32,6 +32,8 @@ import javax.swing.ScrollPaneConstants;
 
 import org.jdom2.JDOMException;
 
+import de.hpi.bpt.scylla.creation.ElementLink;
+
 
 
 @SuppressWarnings("serial")
@@ -42,7 +44,7 @@ import org.jdom2.JDOMException;
  * @author Leon Bein
  *
  */
-public abstract class EditorPane extends JPanel implements FormManager{
+public abstract class EditorPane<CreatorType extends ElementLink> extends JPanel implements FormManager<CreatorType>{
 	
 	/**Flag to display if there are any non-user changes performed at user input objects,
 	 * in order to prevent user input events to be fired.
@@ -84,6 +86,8 @@ public abstract class EditorPane extends JPanel implements FormManager{
 	protected Set<Observer> titleObservers;
 	
 	protected Map<Object, Container> tabs;
+	
+	protected CreatorType creator;
 	
 	
 	/**
@@ -412,6 +416,9 @@ public abstract class EditorPane extends JPanel implements FormManager{
 		buttonSavefile.setEnabled(!b);
 		notifyTitleObservers(getFile());
 	}
+
+	public CreatorType getModel() {return getCreator();}
+	public CreatorType getCreator() {return creator;}
 	
 	public Set<Observer> getTitleObservers() {
 		return titleObservers;

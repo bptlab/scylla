@@ -1,54 +1,67 @@
 package de.hpi.bpt.scylla.plugin.guiPluginPrototypes;
 
-import de.hpi.bpt.scylla.GUI.FormManager;
+import de.hpi.bpt.scylla.GUI.EditorPane;
 import de.hpi.bpt.scylla.GUI.GlobalConfigurationPane.GlobalConfigurationPane;
 import de.hpi.bpt.scylla.GUI.InputFields.StringField;
 import de.hpi.bpt.scylla.GUI.plugin.InputFieldPluggable;
+import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator;
 
-public class PrototypeInputFieldPluggable extends InputFieldPluggable<StringField>{
+public class PrototypeInputFieldPluggable extends InputFieldPluggable<GlobalConfigurationPane>{
 	
-	private String model;
+	private String model = "Look at mee!";
+	private StringField field;
+	
+	@Override
+	protected void runPlugin(GlobalConfigurationPane editor) {
+		createInputField(editor);
+    	editor.addInputField(
+			getTabIdentifier(),
+			getLabel(),
+			field.getComponent());
+	}
 
 	@Override
 	public String getName() {
 		return this.getClass().getSimpleName();
 	}
 
-	@Override
-	protected StringField createInputField() {
-		return new StringField(
-				new FormManager() {
-					public void setSaved(boolean b) {}
-					public boolean isChangeFlag() {return false;}
-					public void setChangeFlag(boolean b) {}
-				}){
+	
+	protected void createInputField(EditorPane<GlobalConfigurationCreator> editor) {
+		field = new StringField(editor){
 				
 				@Override
 				protected void setSavedValue(String v) {
-					model = v;
+					if(editor.getCreator() == null)return;
+					editor.getCreator().setId(v);
 					System.out.println(getName()+" saved "+v);
 				}
 				
 				@Override
 				protected String getSavedValue() {
-					return model;
+					if(editor.getCreator() == null)return null;
+					return editor.getCreator().getId();
+				}
+				
+				public void loadSavedValue() {
+					super.loadSavedValue();
+					//TODO Getsavedvalue returns null
+					System.out.println("Loaded "+getSavedValue());
 				}
 			};
+		fieldsToLoad.add(field);
 	}
 
-	@Override
 	protected String getLabel() {
 		return "Protoype Input:";
 	}
 
-	@Override
 	public Class<GlobalConfigurationPane> targetClass() {
 		return GlobalConfigurationPane.class;
 	}
 
-	@Override
 	protected Object getTabIdentifier() {
 		return GlobalConfigurationPane.Tabs.GENERAL;
 	}
+
 
 }

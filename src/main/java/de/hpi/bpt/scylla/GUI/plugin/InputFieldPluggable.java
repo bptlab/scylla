@@ -1,38 +1,49 @@
 package de.hpi.bpt.scylla.GUI.plugin;
 
+import java.util.ArrayList;
 import java.util.Iterator;
-
-import javax.swing.JComponent;
+import java.util.List;
 
 import de.hpi.bpt.scylla.GUI.EditorPane;
 import de.hpi.bpt.scylla.GUI.InputFields.InputField;
+import de.hpi.bpt.scylla.creation.ElementLink;
 import de.hpi.bpt.scylla.plugin_loader.PluginLoader;
 
-public abstract class InputFieldPluggable<FieldType extends InputField<?,?>> implements IGUIPlugin<JComponent>{
+public abstract class InputFieldPluggable<TargetClass extends EditorPane<?>> implements IGUIPlugin<TargetClass>{
 		
 
-	public static <EditorType extends EditorPane> void runPlugins(EditorType editor) {
+	public static <CreatorType extends ElementLink> void runPlugins(EditorPane<CreatorType> editor) {
 		Iterator<InputFieldPluggable> inputFieldExtensions = PluginLoader.dGetPlugins(InputFieldPluggable.class);
 
         while (inputFieldExtensions.hasNext()) {
-        	InputFieldPluggable<?> inputFieldExtension = inputFieldExtensions.next();
+        	InputFieldPluggable inputFieldExtension = inputFieldExtensions.next();
         	if(!inputFieldExtension.isTarget(editor))continue;
-        	editor.addInputField(
-        			inputFieldExtension.getTabIdentifier(),
-        			inputFieldExtension.getLabel(),
-        			inputFieldExtension.getComponent());
+        	inputFieldExtension.runPlugin(editor);
         }
 	}
 	
-	@Override
-	public JComponent getComponent() {
-		return createInputField().getComponent();
+	public static <CreatorType extends ElementLink> void notifyPluginsOnLoad(EditorPane<CreatorType> editor) {
+		Iterator<InputFieldPluggable> inputFieldExtensions = PluginLoader.dGetPlugins(InputFieldPluggable.class);
+
+        while (inputFieldExtensions.hasNext()) {
+        	InputFieldPluggable inputFieldExtension = inputFieldExtensions.next();
+        	if(!inputFieldExtension.isTarget(editor))continue;
+        	inputFieldExtension.onLoad(editor);
+        }
 	}
 	
-	protected abstract FieldType createInputField();
+	protected List<InputField<?, ?>> fieldsToLoad = new ArrayList<>();
+
+	protected abstract void runPlugin(TargetClass editor);
+	protected List<InputField<?, ?>> fieldsToLoad(){
+		return fieldsToLoad;
+	}
+	protected void onLoad(TargetClass editor) {
+		for(InputField<?, ?> field : fieldsToLoad()) {
+			field.loadSavedValue();
+		}
+	}
 	
-	protected abstract String getLabel();
-	
-	protected abstract Object getTabIdentifier();
+
 
 }

@@ -5,7 +5,7 @@ package de.hpi.bpt.scylla.GUI;
  * @author Leon Bein
  * TODO
  */
-public interface FormManager {
+public interface FormManager<ModelType> {
 	
 	/**
 	 * Sets if the form is saved or not
@@ -31,5 +31,7 @@ public interface FormManager {
 		public void notifyDeletion(ValueType id);
 		public void notifyRenaming(ValueType id, ValueType newid);
 	}
+	
+	public ModelType getModel();
 
 }

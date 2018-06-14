@@ -3,13 +3,14 @@ package de.hpi.bpt.scylla.GUI.GlobalConfigurationPane;
 import java.util.List;
 
 import de.hpi.bpt.scylla.GUI.FormManager;
+import de.hpi.bpt.scylla.creation.GlobalConfiguration.GlobalConfigurationCreator;
 
 /**
  * Central interface for managing the whole form
  * @author Leon Bein
  * TODO
  */
-public interface GCFormManager extends FormManager{
+public interface GCFormManager extends FormManager<GlobalConfigurationCreator>{
 	
 	/**
 	 * List of comboboxes, that show timetable selection and therefore have to be updated
