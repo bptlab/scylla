@@ -592,6 +592,11 @@ public class SimulationPane extends JPanel{
 	 */
 	private synchronized void startSimulation(String resFilename, String[] bpmnFilenames, String[] simFilenames) {
 
+		if(resFilename.isEmpty() || bpmnFilenames.length == 0 || simFilenames.length == 0) {
+			System.err.println("Not all simulation input files have been specified. Aborting.");
+			return;
+		}
+		
 		button_StartSimulation.setText("Running ...");
         button_StartSimulation.setEnabled(false);
         
