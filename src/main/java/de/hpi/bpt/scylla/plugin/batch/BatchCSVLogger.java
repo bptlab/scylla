@@ -146,7 +146,6 @@ public class BatchCSVLogger extends OutputLoggerPluggable{
             
     		/**Build string for table*/
     		String s = buildString(table);
-    		System.out.println(s);//TODO this is a debug print
     		/**Write to file*/
     		String fileName = outputPathWithoutExtension + processId + "_processBatchActivityStats.csv";
             writeToFile(fileName, s);
