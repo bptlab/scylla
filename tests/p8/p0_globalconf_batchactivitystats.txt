@@ -1,5 +1,0 @@
-BATCH REPORT
-Reference unit: SECONDS
-Please note: Duration and cost of batch activity execution can be found in output file of statslogger plug-in.
-
-
