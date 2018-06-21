@@ -3,4 +3,4 @@
 /output_*/*
 /samples/output_*/*
 /.idea/*
-/*.iml
+**/*.iml
