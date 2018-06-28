@@ -51,7 +51,7 @@ public final class WebSwingUtils {
 	}
 	
 	public static String getResource(String name) {
-		InputStream inputStream = WebSwingUtils.class.getResourceAsStream("/resources"+name);
+		InputStream inputStream = WebSwingUtils.class.getResourceAsStream(name);
 		ByteArrayOutputStream result = new ByteArrayOutputStream();
 		byte[] buffer = new byte[1024];
 		int length;

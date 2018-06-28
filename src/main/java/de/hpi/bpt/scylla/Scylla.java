@@ -10,6 +10,8 @@ import java.util.Arrays;
  *
  */
 public class Scylla {
+    public static final String OS = System.getProperty("os.name");
+    public static final String FILEDELIM = (OS.contains("Linux") || OS.contains("Mac OS")) ? "/" : "\\";
 
     public static void main(String[] args) throws Exception {
 
