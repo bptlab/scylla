@@ -1,0 +1,15 @@
+sudo: false
+language: java
+
+git:
+  depth: 3
+  lfs_skip_smudge: true
+
+jdk:
+  - oraclejdk8
+  - oraclejdk9
+
+script: mvn '-Dtest=de.hpi.bpt.scylla.*Tests' test
+
+notifications:
+  email: false
