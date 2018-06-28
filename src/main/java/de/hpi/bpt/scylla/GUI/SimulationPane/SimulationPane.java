@@ -540,9 +540,7 @@ public class SimulationPane extends JPanel{
 		panelBottom.add(button_AdvancedOptions, gbc_button_AdvancedOptions);
 		
 		lastOutPutFolder = "";
-		
 
-		setBounds(new Rectangle(1200,900));
 		loadPlugins();
 	}
 	
