@@ -91,8 +91,7 @@ public class PluginLoader {
 //			File plugins_list = new File(PluginLoader.class.getClassLoader().getResource("META-INF/plugins/plugins_list").toURI());
 
 			//FileReader fr = new FileReader(plugins_list);
-			String prefix = ScyllaGUI.INJAR ? "/resources" : "";
-			InputStreamReader fr = new InputStreamReader(PluginLoader.class.getResourceAsStream(prefix+"/META-INF/plugins/plugins_list"));
+			InputStreamReader fr = new InputStreamReader(PluginLoader.class.getResourceAsStream("/META-INF/plugins/plugins_list"));
 			BufferedReader br = new BufferedReader(fr);
 
 			ArrayList<String> packages = new ArrayList<String>();
