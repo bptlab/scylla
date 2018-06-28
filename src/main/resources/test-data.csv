@@ -1,0 +1,7 @@
+test, samples, p0_globalconf, test, test
+p1, samples, p0_globalconf, p1_boundary, p1_boundary_sim
+p8, samples, p0_globalconf, p8_normalbpmn_with_dataobject, p8_normalbpmn_with_dataobject_sim
+adminProcess_batch_parallel, samples, adminProcess_global, adminProcess_batch_parallel, adminProcess_batch_sim
+adminProcess_batch_sequential_casebased, samples, adminProcess_global, adminProcess_batch_sequential_casebased, adminProcess_batch_sim
+adminProcess_batch_sequential_taskbased, samples, adminProcess_global, adminProcess_batch_sequential_taskbased, adminProcess_batch_sim
+retailer_batch, samples, retailer_global, retailer_batch_bpmn, retailer_batch_sim

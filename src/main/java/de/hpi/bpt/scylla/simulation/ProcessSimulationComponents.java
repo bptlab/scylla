@@ -34,7 +34,9 @@ public class ProcessSimulationComponents {
     private Map<Integer, ProcessSimulationComponents> children = new HashMap<Integer, ProcessSimulationComponents>();
 
     private Map<Integer, NumericalDist<?>> distributions = new HashMap<Integer, NumericalDist<?>>();
+    private Map<Integer, NumericalDist<?>> setUpDistributions = new HashMap<Integer, NumericalDist<?>>();
     private Map<Integer, TimeUnit> distributionTimeUnits = new HashMap<Integer, TimeUnit>();
+    private Map<Integer, TimeUnit> setUpDistributionTimeUnits = new HashMap<Integer, TimeUnit>();
 
     private boolean showInReport;
     private boolean showInTrace;
@@ -69,19 +71,18 @@ public class ProcessSimulationComponents {
         try {
             Map<Integer, TimeDistributionWrapper> arrivalRates = simulationConfiguration.getArrivalRates();
             Map<Integer, TimeDistributionWrapper> durations = simulationConfiguration.getDurations();
+            Map<Integer, TimeDistributionWrapper> setUpDurations = simulationConfiguration.getSetUpDurations();
             Map<Integer, TimeDistributionWrapper> arrivalRatesAndDurations = new HashMap<Integer, TimeDistributionWrapper>();
 
             arrivalRatesAndDurations.putAll(arrivalRates);
             arrivalRatesAndDurations.putAll(durations);
 
-            for (Integer nodeId : arrivalRatesAndDurations.keySet()) {
-            	TimeDistributionWrapper dist = arrivalRatesAndDurations.get(nodeId);
-                TimeUnit distTimeUnit = dist.getTimeUnit();
-                if (distTimeUnit.ordinal() < model.getSmallestTimeUnit().ordinal()) {
-                    model.setSmallestTimeUnit(distTimeUnit);
-                }
-            }
-            convertToDesmojDistributions(arrivalRatesAndDurations);
+            setSmallestTimeUnit(arrivalRatesAndDurations);
+            setSmallestTimeUnit(setUpDurations);
+
+            convertToDesmojDistributions(arrivalRatesAndDurations, false);
+            convertToDesmojDistributions(setUpDurations, true);
+
             extensionDistributions = DistributionConversionPluggable.runPlugins(this);
 
             Map<Integer, SimulationConfiguration> configurationsOfSubProcesses = simulationConfiguration
@@ -101,22 +102,38 @@ public class ProcessSimulationComponents {
         }
     }
 
-    private void convertToDesmojDistributions(Map<Integer, TimeDistributionWrapper> arrivalRatesAndDurations)
+    private void setSmallestTimeUnit(Map<Integer, TimeDistributionWrapper> durations) {
+        for (Integer nodeId : durations.keySet()) {
+            TimeDistributionWrapper dist = durations.get(nodeId);
+            TimeUnit distTimeUnit = dist.getTimeUnit();
+            if (distTimeUnit.ordinal() < model.getSmallestTimeUnit().ordinal()) {
+                model.setSmallestTimeUnit(distTimeUnit);
+            }
+        }
+    }
+
+    private void convertToDesmojDistributions(Map<Integer, TimeDistributionWrapper> arrivalRatesAndDurations, boolean setUp)
             throws InstantiationException {
-        distributions = new HashMap<Integer, NumericalDist<?>>();
+        
+        
         Long randomSeed = simulationConfiguration.getRandomSeed();
         for (Integer nodeId : arrivalRatesAndDurations.keySet()) {
         	TimeDistributionWrapper distWrapper = arrivalRatesAndDurations.get(nodeId);
             TimeUnit distTimeUnit = distWrapper.getTimeUnit();
             Distribution dist = distWrapper.getDistribution();
-            distributionTimeUnits.put(nodeId, distTimeUnit);
             String name = processModel.getModelScopeId() + "_" + nodeId.toString();
             NumericalDist<?> desmojDist = SimulationUtils.getDistribution(dist, model, name, nodeId, showInReport, showInTrace);
 
             desmojDist.setSeed(randomSeed);
             // XXX no conversion of distribution to target unit smallestTimeUnit during runtime required, desmoj does it
             // all
-            distributions.put(nodeId, desmojDist);
+            if (!setUp) {
+                distributions.put(nodeId, desmojDist);
+                distributionTimeUnits.put(nodeId, distTimeUnit);
+            } else {
+                setUpDistributions.put(nodeId, desmojDist);
+                setUpDistributionTimeUnits.put(nodeId, distTimeUnit);
+            }
         }
     }
 
@@ -191,6 +208,7 @@ public class ProcessSimulationComponents {
 
     public double getDistributionSample(Integer nodeId) {
         NumericalDist<?> distribution = distributions.get(nodeId);
+        NumericalDist<?> setUpDistribution = setUpDistributions.get(nodeId);
         if (distribution == null) {
             DebugLogger.log("No distribution found for node " + nodeId + ". " + "\nUse zero time interval.");
             // distribution = new DiscreteDistConstant<Double>(model, nodeId.toString(), 0d, showInReport, showInTrace);
@@ -204,6 +222,33 @@ public class ProcessSimulationComponents {
             dist.skipTraceNote((int) dist.getOrder());
         }
         double value = distribution.sample().doubleValue();
+
+        /*if (setUpDistributions.containsKey(nodeId)) {
+            value+=setUpDistribution.sample().doubleValue();
+        }*/
+
+        if (value < 0){
+            value = 0; //negative values are not allowed, DESMOJ can't handle negative event times
+        }
+
+        return value;
+    }
+
+    public double getSetUpDistributionSample(Integer nodeId) {
+        NumericalDist<?> setUpDistribution = setUpDistributions.get(nodeId);
+        if (setUpDistribution == null) {
+            DebugLogger.log("No distribution found for node " + nodeId + ". " + "\nUse zero time interval.");
+            // distribution = new DiscreteDistConstant<Double>(model, nodeId.toString(), 0d, showInReport, showInTrace);
+            return 0d;
+        }
+        if (setUpDistribution instanceof ContDistErlang) {
+            // skip trace notes to avoid confusion
+            // when order is e.g. 10, it provides 11x "samples ... from ..." notes
+            // only the last one is relevant for the user, so skip first 10
+            ContDistErlang dist = (ContDistErlang) setUpDistribution;
+            dist.skipTraceNote((int) dist.getOrder());
+        }
+        double value = setUpDistribution.sample().doubleValue();
 
         if (value < 0){
             value = 0; //negative values are not allowed, DESMOJ can't handle negative event times
@@ -222,6 +267,14 @@ public class ProcessSimulationComponents {
             distributionTimeUnit = TimeUnit.DAYS;
         }
         return distributionTimeUnit;
+    }
+
+    public TimeUnit getSetUpDistributionTimeUnit(Integer nodeId) {
+        TimeUnit setUpdistributionTimeUnit = setUpDistributionTimeUnits.get(nodeId);
+        if (setUpdistributionTimeUnit == null) {
+            setUpdistributionTimeUnit = TimeUnit.DAYS;
+        }
+        return setUpdistributionTimeUnit;
     }
 
     public Map<Integer, TimeUnit> getDistributionTimeUnits() {

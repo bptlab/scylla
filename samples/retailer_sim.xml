@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bsim:definitions xmlns:bsim="http://bsim.hpi.uni-potsdam.de/scylla/simModel" targetNamespace="http://www.hpi.de">
+  <bsim:simulationConfiguration id="retailerProcess_sim" processRef="sid-84e84226-d31d-4a97-a17b-c02ece90946f" processInstances="15000" startDateTime="2017-07-10T00:00+02:00" randomSeed="280">
+    <bsim:startEvent id="sid-04B854FC-4737-4C01-BB39-9875957363E3">
+      <bsim:arrivalRate timeUnit="MINUTES">
+        <bsim:exponentialDistribution>
+          <bsim:mean>30</bsim:mean>
+        </bsim:exponentialDistribution>
+      </bsim:arrivalRate>
+    </bsim:startEvent>
+    <bsim:Task id="sid-6D861654-615E-4A8D-B318-A56A3B85CA9D" name="Take items out of stock">
+      <bsim:duration timeUnit="MINUTES">
+        <bsim:exponentialDistribution>
+          <bsim:mean>30</bsim:mean>
+        </bsim:exponentialDistribution>
+      </bsim:duration>
+      <bsim:resources>
+        <bsim:resource id="Robot" amount="1" />
+      </bsim:resources>
+    </bsim:Task>
+    <bsim:Task id="sid-0B137946-FA8D-4D7A-A0E2-877E3E2965E7" name="Pack order">
+      <bsim:duration timeUnit="MINUTES">
+        <bsim:uniformDistribution>
+          <bsim:lower>5</bsim:lower>
+          <bsim:upper>15</bsim:upper>
+        </bsim:uniformDistribution>
+      </bsim:duration>
+      <bsim:resources>
+        <bsim:resource id="Worker" amount="1" />
+      </bsim:resources>
+    </bsim:Task>
+    <bsim:Task id="sid-9802B38D-B836-415C-B346-724CB5592BBC" name="Ship order">
+      <bsim:duration timeUnit="MINUTES">
+        <bsim:exponentialDistribution>
+          <bsim:mean>7</bsim:mean>
+        </bsim:exponentialDistribution>
+      </bsim:duration>
+      <bsim:resources>
+        <bsim:resource id="Worker" amount="1" />
+      </bsim:resources>
+    </bsim:Task>
+    <bsim:Task id="sid-F3575A76-8539-4B47-9C0D-93CE802D1159" name="Archive order">
+      <bsim:duration timeUnit="SECONDS">
+        <bsim:exponentialDistribution>
+          <bsim:mean>10</bsim:mean>
+        </bsim:exponentialDistribution>
+      </bsim:duration>
+      <bsim:resources>
+        <bsim:resource id="System" amount="1" />
+      </bsim:resources>
+    </bsim:Task>
+  </bsim:simulationConfiguration>
+</bsim:definitions>

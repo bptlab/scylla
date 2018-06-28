@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:signavio="http://www.signavio.com" xmlns:qbp="http://www.qbp-simulator.com/Schema201212" id="sid-43facd4c-3294-4547-bfd7-67ba3d216aa4" targetNamespace="http://www.signavio.com" expressionLanguage="http://www.w3.org/TR/XPath" exporter="Camunda Modeler" exporterVersion="1.9.0" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+  <process id="sid-84e84226-d31d-4a97-a17b-c02ece90946f" processType="None" isClosed="false" isExecutable="false">
+    <startEvent id="sid-04B854FC-4737-4C01-BB39-9875957363E3" name="Order&#10;received">
+      <extensionElements>
+        <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff" />
+        <signavio:signavioMetaData metaKey="bordercolor" metaValue="#000000" />
+        <signavio:signavioLabel bold="" fill="" fontFamily="" fontSize="12.0" italic="" ref="text_name" />
+      </extensionElements>
+      <outgoing>sid-8EEAA030-8480-4359-9BE1-9EC1E9F52E1D</outgoing>
+    </startEvent>
+    <task id="sid-6D861654-615E-4A8D-B318-A56A3B85CA9D" name="Prepare order for shipment">
+      <extensionElements>
+        <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffcc" />
+        <signavio:signavioMetaData metaKey="bordercolor" metaValue="#000000" />
+        <signavio:signavioMetaData metaKey="risklevel" metaValue="" />
+        <signavio:signavioMetaData metaKey="externaldocuments" metaValue="" />
+        <signavio:signavioLabel bold="" fill="" fontFamily="" fontSize="14.0" italic="" ref="text_name" />
+      </extensionElements>
+      <incoming>SequenceFlow_16cc0qu</incoming>
+      <outgoing>SequenceFlow_1cekdvv</outgoing>
+    </task>
+    <task id="sid-F3575A76-8539-4B47-9C0D-93CE802D1159" name="Archive order">
+      <extensionElements>
+        <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffcc" />
+        <signavio:signavioMetaData metaKey="bordercolor" metaValue="#000000" />
+        <signavio:signavioMetaData metaKey="risklevel" metaValue="" />
+        <signavio:signavioMetaData metaKey="externaldocuments" metaValue="" />
+        <signavio:signavioLabel bold="" fill="" fontFamily="" fontSize="14.0" italic="" ref="text_name" />
+      </extensionElements>
+      <incoming>SequenceFlow_06pf2b9</incoming>
+      <outgoing>sid-B96E9253-F554-454D-B1C5-80AEB84D83E6</outgoing>
+    </task>
+    <endEvent id="sid-B1C5D6F5-4D77-4FC7-B5BC-5F695C2351D9">
+      <extensionElements>
+        <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff" />
+        <signavio:signavioMetaData metaKey="bordercolor" metaValue="#000000" />
+      </extensionElements>
+      <incoming>sid-B96E9253-F554-454D-B1C5-80AEB84D83E6</incoming>
+    </endEvent>
+    <sequenceFlow id="sid-8EEAA030-8480-4359-9BE1-9EC1E9F52E1D" sourceRef="sid-04B854FC-4737-4C01-BB39-9875957363E3" targetRef="Task_080f6qu">
+      <extensionElements>
+        <signavio:signavioMetaData metaKey="bordercolor" metaValue="#000000" />
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="sid-B96E9253-F554-454D-B1C5-80AEB84D83E6" sourceRef="sid-F3575A76-8539-4B47-9C0D-93CE802D1159" targetRef="sid-B1C5D6F5-4D77-4FC7-B5BC-5F695C2351D9">
+      <extensionElements>
+        <signavio:signavioMetaData metaKey="bordercolor" metaValue="#000000" />
+      </extensionElements>
+    </sequenceFlow>
+    <subProcess id="Task_0hqu3vf" name="Batch Activity">
+      <extensionElements>
+        <camunda:properties>
+          <camunda:property name="maxBatchSize" value="3" />
+          <camunda:property name="executionType" value="parallel" />
+          <camunda:property name="groupingCharacteristics">
+            	<!--camunda:property name="processVariable" value="Order.CustID"/-->
+          </camunda:property>
+          <camunda:property name="activationRule">
+            	<camunda:property name="thresholdRule" threshold="60" timeout="PT30M"/>
+            	<!--camunda:property name="minMaxRule" minInstances="1" minTimeout="PT0S" maxInstances="2" maxTimeout="PT30M"/-->
+          </camunda:property>
+        </camunda:properties>
+      </extensionElements>
+      <incoming>SequenceFlow_1cekdvv</incoming>
+      <outgoing>SequenceFlow_06pf2b9</outgoing>
+      <property id="Property_1ja5hkt" name="__targetRef_placeholder" />
+      <dataInputAssociation id="DataInputAssociation_1yfrpya">
+        <sourceRef>DataObjectReference_04zmr4a</sourceRef>
+        <targetRef>Property_1ja5hkt</targetRef>
+      </dataInputAssociation>
+      <task id="sid-0B137946-FA8D-4D7A-A0E2-877E3E2965E7" name="Pack order">
+        <extensionElements>
+          <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffcc" />
+          <signavio:signavioMetaData metaKey="bordercolor" metaValue="#000000" />
+          <signavio:signavioMetaData metaKey="risklevel" metaValue="" />
+          <signavio:signavioMetaData metaKey="externaldocuments" metaValue="" />
+          <signavio:signavioLabel bold="" fill="" fontFamily="" fontSize="14.0" italic="" ref="text_name" />
+        </extensionElements>
+        <incoming>SequenceFlow_0dcmbeo</incoming>
+        <outgoing>SequenceFlow_1mxjtsy</outgoing>
+      </task>
+      <task id="sid-9802B38D-B836-415C-B346-724CB5592BBC" name="Ship order">
+        <extensionElements>
+          <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffcc" />
+          <signavio:signavioMetaData metaKey="bordercolor" metaValue="#000000" />
+          <signavio:signavioMetaData metaKey="risklevel" metaValue="" />
+          <signavio:signavioMetaData metaKey="externaldocuments" metaValue="" />
+          <signavio:signavioLabel bold="" fill="" fontFamily="" fontSize="14.0" italic="" ref="text_name" />
+        </extensionElements>
+        <incoming>SequenceFlow_1mxjtsy</incoming>
+        <outgoing>SequenceFlow_0i4f6qq</outgoing>
+      </task>
+      <sequenceFlow id="SequenceFlow_1mxjtsy" sourceRef="sid-0B137946-FA8D-4D7A-A0E2-877E3E2965E7" targetRef="sid-9802B38D-B836-415C-B346-724CB5592BBC" />
+      <startEvent id="StartEvent_1rquzlj">
+        <outgoing>SequenceFlow_0dcmbeo</outgoing>
+      </startEvent>
+      <sequenceFlow id="SequenceFlow_0dcmbeo" sourceRef="StartEvent_1rquzlj" targetRef="sid-0B137946-FA8D-4D7A-A0E2-877E3E2965E7" />
+      <endEvent id="EndEvent_0rcqhsk">
+        <incoming>SequenceFlow_0i4f6qq</incoming>
+      </endEvent>
+      <sequenceFlow id="SequenceFlow_0i4f6qq" sourceRef="sid-9802B38D-B836-415C-B346-724CB5592BBC" targetRef="EndEvent_0rcqhsk" />
+    </subProcess>
+    <sequenceFlow id="SequenceFlow_1cekdvv" sourceRef="sid-6D861654-615E-4A8D-B318-A56A3B85CA9D" targetRef="Task_0hqu3vf" />
+    <sequenceFlow id="SequenceFlow_06pf2b9" sourceRef="Task_0hqu3vf" targetRef="sid-F3575A76-8539-4B47-9C0D-93CE802D1159" />
+    <dataObjectReference id="DataObjectReference_04zmr4a" name="Order" dataObjectRef="DataObject_0ws356e" />
+    <dataObject id="DataObject_0ws356e" />
+    <task id="Task_080f6qu" name="Order analyzed">
+      <incoming>sid-8EEAA030-8480-4359-9BE1-9EC1E9F52E1D</incoming>
+      <outgoing>SequenceFlow_16cc0qu</outgoing>
+      <dataOutputAssociation id="DataOutputAssociation_15camf0">
+        <targetRef>DataObjectReference_04zmr4a</targetRef>
+      </dataOutputAssociation>
+    </task>
+    <sequenceFlow id="SequenceFlow_16cc0qu" sourceRef="Task_080f6qu" targetRef="sid-6D861654-615E-4A8D-B318-A56A3B85CA9D" />
+  </process>
+  <bpmndi:BPMNDiagram id="sid-b8068cdc-fc02-431b-a2a0-6717a0b7c814">
+    <bpmndi:BPMNPlane id="sid-ad75e8ce-87ff-4580-a237-fa5af7440ee6" bpmnElement="sid-84e84226-d31d-4a97-a17b-c02ece90946f">
+      <bpmndi:BPMNShape id="sid-04B854FC-4737-4C01-BB39-9875957363E3_gui" bpmnElement="sid-04B854FC-4737-4C01-BB39-9875957363E3">
+        <omgdc:Bounds x="111" y="90" width="30" height="30" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="105" y="120" width="42" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sid-6D861654-615E-4A8D-B318-A56A3B85CA9D_gui" bpmnElement="sid-6D861654-615E-4A8D-B318-A56A3B85CA9D">
+        <omgdc:Bounds x="318" y="65" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sid-0B137946-FA8D-4D7A-A0E2-877E3E2965E7_gui" bpmnElement="sid-0B137946-FA8D-4D7A-A0E2-877E3E2965E7">
+        <omgdc:Bounds x="550" y="74" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sid-9802B38D-B836-415C-B346-724CB5592BBC_gui" bpmnElement="sid-9802B38D-B836-415C-B346-724CB5592BBC">
+        <omgdc:Bounds x="683" y="74" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sid-F3575A76-8539-4B47-9C0D-93CE802D1159_gui" bpmnElement="sid-F3575A76-8539-4B47-9C0D-93CE802D1159">
+        <omgdc:Bounds x="944" y="62" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sid-B1C5D6F5-4D77-4FC7-B5BC-5F695C2351D9_gui" bpmnElement="sid-B1C5D6F5-4D77-4FC7-B5BC-5F695C2351D9">
+        <omgdc:Bounds x="1079" y="91" width="28" height="28" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="1093" y="119" width="0" height="0" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="sid-8EEAA030-8480-4359-9BE1-9EC1E9F52E1D_gui" bpmnElement="sid-8EEAA030-8480-4359-9BE1-9EC1E9F52E1D">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="140" y="105" />
+        <omgdi:waypoint xsi:type="omgdc:Point" x="179" y="105" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="114.5" y="90" width="90" height="0" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sid-B96E9253-F554-454D-B1C5-80AEB84D83E6_gui" bpmnElement="sid-B96E9253-F554-454D-B1C5-80AEB84D83E6">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="1044" y="102" />
+        <omgdi:waypoint xsi:type="omgdc:Point" x="1062" y="102" />
+        <omgdi:waypoint xsi:type="omgdc:Point" x="1062" y="105" />
+        <omgdi:waypoint xsi:type="omgdc:Point" x="1080" y="105" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="1032" y="103.5" width="90" height="0" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="SubProcess_16r7az1_di" bpmnElement="Task_0hqu3vf" isExpanded="true">
+        <omgdc:Bounds x="468" y="28" width="419" height="154" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1mxjtsy_di" bpmnElement="SequenceFlow_1mxjtsy">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="650" y="114" />
+        <omgdi:waypoint xsi:type="omgdc:Point" x="683" y="114" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="621.5" y="99" width="90" height="0" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1cekdvv_di" bpmnElement="SequenceFlow_1cekdvv">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="418" y="105" />
+        <omgdi:waypoint xsi:type="omgdc:Point" x="444" y="105" />
+        <omgdi:waypoint xsi:type="omgdc:Point" x="444" y="105" />
+        <omgdi:waypoint xsi:type="omgdc:Point" x="468" y="105" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="414" y="105" width="90" height="0" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_06pf2b9_di" bpmnElement="SequenceFlow_06pf2b9">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="887" y="105" />
+        <omgdi:waypoint xsi:type="omgdc:Point" x="916" y="105" />
+        <omgdi:waypoint xsi:type="omgdc:Point" x="916" y="102" />
+        <omgdi:waypoint xsi:type="omgdc:Point" x="944" y="102" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="886" y="103.5" width="90" height="0" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="DataObjectReference_04zmr4a_di" bpmnElement="DataObjectReference_04zmr4a">
+        <omgdc:Bounds x="470" y="212" width="36" height="50" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="473" y="262" width="29" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="DataOutputAssociation_15camf0_di" bpmnElement="DataOutputAssociation_15camf0">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="260" y="146" />
+        <omgdi:waypoint xsi:type="omgdc:Point" x="470" y="229" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataInputAssociation_1yfrpya_di" bpmnElement="DataInputAssociation_1yfrpya">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="506" y="225" />
+        <omgdi:waypoint xsi:type="omgdc:Point" x="574" y="182" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="StartEvent_1rquzlj_di" bpmnElement="StartEvent_1rquzlj">
+        <omgdc:Bounds x="490" y="96" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="463" y="132" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0dcmbeo_di" bpmnElement="SequenceFlow_0dcmbeo">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="526" y="114" />
+        <omgdi:waypoint xsi:type="omgdc:Point" x="550" y="114" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="538" y="93" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_0rcqhsk_di" bpmnElement="EndEvent_0rcqhsk">
+        <omgdc:Bounds x="824" y="96" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="842" y="136" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_0i4f6qq_di" bpmnElement="SequenceFlow_0i4f6qq">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="783" y="114" />
+        <omgdi:waypoint xsi:type="omgdc:Point" x="824" y="114" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="803.5" y="93" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Task_080f6qu_di" bpmnElement="Task_080f6qu">
+        <omgdc:Bounds x="178.57286995515693" y="65" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_16cc0qu_di" bpmnElement="SequenceFlow_16cc0qu">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="279" y="105" />
+        <omgdi:waypoint xsi:type="omgdc:Point" x="318" y="105" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="298.5" y="84" width="0" height="12" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

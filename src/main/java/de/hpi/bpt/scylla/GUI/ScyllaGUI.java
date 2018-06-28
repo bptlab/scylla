@@ -39,7 +39,7 @@ import de.hpi.bpt.scylla.GUI.WebSwing.WebSwingUtils;
 public class ScyllaGUI extends JFrame {
 	
 	/**A Developer variable to suppress e.g. output forwarding*/
-	public static final boolean DEBUG = false;
+	public static final boolean DEBUG = true;
 	
 	/**Tells whether the programm is running in a jar or not*/
 	public static final boolean INJAR = ScyllaGUI.class.getResource(ScyllaGUI.class.getSimpleName()+".class").toString().startsWith("jar:");
@@ -240,9 +240,8 @@ public class ScyllaGUI extends JFrame {
 	}
 	
 	public static Image getResource(String path) {
-		String prefix = INJAR ? "/resources" : "";
 		try {
-			return ImageIO.read(ScyllaGUI.class.getResourceAsStream(prefix+path));
+			return ImageIO.read(ScyllaGUI.class.getResourceAsStream(path));
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;

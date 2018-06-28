@@ -7,7 +7,6 @@ de.hpi.bpt.scylla.plugin.eventorder_basic
 de.hpi.bpt.scylla.plugin.gateway_exclusive
 de.hpi.bpt.scylla.plugin.gateway_inclusive
 de.hpi.bpt.scylla.plugin.statslogger_nojar
-de.hpi.bpt.scylla.plugin.subprocess
 de.hpi.bpt.scylla.plugin.batch
 de.hpi.bpt.scylla.plugin.xeslogger
 de.hpi.bpt.scylla.plugin.eventArrivalRate

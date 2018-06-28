@@ -1,9 +1,6 @@
 package de.hpi.bpt.scylla.plugin.dataobject;
 
-import java.util.AbstractMap;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 
 public class DataObjectField {
 

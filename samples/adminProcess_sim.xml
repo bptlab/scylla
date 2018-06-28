@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bsim:definitions xmlns:bsim="http://bsim.hpi.uni-potsdam.de/scylla/simModel" targetNamespace="http://www.hpi.de">
-  <bsim:simulationConfiguration id="evaluationProcessA_sim" processRef="Process_1" processInstances="50" startDateTime="2017-07-17T00:00+00:00">
+  <bsim:simulationConfiguration id="evaluationProcessA_sim" processRef="Process_1" processInstances="150" startDateTime="2017-07-17T00:00+02:00" randomSeed="280">
     <bsim:Task id="Task_0ozv8lz" name="Check and define due date;">
       <bsim:duration timeUnit="MINUTES">
         <bsim:exponentialDistribution>

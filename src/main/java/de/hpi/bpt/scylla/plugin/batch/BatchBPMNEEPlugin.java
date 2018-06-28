@@ -25,7 +25,7 @@ public class BatchBPMNEEPlugin extends BPMNEndEventPluggable {
         BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
         pluginInstance.logBPMNEventForNonResponsiblePI(event, processInstance);
 
-        // schedule parental end events
+        // Schedule parental end events
 
         ProcessInstance parentProcessInstance = processInstance.getParent();
         if (parentProcessInstance != null) {
@@ -37,28 +37,35 @@ public class BatchBPMNEEPlugin extends BPMNEndEventPluggable {
 
             if (cluster != null) {
 
-                if (pluginInstance.isProcessInstanceCompleted(processInstance)) {
-                    List<TaskTerminateEvent> parentalEndEvents = cluster.getParentalEndEvents();
-                    for (int i = 0; i < parentalEndEvents.size(); i++) {
-                        TaskTerminateEvent pee = parentalEndEvents.get(i);
-                        ProcessInstance pi = pee.getProcessInstance();
-                        pee.schedule(pi);
+                cluster.setProcessInstanceToFinished();
+                // Schedule them only if either all process instances has passed the last event of the batch activity or the execution type is parallel
+                if (cluster.areAllProcessInstancesFinished() || cluster.hasExecutionType(BatchClusterExecutionType.PARALLEL)) {
+
+                    if (pluginInstance.isProcessInstanceCompleted(processInstance)) {
+                        List<TaskTerminateEvent> parentalEndEvents = cluster.getParentalEndEvents();
+                        for (TaskTerminateEvent pee : parentalEndEvents) {
+                            ProcessInstance pi = pee.getProcessInstance();
+                            pee.schedule(pi);
+                        }
+
+                        parentalEndEvents.clear();
+
+                        pluginInstance.setClusterToTerminated(parentProcessInstance, parentNodeId);
                     }
 
-                    parentalEndEvents.clear();
+                    // Prevent parental task terminate event from scheduling, if there is any (from subprocess plugin)
 
-                    pluginInstance.setClusterToTerminated(parentProcessInstance, parentNodeId);
-                }
+                    Map<Integer, ScyllaEvent> nextEventMap = event.getNextEventMap();
+                    if (!nextEventMap.isEmpty()) {
+                        Map<Integer, TimeSpan> timeSpanToNextEventMap = event.getTimeSpanToNextEventMap();
+                        int indexOfParentalTaskTerminateEvent = 0;
 
-                // prevent parental task terminate event from scheduling, if there is any (from subprocess plugin)
-
-                Map<Integer, ScyllaEvent> nextEventMap = event.getNextEventMap();
-                if (!nextEventMap.isEmpty()) {
-                    Map<Integer, TimeSpan> timeSpanToNextEventMap = event.getTimeSpanToNextEventMap();
-                    int indexOfParentalTaskTerminateEvent = 0;
-
-                    nextEventMap.remove(indexOfParentalTaskTerminateEvent);
-                    timeSpanToNextEventMap.remove(indexOfParentalTaskTerminateEvent);
+                        nextEventMap.remove(indexOfParentalTaskTerminateEvent);
+                        timeSpanToNextEventMap.remove(indexOfParentalTaskTerminateEvent);
+                    }
+                } else if (cluster.hasExecutionType(BatchClusterExecutionType.SEQUENTIAL_CASEBASED)) {
+                    // Schedule the next start event
+                    pluginInstance.scheduleNextCaseInBatchProcess(cluster);
                 }
             }
         }

@@ -3,11 +3,9 @@ package de.hpi.bpt.scylla.plugin.batch;
 import java.util.Map;
 
 import de.hpi.bpt.scylla.exception.ScyllaRuntimeException;
-import de.hpi.bpt.scylla.model.configuration.SimulationConfiguration;
 import de.hpi.bpt.scylla.model.process.ProcessModel;
 import de.hpi.bpt.scylla.plugin_type.simulation.event.TaskEnableEventPluggable;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
-import de.hpi.bpt.scylla.simulation.ProcessSimulationComponents;
 import de.hpi.bpt.scylla.simulation.event.ScyllaEvent;
 import de.hpi.bpt.scylla.simulation.event.TaskBeginEvent;
 import de.hpi.bpt.scylla.simulation.event.TaskEnableEvent;
@@ -24,17 +22,20 @@ public class BatchTEPlugin extends TaskEnableEventPluggable {
     @Override
     public void eventRoutine(TaskEnableEvent event, ProcessInstance processInstance) throws ScyllaRuntimeException {
 
+
         BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
         pluginInstance.logTaskEventForNonResponsiblePI(event, processInstance);
 
-        ProcessSimulationComponents desmojObjects = event.getDesmojObjects();
+        //ProcessSimulationComponents desmojObjects = event.getDesmojObjects();
         // SimulationModel model = (SimulationModel) desmojEvent.getModel();
         int nodeId = event.getNodeId();
         ProcessModel processModel = processInstance.getProcessModel();
-        SimulationConfiguration simulationConfiguration = desmojObjects.getSimulationConfiguration();
-        Map<Integer, BatchRegion> batchRegions = (Map<Integer, BatchRegion>) simulationConfiguration
-                .getExtensionValue(getName(), "batchRegions");
-        if (batchRegions.containsKey(nodeId) && processModel.getSubProcesses().containsKey(nodeId)) {
+        //SimulationConfiguration simulationConfiguration = desmojObjects.getSimulationConfiguration();
+        /*Map<Integer, BatchActivity> batchActivities = (Map<Integer, BatchActivity>) simulationConfiguration
+                .getExtensionValue(getName(), "batchActivities");*/
+        Map<Integer, BatchActivity> batchActivities = processModel.getBatchActivities();
+
+        if (batchActivities.containsKey(nodeId) && processModel.getSubProcesses().containsKey(nodeId)) {
 
             // in any case: put taskbeginevent of subprocess container on hold
             // String source = desmojEvent.getSource();

@@ -1,51 +1,56 @@
 package de.hpi.bpt.scylla.plugin.batch;
 
 import java.time.Duration;
+import java.util.List;
 
 import de.hpi.bpt.scylla.plugin.dataobject.DataObjectField;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
 import de.hpi.bpt.scylla.simulation.SimulationModel;
 import de.hpi.bpt.scylla.simulation.event.TaskBeginEvent;
+import desmoj.core.simulator.Entity;
+import desmoj.core.simulator.Model;
 
 
-class ThresholdRule implements ActivationRule{
+public class ThresholdRule implements ActivationRule{
 
     private int threshold;
     private Duration timeOut;
     private String dueDate;
-    
-    ThresholdRule (int threshold, Duration timeout) {
+
+    public ThresholdRule (int threshold, Duration timeout) {
         this.threshold = threshold;
         this.timeOut = timeout;
         this.dueDate = null;
     }
-    
-    ThresholdRule (int threshold, String dueDate) {
+
+    public ThresholdRule (int threshold, String dueDate) {
         this.threshold = threshold;
         this.timeOut = null;
         this.dueDate = dueDate;
     }
 
-	public int getThreshold(TaskBeginEvent desmojEvent, ProcessInstance processInstance) {
-		return threshold;
-	}
+    public int getThreshold(TaskBeginEvent desmojEvent, ProcessInstance processInstance) {
 
-	public Duration getTimeOut(TaskBeginEvent desmojEvent, ProcessInstance processInstance){
-		if (timeOut != null){
-			return timeOut;
-		}else{
-			
-			return Duration.ofDays(getDurationForCurrentInstance(desmojEvent, processInstance));
-	}
-		
-	}
-	
-	private long getDurationForCurrentInstance(TaskBeginEvent desmojEvent, ProcessInstance processInstance){
-		long numberOfDays = 0;
-		
-		//***********
-		// get the value of the dataObject  
-		//***********
+        return threshold;
+
+    }
+
+    public Duration getTimeOut(TaskBeginEvent desmojEvent, ProcessInstance processInstance){
+        if (timeOut != null){
+            return timeOut;
+        }else{
+
+            return Duration.ofDays(getDurationForCurrentInstance(desmojEvent, processInstance));
+        }
+
+    }
+
+    private long getDurationForCurrentInstance(TaskBeginEvent desmojEvent, ProcessInstance processInstance){
+        long numberOfDays = 0;
+
+        //***********
+        // get the value of the dataObject
+        //***********
 
         SimulationModel model = (SimulationModel) desmojEvent.getModel();
 
@@ -53,8 +58,8 @@ class ThresholdRule implements ActivationRule{
 
         System.out.println("Due Date for "+ desmojEvent+" in: "+ numberOfDays);
 
-		return numberOfDays;
-	}
+        return numberOfDays;
+    }
 
 
 }

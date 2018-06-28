@@ -138,7 +138,7 @@ public class SimulationPane extends JPanel{
 		displayCurrentGlobalConfigChosen.buttonEdit.setVisible(false);
 		//textfield_CurrentGlobalConfig_chosen.setMargin(ScyllaGUI.LEFTMARGIN);
 		displayCurrentGlobalConfigChosen.setFont(ScyllaGUI.DEFAULTFONT);
-		displayCurrentGlobalConfigChosen.setToolTipText("Path for current global configuarition file");
+		displayCurrentGlobalConfigChosen.setToolTipText("Path for current global configuaration file");
 		GridBagConstraints gbc_displayCurrentGlobalConfigChosenWrap = new GridBagConstraints();
 		gbc_displayCurrentGlobalConfigChosenWrap.fill = GridBagConstraints.BOTH;
 		gbc_displayCurrentGlobalConfigChosenWrap.insets = new Insets(0, COL1, 0, 0);
@@ -553,9 +553,7 @@ public class SimulationPane extends JPanel{
 		panelBottom.add(button_AdvancedOptions, gbc_button_AdvancedOptions);
 		
 		lastOutPutFolder = "";
-		
 
-		setBounds(new Rectangle(1200,900));
 		loadPlugins();
 	}
 	
@@ -605,6 +603,11 @@ public class SimulationPane extends JPanel{
 	 */
 	private synchronized void startSimulation(String resFilename, String[] bpmnFilenames, String[] simFilenames) {
 
+		if(resFilename.isEmpty() || bpmnFilenames.length == 0 || simFilenames.length == 0) {
+			System.err.println("Not all simulation input files have been specified. Aborting.");
+			return;
+		}
+		
 		button_StartSimulation.setText("Running ...");
         button_StartSimulation.setEnabled(false);
         

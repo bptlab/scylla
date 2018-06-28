@@ -25,16 +25,16 @@
       <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>
       <bpmn2:outgoing>SequenceFlow_2</bpmn2:outgoing>
     </bpmn2:task>
-    <bpmn2:subProcess id="SubProcess_1jvlipe" name="Batch Region">
+    <bpmn2:subProcess id="SubProcess_1jvlipe" name="Batch Activity">
       <bpmn2:extensionElements>
-        <bpt:batchRegion id="batch1">
+        <bpt:batchActivity id="batch1">
           <bpt:groupingCharacteristic>
             <bpt:processVariable id="1">custName</bpt:processVariable>
             <bpt:processVariable id="1">custAdress</bpt:processVariable>
           </bpt:groupingCharacteristic>
           <bpt:maxCapacity>3</bpt:maxCapacity>
           <bpt:thresholdRule num="2" timeout="PT10S"/>
-        </bpt:batchRegion>
+        </bpt:batchActivity>
       </bpmn2:extensionElements>
       <bpmn2:incoming>SequenceFlow_3</bpmn2:incoming>
       <bpmn2:outgoing>SequenceFlow_15abaew</bpmn2:outgoing>

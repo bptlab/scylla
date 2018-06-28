@@ -94,7 +94,7 @@ public class SimulationManager {
     /**
      * parses input, runs DesmoJ simulation experiment, writes BPS output logs
      */
-    public void run() {
+    public String run() {
 
         try {
             SAXBuilder builder = new SAXBuilder();
@@ -177,7 +177,7 @@ public class SimulationManager {
 
         String experimentName = Long.toString((new Date()).getTime());
         Experiment.setEpsilon(epsilon);
-        Experiment exp = new Experiment(experimentName, experimentOutputFolder);
+        Experiment exp = new Experiment(experimentName, false);
         exp.setShowProgressBar(false);
 
         // XXX each simulation configuration may have its own seed
@@ -234,6 +234,7 @@ public class SimulationManager {
         catch (IOException e) {
             e.printStackTrace();
         }
+        return outputPath;
     }
 
     public GlobalConfiguration getGlobalConfiguration() {

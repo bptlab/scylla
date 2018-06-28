@@ -26,7 +26,7 @@
 	      	<bsim:branchingProbability>0.9</bsim:branchingProbability>
 	      </bsim:outgoingSequenceFlow>
 	    </bsim:exclusiveGateway>
-	    <bsim:subProcess id="SubProcess_1jvlipe" name="Batch Region">
+	    <bsim:subProcess id="SubProcess_1jvlipe" name="Batch Activity">
 		    <bsim:task id="Task_0me73xw" name="Pack order">
 		    	<bsim:duration timeUnit="MINUTES">
 		    		<bsim:exponentialDistribution>

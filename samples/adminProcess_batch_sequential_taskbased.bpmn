@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:bpt="https://bpt.hpi.uni-potsdam.de/Public/LuisePufahl" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="1.3.0">
+<bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:bpt="https://bpt.hpi.uni-potsdam.de/Public/LuisePufahl" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="1.9.0">
   <bpmn:process id="Process_1" isExecutable="false">
     <bpmn:task id="Task_0ozv8lz" name="Check and define due date">
       <bpmn:incoming>SequenceFlow_0xx091n</bpmn:incoming>
@@ -22,6 +22,19 @@
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="SequenceFlow_1q8upv2" sourceRef="Task_0tfwteo" targetRef="EndEvent_0r55m0h" />
     <bpmn:subProcess id="Task_0z95iaa" name="Batch Activity">
+      <bpmn:extensionElements>
+        <camunda:properties>
+          <camunda:property name="maxBatchSize" value="100" />
+          <camunda:property name="executionType" value="sequential-taskbased" />
+          <camunda:property name="groupingCharacteristic">
+          	<!--camunda:property name="minMaxRule" minInstances="1" minTimeout="PT0S" maxInstances="2" maxTimeout="PT30M"/-->
+           	<!--camunda:property name="processVariable" value="RoomRequest.Date"/-->
+          </camunda:property>
+          <camunda:property name="activationRule">
+            <camunda:property name="thresholdRule" duedate="RoomRequest.Date"/>
+          </camunda:property>
+        </camunda:properties>
+      </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_1wme4vv</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0frjqhf</bpmn:outgoing>
       <bpmn:property id="Property_1ecqjnc" name="__targetRef_placeholder" />
@@ -49,8 +62,7 @@
     </bpmn:subProcess>
     <bpmn:sequenceFlow id="SequenceFlow_1wme4vv" sourceRef="Task_0ozv8lz" targetRef="Task_0z95iaa" />
     <bpmn:sequenceFlow id="SequenceFlow_0frjqhf" sourceRef="Task_0z95iaa" targetRef="Task_0tfwteo" />
-    <bpmn:dataObjectReference id="DataObjectReference_0vnqhdu" name="RoomRequest" dataObjectRef="DataObject_0xg412q" />
-    <!--bpmn:dataObject id="DataObject_0xg412q" name="RoomRequest"/-->
+    <bpmn:dataObjectReference id="DataObjectReference_0vnqhdu" name="RoomRequest" />
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">

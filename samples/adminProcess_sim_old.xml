@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bsim:definitions xmlns:bsim="http://bsim.hpi.uni-potsdam.de/scylla/simModel" targetNamespace="http://www.hpi.de">
+  <bsim:simulationConfiguration id="evaluationProcessA_sim" processRef="Process_1" processInstances="50" startDateTime="2017-07-17T00:00+00:00">
+    <bsim:Task id="Task_0ozv8lz" name="Check and define due date;">
+      <bsim:duration timeUnit="MINUTES">
+        <bsim:exponentialDistribution>
+          <bsim:mean>4</bsim:mean>
+        </bsim:exponentialDistribution>
+      </bsim:duration>
+      <bsim:resources>
+        <bsim:resource id="Clerk" amount="1" />
+      </bsim:resources>
+    </bsim:Task>
+    <bsim:Task id="Task_1pqdkju" name="Prepare printouts;">
+      <bsim:duration timeUnit="MINUTES">
+        <bsim:exponentialDistribution>
+          <bsim:mean>6</bsim:mean>
+        </bsim:exponentialDistribution>
+      </bsim:duration>
+      <bsim:resources>
+        <bsim:resource id="Clerk" amount="1" />
+      </bsim:resources>
+    </bsim:Task>
+    <bsim:Task id="Task_1byi30v" name="Hang printouts up;">
+      <bsim:duration timeUnit="MINUTES">
+        <bsim:uniformDistribution>
+          <bsim:lower>5</bsim:lower>
+          <bsim:upper>30</bsim:upper>
+        </bsim:uniformDistribution>
+      </bsim:duration>
+      <bsim:resources>
+        <bsim:resource id="Clerk" amount="1" />
+      </bsim:resources>
+    </bsim:Task>
+    <bsim:Task id="Task_0tfwteo" name="Update room list;">
+      <bsim:duration timeUnit="MINUTES">
+        <bsim:exponentialDistribution>
+          <bsim:mean>2</bsim:mean>
+        </bsim:exponentialDistribution>
+      </bsim:duration>
+      <bsim:resources>
+        <bsim:resource id="Clerk" amount="1" />
+      </bsim:resources>
+    </bsim:Task>
+    <bsim:startEvent id="StartEvent_1">
+      <bsim:arrivalRate timeUnit="DAYS">
+        <bsim:exponentialDistribution>
+          <bsim:mean>1</bsim:mean>
+        </bsim:exponentialDistribution>
+      </bsim:arrivalRate>
+    </bsim:startEvent>
+    <bsim:Task id="Task_1rldc6n" name="Wait for due date">
+      <bsim:duration timeUnit="DAYS">
+        <bsim:uniformDistribution>
+          <bsim:lower>0.5</bsim:lower>
+          <bsim:upper>21</bsim:upper>
+        </bsim:uniformDistribution>
+      </bsim:duration>
+      <bsim:resources />
+    </bsim:Task>
+  </bsim:simulationConfiguration>
+</bsim:definitions>
