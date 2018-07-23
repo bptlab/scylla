@@ -172,7 +172,7 @@ public class BatchCSVLogger extends OutputLoggerPluggable{
 	 */
 	private static String buildString(Iterable<Object[]> table) {
 		StringBuilder sb = new StringBuilder();
-		sb.append("\"sep=;\"\n");
+		//sb.append("\"sep=;\"\n");
 		for(Object[] row : table) {
 			for(Object o : row) {
 				if(o != null)sb.append(o.toString());
