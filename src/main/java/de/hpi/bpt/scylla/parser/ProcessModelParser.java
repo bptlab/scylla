@@ -580,11 +580,11 @@ public class ProcessModelParser extends Parser<ProcessModel> {
                         executionType = property.getAttributeValue("value");*/
                         switch (property.getAttributeValue("value")){
                             case "parallel":
-                                executionType = BatchClusterExecutionType.PARALLEL;
+                                executionType = BatchClusterExecutionType.PARALLEL;break;
                             case "sequential-taskbased":
-                                executionType = BatchClusterExecutionType.SEQUENTIAL_TASKBASED;
+                                executionType = BatchClusterExecutionType.SEQUENTIAL_TASKBASED;break;
                             case "sequential-casebased":
-                                executionType = BatchClusterExecutionType.SEQUENTIAL_CASEBASED;
+                                executionType = BatchClusterExecutionType.SEQUENTIAL_CASEBASED;break;
                         }
                         break;
 
