@@ -23,11 +23,11 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>sun.plugin</groupId>
+			<groupId>plugin</groupId>
 			<artifactId>plugin</artifactId>
-			<version>1.6</version>
+			<version>1.0</version>
 			<scope>system</scope>
-			<systemPath>${java.home}/lib/plugin.jar</systemPath>
+			<systemPath>${project.basedir}/lib/plugin.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
