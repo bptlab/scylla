@@ -2,7 +2,6 @@ package de.hpi.bpt.scylla.plugin_loader;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.JarURLConnection;
@@ -13,12 +12,13 @@ import java.util.Enumeration;
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.stream.Collectors;
 
 import de.hpi.bpt.scylla.GUI.CheckBoxList.StateObserver;
-import de.hpi.bpt.scylla.GUI.ScyllaGUI;
 import de.hpi.bpt.scylla.logger.DebugLogger;
 import de.hpi.bpt.scylla.plugin_type.IPluggable;
 
@@ -26,8 +26,8 @@ import de.hpi.bpt.scylla.plugin_type.IPluggable;
 /**
  * @author Leon Bein
  */
+@SuppressWarnings("rawtypes")
 public class PluginLoader {
-	
 	
 
 	
@@ -87,27 +87,11 @@ public class PluginLoader {
 	public void loadPlugins(){
 		
 		try {
-			//Collecting all plugin classpaths
-//			File plugins_list = new File(PluginLoader.class.getClassLoader().getResource("META-INF/plugins/plugins_list").toURI());
 
-			//FileReader fr = new FileReader(plugins_list);
-			InputStreamReader fr = new InputStreamReader(PluginLoader.class.getResourceAsStream("/META-INF/plugins/plugins_list"));
-			BufferedReader br = new BufferedReader(fr);
-
-			ArrayList<String> packages = new ArrayList<String>();
-			
-			String line = null;
-			while ((line = br.readLine()) != null) {
-				packages.add(line);
-			}
-			
-			br.close();
-			fr.close();
-			
 			//Finding superclasses of plugins and sorting by them
 			extensions = new HashMap<Class<?>,ArrayList<PluginWrapper>>();
 			
-			for(String pack : packages){
+			for(String pack : getStandardPluginPackages()){
 				try{
 					String pack_slash  = pack.replace('.','/')+"/"; 
 					URL packURL = PluginLoader.class.getClassLoader().getResource(pack_slash);
@@ -115,40 +99,11 @@ public class PluginLoader {
 						DebugLogger.error("Error loading plugins: Could not find package "+pack);
 						continue;
 					}
-					String[] classPaths = 
-							packURL.getProtocol().equals("jar") ?
+					ArrayList<String> classPaths = 
+						packURL.getProtocol().equals("jar") ?
 							getJarClassPaths(packURL, pack_slash) :
 							getFilePaths(packURL, pack);
-					for (String classPath : classPaths) {
-						String c = classPath;
-						if (!c.endsWith(".class")) continue;
-						c = c.substring(0, c.lastIndexOf(".class"));
-
-						try {
-							Class<?> plugin = Class.forName(c);
-							if (plugin == null) {
-								try {
-									throw new Exception(plugin + " not found");
-								} catch (Exception e) {
-									e.printStackTrace();
-									continue;
-								}
-							}
-							Class<?> entry_point = plugin.getSuperclass();
-							if (entry_point == null || !IPluggable.class.isAssignableFrom(entry_point)) {
-								//try{throw new Exception(plugin+" is not a valid extension of an entry point");}catch(Exception e){e.printStackTrace();continue;}
-							} else {
-								if (!extensions.containsKey(entry_point))
-									extensions.put(entry_point, new ArrayList<PluginWrapper>());
-								if (!extensions.get(entry_point).contains(plugin))
-									extensions.get(entry_point).add(new PluginWrapper(plugin, true));
-							}
-						} catch (ClassNotFoundException e) {
-							e.printStackTrace();
-							continue;
-						}
-
-					}
+					searchClassesForPlugins(getClassesIn(classPaths));
 				}catch (IllegalArgumentException e){
 					e.printStackTrace();
 					continue;
@@ -159,7 +114,30 @@ public class PluginLoader {
 			e.printStackTrace();
 		}
 		
+		try {
+			searchClassesForPlugins(new ExternalJarLoader().loadClasses());
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 		
+		
+	}
+	
+	private List<String> getStandardPluginPackages(){
+		try(InputStreamReader fr = new InputStreamReader(PluginLoader.class.getResourceAsStream("/META-INF/plugins/plugins_list"))){
+			try(BufferedReader br = new BufferedReader(fr)){
+				ArrayList<String> packages = new ArrayList<String>();
+				
+				String line = null;
+				while ((line = br.readLine()) != null) {
+					packages.add(line);
+				}
+				return packages;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 	/**
@@ -168,14 +146,13 @@ public class PluginLoader {
 	 * @param packname name of package in form superpackage/package/subpackage/
 	 * @return String array of file path in form packname.filename.fileending
 	 */
-	private String[] getJarClassPaths(URL packURL, String pack_slash){
-		String[] paths = null;
+	private ArrayList<String> getJarClassPaths(URL packURL, String pack_slash){
+		ArrayList<String> filePaths = new ArrayList<String>();
 			JarURLConnection connection;
 			try {
 				connection = (JarURLConnection) packURL.openConnection();
 				JarFile file = connection.getJarFile();
 				Enumeration<JarEntry> en = file.entries();
-				ArrayList<String> filePaths = new ArrayList<String>();
 				while (en.hasMoreElements()) {
 					JarEntry entry = en.nextElement();
 					String c = entry.toString();
@@ -183,12 +160,10 @@ public class PluginLoader {
 					c = c.replace("/",".");
 					filePaths.add(c);
 				}
-				paths = new String[filePaths.size()];
-				return filePaths.toArray(paths);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		return paths;
+		return filePaths;
 	}
 	
 	/**
@@ -197,18 +172,49 @@ public class PluginLoader {
 	 * @param packname name of package in form superpackage.package.subpackage
 	 * @return String array of file path in form packname.filename.fileending
 	 */
-	private String[] getFilePaths(URL packURL, String packname){
-		String[] paths = null;
+	private ArrayList<String> getFilePaths(URL packURL, String packname){
+		ArrayList<String> paths = new ArrayList<String>();
 		try {
 			File[] files = new File(packURL.toURI()).listFiles();
-			paths = new String[files.length];
 			for(int i = 0; i < files.length; i++){
-				paths[i] = packname+"."+files[i].getName();
+				paths.add(packname+"."+files[i].getName());
 			}
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
 		return paths;
+	}
+	
+	private ArrayList<Class> getClassesIn(ArrayList<String> classPaths) {
+		return ((ArrayList<Class>)classPaths.stream()
+			.map(classPath -> {
+				assert classPath.endsWith(".class");
+				String className = classPath.substring(0, classPath.lastIndexOf(".class"));
+				try {
+					Class clazz = Class.forName(className);
+					if (clazz == null) {throw new ClassNotFoundException(clazz + " not found");}
+					return clazz;
+				} catch(ClassNotFoundException e) {
+					e.printStackTrace();
+					return null;
+				}
+			})
+			.collect(Collectors.toCollection(ArrayList::new))
+		);
+	}
+	
+	private void searchClassesForPlugins(List<Class> classes) {
+		for(Class c : classes) {
+			if(isPluginClass(c))loadClass(c);
+		}
+	}
+	
+	private void loadClass(Class plugin) {
+		Class<?> entry_point = plugin.getSuperclass();
+		if (!extensions.containsKey(entry_point))
+			extensions.put(entry_point, new ArrayList<PluginWrapper>());
+		if (!extensions.get(entry_point).contains(plugin))
+			extensions.get(entry_point).add(new PluginWrapper(plugin, true));
 	}
 	
 
@@ -266,6 +272,11 @@ public class PluginLoader {
 		}
 		
 		return l;
+	}
+	
+	public static boolean isPluginClass(Class<?> clazz) {
+		Class<?> entry_point = clazz.getSuperclass();
+		return entry_point != null && IPluggable.class.isAssignableFrom(entry_point);
 	}
 	
 	
