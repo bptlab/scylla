@@ -39,7 +39,7 @@ import de.hpi.bpt.scylla.GUI.WebSwing.WebSwingUtils;
 public class ScyllaGUI extends JFrame {
 	
 	/**A Developer variable to suppress e.g. output forwarding*/
-	public static final boolean DEBUG = true;
+	public static final boolean DEBUG = false;
 	
 	/**Tells whether the programm is running in a jar or not*/
 	public static final boolean INJAR = ScyllaGUI.class.getResource(ScyllaGUI.class.getSimpleName()+".class").toString().startsWith("jar:");
