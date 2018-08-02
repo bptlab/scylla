@@ -210,7 +210,8 @@ public class ProcessSimulationComponents {
         NumericalDist<?> distribution = distributions.get(nodeId);
         NumericalDist<?> setUpDistribution = setUpDistributions.get(nodeId);
         if (distribution == null) {
-            DebugLogger.log("No distribution found for node " + nodeId + ". " + "\nUse zero time interval.");
+        	String name = processModel.getIdentifiers().get(nodeId);
+            DebugLogger.log("No distribution found for node " + nodeId +": "+ name + ". " + "\nUse zero time interval.");
             // distribution = new DiscreteDistConstant<Double>(model, nodeId.toString(), 0d, showInReport, showInTrace);
             return 0d;
         }
@@ -237,7 +238,8 @@ public class ProcessSimulationComponents {
     public double getSetUpDistributionSample(Integer nodeId) {
         NumericalDist<?> setUpDistribution = setUpDistributions.get(nodeId);
         if (setUpDistribution == null) {
-            DebugLogger.log("No distribution found for node " + nodeId + ". " + "\nUse zero time interval.");
+        	String name = processModel.getIdentifiers().get(nodeId);
+            DebugLogger.log("No setUp distribution found for node " + nodeId +": "+ name + ". " + "\nUse zero time interval.");
             // distribution = new DiscreteDistConstant<Double>(model, nodeId.toString(), 0d, showInReport, showInTrace);
             return 0d;
         }

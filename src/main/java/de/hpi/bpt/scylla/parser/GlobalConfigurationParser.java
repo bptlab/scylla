@@ -226,7 +226,8 @@ public class GlobalConfigurationParser extends Parser<GlobalConfiguration> {
             }
         }
         if (resources.isEmpty()) {
-            throw new ScyllaValidationException("No resource data definitions in file.");
+            //throw new ScyllaValidationException("No resource data definitions in file.");
+        	System.err.println("[Warning:] No resource data definitions in file.");
         }
         if (randomSeed == null) {
             Random random = new Random();

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bsim:globalConfiguration xmlns:bsim="http://bsim.hpi.uni-potsdam.de/scylla/simModel" targetNamespace="http://www.hpi.de" id="BatchTestGlobalConfiguration">
+  <bsim:zoneOffset>+01:00</bsim:zoneOffset>
+  <bsim:resourceData />
+</bsim:globalConfiguration>

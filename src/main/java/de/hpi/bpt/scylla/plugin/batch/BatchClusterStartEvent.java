@@ -35,11 +35,12 @@ public class BatchClusterStartEvent extends Event<BatchCluster> {
 
 
         // Schedule all task begin events of the process instance
+        // This does not schedule the activities inside the subprocess
+        //TODO: That should not be done for sequential, neither case- nor taskbased
         for (TaskBeginEvent pse : parentalStartEvents) {
             ProcessInstance pi = pse.getProcessInstance();
             pse.schedule(pi);
         }
-
         // schedule subprocess start events for all process instances in parent
         // processInstances and parentalStartEvents are ordered the same way
 
@@ -79,8 +80,7 @@ public class BatchClusterStartEvent extends Event<BatchCluster> {
                 }
 
             } catch (NodeNotFoundException | MultipleStartNodesException | NoStartNodeException e) {
-                DebugLogger.log("Start node of process model " + subprocess.getId() + " not found.");
-                System.err.println(e.getMessage());
+                DebugLogger.error("Start node of process model " + subprocess.getId() + " not found.");
                 e.printStackTrace();
                 SimulationUtils.abort(model, responsibleProcessInstance, nodeId, traceIsOn());
                 return;

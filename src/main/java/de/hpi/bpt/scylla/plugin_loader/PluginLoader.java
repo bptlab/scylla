@@ -8,6 +8,7 @@ import java.net.JarURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.EventListener;
 import java.util.HashMap;
@@ -94,16 +95,18 @@ public class PluginLoader {
 			for(String pack : getStandardPluginPackages()){
 				try{
 					String pack_slash  = pack.replace('.','/')+"/"; 
-					URL packURL = PluginLoader.class.getClassLoader().getResource(pack_slash);
-					if(packURL == null){
+					Enumeration<URL> packURLs = PluginLoader.class.getClassLoader().getResources(pack_slash);
+					if(!packURLs.hasMoreElements()){
 						DebugLogger.error("Error loading plugins: Could not find package "+pack);
 						continue;
 					}
-					ArrayList<String> classPaths = 
-						packURL.getProtocol().equals("jar") ?
-							getJarClassPaths(packURL, pack_slash) :
-							getFilePaths(packURL, pack);
-					searchClassesForPlugins(getClassesIn(classPaths));
+					for(URL packURL : Collections.list(packURLs)) {
+						ArrayList<String> classPaths = 
+								packURL.getProtocol().equals("jar") ?
+									getJarClassPaths(packURL, pack_slash) :
+									getFilePaths(packURL, pack);
+						searchClassesForPlugins(getClassesIn(classPaths));
+					}
 				}catch (IllegalArgumentException e){
 					e.printStackTrace();
 					continue;

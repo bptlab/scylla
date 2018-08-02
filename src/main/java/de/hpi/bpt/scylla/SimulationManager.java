@@ -77,8 +77,6 @@ public class SimulationManager {
      *            log {@link de.hpi.bpt.scylla.logger.ProcessNodeInfo} objects if true
      * @param enableDesLogging
      *            log DesmoJ traces and write HTML trace file if true
-     * @param gui
-     * 			a gui reference for feedback
      */
     public SimulationManager(String folder, String[] processModelFilenames, String[] simulationConfigurationFilenames,
             String globalConfigurationFilename, boolean enableBpsLogging, boolean enableDesLogging) {

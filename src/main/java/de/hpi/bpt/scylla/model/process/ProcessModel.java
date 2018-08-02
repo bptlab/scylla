@@ -275,6 +275,7 @@ public class ProcessModel extends SimulationInput {
         return graph;
     }
 
+    //TODO: Maybe create a direct map method
     public Map<Integer, String> getIdentifiers() {
         return identifiers;
     }

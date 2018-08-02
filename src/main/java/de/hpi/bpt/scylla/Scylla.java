@@ -13,7 +13,7 @@ public class Scylla {
     public static final String OS = System.getProperty("os.name");
     public static final String FILEDELIM = (OS.contains("Linux") || OS.contains("Mac OS")) ? "/" : "\\";
   
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws IllegalArgumentException {
 
         if (Arrays.stream(args).anyMatch(x -> x.contains("--help"))) {
                 System.out.println("Usage: Scylla --config=<your config file> --bpmn=<your first bpmn file> [--bpmn=<your second bpmn file>] [--bpmn=...] --sim=<your first sim file> [--sim=<your second sim file>] [--sim=...] [--output=<your output path>]");

@@ -18,11 +18,10 @@ public class BatchTEPlugin extends TaskEnableEventPluggable {
         return BatchPluginUtils.PLUGIN_NAME;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void eventRoutine(TaskEnableEvent event, ProcessInstance processInstance) throws ScyllaRuntimeException {
 
-
+    	System.out.println("Taskenablevent: "+event.getDisplayName()+" for instance "+processInstance.getId());
         BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
         pluginInstance.logTaskEventForNonResponsiblePI(event, processInstance);
 
@@ -35,6 +34,8 @@ public class BatchTEPlugin extends TaskEnableEventPluggable {
                 .getExtensionValue(getName(), "batchActivities");*/
         Map<Integer, BatchActivity> batchActivities = processModel.getBatchActivities();
 
+        /**If the task is a batch activity and a subprocess, cancel its normal execution 
+         * and execute as batch activity instead*/
         if (batchActivities.containsKey(nodeId) && processModel.getSubProcesses().containsKey(nodeId)) {
 
             // in any case: put taskbeginevent of subprocess container on hold

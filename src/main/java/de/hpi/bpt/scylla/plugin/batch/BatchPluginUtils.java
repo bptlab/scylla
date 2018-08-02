@@ -10,26 +10,32 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.javatuples.Pair;
+
+import com.google.common.base.Objects;
+
 import de.hpi.bpt.scylla.exception.ScyllaRuntimeException;
-import de.hpi.bpt.scylla.exception.ScyllaValidationException;
 import de.hpi.bpt.scylla.logger.ProcessNodeInfo;
 import de.hpi.bpt.scylla.logger.ProcessNodeTransitionType;
 import de.hpi.bpt.scylla.model.process.ProcessModel;
-import de.hpi.bpt.scylla.plugin.dataobject.DataDistributionWrapper;
 import de.hpi.bpt.scylla.plugin.dataobject.DataObjectField;
-import de.hpi.bpt.scylla.plugin.dataobject.DataObjectPluginUtils;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
 import de.hpi.bpt.scylla.simulation.ProcessSimulationComponents;
 import de.hpi.bpt.scylla.simulation.ResourceObject;
 import de.hpi.bpt.scylla.simulation.SimulationModel;
-import de.hpi.bpt.scylla.simulation.event.*;
+import de.hpi.bpt.scylla.simulation.event.BPMNEvent;
+import de.hpi.bpt.scylla.simulation.event.ScyllaEvent;
+import de.hpi.bpt.scylla.simulation.event.TaskBeginEvent;
+import de.hpi.bpt.scylla.simulation.event.TaskCancelEvent;
+import de.hpi.bpt.scylla.simulation.event.TaskEnableEvent;
+import de.hpi.bpt.scylla.simulation.event.TaskEvent;
+import de.hpi.bpt.scylla.simulation.event.TaskTerminateEvent;
 import de.hpi.bpt.scylla.simulation.utils.DateTimeUtils;
 import de.hpi.bpt.scylla.simulation.utils.SimulationUtils;
 import desmoj.core.simulator.EventAbstract;
 import desmoj.core.simulator.Model;
 import desmoj.core.simulator.TimeInstant;
 import desmoj.core.simulator.TimeSpan;
-import org.javatuples.Pair;
 
 public class BatchPluginUtils {
 
@@ -77,7 +83,14 @@ public class BatchPluginUtils {
         return batchClusters;
     }
 
-    @SuppressWarnings("unchecked")
+    /**
+     * Called when a subprocess batch activity is started
+     * Assigns the process instance to a cluster (creates a new one if needed)
+     * Takes care of scheduling of the cluster start events
+     * @param processInstance : Instance of process where the batch cluster starts
+     * @param nodeId : NodeId of the subprocess
+     * @param parentalBeginEvent : Begin event of the subprocess task
+     */
     void assignToBatchCluster(ProcessInstance processInstance, int nodeId, TaskBeginEvent parentalBeginEvent) {
 
         ProcessModel processModel = processInstance.getProcessModel();
@@ -90,7 +103,7 @@ public class BatchPluginUtils {
         BatchCluster cluster = null;
 
         // (1) select the right batch cluster
-        // (1a) check if there is already a batch with the data view
+        // (1a) check if there is already a batch with the data view (= a cluster the instance can be added to)
         String processId = processModel.getId();
         Map<Integer, List<BatchCluster>> batchClustersOfProcess = batchClusters.get(processId);
         if (batchClustersOfProcess != null) {
@@ -98,16 +111,13 @@ public class BatchPluginUtils {
             if (clusters != null) {
                 for (BatchCluster bc : clusters) {
 
-
-
-
-                    if (batchClusterHasNotStarted(bc.getState())){
-                        if( isProcessInstanceMatchingToDataView(parentalBeginEvent, processInstance, bc)) {
+                    if(batchClusterHasNotStarted(bc.getState())){
+                        if(isProcessInstanceMatchingToDataView(parentalBeginEvent, processInstance, bc)) {
                             cluster = bc;
-                            // clusters.remove(bc);
                             break;
 
                         }else{
+                        //TODO LB 180208 : What should have been done here and is it needed?
                             //for MinMax-Rule --> check whether similar instance exists
 
                             //set new timeout for the cluster for comparison
@@ -170,7 +180,7 @@ public class BatchPluginUtils {
         // (3) check if bc can be started
 
         //TODO check whether timeout should be updated
-        if (cluster.getState() == BatchClusterState.INIT && cluster.getProcessInstances().size()>1) {
+        if (cluster.getState() == BatchClusterState.INIT && cluster.getProcessInstances().size() > 1) {
 
             // if the dueDate of the current instance is earlier as of the instances added before, the cluster begin event is rescheduled
             Duration timeoutForCurrentInstance = batchActivity.getActivationRule().getTimeOut(parentalBeginEvent, processInstance);
@@ -215,30 +225,7 @@ public class BatchPluginUtils {
         String bcDataView = batchCluster.getDataView();
         String instanceDataView = getDataViewOfInstance(processInstance.getId(), batchCluster.getBatchActivity());
 
-        if ((bcDataView == null && instanceDataView == null) || instanceDataView.equals(bcDataView)){
-            return true;
-        }else{
-
-//			// only for the manual use case
-
-//		     long numberOfDays = (long) DataObjectField.getDataObjectValue(processInstance.getId(),"RoomRequest.Date");
-//		     Duration timeoutForCurrentInstance = Duration.ofDays(numberOfDays);
-//		     TimeUnit epsilon = TimeUnit.SECONDS;
-//		     Duration threeDaysInSeconds = Duration.ofSeconds(3*24*60*60);
-//	    	 Duration durationBtwClusterStartAndInstanceTaskBegin = Duration.ofSeconds((long) (desmojEvent.getSimulationTimeOfSource().getTimeAsDouble(epsilon)-batchCluster.getCreationTime().getTimeAsDouble(epsilon)));
-//	    	 //System.out.println("InstanceEnable: "+parentalBeginEvent.getSimulationTimeOfSource().getTimeAsDouble(epsilon)+" ClusterCreation: "+cluster.getCreationTime().getTimeAsDouble(epsilon)+" Duration "+durationBtwClusterStartAndInstanceTaskBegin);
-//
-//	    	 Duration differenceBtwClusterInst = batchCluster.getCurrentTimeOut().minus(timeoutForCurrentInstance.plus(durationBtwClusterStartAndInstanceTaskBegin));
-//
-//	    	 //if differenceBtwClusterInst is less than three days
-//	    	 if (threeDaysInSeconds.compareTo(differenceBtwClusterInst.abs())>0){
-//	        	  return true;
-//	         }
-
-
-
-            return false;
-        }
+        return Objects.equal(instanceDataView, bcDataView);
 
     }
 
@@ -250,7 +237,7 @@ public class BatchPluginUtils {
         }else{
 
             String dataView = "";
-            for (String dataViewElement:batchRegion.getGroupingCharacteristic()){
+            for (String dataViewElement : batchRegion.getGroupingCharacteristic()){
                 //TODO is currently only programmed for one Data View Element
                 dataView = (String) DataObjectField.getDataObjectValue(processInstanceID,dataViewElement);
             }
@@ -471,30 +458,31 @@ public class BatchPluginUtils {
     // if the execution type is sequential-taskbased, this is responsible for scheduling the same event of the next process instance, if it exists
     void scheduleNextEventInBatchProcess(ScyllaEvent event, ProcessInstance processInstance) {
 
-        ProcessInstance parentProcessInstance = processInstance.getParent();
+    	ProcessInstance parentProcessInstance = processInstance.getParent();
         if (parentProcessInstance != null) {
 
             ProcessModel processModel = processInstance.getProcessModel();
             int parentNodeId = processModel.getNodeIdInParent();
 
-            BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
-            BatchCluster cluster = pluginInstance.getRunningCluster(parentProcessInstance, parentNodeId);
+            BatchCluster cluster = getRunningCluster(parentProcessInstance, parentNodeId);
 
             if (cluster != null && cluster.hasExecutionType(BatchClusterExecutionType.SEQUENTIAL_TASKBASED)) {
-                // Get the other events or tasks from this batch to be scheduled after the current one...
+                System.out.println("Start event: "+event.getClass().getSimpleName()+" for process instance "+processInstance.getId()+" and cluster "+cluster.getName().split("#")[1]);
+            	// Get the other events or tasks from this batch to be scheduled after the current one...
                 Integer nodeId = event.getNodeId();
                 Pair<ScyllaEvent, ProcessInstance> eventToSchedule = cluster.getNotPIEvents(nodeId);
                 if (eventToSchedule != null) {
                     eventToSchedule.getValue0().schedule(eventToSchedule.getValue1());
-                    //System.out.println("Scheduled " + eventToSchedule.getValue0().getDisplayName() + " for process instance " + eventToSchedule.getValue1());
+                    System.out.println("Scheduled " + eventToSchedule.getValue0().getDisplayName() + " for process instance " + eventToSchedule.getValue1().getId());
                 }
 
+                //For all instances that are only "co-driving"
                 if (parentProcessInstance != cluster.getResponsibleProcessInstance()) {
-                    // ..and save the next events before them getting clered
+                    // ..and save the next events before they get cleared
                     ScyllaEvent nextEvent = event.getNextEventMap().get(0);
                     Integer nodeIdOfNextElement = nextEvent.getNodeId();
                     cluster.addPIEvent(nodeIdOfNextElement, nextEvent, processInstance);
-                    //System.out.println("Added " + nextEvent.getDisplayName() + " to cluster queue for process instance " + processInstance);
+                    System.out.println("Added " + nextEvent.getDisplayName() + " " + nextEvent.getClass().getSimpleName() + " to cluster queue for process instance " + processInstance.getId());
                 }
             }
         }
