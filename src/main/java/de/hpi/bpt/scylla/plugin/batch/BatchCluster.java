@@ -213,4 +213,33 @@ class BatchCluster extends Entity {
             //System.out.println("Scheduled " + eventToSchedule.getValue0().getDisplayName() + " for process instance " + eventToSchedule.getValue1());
         }
     }
+    
+    /**
+     * For execution type sequential-taskbased:
+     * Scheduling the next event for the current node,
+     * or the first event for the next node
+     * Currently called for start and task terminate events
+     * @param event : Event of the current node
+     */
+    void scheduleNextEventInBatchProcess(ScyllaEvent event) {
+        // The event that would come next in default flow
+        ScyllaEvent nextEvent = event.getNextEventMap().get(0);
+        Integer nodeIdOfNextElement = nextEvent.getNodeId();
+        
+        // Get next queued event for same node or for next node instead
+        Pair<ScyllaEvent, ProcessInstance> eventToSchedule = pollNextQueuedEvent(event.getNodeId());
+        if (eventToSchedule == null) {
+    		eventToSchedule = pollNextQueuedEvent(nodeIdOfNextElement);
+        }
+        
+        if (eventToSchedule != null) {
+        	// Schedule selected event
+        	eventToSchedule.getValue0().schedule(eventToSchedule.getValue1());
+       
+        	// "Unschedule" normal flow next event, but queue it instead
+            assert event.getNextEventMap().size() == 1;
+            event.getNextEventMap().clear();
+            queueEvent(nodeIdOfNextElement, nextEvent, event.getProcessInstance());
+        }
+    }
 }

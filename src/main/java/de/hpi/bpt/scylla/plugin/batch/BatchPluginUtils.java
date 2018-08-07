@@ -10,8 +10,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.javatuples.Pair;
-
 import com.google.common.base.Objects;
 
 import de.hpi.bpt.scylla.exception.ScyllaRuntimeException;
@@ -24,7 +22,6 @@ import de.hpi.bpt.scylla.simulation.ProcessSimulationComponents;
 import de.hpi.bpt.scylla.simulation.ResourceObject;
 import de.hpi.bpt.scylla.simulation.SimulationModel;
 import de.hpi.bpt.scylla.simulation.event.BPMNEvent;
-import de.hpi.bpt.scylla.simulation.event.ScyllaEvent;
 import de.hpi.bpt.scylla.simulation.event.TaskBeginEvent;
 import de.hpi.bpt.scylla.simulation.event.TaskCancelEvent;
 import de.hpi.bpt.scylla.simulation.event.TaskEnableEvent;
@@ -451,31 +448,5 @@ public class BatchPluginUtils {
         ProcessModel processModel = processInstance.getProcessModel();
         int parentNodeId = processModel.getNodeIdInParent();
         return getRunningCluster(parentProcessInstance, parentNodeId);
-    }
-
-    // if the execution type is sequential-taskbased, this is responsible for scheduling the same event of the next process instance, if it exists
-    void scheduleNextEventInBatchProcess(ScyllaEvent event, ProcessInstance processInstance) {
-        BatchCluster cluster = getCluster(processInstance);
-
-        if (cluster != null && cluster.hasExecutionType(BatchClusterExecutionType.SEQUENTIAL_TASKBASED)) {
-//System.out.println("Origevent "+event.getDisplayName()+" "+event.getClass().getSimpleName()+" for instance "+processInstance.getId());
-        	// Get the other events or tasks from this batch to be scheduled after the current one...
-            Integer nodeId = event.getNodeId();
-            //EventToSchedule is the event for the next process instance; null if last instance
-            ScyllaEvent nextEvent = event.getNextEventMap().get(0);
-            Integer nodeIdOfNextElement = nextEvent.getNodeId();
-            Pair<ScyllaEvent, ProcessInstance> eventToSchedule = cluster.pollNextQueuedEvent(nodeId);
-            if (eventToSchedule == null) {
-        		eventToSchedule = cluster.pollNextQueuedEvent(nodeIdOfNextElement);
-            }
-            if (eventToSchedule != null) {
-            	eventToSchedule.getValue0().schedule(eventToSchedule.getValue1());
-                
-                assert event.getNextEventMap().size() == 1;
-                event.getNextEventMap().clear();
-                cluster.queueEvent(nodeIdOfNextElement, nextEvent, processInstance);
-
-            }
-        }
     }
 }

@@ -68,7 +68,6 @@ public class BatchBPMNEEPlugin extends BPMNEndEventPluggable {
             	//Schedule other end events
             	Pair<ScyllaEvent, ProcessInstance> eventToSchedule = cluster.pollNextQueuedEvent(event.getNodeId());
             	eventToSchedule.getValue0().schedule(eventToSchedule.getValue1());
-                
             }
         }
 

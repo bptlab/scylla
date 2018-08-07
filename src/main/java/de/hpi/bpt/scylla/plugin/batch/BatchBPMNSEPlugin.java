@@ -17,7 +17,11 @@ public class BatchBPMNSEPlugin extends BPMNStartEventPluggable {
 
         BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
         pluginInstance.logBPMNEventForNonResponsiblePI(event, processInstance);
-        pluginInstance.scheduleNextEventInBatchProcess(event, processInstance);
+        
+        BatchCluster cluster = pluginInstance.getCluster(processInstance);
+        if (cluster != null && cluster.hasExecutionType(BatchClusterExecutionType.SEQUENTIAL_TASKBASED)) {
+            cluster.scheduleNextEventInBatchProcess(event);
+        }
     }
 
 }

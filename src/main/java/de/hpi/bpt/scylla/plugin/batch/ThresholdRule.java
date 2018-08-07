@@ -1,14 +1,10 @@
 package de.hpi.bpt.scylla.plugin.batch;
 
 import java.time.Duration;
-import java.util.List;
 
 import de.hpi.bpt.scylla.plugin.dataobject.DataObjectField;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
-import de.hpi.bpt.scylla.simulation.SimulationModel;
 import de.hpi.bpt.scylla.simulation.event.TaskBeginEvent;
-import desmoj.core.simulator.Entity;
-import desmoj.core.simulator.Model;
 
 
 public class ThresholdRule implements ActivationRule{
@@ -52,10 +48,10 @@ public class ThresholdRule implements ActivationRule{
         // get the value of the dataObject
         //***********
 
-        SimulationModel model = (SimulationModel) desmojEvent.getModel();
+        //SimulationModel model = (SimulationModel) desmojEvent.getModel();
 
         numberOfDays = (long) DataObjectField.getDataObjectValue(processInstance.getId(),dueDate);
-
+        //TODO sysout ???
         System.out.println("Due Date for "+ desmojEvent+" in: "+ numberOfDays);
 
         return numberOfDays;

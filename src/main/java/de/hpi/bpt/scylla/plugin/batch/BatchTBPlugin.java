@@ -22,7 +22,6 @@ public class BatchTBPlugin extends TaskBeginEventPluggable {
         return BatchPluginUtils.PLUGIN_NAME;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void eventRoutine(TaskBeginEvent event, ProcessInstance processInstance) throws ScyllaRuntimeException {
 
