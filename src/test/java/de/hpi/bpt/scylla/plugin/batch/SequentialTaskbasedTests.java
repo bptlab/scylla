@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import de.hpi.bpt.scylla.SimulationManager;
 import de.hpi.bpt.scylla.TestUtils;
+import de.hpi.bpt.scylla.logger.DebugLogger;
 
 public class SequentialTaskbasedTests {
 	
@@ -34,6 +35,7 @@ public class SequentialTaskbasedTests {
 	
 	@Test(timeout=3000)
 	public void testActivitiesAreSequential() {
+		DebugLogger.allowDebugLogging = false;
 		outputPath = new SimulationManager(
 				folder, 
 				new String[] {folder+"SimpleTaskbasedModel.bpmn"}, 

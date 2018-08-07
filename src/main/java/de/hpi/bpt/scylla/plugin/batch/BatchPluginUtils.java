@@ -341,45 +341,40 @@ public class BatchPluginUtils {
     // If the execution type is parallel this makes the entry for the not really simulated process instances for events
     void logBPMNEventForNonResponsiblePI(BPMNEvent event, ProcessInstance processInstance) {
 
-        ProcessInstance parentProcessInstance = processInstance.getParent();
-        if (parentProcessInstance != null) {
+        ProcessModel processModel = processInstance.getProcessModel();
 
-            ProcessModel processModel = processInstance.getProcessModel();
-            int parentNodeId = processModel.getNodeIdInParent();
+        BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
+        BatchCluster cluster = pluginInstance.getCluster(processInstance);
 
-            BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
-            BatchCluster cluster = pluginInstance.getRunningCluster(parentProcessInstance, parentNodeId);
+        if (cluster != null && cluster.hasExecutionType(BatchClusterExecutionType.PARALLEL)) {
+            SimulationModel model = (SimulationModel) event.getModel();
 
-            if (cluster != null && cluster.hasExecutionType(BatchClusterExecutionType.PARALLEL)) {
-                SimulationModel model = (SimulationModel) event.getModel();
+            long timestamp = Math.round(model.presentTime().getTimeRounded(DateTimeUtils.getReferenceTimeUnit()));
+            Set<String> resources = new HashSet<String>();
 
-                long timestamp = Math.round(model.presentTime().getTimeRounded(DateTimeUtils.getReferenceTimeUnit()));
-                Set<String> resources = new HashSet<String>();
+            String taskName = event.getDisplayName();
+            int nodeId = event.getNodeId();
+            String processScopeNodeId = SimulationUtils.getProcessScopeNodeId(processModel, nodeId);
+            String source = event.getSource();
 
-                String taskName = event.getDisplayName();
-                int nodeId = event.getNodeId();
-                String processScopeNodeId = SimulationUtils.getProcessScopeNodeId(processModel, nodeId);
-                String source = event.getSource();
+            int sourceSuffix = 0;
+            List<ProcessInstance> processInstances = cluster.getProcessInstances();
+            for (ProcessInstance pi : processInstances) {
 
-                int sourceSuffix = 0;
-                List<ProcessInstance> processInstances = cluster.getProcessInstances();
-                for (ProcessInstance pi : processInstances) {
+                if (!processInstance.getParent().equals(pi)) {
 
-                    if (!processInstance.getParent().equals(pi)) {
+                    // the source attribute comes from an event, but we did not really simulate the events for the
+                    // non-responsible process instances, so we mock a source attribute value
+                    String mockSource = source + "##" + ++sourceSuffix;
 
-                        // the source attribute comes from an event, but we did not really simulate the events for the
-                        // non-responsible process instances, so we mock a source attribute value
-                        String mockSource = source + "##" + ++sourceSuffix;
+                    ProcessNodeInfo info;
+                    info = new ProcessNodeInfo(nodeId, processScopeNodeId, mockSource, timestamp, taskName, resources,
+                            ProcessNodeTransitionType.EVENT_BEGIN);
+                    model.addNodeInfo(processModel, pi, info);
 
-                        ProcessNodeInfo info;
-                        info = new ProcessNodeInfo(nodeId, processScopeNodeId, mockSource, timestamp, taskName, resources,
-                                ProcessNodeTransitionType.EVENT_BEGIN);
-                        model.addNodeInfo(processModel, pi, info);
-
-                        info = new ProcessNodeInfo(nodeId, processScopeNodeId, mockSource, timestamp, taskName, resources,
-                                ProcessNodeTransitionType.EVENT_TERMINATE);
-                        model.addNodeInfo(processModel, pi, info);
-                    }
+                    info = new ProcessNodeInfo(nodeId, processScopeNodeId, mockSource, timestamp, taskName, resources,
+                            ProcessNodeTransitionType.EVENT_TERMINATE);
+                    model.addNodeInfo(processModel, pi, info);
                 }
             }
         }
@@ -389,113 +384,98 @@ public class BatchPluginUtils {
     void logTaskEventForNonResponsiblePI(TaskEvent event, ProcessInstance processInstance)
             throws ScyllaRuntimeException {
 
-        ProcessInstance parentProcessInstance = processInstance.getParent();
-        if (parentProcessInstance != null) {
+        ProcessModel processModel = processInstance.getProcessModel();
 
-            ProcessModel processModel = processInstance.getProcessModel();
-            int parentNodeId = processModel.getNodeIdInParent();
+        BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
+        BatchCluster cluster = pluginInstance.getCluster(processInstance);
 
-            BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
-            BatchCluster cluster = pluginInstance.getRunningCluster(parentProcessInstance, parentNodeId);
+        if (cluster != null && cluster.hasExecutionType(BatchClusterExecutionType.PARALLEL)) {
+            SimulationModel model = (SimulationModel) event.getModel();
 
-            if (cluster != null && cluster.getBatchActivity().getExecutionType().equals(BatchClusterExecutionType.PARALLEL)) {
-                SimulationModel model = (SimulationModel) event.getModel();
+            long timestamp = Math.round(model.presentTime().getTimeRounded(DateTimeUtils.getReferenceTimeUnit()));
 
-                long timestamp = Math.round(model.presentTime().getTimeRounded(DateTimeUtils.getReferenceTimeUnit()));
+            String taskName = event.getDisplayName();
+            int nodeId = event.getNodeId();
+            String processScopeNodeId = SimulationUtils.getProcessScopeNodeId(processModel, nodeId);
+            String source = event.getSource();
 
-                String taskName = event.getDisplayName();
-                int nodeId = event.getNodeId();
-                String processScopeNodeId = SimulationUtils.getProcessScopeNodeId(processModel, nodeId);
-                String source = event.getSource();
-
-                ProcessNodeTransitionType transition;
-                Set<String> resources = new HashSet<String>();
-                if (event instanceof TaskEnableEvent) {
-                    transition = ProcessNodeTransitionType.ENABLE;
-                } else if (event instanceof TaskBeginEvent) {
-                    transition = ProcessNodeTransitionType.BEGIN;
-                    Set<ResourceObject> resourceObjects = processInstance.getAssignedResources().get(source)
-                            .getResourceObjects();
-                    for (ResourceObject res : resourceObjects) {
-                        String resourceName = res.getResourceType() + "_" + res.getId();
-                        resources.add(resourceName);
-                    }
-                    tasksAndResources.put(source, resources);
-                } else if (event instanceof TaskCancelEvent) {
-                    transition = ProcessNodeTransitionType.CANCEL;
-                    resources = tasksAndResources.get(source);
-                    tasksAndResources.remove(source);
-                } else if (event instanceof TaskTerminateEvent) {
-                    transition = ProcessNodeTransitionType.TERMINATE;
-                    resources = tasksAndResources.get(source);
-                    tasksAndResources.remove(source);
-                } else {
-                    throw new ScyllaRuntimeException("Task event type not supported.");
+            ProcessNodeTransitionType transition;
+            Set<String> resources = new HashSet<String>();
+            if (event instanceof TaskEnableEvent) {
+                transition = ProcessNodeTransitionType.ENABLE;
+            } else if (event instanceof TaskBeginEvent) {
+                transition = ProcessNodeTransitionType.BEGIN;
+                Set<ResourceObject> resourceObjects = processInstance.getAssignedResources().get(source)
+                        .getResourceObjects();
+                for (ResourceObject res : resourceObjects) {
+                    String resourceName = res.getResourceType() + "_" + res.getId();
+                    resources.add(resourceName);
                 }
+                tasksAndResources.put(source, resources);
+            } else if (event instanceof TaskCancelEvent) {
+                transition = ProcessNodeTransitionType.CANCEL;
+                resources = tasksAndResources.get(source);
+                tasksAndResources.remove(source);
+            } else if (event instanceof TaskTerminateEvent) {
+                transition = ProcessNodeTransitionType.TERMINATE;
+                resources = tasksAndResources.get(source);
+                tasksAndResources.remove(source);
+            } else {
+                throw new ScyllaRuntimeException("Task event type not supported.");
+            }
 
-                int sourceSuffix = 0;
-                List<ProcessInstance> processInstances = cluster.getProcessInstances();
+            int sourceSuffix = 0;
+            List<ProcessInstance> processInstances = cluster.getProcessInstances();
 
 
-                for (ProcessInstance pi : processInstances) {
+            for (ProcessInstance pi : processInstances) {
 
-                    if (!processInstance.getParent().equals(pi)) {
+                if (!processInstance.getParent().equals(pi)) {
 
-                        // the source attribute comes from an event, but we did not really simulate the events for the
-                        // non-responsible process instances, so we mock a source attribute value
-                        String mockSource = source + "##" + ++sourceSuffix;
+                    // the source attribute comes from an event, but we did not really simulate the events for the
+                    // non-responsible process instances, so we mock a source attribute value
+                    String mockSource = source + "##" + ++sourceSuffix;
 
-                        ProcessNodeInfo info;
-                        info = new ProcessNodeInfo(nodeId, processScopeNodeId, mockSource, timestamp, taskName, resources,
-                                transition);
-                        model.addNodeInfo(processModel, pi, info);
-                    }
+                    ProcessNodeInfo info;
+                    info = new ProcessNodeInfo(nodeId, processScopeNodeId, mockSource, timestamp, taskName, resources,
+                            transition);
+                    model.addNodeInfo(processModel, pi, info);
                 }
             }
         }
+    }
+    
+    BatchCluster getCluster(ProcessInstance processInstance) {
+    	ProcessInstance parentProcessInstance = processInstance.getParent();
+        if (parentProcessInstance == null) return null;
+        ProcessModel processModel = processInstance.getProcessModel();
+        int parentNodeId = processModel.getNodeIdInParent();
+        return getRunningCluster(parentProcessInstance, parentNodeId);
     }
 
     // if the execution type is sequential-taskbased, this is responsible for scheduling the same event of the next process instance, if it exists
     void scheduleNextEventInBatchProcess(ScyllaEvent event, ProcessInstance processInstance) {
+        BatchCluster cluster = getCluster(processInstance);
 
-    	ProcessInstance parentProcessInstance = processInstance.getParent();
-        if (parentProcessInstance != null) {
+        if (cluster != null && cluster.hasExecutionType(BatchClusterExecutionType.SEQUENTIAL_TASKBASED)) {
+//System.out.println("Origevent "+event.getDisplayName()+" "+event.getClass().getSimpleName()+" for instance "+processInstance.getId());
+        	// Get the other events or tasks from this batch to be scheduled after the current one...
+            Integer nodeId = event.getNodeId();
+            //EventToSchedule is the event for the next process instance; null if last instance
+            ScyllaEvent nextEvent = event.getNextEventMap().get(0);
+            Integer nodeIdOfNextElement = nextEvent.getNodeId();
+            Pair<ScyllaEvent, ProcessInstance> eventToSchedule = cluster.pollNextQueuedEvent(nodeId);
+            if (eventToSchedule == null) {
+        		eventToSchedule = cluster.pollNextQueuedEvent(nodeIdOfNextElement);
+            }
+            if (eventToSchedule != null) {
+            	eventToSchedule.getValue0().schedule(eventToSchedule.getValue1());
+                
+                assert event.getNextEventMap().size() == 1;
+                event.getNextEventMap().clear();
+                cluster.queueEvent(nodeIdOfNextElement, nextEvent, processInstance);
 
-            ProcessModel processModel = processInstance.getProcessModel();
-            int parentNodeId = processModel.getNodeIdInParent();
-
-            BatchCluster cluster = getRunningCluster(parentProcessInstance, parentNodeId);
-
-            if (cluster != null && cluster.hasExecutionType(BatchClusterExecutionType.SEQUENTIAL_TASKBASED)) {
-                System.out.println("Start event: "+event.getClass().getSimpleName()+" for process instance "+processInstance.getId()+" and cluster "+cluster.getName().split("#")[1]);
-            	// Get the other events or tasks from this batch to be scheduled after the current one...
-                Integer nodeId = event.getNodeId();
-                Pair<ScyllaEvent, ProcessInstance> eventToSchedule = cluster.getNotPIEvents(nodeId);
-                if (eventToSchedule != null) {
-                    eventToSchedule.getValue0().schedule(eventToSchedule.getValue1());
-                    System.out.println("Scheduled " + eventToSchedule.getValue0().getDisplayName() + " for process instance " + eventToSchedule.getValue1().getId());
-                }
-
-                //For all instances that are only "co-driving"
-                if (parentProcessInstance != cluster.getResponsibleProcessInstance()) {
-                    // ..and save the next events before they get cleared
-                    ScyllaEvent nextEvent = event.getNextEventMap().get(0);
-                    Integer nodeIdOfNextElement = nextEvent.getNodeId();
-                    cluster.addPIEvent(nodeIdOfNextElement, nextEvent, processInstance);
-                    System.out.println("Added " + nextEvent.getDisplayName() + " " + nextEvent.getClass().getSimpleName() + " to cluster queue for process instance " + processInstance.getId());
-                }
             }
         }
-    }
-
-    // if the execution type is sequential-casebased, this is responsible for scheduling the next start event in the batch activty
-    void scheduleNextCaseInBatchProcess(BatchCluster cluster) {
-        // Get the start event of the next process instance and schedule it
-        Pair<ScyllaEvent, ProcessInstance> eventToSchedule = cluster.getNotPIEvents(cluster.getStartNodeId());
-        if (eventToSchedule != null) {
-            eventToSchedule.getValue0().schedule(eventToSchedule.getValue1());
-            //System.out.println("Scheduled " + eventToSchedule.getValue0().getDisplayName() + " for process instance " + eventToSchedule.getValue1());
-        }
-
     }
 }

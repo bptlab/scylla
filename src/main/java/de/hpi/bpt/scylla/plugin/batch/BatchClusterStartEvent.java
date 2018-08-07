@@ -36,7 +36,6 @@ public class BatchClusterStartEvent extends Event<BatchCluster> {
 
         // Schedule all task begin events of the process instance
         // This does not schedule the activities inside the subprocess
-        //TODO: That should not be done for sequential, neither case- nor taskbased
         for (TaskBeginEvent pse : parentalStartEvents) {
             ProcessInstance pi = pse.getProcessInstance();
             pse.schedule(pi);
@@ -76,7 +75,7 @@ public class BatchClusterStartEvent extends Event<BatchCluster> {
                     subprocessEvent.schedule(subprocessInstance);
                     cluster.setStartNodeId(startNodeId);
                 } else { // ...if not, save them for later
-                    cluster.addPIEvent(startNodeId, subprocessEvent, subprocessInstance);
+                    cluster.queueEvent(startNodeId, subprocessEvent, subprocessInstance);
                 }
 
             } catch (NodeNotFoundException | MultipleStartNodesException | NoStartNodeException e) {

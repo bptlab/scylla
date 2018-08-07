@@ -21,8 +21,7 @@ public class BatchTEPlugin extends TaskEnableEventPluggable {
     @Override
     public void eventRoutine(TaskEnableEvent event, ProcessInstance processInstance) throws ScyllaRuntimeException {
 
-    	System.out.println("Taskenablevent: "+event.getDisplayName()+" for instance "+processInstance.getId());
-        BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
+    	BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
         pluginInstance.logTaskEventForNonResponsiblePI(event, processInstance);
 
         //ProcessSimulationComponents desmojObjects = event.getDesmojObjects();

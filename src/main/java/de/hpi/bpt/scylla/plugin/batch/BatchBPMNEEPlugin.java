@@ -3,6 +3,8 @@ package de.hpi.bpt.scylla.plugin.batch;
 import java.util.List;
 import java.util.Map;
 
+import org.javatuples.Pair;
+
 import de.hpi.bpt.scylla.exception.ScyllaRuntimeException;
 import de.hpi.bpt.scylla.model.process.ProcessModel;
 import de.hpi.bpt.scylla.plugin_type.simulation.event.BPMNEndEventPluggable;
@@ -26,47 +28,47 @@ public class BatchBPMNEEPlugin extends BPMNEndEventPluggable {
         pluginInstance.logBPMNEventForNonResponsiblePI(event, processInstance);
 
         // Schedule parental end events
+        BatchCluster cluster = pluginInstance.getCluster(processInstance);
 
-        ProcessInstance parentProcessInstance = processInstance.getParent();
-        if (parentProcessInstance != null) {
+        if (cluster != null) {
 
-            ProcessModel processModel = processInstance.getProcessModel();
-            int parentNodeId = processModel.getNodeIdInParent();
+            cluster.setProcessInstanceToFinished();
+            // Schedule them only if either all process instances has passed the last event of the batch activity or the execution type is parallel
+            if (cluster.areAllProcessInstancesFinished() || cluster.hasExecutionType(BatchClusterExecutionType.PARALLEL)) {
 
-            BatchCluster cluster = pluginInstance.getRunningCluster(parentProcessInstance, parentNodeId);
-
-            if (cluster != null) {
-
-                cluster.setProcessInstanceToFinished();
-                // Schedule them only if either all process instances has passed the last event of the batch activity or the execution type is parallel
-                if (cluster.areAllProcessInstancesFinished() || cluster.hasExecutionType(BatchClusterExecutionType.PARALLEL)) {
-
-                    if (pluginInstance.isProcessInstanceCompleted(processInstance)) {
-                        List<TaskTerminateEvent> parentalEndEvents = cluster.getParentalEndEvents();
-                        for (TaskTerminateEvent pee : parentalEndEvents) {
-                            ProcessInstance pi = pee.getProcessInstance();
-                            pee.schedule(pi);
-                        }
-
-                        parentalEndEvents.clear();
-
-                        pluginInstance.setClusterToTerminated(parentProcessInstance, parentNodeId);
+                if (pluginInstance.isProcessInstanceCompleted(processInstance)) {
+                    List<TaskTerminateEvent> parentalEndEvents = cluster.getParentalEndEvents();
+                    for (TaskTerminateEvent pee : parentalEndEvents) {
+                        ProcessInstance pi = pee.getProcessInstance();
+                        pee.schedule(pi);
                     }
 
-                    // Prevent parental task terminate event from scheduling, if there is any (from subprocess plugin)
+                    parentalEndEvents.clear();
 
-                    Map<Integer, ScyllaEvent> nextEventMap = event.getNextEventMap();
-                    if (!nextEventMap.isEmpty()) {
-                        Map<Integer, TimeSpan> timeSpanToNextEventMap = event.getTimeSpanToNextEventMap();
-                        int indexOfParentalTaskTerminateEvent = 0;
-
-                        nextEventMap.remove(indexOfParentalTaskTerminateEvent);
-                        timeSpanToNextEventMap.remove(indexOfParentalTaskTerminateEvent);
-                    }
-                } else if (cluster.hasExecutionType(BatchClusterExecutionType.SEQUENTIAL_CASEBASED)) {
-                    // Schedule the next start event
-                    pluginInstance.scheduleNextCaseInBatchProcess(cluster);
+                	ProcessInstance parentProcessInstance = processInstance.getParent();
+                    ProcessModel processModel = processInstance.getProcessModel();
+                    int parentNodeId = processModel.getNodeIdInParent();
+                    pluginInstance.setClusterToTerminated(parentProcessInstance, parentNodeId);
                 }
+
+                // Prevent parental task terminate event from scheduling, if there is any (from subprocess plugin)
+
+                Map<Integer, ScyllaEvent> nextEventMap = event.getNextEventMap();
+                if (!nextEventMap.isEmpty()) {
+                    Map<Integer, TimeSpan> timeSpanToNextEventMap = event.getTimeSpanToNextEventMap();
+                    int indexOfParentalTaskTerminateEvent = 0;
+
+                    nextEventMap.remove(indexOfParentalTaskTerminateEvent);
+                    timeSpanToNextEventMap.remove(indexOfParentalTaskTerminateEvent);
+                }
+            } else if (cluster.hasExecutionType(BatchClusterExecutionType.SEQUENTIAL_CASEBASED)) {
+                // Schedule the next start event
+                cluster.scheduleNextCaseInBatchProcess();
+            } else if (cluster.hasExecutionType(BatchClusterExecutionType.SEQUENTIAL_TASKBASED)) {
+            	//Schedule other end events
+            	Pair<ScyllaEvent, ProcessInstance> eventToSchedule = cluster.pollNextQueuedEvent(event.getNodeId());
+            	eventToSchedule.getValue0().schedule(eventToSchedule.getValue1());
+                
             }
         }
 

@@ -20,32 +20,27 @@ public class BatchTCPlugin extends TaskCancelEventPluggable {
     public void eventRoutine(TaskCancelEvent event, ProcessInstance processInstance) throws ScyllaRuntimeException {
         BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
         pluginInstance.logTaskEventForNonResponsiblePI(event, processInstance);
+        BatchCluster cluster = pluginInstance.getCluster(processInstance);
+
+        if (cluster != null) {
+
+            List<TaskTerminateEvent> parentalEndEvents = cluster.getParentalEndEvents();
+            for (TaskTerminateEvent pee : parentalEndEvents) {
+                TaskCancelEvent cancelEvent = new TaskCancelEvent(pee.getModel(), pee.getSource(),
+                        pee.getSimulationTimeOfSource(), pee.getDesmojObjects(), pee.getProcessInstance(),
+                        pee.getNodeId());
+                cancelEvent.schedule(pee.getProcessInstance());
+            }
+
+            parentalEndEvents.clear();
 
 
-        ProcessInstance parentProcessInstance = processInstance.getParent();
-        if (parentProcessInstance != null) {
-
+            ProcessInstance parentProcessInstance = processInstance.getParent();
             ProcessModel processModel = processInstance.getProcessModel();
             int parentNodeId = processModel.getNodeIdInParent();
-
-            BatchCluster cluster = pluginInstance.getRunningCluster(parentProcessInstance, parentNodeId);
-
-            if (cluster != null) {
-
-                List<TaskTerminateEvent> parentalEndEvents = cluster.getParentalEndEvents();
-                for (TaskTerminateEvent pee : parentalEndEvents) {
-                    TaskCancelEvent cancelEvent = new TaskCancelEvent(pee.getModel(), pee.getSource(),
-                            pee.getSimulationTimeOfSource(), pee.getDesmojObjects(), pee.getProcessInstance(),
-                            pee.getNodeId());
-                    cancelEvent.schedule(pee.getProcessInstance());
-                }
-
-                parentalEndEvents.clear();
-
-                pluginInstance.setClusterToTerminated(parentProcessInstance, parentNodeId);
-            }
+            pluginInstance.setClusterToTerminated(parentProcessInstance, parentNodeId);
         }
-
     }
 
+    
 }
