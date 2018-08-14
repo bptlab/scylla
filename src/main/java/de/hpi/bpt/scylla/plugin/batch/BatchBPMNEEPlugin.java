@@ -3,8 +3,6 @@ package de.hpi.bpt.scylla.plugin.batch;
 import java.util.List;
 import java.util.Map;
 
-import org.javatuples.Pair;
-
 import de.hpi.bpt.scylla.exception.ScyllaRuntimeException;
 import de.hpi.bpt.scylla.model.process.ProcessModel;
 import de.hpi.bpt.scylla.plugin_type.simulation.event.BPMNEndEventPluggable;
@@ -39,8 +37,7 @@ public class BatchBPMNEEPlugin extends BPMNEndEventPluggable {
                 if (pluginInstance.isProcessInstanceCompleted(processInstance)) {
                     List<TaskTerminateEvent> parentalEndEvents = cluster.getParentalEndEvents();
                     for (TaskTerminateEvent pee : parentalEndEvents) {
-                        ProcessInstance pi = pee.getProcessInstance();
-                        pee.schedule(pi);
+                        pee.schedule();
                     }
 
                     parentalEndEvents.clear();
@@ -66,8 +63,8 @@ public class BatchBPMNEEPlugin extends BPMNEndEventPluggable {
                 cluster.scheduleNextCaseInBatchProcess();
             } else if (cluster.hasExecutionType(BatchClusterExecutionType.SEQUENTIAL_TASKBASED)) {
             	//Schedule other end events
-            	Pair<ScyllaEvent, ProcessInstance> eventToSchedule = cluster.pollNextQueuedEvent(event.getNodeId());
-            	eventToSchedule.getValue0().schedule(eventToSchedule.getValue1());
+            	ScyllaEvent eventToSchedule = cluster.pollNextQueuedEvent(event.getNodeId());
+            	if(eventToSchedule != null)eventToSchedule.schedule();
             }
         }
 

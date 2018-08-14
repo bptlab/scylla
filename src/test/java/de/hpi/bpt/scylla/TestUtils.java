@@ -6,7 +6,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TestUtils {
 	
@@ -46,6 +48,17 @@ public class TestUtils {
 			e.printStackTrace();
 		}
 		return table;
+	}
+	
+	//TODO Probably move to special batch-test-utils
+	public static Map<String, List<String[]>> orderByCluster(List<String[]> table){
+		Map<String, List<String[]>> clusters = new HashMap<String, List<String[]>>();
+		for(String[] row : table) {
+			String batchNumber = row[6];
+			if(!clusters.containsKey(batchNumber))clusters.put(batchNumber, new ArrayList<String[]>());
+			clusters.get(batchNumber).add(row);
+		}
+		return clusters;
 	}
 
 }

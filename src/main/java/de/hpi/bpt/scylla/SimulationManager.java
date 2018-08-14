@@ -242,6 +242,10 @@ public class SimulationManager {
     public Map<String, ProcessModel> getProcessModels() {
         return processModels;
     }
+    
+    public Map<String, SimulationConfiguration> getSimulationConfigurations() {
+        return simulationConfigurations;
+    }
 
     /**
      * Returns default output path if set

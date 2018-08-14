@@ -135,4 +135,8 @@ public abstract class ScyllaEvent extends Event<ProcessInstance> {
     public int getNewEventIndex() {
         return nextEventIndex++;
     }
+    
+    public void schedule() {
+    	schedule(getProcessInstance());
+    }
 }

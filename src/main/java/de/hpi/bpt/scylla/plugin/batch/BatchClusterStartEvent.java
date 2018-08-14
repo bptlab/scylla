@@ -75,7 +75,7 @@ public class BatchClusterStartEvent extends Event<BatchCluster> {
                     subprocessEvent.schedule(subprocessInstance);
                     cluster.setStartNodeId(startNodeId);
                 } else { // ...if not, save them for later
-                    cluster.queueEvent(startNodeId, subprocessEvent, subprocessInstance);
+                    cluster.queueEvent(startNodeId, subprocessEvent);
                 }
 
             } catch (NodeNotFoundException | MultipleStartNodesException | NoStartNodeException e) {

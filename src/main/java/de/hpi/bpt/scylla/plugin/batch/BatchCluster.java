@@ -2,6 +2,7 @@ package de.hpi.bpt.scylla.plugin.batch;
 
 import java.time.Duration;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import de.hpi.bpt.scylla.model.process.ProcessModel;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
@@ -12,7 +13,6 @@ import de.hpi.bpt.scylla.simulation.event.TaskTerminateEvent;
 import desmoj.core.simulator.Entity;
 import desmoj.core.simulator.Model;
 import desmoj.core.simulator.TimeInstant;
-import org.javatuples.Pair;
 
 class BatchCluster extends Entity {
 
@@ -38,7 +38,7 @@ class BatchCluster extends Entity {
      * This stores queues that are used for sequential case- and taskbased:<br>
      * For sequential casebased: The start events of the single instances are stored and scheduled after one instance reaches the end event<br>
      * For sequential taskbased: All start events, task enable events and end events are stored there, and are scheduled sequentially. More events might follow in the future*/
-    private Map<Integer,Queue<Pair<ScyllaEvent, ProcessInstance>>> queuedEvents;
+    private Map<Integer,Queue<ScyllaEvent>> queuedEvents;
     // this is needed for all types of sequential execution to determine when to schedule the completion of the batch actvity
     private Integer finishedProcessInstances = 0;
 
@@ -60,7 +60,7 @@ class BatchCluster extends Entity {
 
         this.processInstanceEntranceTimes = new ArrayList<TimeInstant>();
         this.startTime = null;
-        this.queuedEvents = new HashMap<Integer,Queue<Pair<ScyllaEvent, ProcessInstance>>>();
+        this.queuedEvents = new HashMap<Integer,Queue<ScyllaEvent>>();
     }
 
     private static String buildBatchClusterName(ProcessSimulationComponents pSimComponents, int nodeId) {
@@ -96,23 +96,22 @@ class BatchCluster extends Entity {
 
     /**
      * Queue an event for later use @see {@link BatchCluster#queuedEvents}
-     * @param startNodeId : Id of the node of the start event
+     * @param nodeId : Id of the node the event is stored for
      * @param event : Event to be queued
-     * @param subprocessInstance : Process instance
      */
-    public void queueEvent(Integer startNodeId, ScyllaEvent event, ProcessInstance subprocessInstance) {
-        if(!queuedEvents.containsKey(startNodeId)) {
-            queuedEvents.put(startNodeId, new LinkedList<Pair<ScyllaEvent, ProcessInstance>>());
+    public void queueEvent(Integer nodeId, ScyllaEvent event) {
+        if(!queuedEvents.containsKey(nodeId)) {
+            queuedEvents.put(nodeId, new LinkedList<ScyllaEvent>());
         }
-        queuedEvents.get(startNodeId).add(new Pair<>(event, subprocessInstance));
+        queuedEvents.get(nodeId).add(event);
     }
 
     /**
      * Pops the next event for the node with a given id
-     * @param nodeId : Id of the start event node
-     * @return Pair of event and the process instance it belongs to or null if no more elements are queued
+     * @param nodeId : Id of the event node
+     * @return Event  or null if no more elements are queued
      */
-    public Pair<ScyllaEvent, ProcessInstance> pollNextQueuedEvent(Integer nodeId) {
+    public ScyllaEvent pollNextQueuedEvent(Integer nodeId) {
         if (!queuedEvents.containsKey(nodeId))return null;
         return queuedEvents.get(nodeId).poll();
     }
@@ -207,9 +206,9 @@ class BatchCluster extends Entity {
      */
     void scheduleNextCaseInBatchProcess() {
         // Get the start event of the next process instance and schedule it
-        Pair<ScyllaEvent, ProcessInstance> eventToSchedule = pollNextQueuedEvent(getStartNodeId());
+        ScyllaEvent eventToSchedule = pollNextQueuedEvent(getStartNodeId());
         if (eventToSchedule != null) {
-            eventToSchedule.getValue0().schedule(eventToSchedule.getValue1());
+            eventToSchedule.schedule(eventToSchedule.getProcessInstance());
             //System.out.println("Scheduled " + eventToSchedule.getValue0().getDisplayName() + " for process instance " + eventToSchedule.getValue1());
         }
     }
@@ -223,23 +222,33 @@ class BatchCluster extends Entity {
      */
     void scheduleNextEventInBatchProcess(ScyllaEvent event) {
         // The event that would come next in default flow
-        ScyllaEvent nextEvent = event.getNextEventMap().get(0);
-        Integer nodeIdOfNextElement = nextEvent.getNodeId();
+        List<ScyllaEvent> nextEvents = event.getNextEventMap().values().stream().collect(Collectors.toList());
+       //Integer nodeIdOfNextElement = nextEvent != null ? nextEvent.getNodeId() : null;
         
         // Get next queued event for same node or for next node instead
-        Pair<ScyllaEvent, ProcessInstance> eventToSchedule = pollNextQueuedEvent(event.getNodeId());
-        if (eventToSchedule == null) {
-    		eventToSchedule = pollNextQueuedEvent(nodeIdOfNextElement);
+        List<ScyllaEvent> eventsToSchedule = new LinkedList<>();
+        ScyllaEvent nextEventOnCurrentNode = pollNextQueuedEvent(event.getNodeId());
+        // If existing take next event for current node, otherwise take first queued event for all next nodes
+        if (nextEventOnCurrentNode != null) {
+        	eventsToSchedule.add(nextEventOnCurrentNode);
+        } else {
+        	for(ScyllaEvent nextNodeEvent : nextEvents) {
+        		ScyllaEvent nextQueuedEvent = pollNextQueuedEvent(nextNodeEvent.getNodeId());
+        		if(nextQueuedEvent != null)eventsToSchedule.add(nextQueuedEvent);
+        	}
         }
         
-        if (eventToSchedule != null) {
-        	// Schedule selected event
-        	eventToSchedule.getValue0().schedule(eventToSchedule.getValue1());
+        if (!eventsToSchedule.isEmpty()) {
+        	// Schedule selected events
+        	for(ScyllaEvent eventToSchedule : eventsToSchedule)eventToSchedule.schedule();
        
         	// "Unschedule" normal flow next event, but queue it instead
-            assert event.getNextEventMap().size() == 1;
+            //assert event.getNextEventMap().size() == 1;
             event.getNextEventMap().clear();
-            queueEvent(nodeIdOfNextElement, nextEvent, event.getProcessInstance());
+            for(ScyllaEvent nextEvent : nextEvents) {
+                Integer nodeIdOfNextElement = nextEvent.getNodeId();
+                queueEvent(nodeIdOfNextElement, nextEvent);
+            }
         }
     }
 }

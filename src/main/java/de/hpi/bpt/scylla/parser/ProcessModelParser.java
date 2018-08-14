@@ -538,6 +538,7 @@ public class ProcessModelParser extends Parser<ProcessModel> {
         return processModel;
     }
 
+    //TODO move! this has no business here
     private  Map<Integer, BatchActivity> parseExtensions(Element el, Namespace bpmnNamespace, Integer nodeId, Map<Integer, BatchActivity> batchActivities) throws ScyllaValidationException {
 
         // Check that only elements with extensions get parsed

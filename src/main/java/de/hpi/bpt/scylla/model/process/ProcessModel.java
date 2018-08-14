@@ -52,7 +52,7 @@ public class ProcessModel extends SimulationInput {
     private Map<Integer, Map<EventDefinitionType, Map<String, String>>> eventDefinitions;
     private Map<Integer, Boolean> cancelActivities;
     private Map<Integer, List<Integer>> referencesToBoundaryEvents;
-    private Map<Integer, BatchActivity> batchActivities;
+    private Map<Integer, BatchActivity> batchActivities;//TODO move! this has no business here
 
     private Graph<Integer> dataObjectsGraph;
     private Map<Integer, DataObjectType> dataObjectTypes;
