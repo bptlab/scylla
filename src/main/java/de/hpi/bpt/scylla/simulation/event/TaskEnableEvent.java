@@ -29,8 +29,11 @@ import desmoj.core.simulator.TimeSpan;
  *
  */
 public class TaskEnableEvent extends TaskEvent {
+	
+	private TaskBeginEvent beginEvent;
 
-    public TaskEnableEvent(Model owner, String source, TimeInstant simulationTimeOfSource,
+
+	public TaskEnableEvent(Model owner, String source, TimeInstant simulationTimeOfSource,
             ProcessSimulationComponents desmojObjects, ProcessInstance processInstance, int nodeId) {
         super(owner, source, simulationTimeOfSource, desmojObjects, processInstance, nodeId);
     }
@@ -87,23 +90,21 @@ public class TaskEnableEvent extends TaskEvent {
 
             // poll available resources and if not available, put TaskBeginEvent on hold
 
-            ScyllaEvent event = new TaskBeginEvent(model, source, currentSimulationTime, pSimComponents,
+            beginEvent = new TaskBeginEvent(model, source, currentSimulationTime, pSimComponents,
                     processInstance, nodeId);
 
-            ResourceObjectTuple resources = QueueManager.getResourcesForEvent(model, event);
+            ResourceObjectTuple resources = QueueManager.getResourcesForEvent(model, beginEvent);
 
             if (resources == null) {
-                QueueManager.addToEventQueues(model, event);
+                QueueManager.addToEventQueues(model, beginEvent);
                 sendTraceNote("Not enough resources available, task " + displayName + " is put in a queue.");
             }
             else {
-                QueueManager.assignResourcesToEvent(model, event, resources);
-
-                TimeSpan timeSpan = new TimeSpan(0);
+                QueueManager.assignResourcesToEvent(model, beginEvent, resources);
 
                 int index = getNewEventIndex();
-                nextEventMap.put(index, event);
-                timeSpanToNextEventMap.put(index, timeSpan);
+                nextEventMap.put(index, beginEvent);
+                timeSpanToNextEventMap.put(index, new TimeSpan(0));
             }
 
             TaskEnableEventPluggable.runPlugins(this, processInstance);
@@ -133,5 +134,9 @@ public class TaskEnableEvent extends TaskEvent {
         model.addNodeInfo(processModel, processInstance, info);
 
     }
+    
+    public TaskBeginEvent getBeginEvent() {
+		return beginEvent;
+	}
 
 }

@@ -51,14 +51,25 @@ public class TestUtils {
 	}
 	
 	//TODO Probably move to special batch-test-utils
-	public static Map<String, List<String[]>> orderByCluster(List<String[]> table){
-		Map<String, List<String[]>> clusters = new HashMap<String, List<String[]>>();
+	public static Map<String, List<String[]>> groupByCluster(List<String[]> table){
+		/*Map<String, List<String[]>> clusters = new HashMap<String, List<String[]>>();
 		for(String[] row : table) {
 			String batchNumber = row[6];
 			if(!clusters.containsKey(batchNumber))clusters.put(batchNumber, new ArrayList<String[]>());
 			clusters.get(batchNumber).add(row);
 		}
-		return clusters;
+		return clusters;*/
+		return groupBy(table,6);
+	}
+	
+	public static Map<String, List<String[]>> groupBy(List<String[]> table, int column){
+		Map<String, List<String[]>> groups = new HashMap<String, List<String[]>>();
+		for(String[] row : table) {
+			String key = row[column];
+			if(!groups.containsKey(key))groups.put(key, new ArrayList<String[]>());
+			groups.get(key).add(row);
+		}
+		return groups;
 	}
 
 }

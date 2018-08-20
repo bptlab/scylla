@@ -30,7 +30,7 @@ public class ParallelTests extends SimulationTest{
 		
 		List<String[]> table = TestUtils.readCSV(f);
 		Assert.assertEquals(30, table.size());
-		Map<String, List<String[]>> clusters = TestUtils.orderByCluster(table);
+		Map<String, List<String[]>> clusters = TestUtils.groupByCluster(table);
 		
 		for(List<String[]> cluster : clusters.values()) {
 			assertActivityGroupsAreEqual(cluster);

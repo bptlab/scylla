@@ -31,7 +31,7 @@ public class SequentialCasebasedTests extends SimulationTest{
 		Assert.assertTrue(f.exists());
 		List<String[]> table = TestUtils.readCSV(f);
 		Assert.assertEquals(30, table.size());
-		Map<String, List<String[]>> clusters = TestUtils.orderByCluster(table);
+		Map<String, List<String[]>> clusters = TestUtils.groupByCluster(table);
 		for(List<String[]> cluster : clusters.values()) {
 			
 			List<String[]> sortedActivities = cluster.stream()

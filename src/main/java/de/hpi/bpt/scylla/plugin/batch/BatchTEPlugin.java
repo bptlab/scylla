@@ -51,7 +51,11 @@ public class BatchTEPlugin extends TaskEnableEventPluggable {
 
             nextEventMap.remove(indexOfSubprocessBeginEvent);
             timeSpanToNextEventMap.remove(indexOfSubprocessBeginEvent);
+        }
 
+        BatchCluster cluster = pluginInstance.getCluster(processInstance);
+        if (cluster != null && cluster.hasExecutionType(BatchClusterExecutionType.SEQUENTIAL_TASKBASED)) {
+            cluster.checkForStashedResources(event);
         }
     }
 

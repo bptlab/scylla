@@ -1,18 +1,30 @@
 package de.hpi.bpt.scylla.plugin.batch;
 
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 import java.util.stream.Collectors;
 
+import de.hpi.bpt.scylla.exception.ScyllaRuntimeException;
 import de.hpi.bpt.scylla.model.process.ProcessModel;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
 import de.hpi.bpt.scylla.simulation.ProcessSimulationComponents;
+import de.hpi.bpt.scylla.simulation.QueueManager;
+import de.hpi.bpt.scylla.simulation.ResourceObjectTuple;
+import de.hpi.bpt.scylla.simulation.SimulationModel;
+import de.hpi.bpt.scylla.simulation.event.ResourceAvailabilityEvent;
 import de.hpi.bpt.scylla.simulation.event.ScyllaEvent;
 import de.hpi.bpt.scylla.simulation.event.TaskBeginEvent;
+import de.hpi.bpt.scylla.simulation.event.TaskEnableEvent;
 import de.hpi.bpt.scylla.simulation.event.TaskTerminateEvent;
 import desmoj.core.simulator.Entity;
 import desmoj.core.simulator.Model;
 import desmoj.core.simulator.TimeInstant;
+import desmoj.core.simulator.TimeSpan;
 
 class BatchCluster extends Entity {
 
@@ -236,6 +248,7 @@ class BatchCluster extends Entity {
         		ScyllaEvent nextQueuedEvent = pollNextQueuedEvent(nextNodeEvent.getNodeId());
         		if(nextQueuedEvent != null)eventsToSchedule.add(nextQueuedEvent);
         	}
+        	if(hasStashedResourcesFor(event.getNodeId()))discardResources(event);
         }
         
         if (!eventsToSchedule.isEmpty()) {
@@ -251,4 +264,53 @@ class BatchCluster extends Entity {
             }
         }
     }
+
+    private Map<Integer, ResourceObjectTuple> stashedResources = new HashMap<>();
+    private Map<Integer, BatchStashResourceEvent> stashEvents = new HashMap<>();
+    
+	public void stashResources(ScyllaEvent event, ResourceObjectTuple assignedResources) {
+		stashedResources.put(event.getNodeId(), assignedResources);
+		QueueManager.assignResourcesToEvent((SimulationModel)event.getModel(), event, new ResourceObjectTuple());
+		
+		BatchStashResourceEvent stashEvent = new BatchStashResourceEvent(this, event.getNodeId());
+		stashEvents.put(event.getNodeId(), stashEvent);
+		QueueManager.assignResourcesToEvent((SimulationModel)getModel(), stashEvent, assignedResources);
+	}
+	
+	public void discardResources(ScyllaEvent event) {
+		stashedResources.remove(event.getNodeId());
+		BatchStashResourceEvent stashEvent = stashEvents.remove(event.getNodeId());
+		try {
+			QueueManager.releaseResourcesAndScheduleQueuedEvents((SimulationModel) event.getModel(), stashEvent);
+		} catch (ScyllaRuntimeException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void checkForStashedResources(TaskEnableEvent event) {
+		if(hasStashedResourcesFor(event.getNodeId())) {
+			ResourceObjectTuple resources = stashedResources.get(event.getNodeId());
+			TaskBeginEvent beginEvent;
+			beginEvent = event.getBeginEvent();
+			if(!event.getNextEventMap().isEmpty()) {
+				assert event.getNextEventMap().size() == 1;
+				try {
+					QueueManager.releaseResourcesAndScheduleQueuedEvents((SimulationModel) beginEvent.getModel(), beginEvent);
+				} catch (ScyllaRuntimeException e) {
+					e.printStackTrace();
+				}
+			} else {//Event waits for resources
+		        QueueManager.removeFromEventQueues((SimulationModel) beginEvent.getModel(), beginEvent);
+	            event.getNextEventMap().put(0, beginEvent);
+	            event.getTimeSpanToNextEventMap().put(0, new TimeSpan(0));
+			}
+			QueueManager.assignResourcesToEvent((SimulationModel) beginEvent.getModel(), beginEvent, resources);
+		}
+	}
+	
+	public boolean hasStashedResourcesFor(Integer nodeId) {
+		return stashedResources.containsKey(nodeId);
+	}
+
+
 }

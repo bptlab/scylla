@@ -21,7 +21,7 @@ import desmoj.core.simulator.TimeSpan;
  * DesmoJ event responsible for scheduling queued events.
  * 
  * @author Tsun Yin Wong
- *
+ * TODO LB  180820 : These events are never created, what was supposed to be their exact purpose?
  */
 public class ResourceAvailabilityEvent extends ExternalEvent {
 

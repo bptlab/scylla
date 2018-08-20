@@ -121,17 +121,21 @@ public class QueueManager {
             ResourceObjectTuple resourcesObjectTuple = getResourcesForEvent(model, event);
             assignResourcesToEvent(model, event, resourcesObjectTuple);
 
-            ProcessSimulationComponents simulationComponents = event.getSimulationComponents();
-            int nodeId = event.getNodeId();
-            Set<ResourceReference> resourceReferences = simulationComponents.getSimulationConfiguration()
-                    .getResourceReferenceSet(nodeId);
-            for (ResourceReference ref : resourceReferences) {
-                // remove from event queues
-                String resourceId = ref.getResourceId();
-                ScyllaEventQueue eventQueue = model.getEventQueues().get(resourceId);
-                eventQueue.remove(event);
-            }
+            removeFromEventQueues(model, event);
             return event;
+        }
+    }
+    
+    public static void removeFromEventQueues(SimulationModel model, ScyllaEvent event) {
+        ProcessSimulationComponents simulationComponents = event.getSimulationComponents();
+        int nodeId = event.getNodeId();
+        Set<ResourceReference> resourceReferences = simulationComponents.getSimulationConfiguration()
+                .getResourceReferenceSet(nodeId);
+        for (ResourceReference ref : resourceReferences) {
+            // remove from event queues
+            String resourceId = ref.getResourceId();
+            ScyllaEventQueue eventQueue = model.getEventQueues().get(resourceId);
+            eventQueue.remove(event);
         }
     }
 
@@ -301,6 +305,7 @@ public class QueueManager {
             return new ResourceObjectTuple();
         }
 
+        //Id and amount of needed resources
         Map<String, Integer> resourcesRequired = new HashMap<String, Integer>();
         for (ResourceReference ref : resourceReferences) {
             String resourceId = ref.getResourceId();
