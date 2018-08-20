@@ -31,7 +31,7 @@ public class EventArrivalRateSchedulingPlugin extends EventSchedulingPluggable{
 	@Override
 	public boolean scheduleEvent(ScyllaEvent event, TimeSpan timeSpan) throws ScyllaRuntimeException {
 
-        ProcessSimulationComponents pSimComponents = event.getDesmojObjects();
+        ProcessSimulationComponents pSimComponents = event.getSimulationComponents();
 
         Map<Integer, Object> arrivalRates = pSimComponents.getExtensionDistributions().get(getName());
         @SuppressWarnings("unchecked")

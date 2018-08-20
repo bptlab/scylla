@@ -27,7 +27,7 @@ public class BatchTCPlugin extends TaskCancelEventPluggable {
             List<TaskTerminateEvent> parentalEndEvents = cluster.getParentalEndEvents();
             for (TaskTerminateEvent pee : parentalEndEvents) {
                 TaskCancelEvent cancelEvent = new TaskCancelEvent(pee.getModel(), pee.getSource(),
-                        pee.getSimulationTimeOfSource(), pee.getDesmojObjects(), pee.getProcessInstance(),
+                        pee.getSimulationTimeOfSource(), pee.getSimulationComponents(), pee.getProcessInstance(),
                         pee.getNodeId());
                 cancelEvent.schedule(pee.getProcessInstance());
             }

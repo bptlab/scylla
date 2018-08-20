@@ -31,7 +31,7 @@ public class BPMNEscalationBPMNEEPlugin extends BPMNEndEventPluggable {
         ProcessModel processModel = processInstance.getProcessModel();
         int nodeId = desmojEvent.getNodeId();
         Map<EventDefinitionType, Map<String, String>> definitions = processModel.getEventDefinitions().get(nodeId);
-        ProcessSimulationComponents desmojObjects = desmojEvent.getDesmojObjects();
+        ProcessSimulationComponents simulationComponents = desmojEvent.getSimulationComponents();
         boolean showInTrace = model.traceIsOn();
         try {
             for (EventDefinitionType definition : definitions.keySet()) {
@@ -46,7 +46,7 @@ public class BPMNEscalationBPMNEEPlugin extends BPMNEndEventPluggable {
                         // model.getCommonProcessElements().getEscalations();
                         // Map<String, String> escalation = escalations.get("escalationRef");
 
-                        ProcessSimulationComponents parentDesmojObjects = desmojObjects.getParent();
+                        ProcessSimulationComponents parentDesmojObjects = simulationComponents.getParent();
                         ProcessModel parentModel = processModel.getParent();
 
                         int nodeIdInParent = processModel.getNodeIdInParent();

@@ -34,7 +34,7 @@ public class SubprocessTCPlugin extends TaskCancelEventPluggable {
                 SimulationModel model = (SimulationModel) event.getModel();
                 String source = event.getSource();
                 TaskCancelEvent cancelEvent = new TaskCancelEvent(model, source, event.getSimulationTimeOfSource(),
-                        event.getDesmojObjects(), event.getProcessInstance(), event.getNodeId());
+                        event.getSimulationComponents(), event.getProcessInstance(), event.getNodeId());
                 cancelEvent.schedule(parentProcessInstance, new TimeSpan(0));
                 eventsOnHoldMap.remove(nodeIdInParent);
             }

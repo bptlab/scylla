@@ -27,7 +27,7 @@ public class DataObjectBPMNIntermediateEvent extends BPMNIntermediateEventPlugga
         try {
             if (processModel.getDataObjectsGraph().getNodes().containsKey(desmojEvent.getNodeId())) {
                 Set<Integer> refferingObjects = processModel.getDataObjectsGraph().getTargetObjects(desmojEvent.getNodeId());
-                Collection<Object> allFields = desmojEvent.getDesmojObjects().getExtensionDistributions().get("dataobject").values();
+                Collection<Object> allFields = desmojEvent.getSimulationComponents().getExtensionDistributions().get("dataobject").values();
                 for (Object fields : allFields) {
                     Integer i = 0;
                     while (((Map<String, Map<Integer, DataObjectField>>) fields).values().toArray().length - i != 0) {

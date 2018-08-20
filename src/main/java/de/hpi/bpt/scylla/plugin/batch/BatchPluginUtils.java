@@ -91,7 +91,7 @@ public class BatchPluginUtils {
     void assignToBatchCluster(ProcessInstance processInstance, int nodeId, TaskBeginEvent parentalBeginEvent) {
 
         ProcessModel processModel = processInstance.getProcessModel();
-        ProcessSimulationComponents pSimComponents = parentalBeginEvent.getDesmojObjects();
+        ProcessSimulationComponents simulationComponents = parentalBeginEvent.getSimulationComponents();
         /*Map<Integer, BatchActivity> batchActivities = (Map<Integer, BatchActivity>) pSimComponents.getSimulationConfiguration()
                 .getExtensionValue(PLUGIN_NAME, "batchActivities");*/
         Map<Integer, BatchActivity> batchActivities = processModel.getBatchActivities();
@@ -141,7 +141,7 @@ public class BatchPluginUtils {
             boolean showInTrace = processInstance.traceIsOn();
             String dataView = this.getDataViewOfInstance(processInstance.getId(), batchActivity);
             TimeInstant currentSimulationTime = processInstance.presentTime();
-            cluster = new BatchCluster(model, currentSimulationTime, pSimComponents, batchActivity, nodeId, dataView,
+            cluster = new BatchCluster(model, currentSimulationTime, simulationComponents, batchActivity, nodeId, dataView,
                     showInTrace);
 
             // schedule BatchClusterStart at current time plus maximum timeout
@@ -296,7 +296,7 @@ public class BatchPluginUtils {
         List<TaskBeginEvent> parentalStartEvents = bc.getParentalStartEvents();
         for (TaskBeginEvent pse : parentalStartEvents) {
             TaskTerminateEvent taskTerminateEvent = new TaskTerminateEvent(pse.getModel(), pse.getSource(),
-                    pse.getSimulationTimeOfSource(), pse.getDesmojObjects(), pse.getProcessInstance(), pse.getNodeId());
+                    pse.getSimulationTimeOfSource(), pse.getSimulationComponents(), pse.getProcessInstance(), pse.getNodeId());
             bc.getParentalEndEvents().add(taskTerminateEvent);
 
         }

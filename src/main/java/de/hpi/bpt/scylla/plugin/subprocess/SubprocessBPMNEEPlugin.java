@@ -34,8 +34,8 @@ public class SubprocessBPMNEEPlugin extends BPMNEndEventPluggable {
                                                                                                // getScheduledEvents().isEmpty()
                                                                                                // works
             try {
-                ProcessSimulationComponents desmojObjects = desmojEvent.getDesmojObjects();
-                ProcessSimulationComponents parentDesmojObjects = desmojObjects.getParent();
+                ProcessSimulationComponents simulationComponents = desmojEvent.getSimulationComponents();
+                ProcessSimulationComponents parentDesmojObjects = simulationComponents.getParent();
                 ProcessModel parentModel = processModel.getParent();
                 int nodeIdInParent = processModel.getNodeIdInParent();
                 ProcessInstance parentProcessInstance = processInstance.getParent();

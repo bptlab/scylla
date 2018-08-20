@@ -31,7 +31,7 @@ public class BatchTBPlugin extends TaskBeginEventPluggable {
         BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
         pluginInstance.logTaskEventForNonResponsiblePI(event, processInstance);
 
-        ProcessSimulationComponents desmojObjects = event.getDesmojObjects();
+        ProcessSimulationComponents simulationComponents = event.getSimulationComponents();
         // SimulationModel model = (SimulationModel) desmojEvent.getModel();
         int nodeId = event.getNodeId();
         ProcessModel processModel = processInstance.getProcessModel();
@@ -47,8 +47,8 @@ public class BatchTBPlugin extends TaskBeginEventPluggable {
             if (cluster != null && parentProcessInstance == cluster.getResponsibleProcessInstance()) {
 
                 // therefore we fist take a sample of the setUp distribution
-                double setUpTimeToAdd = desmojObjects.getSetUpDistributionSample(nodeId);
-                TimeUnit unit = desmojObjects.getSetUpDistributionTimeUnit(nodeId);
+                double setUpTimeToAdd = simulationComponents.getSetUpDistributionSample(nodeId);
+                TimeUnit unit = simulationComponents.getSetUpDistributionTimeUnit(nodeId);
                 TimeSpan setUpTimeToAddAsTimeSpan = new TimeSpan(setUpTimeToAdd, unit);
                 // get the old value (this will always be the entry 0 in our map, because it's always the next)
                 double standardTime = event.getTimeSpanToNextEventMap().get(0).getTimeAsDouble(TimeUnit.SECONDS);

@@ -51,14 +51,14 @@ public class SubprocessTBPlugin extends TaskBeginEventPluggable {
             desmojEvent.getNextEventMap().remove(indexOfTaskTerminateEvent);
 
             String source = desmojEvent.getSource();
-            ProcessSimulationComponents desmojObjects = desmojEvent.getDesmojObjects();
+            ProcessSimulationComponents simulationComponents = desmojEvent.getSimulationComponents();
             SimulationModel model = (SimulationModel) desmojEvent.getModel();
             TimeInstant currentSimulationTime = model.presentTime();
             boolean showInTrace = model.traceIsOn();
             int processInstanceId = processInstance.getId();
 
             try {
-                ProcessSimulationComponents desmojObjectsOfSubProcess = desmojObjects.getChildren().get(nodeId);
+                ProcessSimulationComponents desmojObjectsOfSubProcess = simulationComponents.getChildren().get(nodeId);
                 Integer startNodeId = subProcess.getStartNode();
                 ProcessInstance subProcessInstance = new ProcessInstance(model, subProcess, processInstanceId,
                         showInTrace);

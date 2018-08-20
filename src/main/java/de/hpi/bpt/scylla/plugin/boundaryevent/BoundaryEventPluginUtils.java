@@ -24,7 +24,6 @@ import de.hpi.bpt.scylla.simulation.event.BPMNIntermediateEvent;
 import de.hpi.bpt.scylla.simulation.event.ScyllaEvent;
 import de.hpi.bpt.scylla.simulation.utils.SimulationUtils;
 import desmoj.core.dist.DiscreteDistEmpirical;
-import desmoj.core.simulator.Entity;
 import desmoj.core.simulator.TimeInstant;
 import desmoj.core.simulator.TimeSpan;
 
@@ -54,11 +53,11 @@ class BoundaryEventPluginUtils {
     void initializeBoundaryObject(double beginTimeOfTask, ScyllaEvent desmojEvent, List<Integer> referenceToBoundaryEvents) {
         ProcessInstance processInstance = desmojEvent.getProcessInstance();
         int nodeId = desmojEvent.getNodeId();
-        ProcessSimulationComponents desmojObjects = desmojEvent.getDesmojObjects();
+        ProcessSimulationComponents simulationComponents = desmojEvent.getSimulationComponents();
         String eventName = desmojEvent.getName();
         String source = desmojEvent.getSource();
 
-        BoundaryObject bo = new BoundaryObject(source, beginTimeOfTask, processInstance, nodeId, desmojObjects,
+        BoundaryObject bo = new BoundaryObject(source, beginTimeOfTask, processInstance, nodeId, simulationComponents,
                 referenceToBoundaryEvents);
         boundaryObjects.put(eventName, bo);
     }
@@ -399,7 +398,7 @@ class BoundaryEventPluginUtils {
             Iterator<Double> iterator = boundaryEventsToSchedule.keySet().iterator();
             Set<Double> elementsToRemove = new HashSet<>();
 
-            ProcessInstance processInstance = bo.getProcessInstance();
+            //not used -> removed 180820 LB ProcessInstance processInstance = bo.getProcessInstance();
 
             while (iterator.hasNext()) {
                 Double timeToSchedule = iterator.next();

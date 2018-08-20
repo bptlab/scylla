@@ -77,9 +77,9 @@ public class QueueManager {
                 boolean eventIsEligible = hasResourcesForEvent(model, eventFromQueue);
 
                 if (eventIsEligible) {
-                    ProcessSimulationComponents desmojObjects = eventFromQueue.getDesmojObjects();
+                    ProcessSimulationComponents simulationComponents = eventFromQueue.getSimulationComponents();
                     int nodeId = eventFromQueue.getNodeId();
-                    Set<ResourceReference> resourceReferences = desmojObjects.getSimulationConfiguration()
+                    Set<ResourceReference> resourceReferences = simulationComponents.getSimulationConfiguration()
                             .getResourceReferenceSet(nodeId);
                     for (ResourceReference ref : resourceReferences) {
                         // add position in queue and add to index
@@ -121,9 +121,9 @@ public class QueueManager {
             ResourceObjectTuple resourcesObjectTuple = getResourcesForEvent(model, event);
             assignResourcesToEvent(model, event, resourcesObjectTuple);
 
-            ProcessSimulationComponents desmojObjects = event.getDesmojObjects();
+            ProcessSimulationComponents simulationComponents = event.getSimulationComponents();
             int nodeId = event.getNodeId();
-            Set<ResourceReference> resourceReferences = desmojObjects.getSimulationConfiguration()
+            Set<ResourceReference> resourceReferences = simulationComponents.getSimulationConfiguration()
                     .getResourceReferenceSet(nodeId);
             for (ResourceReference ref : resourceReferences) {
                 // remove from event queues
@@ -160,9 +160,9 @@ public class QueueManager {
      *            the event to be added to event queues
      */
     public static void addToEventQueues(SimulationModel model, ScyllaEvent event) {
-        ProcessSimulationComponents desmojObjects = event.getDesmojObjects();
+        ProcessSimulationComponents simulationComponents = event.getSimulationComponents();
         int nodeId = event.getNodeId();
-        Set<ResourceReference> resourceReferences = desmojObjects.getSimulationConfiguration()
+        Set<ResourceReference> resourceReferences = simulationComponents.getSimulationConfiguration()
                 .getResourceReferenceSet(nodeId);
 
         Map<String, ScyllaEventQueue> eventQueues = model.getEventQueues();
@@ -292,9 +292,9 @@ public class QueueManager {
         TimeInstant currentSimulationTime = model.presentTime();
 
         Map<String, List<ResourceObject>> availableResourceObjects = new TreeMap<String, List<ResourceObject>>();
-        ProcessSimulationComponents desmojObjects = event.getDesmojObjects();
+        ProcessSimulationComponents simulationComponents = event.getSimulationComponents();
         int nodeId = event.getNodeId();
-        Set<ResourceReference> resourceReferences = desmojObjects.getSimulationConfiguration()
+        Set<ResourceReference> resourceReferences = simulationComponents.getSimulationConfiguration()
                 .getResourceReferenceSet(nodeId);
 
         if (resourceReferences.isEmpty()) {

@@ -10,7 +10,6 @@ import java.util.Set;
 
 import de.hpi.bpt.scylla.exception.ScyllaRuntimeException;
 import de.hpi.bpt.scylla.exception.ScyllaValidationException;
-import de.hpi.bpt.scylla.logger.ProcessNodeInfo;
 import de.hpi.bpt.scylla.model.process.ProcessModel;
 import de.hpi.bpt.scylla.model.process.graph.exception.NodeNotFoundException;
 import de.hpi.bpt.scylla.model.process.node.GatewayType;
@@ -78,14 +77,14 @@ public class ExclusiveGatewayEventPlugin extends GatewayEventPluggable {
         boolean showInTrace = desmojEvent.traceIsOn();
 
         GatewayType type = processModel.getGateways().get(nodeId);
-        ProcessSimulationComponents desmojObjects = desmojEvent.getDesmojObjects();
+        ProcessSimulationComponents simulationComponents = desmojEvent.getSimulationComponents();
 
         try {
             Set<Integer> idsOfNextNodes = processModel.getIdsOfNextNodes(nodeId);
 
             if (idsOfNextNodes.size() > 1) { // split
                 if (type == GatewayType.DEFAULT || type == GatewayType.EXCLUSIVE) {
-                    Map<Integer, Object> branchingDistributions = desmojObjects.getExtensionDistributions()
+                    Map<Integer, Object> branchingDistributions = simulationComponents.getExtensionDistributions()
                             .get(getName());
                     DiscreteDistEmpirical<Integer> distribution = (DiscreteDistEmpirical<Integer>) branchingDistributions
                             .get(nodeId);

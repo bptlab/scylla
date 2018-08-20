@@ -151,7 +151,7 @@ public class ProcessInstance extends Entity {
                         TaskEvent event = (TaskEvent) e;
 
                         TaskCancelEvent cancelEvent = new TaskCancelEvent(event.getModel(), event.getSource(),
-                                event.getSimulationTimeOfSource(), event.getDesmojObjects(), this, event.getNodeId());
+                                event.getSimulationTimeOfSource(), event.getSimulationComponents(), this, event.getNodeId());
                         rescheduledEvents.add(cancelEvent);
                     }
                 }

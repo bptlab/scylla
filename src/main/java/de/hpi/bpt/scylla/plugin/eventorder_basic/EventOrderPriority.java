@@ -37,7 +37,7 @@ public class EventOrderPriority extends EventOrderType {
         }
 
         Integer priorityOfFirstEvent = null;
-        Set<ResourceReference> resourceRefsOfFirstEvent = e1.getDesmojObjects().getSimulationConfiguration()
+        Set<ResourceReference> resourceRefsOfFirstEvent = e1.getSimulationComponents().getSimulationConfiguration()
                 .getResourceReferenceSet(e1.getNodeId());
         for (ResourceReference resourceRef : resourceRefsOfFirstEvent) {
             if (resourceId.equals(resourceRef.getResourceId())) {
@@ -51,7 +51,7 @@ public class EventOrderPriority extends EventOrderType {
             }
         }
         Integer priorityOfSecondEvent = null;
-        Set<ResourceReference> resourceRefsOfSecondEvent = e2.getDesmojObjects().getSimulationConfiguration()
+        Set<ResourceReference> resourceRefsOfSecondEvent = e2.getSimulationComponents().getSimulationConfiguration()
                 .getResourceReferenceSet(e2.getNodeId());
         for (ResourceReference resourceRef : resourceRefsOfSecondEvent) {
             if (resourceId.equals(resourceRef.getResourceId())) {

@@ -32,7 +32,7 @@ public class BPMNErrorBPMNEEPlugin extends BPMNEndEventPluggable {
         ProcessModel processModel = processInstance.getProcessModel();
         int nodeId = desmojEvent.getNodeId();
         Map<EventDefinitionType, Map<String, String>> definitions = processModel.getEventDefinitions().get(nodeId);
-        ProcessSimulationComponents desmojObjects = desmojEvent.getDesmojObjects();
+        ProcessSimulationComponents simulationComponents = desmojEvent.getSimulationComponents();
         boolean showInTrace = model.traceIsOn();
         try {
             for (EventDefinitionType definition : definitions.keySet()) {
@@ -46,7 +46,7 @@ public class BPMNErrorBPMNEEPlugin extends BPMNEndEventPluggable {
                         // Map<String, Map<String, String>> errors = model.getCommonProcessElements().getErrors();
                         // Map<String, String> error = errors.get("errorRef");
 
-                        ProcessSimulationComponents parentDesmojObjects = desmojObjects.getParent();
+                        ProcessSimulationComponents parentSimulationComponents = simulationComponents.getParent();
                         ProcessModel parentModel = processModel.getParent();
 
                         int nodeIdInParent = processModel.getNodeIdInParent();
@@ -77,7 +77,7 @@ public class BPMNErrorBPMNEEPlugin extends BPMNEndEventPluggable {
                         ProcessInstance parentProcessInstance = processInstance.getParent();
 
                         List<ScyllaEvent> events = SimulationUtils.createEventsForNextNode(desmojEvent,
-                                parentDesmojObjects, parentProcessInstance, nextNodeId);
+                                parentSimulationComponents, parentProcessInstance, nextNodeId);
                         TimeSpan timeSpan = new TimeSpan(0);
 
                         /**

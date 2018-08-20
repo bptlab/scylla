@@ -100,7 +100,7 @@ public abstract class ScyllaEvent extends Event<ProcessInstance> {
 
     }
 
-    public ProcessSimulationComponents getDesmojObjects() {
+    public ProcessSimulationComponents getSimulationComponents() {
         return pSimComponents;
     }
 
