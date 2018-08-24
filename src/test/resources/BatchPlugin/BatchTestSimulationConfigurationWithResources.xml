@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bsim:definitions xmlns:bsim="http://bsim.hpi.uni-potsdam.de/scylla/simModel" targetNamespace="http://www.hpi.de">
-  <bsim:simulationConfiguration startDateTime="2018-04-26T00:00+02:00[Europe/Berlin]" id="BatchTestSimulationConfiguration" processRef="Process_1" processInstances="10"  randomSeed="1062319517807224831">
+  <bsim:simulationConfiguration startDateTime="2018-04-26T00:00+02:00[Europe/Berlin]" id="BatchTestSimulationConfiguration" processRef="Process_1" processInstances="10">
     <bsim:startEvent id="StartEvent_1">
       <bsim:arrivalRate timeUnit="MINUTES">
         <bsim:exponentialDistribution>
