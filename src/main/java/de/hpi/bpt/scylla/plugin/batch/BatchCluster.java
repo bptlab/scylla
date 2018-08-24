@@ -2,7 +2,6 @@ package de.hpi.bpt.scylla.plugin.batch;
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,10 +14,8 @@ import de.hpi.bpt.scylla.model.process.ProcessModel;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
 import de.hpi.bpt.scylla.simulation.ProcessSimulationComponents;
 import de.hpi.bpt.scylla.simulation.QueueManager;
-import de.hpi.bpt.scylla.simulation.ResourceObject;
 import de.hpi.bpt.scylla.simulation.ResourceObjectTuple;
 import de.hpi.bpt.scylla.simulation.SimulationModel;
-import de.hpi.bpt.scylla.simulation.event.ResourceAvailabilityEvent;
 import de.hpi.bpt.scylla.simulation.event.ScyllaEvent;
 import de.hpi.bpt.scylla.simulation.event.TaskBeginEvent;
 import de.hpi.bpt.scylla.simulation.event.TaskEnableEvent;
@@ -271,16 +268,25 @@ class BatchCluster extends Entity {
     private Map<Integer, ResourceObjectTuple> stashedResources = new HashMap<>();
     private Map<Integer, BatchStashResourceEvent> stashEvents = new HashMap<>();
     
+
+	public void scheduleStashEvent(TaskBeginEvent event, ResourceObjectTuple assignedResources) {
+		BatchStashResourceEvent stashEvent = getStashResourceEvent(event, assignedResources);
+		BatchPluginUtils.getInstance().stashEvents.add(stashEvent);
+	}
+    
+	public BatchStashResourceEvent getStashResourceEvent(TaskBeginEvent beginEvent, ResourceObjectTuple assignedResources) {
+		Integer nodeId = beginEvent.getNodeId();
+		if(hasStashedResourcesFor(nodeId))return stashEvents.get(nodeId);
+		assert !stashEvents.containsKey(nodeId);
+		BatchStashResourceEvent stashEvent = new BatchStashResourceEvent(this, beginEvent, assignedResources);
+		stashResources(stashEvent, assignedResources);
+		return stashEvent;
+	}
+	
 	public void stashResources(BatchStashResourceEvent stashEvent, ResourceObjectTuple assignedResources) {
 		stashedResources.put(stashEvent.getNodeId(), assignedResources);
 		stashEvents.put(stashEvent.getNodeId(), stashEvent);
-		SimulationModel model = (SimulationModel)getModel();
-		//Remove resources from queues; they are not available anymore
-		for(ResourceObject resource : assignedResources.getResourceObjects()) {
-			Collection<ResourceObject> typeQueue = model.getResourceObjects().get(resource.getResourceType());
-			typeQueue.remove(resource);
-		}
-		QueueManager.assignResourcesToEvent(model, stashEvent, assignedResources);
+		QueueManager.assignResourcesToEvent((SimulationModel)getModel(), stashEvent, assignedResources);
 	}
 	
 	public void discardResources(ScyllaEvent event) {

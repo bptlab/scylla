@@ -17,7 +17,7 @@ public class BatchResourceQueueUpdatedPlugin extends ResourceQueueUpdatedPluggab
 		for(BatchStashResourceEvent stashEvent : BatchPluginUtils.getInstance().stashEvents) {
 			if(stashEvent.interestedInResources(resourceQueuesUpdated)) {
 				BatchPluginUtils.getInstance().stashEvents.remove(stashEvent);
-				stashEvent.stashResources();
+				stashEvent.makeResourcesUnavailable();
 				return stashEvent;
 			}
 		}
