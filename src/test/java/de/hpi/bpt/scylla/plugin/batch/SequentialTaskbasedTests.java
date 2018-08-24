@@ -13,10 +13,12 @@ import java.util.stream.Collectors;
 import org.junit.Test;
 
 import de.hpi.bpt.scylla.TestUtils;
+import de.hpi.bpt.scylla.logger.DebugLogger;
 
 public class SequentialTaskbasedTests extends SimulationTest{
 	
 	public static void main(String[] args) {
+		DebugLogger.allowDebugLogging = false;
 		SequentialTaskbasedTests x = new SequentialTaskbasedTests();
 		//x.testActivitiesAreSequential();
 		//x.testParallelGateway();

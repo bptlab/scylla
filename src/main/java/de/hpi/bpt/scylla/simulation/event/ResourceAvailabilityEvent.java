@@ -47,11 +47,7 @@ public class ResourceAvailabilityEvent extends ExternalEvent {
         String resourceType = resourceObject.getResourceType();
         resourceQueuesUpdated.add(resourceType);
         try {
-            ScyllaEvent eventFromQueue = QueueManager.getEventFromQueueReadyForSchedule(model, resourceQueuesUpdated);
-            while (eventFromQueue != null) {
-                SimulationUtils.scheduleEvent(eventFromQueue, new TimeSpan(0));
-                eventFromQueue = QueueManager.getEventFromQueueReadyForSchedule(model, resourceQueuesUpdated);
-            }
+            QueueManager.scheduleAllEventsFromQueueReadyForSchedule(model, resourceQueuesUpdated);
 
             ResourceAvailabilityEventPluggable.runPlugins(this);
 

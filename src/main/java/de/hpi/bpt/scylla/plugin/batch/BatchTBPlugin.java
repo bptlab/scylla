@@ -26,7 +26,7 @@ public class BatchTBPlugin extends TaskBeginEventPluggable {
     @Override
     public void eventRoutine(TaskBeginEvent event, ProcessInstance processInstance) throws ScyllaRuntimeException {
 
-        // System.out.println(event + " with display name " + event.getDisplayName() + " || " + event.getNextEventMap() + " and source " + event.getSource());
+        //System.out.println(event + " with display name " + event.getDisplayName() + " || " + event.getNextEventMap() + " and source " + event.getSource());
 
 
         BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
@@ -62,7 +62,9 @@ public class BatchTBPlugin extends TaskBeginEventPluggable {
             if (cluster != null && cluster.hasExecutionType(BatchClusterExecutionType.SEQUENTIAL_TASKBASED)) {
             	ResourceObjectTuple assignedResources = processInstance.getAssignedResources().get(event.getSource());
             	if(assignedResources != null) {
-            		cluster.stashResources(event, assignedResources);
+            		BatchStashResourceEvent stashEvent = new BatchStashResourceEvent(cluster, event, assignedResources);
+            		pluginInstance.stashEvents.add(stashEvent);
+            		//cluster.stashResources(event, assignedResources);
             	}
                 
             }

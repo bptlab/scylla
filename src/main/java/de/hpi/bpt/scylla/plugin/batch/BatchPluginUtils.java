@@ -51,6 +51,10 @@ public class BatchPluginUtils {
      */
     // eventsourcename:resources
     private Map<String, Set<String>> tasksAndResources = new HashMap<String, Set<String>>();
+    
+    
+    //TODO remove
+    public Set<BatchStashResourceEvent> stashEvents = new HashSet<>();
 
     // TODO data view blocks next batch cluster
     // TODO one process instance is responsible for the others

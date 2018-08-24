@@ -14,7 +14,6 @@ public class BatchGatewayPlugin extends GatewayEventPluggable{
 
 	@Override
 	public void eventRoutine(GatewayEvent event, ProcessInstance processInstance) throws ScyllaRuntimeException {
-		System.err.println("Gateway process "+event.getProcessInstance().getId());
 		BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
         
         BatchCluster cluster = pluginInstance.getCluster(processInstance);

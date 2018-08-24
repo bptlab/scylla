@@ -1,6 +1,7 @@
 package de.hpi.bpt.scylla.simulation;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -17,6 +18,7 @@ import de.hpi.bpt.scylla.logger.ResourceInfo;
 import de.hpi.bpt.scylla.logger.ResourceStatus;
 import de.hpi.bpt.scylla.model.configuration.ResourceReference;
 import de.hpi.bpt.scylla.model.global.resource.TimetableItem;
+import de.hpi.bpt.scylla.plugin_type.simulation.resource.ResourceQueueUpdatedPluggable;
 import de.hpi.bpt.scylla.simulation.event.ScyllaEvent;
 import de.hpi.bpt.scylla.simulation.utils.DateTimeUtils;
 import de.hpi.bpt.scylla.simulation.utils.SimulationUtils;
@@ -48,6 +50,21 @@ public class QueueManager {
             }
         }
     };
+    
+    /**
+     * Immediately schedules all possible events that become ready through updates at the given resources
+     * (As multiple events might wait for one resource, most likely not all waiting events for that resource will be scheduled)
+     * @param model : The simulation model; delivers the resource event queues
+     * @param resourceQueuesUpdated : Set of ids of resources that have been updated (usually have become available again)
+     * @throws ScyllaRuntimeException
+     */
+    public static void scheduleAllEventsFromQueueReadyForSchedule(SimulationModel model, Set<String> resourceQueuesUpdated) throws ScyllaRuntimeException {
+    	ScyllaEvent eventFromQueue = getEventFromQueueReadyForSchedule(model, resourceQueuesUpdated);
+        while (eventFromQueue != null) {
+        	SimulationUtils.scheduleEvent(eventFromQueue, new TimeSpan(0));
+            eventFromQueue = getEventFromQueueReadyForSchedule(model, resourceQueuesUpdated);
+        }
+    }
 
     /**
      * Returns eventwhich is ready to be scheduled for immediate execution from event queues.
@@ -61,6 +78,9 @@ public class QueueManager {
      */
     public static ScyllaEvent getEventFromQueueReadyForSchedule(SimulationModel model,
             Set<String> resourceQueuesUpdated) {
+    	
+    	ScyllaEvent eventFromPlugin = ResourceQueueUpdatedPluggable.runPlugins(resourceQueuesUpdated);
+    	if(eventFromPlugin != null)return eventFromPlugin;
 
         List<ScyllaEvent> eventCandidates = new ArrayList<ScyllaEvent>();
         int accumulatedIndex = Integer.MAX_VALUE;
@@ -511,7 +531,7 @@ public class QueueManager {
      */
     public static void releaseResourcesAndScheduleQueuedEvents(SimulationModel model, ScyllaEvent releasingEvent)
             throws ScyllaRuntimeException {
-        ProcessInstance processInstance = releasingEvent.getProcessInstance();
+    	ProcessInstance processInstance = releasingEvent.getProcessInstance();
         int nodeId = releasingEvent.getNodeId();
         String nameOfResponsibleEvent = releasingEvent.getSource();
 
@@ -556,11 +576,7 @@ public class QueueManager {
          * 
          * --> solved by introduction of ResourceAvailableEvent
          */
-        ScyllaEvent eventFromQueue = getEventFromQueueReadyForSchedule(model, resourceQueuesUpdated);
-        while (eventFromQueue != null) {
-            SimulationUtils.scheduleEvent(eventFromQueue, new TimeSpan(0));
-            eventFromQueue = getEventFromQueueReadyForSchedule(model, resourceQueuesUpdated);
-        }
+        scheduleAllEventsFromQueueReadyForSchedule(model, resourceQueuesUpdated);
     }
 
     /**
