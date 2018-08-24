@@ -19,9 +19,9 @@ import desmoj.core.simulator.TimeSpan;
 
 /**
  * DesmoJ event responsible for scheduling queued events.
+ * This event occurs at the start of each timetable item for each resource instance
  * 
  * @author Tsun Yin Wong
- * TODO LB  180820 : These events are never created, what was supposed to be their exact purpose?
  */
 public class ResourceAvailabilityEvent extends ExternalEvent {
 
@@ -33,6 +33,10 @@ public class ResourceAvailabilityEvent extends ExternalEvent {
         this.resourceObject = resourceObject;
     }
 
+    /**
+     * This notifies all events waiting for resources with the type of the specific resource instance of this event
+     * and reschedules such an event for the beginning of the next timetable item
+     */
     @Override
     public void eventRoutine() throws SuspendExecution {
         SimulationModel model = (SimulationModel) getModel();

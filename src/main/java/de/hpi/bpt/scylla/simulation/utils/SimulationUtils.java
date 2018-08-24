@@ -243,7 +243,8 @@ public class SimulationUtils {
     }
 
     /**
-     * Creates and schedules a DesmoJ event which represents a resource instance which returns from idle.
+     * Creates and schedules a DesmoJ event which represents a resource instance which returns from idle
+     * for the beginning of the next timetable item for this resource instance.
      * 
      * @param model
      *            the simulation model

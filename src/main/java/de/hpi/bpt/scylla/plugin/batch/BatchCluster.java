@@ -290,15 +290,12 @@ class BatchCluster extends Entity {
 	public void checkForStashedResources(TaskEnableEvent event) {
 		if(hasStashedResourcesFor(event.getNodeId())) {
 			ResourceObjectTuple resources = stashedResources.get(event.getNodeId());
-			TaskBeginEvent beginEvent;
-			beginEvent = event.getBeginEvent();
-			if(!event.getNextEventMap().isEmpty()) {
+			TaskBeginEvent beginEvent = event.getBeginEvent();
+			if(!event.getNextEventMap().isEmpty()) {//Event has assigned resources - but not the ones that are stashed for it
 				assert event.getNextEventMap().size() == 1;
 				try {
 					QueueManager.releaseResourcesAndScheduleQueuedEvents((SimulationModel) beginEvent.getModel(), beginEvent);
-				} catch (ScyllaRuntimeException e) {
-					e.printStackTrace();
-				}
+				} catch (ScyllaRuntimeException e) { e.printStackTrace(); }
 			} else {//Event waits for resources
 		        QueueManager.removeFromEventQueues((SimulationModel) beginEvent.getModel(), beginEvent);
 	            event.getNextEventMap().put(0, beginEvent);
