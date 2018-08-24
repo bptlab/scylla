@@ -14,9 +14,9 @@ public class BatchResourceQueueUpdatedPlugin extends ResourceQueueUpdatedPluggab
 
 	@Override
 	public ScyllaEvent eventToBeScheduled(Set<String> resourceQueuesUpdated) {
-		for(BatchStashResourceEvent stashEvent : BatchPluginUtils.getInstance().stashEvents) {
+		for(BatchStashResourceEvent stashEvent : BatchPluginUtils.getInstance().getStashEvents()) {
 			if(stashEvent.interestedInResources(resourceQueuesUpdated)) {
-				BatchPluginUtils.getInstance().stashEvents.remove(stashEvent);
+				BatchPluginUtils.getInstance().getStashEvents().remove(stashEvent);
 				stashEvent.makeResourcesUnavailable();
 				return stashEvent;
 			}

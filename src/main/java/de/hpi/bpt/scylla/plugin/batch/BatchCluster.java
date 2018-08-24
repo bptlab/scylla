@@ -271,7 +271,7 @@ class BatchCluster extends Entity {
 
 	public void scheduleStashEvent(TaskBeginEvent event, ResourceObjectTuple assignedResources) {
 		BatchStashResourceEvent stashEvent = getStashResourceEvent(event, assignedResources);
-		BatchPluginUtils.getInstance().stashEvents.add(stashEvent);
+		BatchPluginUtils.getInstance().getStashEvents().add(stashEvent);
 	}
     
 	public BatchStashResourceEvent getStashResourceEvent(TaskBeginEvent beginEvent, ResourceObjectTuple assignedResources) {

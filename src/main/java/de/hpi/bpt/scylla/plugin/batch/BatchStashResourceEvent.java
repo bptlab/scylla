@@ -24,7 +24,6 @@ public class BatchStashResourceEvent extends ScyllaEvent{
 
 	@Override
 	public void eventRoutine(ProcessInstance processInstance) {
-		//cluster.stashResources(this, resources);
 	}
 	
 	public void makeResourcesUnavailable() {

@@ -54,7 +54,7 @@ public class BatchPluginUtils {
     
     
     //TODO remove
-    public Set<BatchStashResourceEvent> stashEvents = new HashSet<>();
+    private Set<BatchStashResourceEvent> stashEvents = new HashSet<>();
 
     // TODO data view blocks next batch cluster
     // TODO one process instance is responsible for the others
@@ -453,4 +453,8 @@ public class BatchPluginUtils {
         int parentNodeId = processModel.getNodeIdInParent();
         return getRunningCluster(parentProcessInstance, parentNodeId);
     }
+
+	public Set<BatchStashResourceEvent> getStashEvents() {
+		return stashEvents;
+	}
 }
