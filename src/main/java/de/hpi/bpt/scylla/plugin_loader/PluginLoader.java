@@ -35,14 +35,18 @@ public class PluginLoader {
 	/**Saves all entry point classes and their plugins*/
 	private HashMap<Class<?>,ArrayList<PluginWrapper>> extensions;
 	
+	/**Caches created plugin objects*/
+	private Map<Class<? extends IPluggable>,Object> cachedPluginObjects = new HashMap<>();
+	
 	/**Default plugin loader*/
 	private static PluginLoader defaultPluginLoader;
 	
 	
-	public class PluginWrapper implements EventListener,StateObserver{
-		private Class<?> plugin;
+	
+	public class PluginWrapper<T extends IPluggable> implements EventListener,StateObserver{
+		private Class<T> plugin;
 		private boolean chosen;
-		private PluginWrapper(Class<?> p, boolean b){
+		private PluginWrapper(Class<T> p, boolean b){
 			plugin = p;
 			chosen = b;
 		}
@@ -206,18 +210,20 @@ public class PluginLoader {
 		);
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void searchClassesForPlugins(List<Class> classes) {
 		for(Class c : classes) {
 			if(isPluginClass(c))loadClass(c);
 		}
 	}
 	
-	private void loadClass(Class plugin) {
+	@SuppressWarnings("unlikely-arg-type")
+	private <T extends IPluggable> void loadClass(Class<T> plugin) {
 		Class<?> entry_point = plugin.getSuperclass();
 		if (!extensions.containsKey(entry_point))
 			extensions.put(entry_point, new ArrayList<PluginWrapper>());
 		if (!extensions.get(entry_point).contains(plugin))
-			extensions.get(entry_point).add(new PluginWrapper(plugin, true));
+			extensions.get(entry_point).add(new PluginWrapper<T>(plugin, true));
 	}
 	
 
@@ -256,11 +262,14 @@ public class PluginLoader {
 			if(entrypoint.isAssignableFrom(savedEntrypoint)){
 				ArrayList<PluginWrapper> plugins = extension.getValue();
 				for(int i = 0; i < plugins.size(); i++){
-					PluginWrapper pl = plugins.get(i);
+					PluginWrapper<? extends S> pl = plugins.get(i);
 					if(pl.getState())
 						try {
-							@SuppressWarnings("unchecked")
-							S inst = (S)(pl.plugin.newInstance());
+							S inst = getCachedInstance(pl.plugin);
+							if(inst == null) {
+								inst = (S)(pl.plugin.newInstance());
+								cacheInstance(pl.plugin, inst);
+							}
 							if(inst != null){
 								l.add(inst);
 								//System.out.println("Added Plugin "+pl.plugin.getCanonicalName());
@@ -275,6 +284,16 @@ public class PluginLoader {
 		}
 		
 		return l;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private <T extends IPluggable> T getCachedInstance(Class<T> entryPoint) {
+		return (T) cachedPluginObjects.get(entryPoint);
+	}
+	
+	//TODO type safety
+	private <T extends IPluggable> void cacheInstance(Class<T> entryPoint, Object instance) {
+		cachedPluginObjects.put(entryPoint, instance);
 	}
 	
 	public static boolean isPluginClass(Class<?> clazz) {
