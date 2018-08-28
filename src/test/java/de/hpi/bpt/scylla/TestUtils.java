@@ -40,7 +40,7 @@ public class TestUtils {
 			if(header == null)return null;
 			String line;
 			while((line = br.readLine()) != null) {
-				table.add(line.split(";"));
+				table.add(line.split(";",-1));
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

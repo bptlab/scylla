@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.jdom2.Document;
@@ -21,18 +20,17 @@ import de.hpi.bpt.scylla.model.configuration.SimulationConfiguration;
 import de.hpi.bpt.scylla.model.global.GlobalConfiguration;
 import de.hpi.bpt.scylla.model.process.CommonProcessElements;
 import de.hpi.bpt.scylla.model.process.ProcessModel;
-import de.hpi.bpt.scylla.model.process.graph.Graph;
-import de.hpi.bpt.scylla.model.process.graph.exception.NodeNotFoundException;
 import de.hpi.bpt.scylla.parser.CommonProcessElementsParser;
 import de.hpi.bpt.scylla.parser.GlobalConfigurationParser;
 import de.hpi.bpt.scylla.parser.ProcessModelParser;
 import de.hpi.bpt.scylla.parser.SimulationConfigurationParser;
+import de.hpi.bpt.scylla.plugin.batch.BatchPluginUtils;
+import de.hpi.bpt.scylla.plugin_loader.PluginLoader;
 import de.hpi.bpt.scylla.plugin_type.logger.OutputLoggerPluggable;
 import de.hpi.bpt.scylla.plugin_type.parser.CommonProcessElementsParserPluggable;
 import de.hpi.bpt.scylla.plugin_type.parser.GlobalConfigurationParserPluggable;
 import de.hpi.bpt.scylla.plugin_type.parser.ProcessModelParserPluggable;
 import de.hpi.bpt.scylla.plugin_type.parser.SimulationConfigurationParserPluggable;
-import de.hpi.bpt.scylla.simulation.ProcessSimulationComponents;
 import de.hpi.bpt.scylla.simulation.SimulationModel;
 import de.hpi.bpt.scylla.simulation.utils.DateTimeUtils;
 import desmoj.core.simulator.Experiment;
@@ -221,21 +219,34 @@ public class SimulationManager {
 
             // log process execution
             // log resources, process, tasks
-
-            StringBuilder strb = new StringBuilder(globalConfigurationFilename.substring(0,globalConfigurationFilename.lastIndexOf(Scylla.FILEDELIM)+1));
-            outputPath = strb.substring(0,strb.lastIndexOf(Scylla.FILEDELIM)+1)+"output_"+new SimpleDateFormat("yy_MM_dd_HH_mm_ss").format(new Date())+ Scylla.FILEDELIM;
+        	String currentTime = new SimpleDateFormat("yy_MM_dd_HH_mm_ss_SSS").format(new Date());
+            StringBuilder strb = new StringBuilder(globalConfigurationFilename);
+            strb
+            	.delete(strb.lastIndexOf(Scylla.FILEDELIM)+1,strb.length())
+            	.append("output_")
+            	.append(currentTime);
+            outputPath = strb.toString()+Scylla.FILEDELIM;
             File outputPathFolder = new File(outputPath);
-            if(!outputPathFolder.exists())outputPathFolder.mkdir();
+            if(outputPathFolder.exists())throw new Error("Output already exists!");
+            outputPathFolder.mkdir();
             OutputLoggerPluggable.runPlugins(sm, outputPath);
 
         }
         catch (IOException e) {
             e.printStackTrace();
+        } finally {
+        	cleanup();
         }
         return outputPath;
     }
 
-    public GlobalConfiguration getGlobalConfiguration() {
+    private void cleanup() {
+		PluginLoader.flushDefault();
+		//TODO remove the following:
+		BatchPluginUtils.clear();
+	}
+
+	public GlobalConfiguration getGlobalConfiguration() {
         return globalConfiguration;
     }
 

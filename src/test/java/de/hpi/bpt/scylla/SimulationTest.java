@@ -1,4 +1,4 @@
-package de.hpi.bpt.scylla.plugin.batch;
+package de.hpi.bpt.scylla;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -8,7 +8,6 @@ import org.junit.After;
 import org.junit.Before;
 
 import de.hpi.bpt.scylla.SimulationManager;
-import de.hpi.bpt.scylla.TestUtils;
 
 public abstract class SimulationTest {
 

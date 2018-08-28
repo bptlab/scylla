@@ -90,35 +90,17 @@ public class PluginLoader {
 	 * Saves the data to {@link de.hpi.bpt.scylla.plugin_loader.PluginLoader.extensions}
 	 */
 	public void loadPlugins(){
-		
-		try {
 
-			//Finding superclasses of plugins and sorting by them
-			extensions = new HashMap<Class<?>,ArrayList<PluginWrapper>>();
-			
-			for(String pack : getStandardPluginPackages()){
-				try{
-					String pack_slash  = pack.replace('.','/')+"/"; 
-					Enumeration<URL> packURLs = PluginLoader.class.getClassLoader().getResources(pack_slash);
-					if(!packURLs.hasMoreElements()){
-						DebugLogger.error("Error loading plugins: Could not find package "+pack);
-						continue;
-					}
-					for(URL packURL : Collections.list(packURLs)) {
-						ArrayList<String> classPaths = 
-								packURL.getProtocol().equals("jar") ?
-									getJarClassPaths(packURL, pack_slash) :
-									getFilePaths(packURL, pack);
-						searchClassesForPlugins(getClassesIn(classPaths));
-					}
-				}catch (IllegalArgumentException e){
-					e.printStackTrace();
-					continue;
-				}
+		//Finding superclasses of plugins and sorting by them
+		extensions = new HashMap<Class<?>,ArrayList<PluginWrapper>>();
+		
+		for(String pack : getStandardPluginPackages()){
+			try{
+				loadPackage(pack);
+			}catch (IllegalArgumentException | IOException e){
+				e.printStackTrace();
+				continue;
 			}
-			
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 		
 		try {
@@ -128,6 +110,22 @@ public class PluginLoader {
 		}
 		
 		
+	}
+	
+	public void loadPackage(String pack) throws IOException {
+		String pack_slash  = pack.replace('.','/')+"/"; 
+		Enumeration<URL> packURLs = PluginLoader.class.getClassLoader().getResources(pack_slash);
+		if(!packURLs.hasMoreElements()){
+			DebugLogger.error("Error loading plugins: Could not find package "+pack);
+			return;
+		}
+		for(URL packURL : Collections.list(packURLs)) {
+			ArrayList<String> classPaths = 
+					packURL.getProtocol().equals("jar") ?
+						getJarClassPaths(packURL, pack_slash) :
+						getFilePaths(packURL, pack);
+			searchClassesForPlugins(getClassesIn(classPaths));
+		}
 	}
 	
 	private List<String> getStandardPluginPackages(){
@@ -294,6 +292,14 @@ public class PluginLoader {
 	//TODO type safety
 	private <T extends IPluggable> void cacheInstance(Class<T> entryPoint, Object instance) {
 		cachedPluginObjects.put(entryPoint, instance);
+	}
+	
+	private void flushCache() {
+		cachedPluginObjects.clear();
+	}
+	
+	public static void flushDefault() {
+		getDefaultPluginLoader().flushCache();
 	}
 	
 	public static boolean isPluginClass(Class<?> clazz) {

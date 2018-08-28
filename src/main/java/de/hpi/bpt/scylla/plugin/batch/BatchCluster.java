@@ -265,6 +265,7 @@ class BatchCluster extends Entity {
         }
     }
 
+    //TODO Stashing is specific for task-based clusters => use polymorphism and subclass BatchCluster
     private Map<Integer, ResourceObjectTuple> stashedResources = new HashMap<>();
     private Map<Integer, BatchStashResourceEvent> stashEvents = new HashMap<>();
     

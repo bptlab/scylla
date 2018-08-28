@@ -75,6 +75,10 @@ public class BatchPluginUtils {
     {
         singleton = null;
     }
+    
+    public static boolean isInitialized() {
+    	return singleton != null;
+    }
 
     // Map<String, TaskBeginEvent> getSubprocessStartEventsOnHold() {
     // return subprocessStartEventsOnHold;
