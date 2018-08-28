@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
 
+import de.hpi.bpt.scylla.SimulationTest;
 import de.hpi.bpt.scylla.TestUtils;
 
 public class SequentialCasebasedTests extends SimulationTest{
@@ -31,6 +32,7 @@ public class SequentialCasebasedTests extends SimulationTest{
 		Assert.assertTrue(f.exists());
 		List<String[]> table = TestUtils.readCSV(f);
 		Assert.assertEquals(30, table.size());
+		assertExecutionType(table);
 		Map<String, List<String[]>> clusters = TestUtils.groupByCluster(table);
 		for(List<String[]> cluster : clusters.values()) {
 			
@@ -54,6 +56,10 @@ public class SequentialCasebasedTests extends SimulationTest{
 				lastEndTime = activity[4].compareTo(lastEndTime) > 0 ? activity[4] : lastEndTime;
 			}
 		}
+	}
+	
+	private static void assertExecutionType(List<String[]> table) {
+		table.stream().forEach((each)->{Assert.assertEquals(BatchClusterExecutionType.SEQUENTIAL_CASEBASED.toString(), each[7]);});
 	}
 
 }

@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
 
+import de.hpi.bpt.scylla.SimulationTest;
 import de.hpi.bpt.scylla.TestUtils;
 
 public class ParallelTests extends SimulationTest{
@@ -30,6 +31,8 @@ public class ParallelTests extends SimulationTest{
 		
 		List<String[]> table = TestUtils.readCSV(f);
 		Assert.assertEquals(30, table.size());
+		assertExecutionType(table);
+		assertNoNaturalArrivalTime(table);
 		Map<String, List<String[]>> clusters = TestUtils.groupByCluster(table);
 		
 		for(List<String[]> cluster : clusters.values()) {
@@ -50,6 +53,14 @@ public class ParallelTests extends SimulationTest{
 				}
 			};
 		}
+	}
+	
+	private static void assertNoNaturalArrivalTime(List<String[]> table) {
+		table.stream().forEach((each)->{Assert.assertTrue(each[8].isEmpty());});
+	}
+	
+	private static void assertExecutionType(List<String[]> table) {
+		table.stream().forEach((each)->{Assert.assertEquals(BatchClusterExecutionType.PARALLEL.toString(), each[7]);});
 	}
 
 }

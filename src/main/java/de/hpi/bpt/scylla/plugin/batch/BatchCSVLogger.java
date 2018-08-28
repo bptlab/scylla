@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import de.hpi.bpt.scylla.logger.ProcessNodeInfo;
 import de.hpi.bpt.scylla.model.process.ProcessModel;
@@ -24,7 +25,7 @@ import de.hpi.bpt.scylla.simulation.utils.DateTimeUtils;
 /**
  * This is a logger for batch analysis.
  * The output contains timestamp and resource data for all tasks 
- * and is also enriched by additional batch region data where possble.
+ * and is also enriched by additional batch region data where possible.
  * This allows for instance to analyze and predict which tasks lie in a batch region
  * and then verify the results by examining the additional  batch data.
  * @author Leon Bein
@@ -36,7 +37,7 @@ public class BatchCSVLogger extends OutputLoggerPluggable{
 	private static DateFormat timeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	/**The header for the table*/
-	private static Object[] header = new Object[] {"Process Instance", "Activity Name", "Arrival", "Start", "Complete", "Resources", "Batch Number", "Batch Type"};
+	private static Object[] header = new Object[] {"Process Instance", "Activity Name", "Arrival", "Start", "Complete", "Resources", "Batch Number", "Batch Type", "Natural Arrival Time"};
 	
 	
 	@Override
@@ -90,7 +91,7 @@ public class BatchCSVLogger extends OutputLoggerPluggable{
             		switch(nodeInfo.getTransition()) {
             		/**On enable: create new data array for task and save enable and general information*/
             		case ENABLE:
-            			Object[] taskData = new Object[header.length];
+            			Object[] taskData = new Object[headerLength()];
             			taskData[0] = instanceId;
             			taskData[1] = nodeInfo.getTaskName();
             			taskData[2] = timeStamp;
@@ -114,6 +115,8 @@ public class BatchCSVLogger extends OutputLoggerPluggable{
             	instanceTasks.put(instanceId, tasks);
             }
             
+
+            
             /**For each batchcluster add information to table*/
             for (Integer clusterNodeId : clustersOfProcess.keySet()) {
             	
@@ -128,6 +131,8 @@ public class BatchCSVLogger extends OutputLoggerPluggable{
                 	/**Execution type information*/
                 	BatchClusterExecutionType batchType = cluster.getBatchActivity().getExecutionType();
                 	
+                	List<Object[]> tasksOfClusterInstance = new ArrayList<>();
+                	
                 	/**Add information to all tasks of cluster in all instances that participated in that cluster*/
                 	for(ProcessInstance instance : cluster.getProcessInstances()) {
                 		
@@ -137,10 +142,31 @@ public class BatchCSVLogger extends OutputLoggerPluggable{
                 		tasksOfInstance.get(clusterNodeId)[7] = batchType;
                 		/**Write information for all tasks inside cluster*/
                 		for(Integer taskId : tasksOfCluster) {
-                    		tasksOfInstance.get(taskId)[6] = batchNumber;
-                    		tasksOfInstance.get(taskId)[7] = batchType;
+                			Object[] task = tasksOfInstance.get(taskId);
+                    		task[6] = batchNumber;
+                    		task[7] = batchType;
+                    		tasksOfClusterInstance.add(task);
                 		}
                 	}
+
+        			Map<Object, List<Object[]>> activities = tasksOfClusterInstance.stream()
+            				.collect(Collectors.groupingBy((each)->{return each[1];}));
+            		if(batchType == BatchClusterExecutionType.SEQUENTIAL_TASKBASED) {
+            			for(List<Object[]> activity : activities.values()) {
+            				Object[] minEnable = activity.stream().min((first, second)->{
+            					return ((String)first[2]).compareTo((String)second[2]);
+            				}).get();
+            				for(Object[] activityInstance : activity)activityInstance[8] = minEnable[2];
+            			}
+            		}
+            		
+            		if(batchType == BatchClusterExecutionType.SEQUENTIAL_TASKBASED || batchType == BatchClusterExecutionType.SEQUENTIAL_CASEBASED) {
+            			Object[] firstActivity = tasksOfClusterInstance.stream()
+            				.min((first, second)->{return ((String)first[2]).compareTo((String)second[2]);}).get();
+            			tasksOfClusterInstance.stream()
+            				.filter((each)->{return each[1].equals(firstActivity[1]);})
+            				.forEach((each)->{each[8] = instanceTasks.get(each[0]).get(clusterNodeId)[2];});
+            		}
             	}
             }
             
@@ -196,5 +222,9 @@ public class BatchCSVLogger extends OutputLoggerPluggable{
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static int headerLength() {
+		return header.length;
 	}
 }

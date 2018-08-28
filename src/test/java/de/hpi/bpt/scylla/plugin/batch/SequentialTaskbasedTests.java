@@ -10,8 +10,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.junit.Assert;
 import org.junit.Test;
 
+import de.hpi.bpt.scylla.SimulationTest;
 import de.hpi.bpt.scylla.TestUtils;
 import de.hpi.bpt.scylla.logger.DebugLogger;
 
@@ -38,6 +40,7 @@ public class SequentialTaskbasedTests extends SimulationTest{
 		List<String[]> table = TestUtils.readCSV(f);
 		
 		assertEquals(30, table.size());
+		assertExecutionType(table);
 		Map<String, List<String[]>> clusters = TestUtils.groupByCluster(table);
 		for(List<String[]> cluster : clusters.values()) {
 			assertActivityIsSequential("Activity A", cluster);
@@ -123,6 +126,10 @@ public class SequentialTaskbasedTests extends SimulationTest{
 				return row[0].equals(""+j) && row[1].equals(activityName);
 			}));
 		}
+	}
+	
+	private static void assertExecutionType(List<String[]> table) {
+		table.stream().forEach((each)->{Assert.assertEquals(BatchClusterExecutionType.SEQUENTIAL_TASKBASED.toString(), each[7]);});
 	}
 
 }
