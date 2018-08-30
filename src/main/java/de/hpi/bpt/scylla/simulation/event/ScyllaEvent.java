@@ -132,6 +132,7 @@ public abstract class ScyllaEvent extends Event<ProcessInstance> {
         return timeSpanToNextEventMap;
     }
 
+    /**SIDEEFFECTS!*/
     public int getNewEventIndex() {
         return nextEventIndex++;
     }

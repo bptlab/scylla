@@ -35,31 +35,34 @@ public class SequentialCasebasedTests extends SimulationTest{
 		assertExecutionType(table);
 		Map<String, List<String[]>> clusters = TestUtils.groupByCluster(table);
 		for(List<String[]> cluster : clusters.values()) {
-			
-			List<String[]> sortedActivities = cluster.stream()
-					.filter((activity)->{return activity[1].equals("Activity A") || activity[1].equals("Activity B");})
-					.sorted((a,b)->{return a[4].compareTo(b[4]);})
-					.collect(Collectors.toList());
-			
-			Set<String> seenInstances = new HashSet<String>();
-			String lastInstance = null;
-			String lastEndTime = "";
-			for(String[] activity : sortedActivities) {
-				String instance = activity[0];
-				String startTime = activity[3];
-				if(!instance.equals(lastInstance)) {
-					Assert.assertFalse(seenInstances.contains(instance));
-					Assert.assertTrue(lastEndTime.compareTo(startTime) <= 0);
-					seenInstances.add(instance);
-				}
-				lastInstance = instance;
-				lastEndTime = activity[4].compareTo(lastEndTime) > 0 ? activity[4] : lastEndTime;
-			}
+			assertClusterIsCaseBased(cluster);
 		}
 	}
 	
 	private static void assertExecutionType(List<String[]> table) {
 		table.stream().forEach((each)->{Assert.assertEquals(BatchClusterExecutionType.SEQUENTIAL_CASEBASED.toString(), each[7]);});
+	}
+	
+	public static void assertClusterIsCaseBased(List<String[]> cluster) {
+		List<String[]> sortedActivities = cluster.stream()
+				.filter((activity)->{return activity[1].equals("Activity A") || activity[1].equals("Activity B");})
+				.sorted((a,b)->{return a[4].compareTo(b[4]);})
+				.collect(Collectors.toList());
+		
+		Set<String> seenInstances = new HashSet<String>();
+		String lastInstance = null;
+		String lastEndTime = "";
+		for(String[] activity : sortedActivities) {
+			String instance = activity[0];
+			String startTime = activity[3];
+			if(!instance.equals(lastInstance)) {
+				Assert.assertFalse(seenInstances.contains(instance));
+				Assert.assertTrue(lastEndTime.compareTo(startTime) <= 0);
+				seenInstances.add(instance);
+			}
+			lastInstance = instance;
+			lastEndTime = activity[4].compareTo(lastEndTime) > 0 ? activity[4] : lastEndTime;
+		}
 	}
 
 }

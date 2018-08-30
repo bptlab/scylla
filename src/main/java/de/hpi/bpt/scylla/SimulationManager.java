@@ -93,73 +93,7 @@ public class SimulationManager {
     public String run() {
 
         try {
-            SAXBuilder builder = new SAXBuilder();
-            
-            if (globalConfigurationFilename == null || globalConfigurationFilename.isEmpty()) {
-                throw new ScyllaValidationException("No global configuration provided.");
-            }
-            else {
-                // parse global configuration XML
-                Document gcDoc = builder.build(globalConfigurationFilename);
-                Element gcRootElement = gcDoc.getRootElement();
-                GlobalConfigurationParser globalConfigurationParser = new GlobalConfigurationParser(this);
-                globalConfiguration = globalConfigurationParser.parse(gcDoc.getRootElement());
-                String fileNameWithoutExtension = globalConfigurationFilename.substring(// filename.lastIndexOf("\\") +
-                                                                                        // 1,
-                		globalConfigurationFilename.lastIndexOf(Scylla.FILEDELIM)+1, globalConfigurationFilename.lastIndexOf(".xml"));
-                globalConfiguration.setFileNameWithoutExtension(fileNameWithoutExtension);
-                // plugins to parse global configuration
-                GlobalConfigurationParserPluggable.runPlugins(this, globalConfiguration, gcRootElement);
-
-                DateTimeUtils.setZoneId(globalConfiguration.getZoneId());
-            }
-
-            CommonProcessElementsParser cpeParser = new CommonProcessElementsParser(this);
-            for (String filename : processModelFilenames) {
-                Document pmDoc = builder.build(filename);
-                Element pmRootElement = pmDoc.getRootElement();
-
-                // parse common process elements from XML (BPMN)
-                CommonProcessElements commonProcessElementsFromFile = cpeParser.parse(pmRootElement);
-                String fileNameWithoutExtension = filename.substring(// filename.lastIndexOf("\\") + 1,
-                        filename.lastIndexOf(Scylla.FILEDELIM)+1, filename.lastIndexOf(".bpmn"));
-                commonProcessElementsFromFile.setBpmnFileNameWithoutExtension(fileNameWithoutExtension);
-
-                // plugins to parse common process elements
-                CommonProcessElementsParserPluggable.runPlugins(this, commonProcessElementsFromFile, pmRootElement);
-
-                // parse process model(s) from XML (BPMN)
-                ProcessModelParser pmParser = new ProcessModelParser(this);
-                pmParser.setCommonProcessElements(commonProcessElementsFromFile);
-                ProcessModel processModelFromFile = pmParser.parse(pmDoc.getRootElement());
-                String processId = processModelFromFile.getId();
-                if (processModels.containsKey(processId)) {
-                    throw new ScyllaValidationException("Duplicate process model with id " + processId + ".");
-                }
-
-                // plugins to parse process model(s)
-                ProcessModelParserPluggable.runPlugins(this, processModelFromFile, pmRootElement);
-
-                processModels.put(processId, processModelFromFile);
-                commonProcessElements.put(processId, commonProcessElementsFromFile);
-            }
-
-            SimulationConfigurationParser simParser = new SimulationConfigurationParser(this);
-            // parse each simulation configuration XML
-            for (String filename : simulationConfigurationFilenames) {
-                Document scDoc = builder.build(filename);
-                SimulationConfiguration simulationConfigurationFromFile = simParser.parse(scDoc.getRootElement());
-                String processId = simulationConfigurationFromFile.getProcessModel().getId();
-                if (simulationConfigurations.containsKey(processId)) {
-                    throw new ScyllaValidationException(
-                            "Multiple simulation configurations for process with id " + processId + ".");
-                }
-
-                // plugins to parse simulation configuration
-                SimulationConfigurationParserPluggable.runPlugins(this, simulationConfigurationFromFile, scDoc);
-
-                simulationConfigurations.put(processId, simulationConfigurationFromFile);
-            }
+        	parseInput();
         }
         catch (JDOMException | IOException | ScyllaValidationException e) {
             DebugLogger.error(e.getMessage());
@@ -238,6 +172,76 @@ public class SimulationManager {
         	cleanup();
         }
         return outputPath;
+    }
+    
+    protected void parseInput() throws ScyllaValidationException, JDOMException, IOException {
+        SAXBuilder builder = new SAXBuilder();
+        
+        if (globalConfigurationFilename == null || globalConfigurationFilename.isEmpty()) {
+            throw new ScyllaValidationException("No global configuration provided.");
+        }
+        else {
+            // parse global configuration XML
+            Document gcDoc = builder.build(globalConfigurationFilename);
+            Element gcRootElement = gcDoc.getRootElement();
+            GlobalConfigurationParser globalConfigurationParser = new GlobalConfigurationParser(this);
+            globalConfiguration = globalConfigurationParser.parse(gcDoc.getRootElement());
+            String fileNameWithoutExtension = globalConfigurationFilename.substring(// filename.lastIndexOf("\\") +
+                                                                                    // 1,
+            		globalConfigurationFilename.lastIndexOf(Scylla.FILEDELIM)+1, globalConfigurationFilename.lastIndexOf(".xml"));
+            globalConfiguration.setFileNameWithoutExtension(fileNameWithoutExtension);
+            // plugins to parse global configuration
+            GlobalConfigurationParserPluggable.runPlugins(this, globalConfiguration, gcRootElement);
+
+            DateTimeUtils.setZoneId(globalConfiguration.getZoneId());
+        }
+
+        CommonProcessElementsParser cpeParser = new CommonProcessElementsParser(this);
+        for (String filename : processModelFilenames) {
+            Document pmDoc = builder.build(filename);
+            Element pmRootElement = pmDoc.getRootElement();
+
+            // parse common process elements from XML (BPMN)
+            CommonProcessElements commonProcessElementsFromFile = cpeParser.parse(pmRootElement);
+            String fileNameWithoutExtension = filename.substring(// filename.lastIndexOf("\\") + 1,
+                    filename.lastIndexOf(Scylla.FILEDELIM)+1, filename.lastIndexOf(".bpmn"));
+            commonProcessElementsFromFile.setBpmnFileNameWithoutExtension(fileNameWithoutExtension);
+
+            // plugins to parse common process elements
+            CommonProcessElementsParserPluggable.runPlugins(this, commonProcessElementsFromFile, pmRootElement);
+
+            // parse process model(s) from XML (BPMN)
+            ProcessModelParser pmParser = new ProcessModelParser(this);
+            pmParser.setCommonProcessElements(commonProcessElementsFromFile);
+            ProcessModel processModelFromFile = pmParser.parse(pmDoc.getRootElement());
+            String processId = processModelFromFile.getId();
+            if (processModels.containsKey(processId)) {
+                throw new ScyllaValidationException("Duplicate process model with id " + processId + ".");
+            }
+
+            // plugins to parse process model(s)
+            ProcessModelParserPluggable.runPlugins(this, processModelFromFile, pmRootElement);
+
+            processModels.put(processId, processModelFromFile);
+            commonProcessElements.put(processId, commonProcessElementsFromFile);
+        }
+
+        SimulationConfigurationParser simParser = new SimulationConfigurationParser(this);
+        // parse each simulation configuration XML
+        for (String filename : simulationConfigurationFilenames) {
+            Document scDoc = builder.build(filename);
+            SimulationConfiguration simulationConfigurationFromFile = simParser.parse(scDoc.getRootElement());
+            String processId = simulationConfigurationFromFile.getProcessModel().getId();
+            if (simulationConfigurations.containsKey(processId)) {
+                throw new ScyllaValidationException(
+                        "Multiple simulation configurations for process with id " + processId + ".");
+            }
+
+            // plugins to parse simulation configuration
+            SimulationConfigurationParserPluggable.runPlugins(this, simulationConfigurationFromFile, scDoc);
+
+            simulationConfigurations.put(processId, simulationConfigurationFromFile);
+        }
     }
 
     private void cleanup() {

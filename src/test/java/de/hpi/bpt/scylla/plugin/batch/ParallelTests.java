@@ -40,7 +40,7 @@ public class ParallelTests extends SimulationTest{
 		}
 	}
 	
-	private static void assertActivityGroupsAreEqual(List<String[]> cluster) {
+	public static void assertActivityGroupsAreEqual(List<String[]> cluster) {
 		Map<String, List<String[]>> activityGroups = cluster.stream()
 				.collect(Collectors.groupingBy((activity)->{return activity[1];}));
 		//For each activity group assert that all information except process instance and arrival time are equal

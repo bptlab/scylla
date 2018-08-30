@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bsim:definitions xmlns:bsim="http://bsim.hpi.uni-potsdam.de/scylla/simModel" targetNamespace="http://www.hpi.de">
+  <bsim:simulationConfiguration startDateTime="2018-04-26T00:00+02:00[Europe/Berlin]" id="BatchTestSimulationConfiguration" processRef="Process_1" processInstances="10">
+    <bsim:startEvent id="StartEvent_1">
+      <bsim:arrivalRate timeUnit="MINUTES">
+        <bsim:exponentialDistribution>
+          <bsim:mean>10.0</bsim:mean>
+        </bsim:exponentialDistribution>
+      </bsim:arrivalRate>
+    </bsim:startEvent>
+    <bsim:subProcess id="BatchSubProcess" name="Batch Process">
+      <bsim:resources />
+      <bsim:Task id="Task_A" name="Activity A">
+        <bsim:duration timeUnit="MINUTES">
+          <bsim:uniformDistribution>
+            <bsim:lower>1.0</bsim:lower>
+            <bsim:upper>5.0</bsim:upper>
+          </bsim:uniformDistribution>
+        </bsim:duration>
+      </bsim:Task>
+      <bsim:Task id="Task_B" name="Activity B">
+        <bsim:duration timeUnit="MINUTES">
+          <bsim:exponentialDistribution>
+            <bsim:mean>5.0</bsim:mean>
+          </bsim:exponentialDistribution>
+        </bsim:duration>
+      </bsim:Task>
+      <bsim:exclusiveGateway id="ExclusiveGateway_1">
+	      <bsim:outgoingSequenceFlow id="SequenceFlow_03">
+	      	<bsim:branchingProbability>0.6</bsim:branchingProbability>
+	      </bsim:outgoingSequenceFlow>
+	      <bsim:outgoingSequenceFlow id="SequenceFlow_06">
+	      	<bsim:branchingProbability>0.4</bsim:branchingProbability>
+	      </bsim:outgoingSequenceFlow>
+	    </bsim:exclusiveGateway>
+    </bsim:subProcess>
+  </bsim:simulationConfiguration>
+</bsim:definitions>

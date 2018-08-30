@@ -143,6 +143,7 @@ public class BatchCSVLogger extends OutputLoggerPluggable{
                 		/**Write information for all tasks inside cluster*/
                 		for(Integer taskId : tasksOfCluster) {
                 			Object[] task = tasksOfInstance.get(taskId);
+                			if(task == null)continue; //Not all tasks are necessarily visited due to XOR-Gateways and similar
                     		task[6] = batchNumber;
                     		task[7] = batchType;
                     		tasksOfClusterInstance.add(task);

@@ -2,12 +2,15 @@ package de.hpi.bpt.scylla;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
 
+import org.jdom2.JDOMException;
 import org.junit.After;
 import org.junit.Before;
 
 import de.hpi.bpt.scylla.SimulationManager;
+import de.hpi.bpt.scylla.exception.ScyllaValidationException;
 
 public abstract class SimulationTest {
 
@@ -28,13 +31,23 @@ public abstract class SimulationTest {
 	}
 	
 	protected void runSimpleSimulation(String globalConfiguration, String simulationModel, String simulationConfiguration) {
+		createSimpleSimulationManager(globalConfiguration, simulationModel, simulationConfiguration);
+		outputPath = simulationManager.run();
+	}
+	
+	protected void createSimpleSimulationManager(String globalConfiguration, String simulationModel, String simulationConfiguration) {
 		simulationManager = new SimulationManager(
 				getFolder(), 
 				new String[] {getFolder()+simulationModel}, 
 				new String[] {getFolder()+simulationConfiguration}, 
 				getFolder()+globalConfiguration,
-                true, false);
-		outputPath = simulationManager.run();
+                true, false) {
+			@Override
+			protected void parseInput() throws ScyllaValidationException, JDOMException, IOException {
+				super.parseInput();
+				SimulationTest.this.afterParsing();
+			}
+		};
 	}
 	
 	@After
@@ -46,5 +59,7 @@ public abstract class SimulationTest {
 	protected int numberOfInstances() {
 		return simulationManager.getSimulationConfigurations().values().iterator().next().getNumberOfProcessInstances();
 	}
+	
+	protected void afterParsing() {}
 	
 }
