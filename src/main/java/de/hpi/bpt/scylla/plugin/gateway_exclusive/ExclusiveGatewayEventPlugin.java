@@ -1,11 +1,11 @@
 package de.hpi.bpt.scylla.plugin.gateway_exclusive;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 import de.hpi.bpt.scylla.exception.ScyllaRuntimeException;
@@ -16,6 +16,7 @@ import de.hpi.bpt.scylla.model.process.node.GatewayType;
 import de.hpi.bpt.scylla.plugin.dataobject.DataObjectField;
 import de.hpi.bpt.scylla.plugin_loader.PluginLoader;
 import de.hpi.bpt.scylla.plugin_loader.PluginLoader.PluginWrapper;
+import de.hpi.bpt.scylla.plugin_type.parser.SimulationConfigurationParserPluggable;
 import de.hpi.bpt.scylla.plugin_type.simulation.event.GatewayEventPluggable;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
 import de.hpi.bpt.scylla.simulation.ProcessSimulationComponents;
@@ -97,16 +98,12 @@ public class ExclusiveGatewayEventPlugin extends GatewayEventPluggable {
                         scheduleNextEvent(desmojEvent, processInstance, processModel, nextFlowId);
 
                     } else { //otherwise try to get information out of the describing branches and branch on the basis of this
-                        Map<Class<?>, ArrayList<PluginWrapper>> a = PluginLoader.getDefaultPluginLoader().getExtensions();
-                        Collection<ArrayList<PluginWrapper>> plugins = a.values();
-                        Boolean dataObjectPluginOn = false;
-                        for (ArrayList<PluginWrapper> plugin : plugins) {
-                            for (PluginWrapper p : plugin) {
-                                if (p.toString().equals("DataObjectSCParserPlugin")) {
-                                    dataObjectPluginOn = true;
-                                }
-                            }
-                        }
+                        //TODO: refactored the following lines, now correct but still a bit messy, might need further work (other plugins stuff should not be here)
+                    	@SuppressWarnings("rawtypes")
+						List<PluginWrapper> scParser = PluginLoader.getDefaultPluginLoader().getExtensions().get(SimulationConfigurationParserPluggable.class);
+                    	@SuppressWarnings("rawtypes")
+						Optional<PluginWrapper> dataObjectScParser = scParser.stream().filter(each -> each.toString().equals("DataObjectSCParserPlugin")).findAny();
+                    	Boolean dataObjectPluginOn = dataObjectScParser.isPresent() && dataObjectScParser.get().getState();
 
                         if (dataObjectPluginOn) {
                             Object[] outgoingRefs = processModel.getGraph().getTargetObjects(nodeId).toArray();
