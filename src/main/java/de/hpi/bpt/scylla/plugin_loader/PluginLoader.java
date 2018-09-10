@@ -8,6 +8,7 @@ import java.net.JarURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.EventListener;
@@ -15,13 +16,16 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
 import de.hpi.bpt.scylla.GUI.CheckBoxList.StateObserver;
 import de.hpi.bpt.scylla.logger.DebugLogger;
+import de.hpi.bpt.scylla.plugin_loader.DependencyGraph.CycleException;
 import de.hpi.bpt.scylla.plugin_type.IPluggable;
+import de.hpi.bpt.scylla.plugin_type.simulation.event.GatewayEventPluggable;
 
 
 /**
@@ -33,10 +37,10 @@ public class PluginLoader {
 
 	
 	/**Saves all entry point classes and their plugins*/
-	private HashMap<Class<?>,ArrayList<PluginWrapper>> extensions;
+	private HashMap<Class<?>, List<PluginWrapper>> extensions;
 	
 	/**Caches created plugin objects*/
-	private Map<Class<? extends IPluggable>,Object> cachedPluginObjects = new HashMap<>();
+	private Map<Class<? extends IPluggable>,IPluggable> cachedPluginObjects = new HashMap<>();
 	
 	/**Default plugin loader*/
 	private static PluginLoader defaultPluginLoader;
@@ -45,11 +49,19 @@ public class PluginLoader {
 	
 	public class PluginWrapper<T extends IPluggable> implements EventListener,StateObserver{
 		private Class<T> plugin;
+		private List<TemporalDependent> temporalDependencies;
 		private boolean chosen;
+		
 		private PluginWrapper(Class<T> p, boolean b){
 			plugin = p;
 			chosen = b;
+			parseTemporalDependencies();
 		}
+		
+		private void parseTemporalDependencies() {
+			temporalDependencies = Arrays.asList(plugin.getAnnotationsByType(TemporalDependent.class));
+		}
+
 		@Override
 		public String toString(){
 			return plugin.getSimpleName();
@@ -79,6 +91,18 @@ public class PluginLoader {
 		public Package getPackage(){
 			return plugin.getPackage();
 		}
+		
+		public List<TemporalDependent> getTemporalDependents() {return temporalDependencies;}
+		
+		private T getInstance(){
+			try {
+				return PluginLoader.this.getInstance(plugin);
+			} catch (InstantiationException | IllegalAccessException e) {
+				System.err.println("Failed to instantiate plugin "+plugin.getSimpleName());
+				e.printStackTrace();
+				return null;
+			}
+		}
 	}
 	
 	
@@ -92,7 +116,7 @@ public class PluginLoader {
 	public void loadPlugins(){
 
 		//Finding superclasses of plugins and sorting by them
-		extensions = new HashMap<Class<?>,ArrayList<PluginWrapper>>();
+		extensions = new HashMap<Class<?>,List<PluginWrapper>>();
 		
 		for(String pack : getStandardPluginPackages()){
 			try{
@@ -231,57 +255,82 @@ public class PluginLoader {
 	 */
 	public void printPlugins(){
 		if(extensions == null)return;
-		for(Map.Entry<Class<?>,ArrayList<PluginWrapper>> entry_point : extensions.entrySet()){
+		for(Map.Entry<Class<?>, List<PluginWrapper>> entry_point : extensions.entrySet()){
 			System.out.println(entry_point.getKey().getName());
-			ArrayList<PluginWrapper> plugins = entry_point.getValue();
+			List<PluginWrapper> plugins = entry_point.getValue();
 			for(PluginWrapper plugin : plugins){
 				System.out.println("\t "+plugin.toString());
 			}
 		}
 	}
-
-	/**
-	 * @return All loaded Plugins, sorted by their entry point
-	 */
-	public Map<Class<?>, ArrayList<PluginWrapper>> getExtensions() {		
-		return extensions;
+	
+	public void prepareForSimulation() throws CycleException {
+		resolveTemporalDependencies();
 	}
 	
-	/**
-	 * Returns all loaded plugins that extends a given entrypoint or one of its sub-entrypoints
-	 * @param entrypoint The entrpoint to be extended
-	 * @return ArrayList of loaded plugins
-	 */
-	public <S extends IPluggable> ArrayList<S> getPlugins(Class<S> entrypoint){
-		ArrayList<S> l = new ArrayList<S>();
-		
-		for(Map.Entry<Class<?>,ArrayList<PluginWrapper>> extension : extensions.entrySet()){
-			Class<?> savedEntrypoint = extension.getKey();
-			if(entrypoint.isAssignableFrom(savedEntrypoint)){
-				ArrayList<PluginWrapper> plugins = extension.getValue();
-				for(int i = 0; i < plugins.size(); i++){
-					PluginWrapper<? extends S> pl = plugins.get(i);
-					if(pl.getState())
-						try {
-							S inst = getCachedInstance(pl.plugin);
-							if(inst == null) {
-								inst = (S)(pl.plugin.newInstance());
-								cacheInstance(pl.plugin, inst);
-							}
-							if(inst != null){
-								l.add(inst);
-								//System.out.println("Added Plugin "+pl.plugin.getCanonicalName());
-							}
-							//System.out.println("Entrypoint: "+savedEntrypoint+" \t Loading plugin "+pl.plugin.getName());
-						} catch (InstantiationException | IllegalAccessException e) {
-							e.printStackTrace();
-							continue;
-						}
+	public void resolveTemporalDependencies () throws CycleException {
+		//TODO ignore non selected plugin
+		for(Entry<Class<?>, List<PluginWrapper>> entryPoint : getExtensions().entrySet()) {
+			if(!entryPoint.getKey().equals(GatewayEventPluggable.class))continue;
+			try {
+				getExtensions().put(entryPoint.getKey(), resolveTemporalDependencies(entryPoint.getValue()));
+			} catch(CycleException e) {
+				throw (CycleException)new CycleException(
+						"Error at plugin loader: Could not resolve temporal dependencies of entrypoint "+entryPoint.getKey().getSimpleName()
+				).initCause(e);
+			}
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private List<PluginWrapper> resolveTemporalDependencies(List<PluginWrapper> plugins) throws CycleException {
+		DependencyGraph<PluginWrapper> graph = new DependencyGraph<>(plugins);
+		Map<Class, PluginWrapper> classMap = new HashMap<>();
+		for(PluginWrapper plugin : plugins) {
+			classMap.put(plugin.plugin, plugin);
+		}
+		for(PluginWrapper plugin : plugins) {
+			for(TemporalDependent dependency : (List<TemporalDependent>)plugin.getTemporalDependents()) {
+				PluginWrapper dependencyPlugin = classMap.get(dependency.value());
+				if(dependencyPlugin == null)continue;//
+				switch(dependency.execute()) {
+				case AFTER :  graph.createEdge(dependencyPlugin, plugin); break;
+				case BEFORE : graph.createEdge(plugin, dependencyPlugin); break;
 				}
 			}
 		}
 		
-		return l;
+		return graph.resolve();
+	}
+
+	/**
+	 * @return All loaded Plugins, sorted by their entry point
+	 */
+	public Map<Class<?>, List<PluginWrapper>> getExtensions() {		
+		return extensions;
+	}
+	
+	/**
+	 * Returns all loaded plugins that extend a given entrypoint or one of its sub-entrypoints)
+	 * @param entrypoint The entrypoint to be extended
+	 * @return ArrayList of loaded plugins
+	 */
+	@SuppressWarnings("unchecked")
+	public <S extends IPluggable> List<S> getPlugins(Class<S> entrypoint) {
+		return (List<S>) extensions.entrySet().stream()
+			.filter(each -> entrypoint.isAssignableFrom(each.getKey()))
+			.flatMap(each -> each.getValue().stream())
+			.map(PluginWrapper::getInstance)
+			.collect(Collectors.toList());
+	}
+	
+	private <T extends IPluggable> T getInstance(Class<T> entryPoint) throws InstantiationException, IllegalAccessException {
+		T inst = getCachedInstance(entryPoint);
+		if(inst == null) {
+			inst = (T)(entryPoint.newInstance());
+			cacheInstance(entryPoint, inst);
+		}
+		return inst;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -289,8 +338,7 @@ public class PluginLoader {
 		return (T) cachedPluginObjects.get(entryPoint);
 	}
 	
-	//TODO type safety
-	private <T extends IPluggable> void cacheInstance(Class<T> entryPoint, Object instance) {
+	private <T extends IPluggable> void cacheInstance(Class<T> entryPoint, T instance) {
 		cachedPluginObjects.put(entryPoint, instance);
 	}
 	

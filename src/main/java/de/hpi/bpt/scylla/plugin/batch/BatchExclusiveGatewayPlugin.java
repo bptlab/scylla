@@ -15,6 +15,7 @@ import de.hpi.bpt.scylla.model.process.node.GatewayType;
 import de.hpi.bpt.scylla.plugin.gateway_exclusive.ExclusiveGatewayEventPlugin;
 import de.hpi.bpt.scylla.plugin_loader.Requires;
 import de.hpi.bpt.scylla.plugin_loader.TemporalDependent;
+import de.hpi.bpt.scylla.plugin_loader.TemporalDependent.Execute;
 import de.hpi.bpt.scylla.plugin_type.simulation.event.GatewayEventPluggable;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
 import de.hpi.bpt.scylla.simulation.ProcessSimulationComponents;
@@ -25,6 +26,7 @@ import desmoj.core.simulator.TimeInstant;
 
 @Requires(ExclusiveGatewayEventPlugin.class)
 @TemporalDependent(ExclusiveGatewayEventPlugin.class)
+@TemporalDependent(value = BatchGatewayPlugin.class, execute=Execute.BEFORE)
 public class BatchExclusiveGatewayPlugin extends GatewayEventPluggable{
 	
 	private WeakHashMap<BatchCluster, Map<Integer, ScyllaEvent>> chosenPaths = new WeakHashMap<>();

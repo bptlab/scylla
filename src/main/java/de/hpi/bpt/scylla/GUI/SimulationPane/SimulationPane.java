@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.function.Consumer;
@@ -552,8 +553,8 @@ public class SimulationPane extends JPanel{
 		PluginLoader p = PluginLoader.getDefaultPluginLoader();
 		
 		TreeMap<String, ArrayList<PluginLoader.PluginWrapper>> plugins = new TreeMap<String, ArrayList<PluginLoader.PluginWrapper>>();
-		for(Entry<Class<?>, ArrayList<PluginLoader.PluginWrapper>> e : p.getExtensions().entrySet()){
-			ArrayList<PluginLoader.PluginWrapper> l = e.getValue();
+		for(Entry<Class<?>, List<PluginLoader.PluginWrapper>> e : p.getExtensions().entrySet()){
+			List<PluginLoader.PluginWrapper> l = e.getValue();
 			for(int i = 0; i < l.size(); i++){
 				PluginLoader.PluginWrapper w = l.get(i);
 				String name = w.getPackage().getName();
@@ -616,7 +617,7 @@ public class SimulationPane extends JPanel{
             try{
             	System.out.println("Starting simulation at "+new SimpleDateFormat("HH:mm:ss").format(new Date()));
                 manager.run();
-            }catch(Exception e){
+            }catch(Error | Exception e){
             	e.printStackTrace();
             	System.out.println("Fatal error, simulation has been canceled");
             	success = false;

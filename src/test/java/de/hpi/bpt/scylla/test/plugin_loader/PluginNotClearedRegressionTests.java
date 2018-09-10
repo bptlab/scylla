@@ -1,4 +1,4 @@
-package de.hpi.bpt.scylla.test.plugin;
+package de.hpi.bpt.scylla.test.plugin_loader;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;

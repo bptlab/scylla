@@ -1,4 +1,4 @@
-package de.hpi.bpt.scylla.test.plugin;
+package de.hpi.bpt.scylla.test.plugin_loader;
 
 import java.io.IOException;
 import java.util.Iterator;

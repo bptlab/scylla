@@ -25,6 +25,7 @@ import de.hpi.bpt.scylla.parser.GlobalConfigurationParser;
 import de.hpi.bpt.scylla.parser.ProcessModelParser;
 import de.hpi.bpt.scylla.parser.SimulationConfigurationParser;
 import de.hpi.bpt.scylla.plugin.batch.BatchPluginUtils;
+import de.hpi.bpt.scylla.plugin_loader.DependencyGraph.CycleException;
 import de.hpi.bpt.scylla.plugin_loader.PluginLoader;
 import de.hpi.bpt.scylla.plugin_type.logger.OutputLoggerPluggable;
 import de.hpi.bpt.scylla.plugin_type.parser.CommonProcessElementsParserPluggable;
@@ -91,6 +92,14 @@ public class SimulationManager {
      * parses input, runs DesmoJ simulation experiment, writes BPS output logs
      */
     public String run() {
+    	
+    	try {
+			PluginLoader.getDefaultPluginLoader().prepareForSimulation();
+		} catch (CycleException e) {
+            DebugLogger.error(e.getMessage());
+			e.printStackTrace();
+			throw new Error(e);
+		}
 
         try {
         	parseInput();
