@@ -320,6 +320,7 @@ public class PluginLoader {
 		return (List<S>) extensions.entrySet().stream()
 			.filter(each -> entrypoint.isAssignableFrom(each.getKey()))
 			.flatMap(each -> each.getValue().stream())
+			.filter(PluginWrapper::getState)
 			.map(PluginWrapper::getInstance)
 			.collect(Collectors.toList());
 	}
