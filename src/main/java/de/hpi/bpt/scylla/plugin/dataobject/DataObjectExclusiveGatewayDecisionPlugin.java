@@ -1,6 +1,7 @@
 package de.hpi.bpt.scylla.plugin.dataobject;
 
 import java.util.Set;
+import java.util.function.Predicate;
 
 import de.hpi.bpt.scylla.exception.ScyllaRuntimeException;
 import de.hpi.bpt.scylla.exception.ScyllaValidationException;
@@ -11,6 +12,23 @@ import de.hpi.bpt.scylla.simulation.ProcessInstance;
 import de.hpi.bpt.scylla.simulation.event.GatewayEvent;
 
 public class DataObjectExclusiveGatewayDecisionPlugin extends ExclusiveGatewayDecisionPluggable{
+	
+	//TODO find out that information when parsing
+	private static enum Operator {
+		EQUAL(			i -> i == 0, "==", "="), 
+		GREATEROREQUAL(	i -> i >= 0, ">="), 
+		LESSOREQUAL(	i -> i <= 0, "<="), 
+		NOTEQUAL(		i -> i != 0, "!="), 
+		LESS(			i -> i <  0, "<"), 
+		GREATER(		i -> i >  0, ">");
+		
+		private String[] tokens;
+		private Predicate<Integer> condition;
+		private Operator(Predicate<Integer> c, String... t) {
+			condition = c;
+			tokens = t;
+		}
+	}
 
 	@Override
 	public String getName() {
@@ -27,7 +45,9 @@ public class DataObjectExclusiveGatewayDecisionPlugin extends ExclusiveGatewayDe
 			
 			Set<Integer> outgoingRefs = processModel.getGraph().getTargetObjects(nodeId);
 			for (Integer outgoingFlow : outgoingRefs) { //go through all outgoing references
-			    String[] conditions = processModel.getDisplayNames().get(outgoingFlow).split("&&");
+				String displayName = processModel.getDisplayNames().get(outgoingFlow);
+				if(displayName == null || !containsOperator(displayName))continue;
+			    String[] conditions = displayName.split("&&");
 			    boolean conditionsFulfilled = true;
 			    for (String condition : conditions) {
 			    	if(!conditionFulfilled(condition, processInstance)) {
@@ -51,9 +71,21 @@ public class DataObjectExclusiveGatewayDecisionPlugin extends ExclusiveGatewayDe
         condition = condition.trim();
         String field = null;
         String value = null;
-        String comparison = null;
+        Operator comparison = null;
+        
+    	operatorSearch:for(Operator operator : Operator.values()) {
+    		for(String token : operator.tokens) {
+    			if(condition.contains(token)) {
+    				comparison = operator;
+    	            field = condition.split(token)[0];
+    	            value = condition.split(token)[1];
+    	            break operatorSearch;
+    			}
+    		}
+    	}
+        if(comparison == null)throw new ScyllaValidationException("Condition " + condition + " does not have a comparison-operator");
 
-        if (condition.contains("==")) {
+        /*if (condition.contains("==")) {
             field = condition.split("==")[0];
             value = condition.split("==")[1];
             //value = processModel.getDisplayNames().get(or).substring(2, processModel.getDisplayNames().get(or).length());
@@ -84,7 +116,7 @@ public class DataObjectExclusiveGatewayDecisionPlugin extends ExclusiveGatewayDe
             comparison = "greater";
         } else {
             throw new ScyllaValidationException("Condition " + condition + " does not have a comparison-operator");
-        }
+        }*/
         value = value.trim();
         field = field.trim();
 
@@ -93,20 +125,13 @@ public class DataObjectExclusiveGatewayDecisionPlugin extends ExclusiveGatewayDe
         if (isParsableAsLong(value) && isParsableAsLong(fieldValue)) { //try a long comparison
             Long LongValue = Long.valueOf(value);
             Long dOValue = Long.valueOf(fieldValue);
-            Integer comparisonResult = (dOValue.compareTo(LongValue));
-
-            return 
-            	(comparison.equals("equal") && comparisonResult == 0)
-            	|| (comparison.equals("less") && comparisonResult < 0)
-            	|| (comparison.equals("greater") && comparisonResult > 0)
-            	|| (comparison.equals("greaterOrEqual") && comparisonResult >= 0)
-            	|| (comparison.equals("lessOrEqual") && comparisonResult <= 0);
+            Integer comparisonResult = (dOValue.compareTo(LongValue));            
+            return comparison.condition.test(comparisonResult);
 
         } else { //otherwise do a string compare
             Integer comparisonResult = fieldValue.trim().compareTo(String.valueOf(value));
             return 
-            	(comparison.equals("equal") && comparisonResult == 0)
-                || (comparison.equals("notEqual") && comparisonResult != 0);
+            	comparison.condition.test(comparisonResult) && (comparison.equals(Operator.EQUAL) || comparison.equals(Operator.NOTEQUAL));
         }
     }
     
@@ -118,6 +143,15 @@ public class DataObjectExclusiveGatewayDecisionPlugin extends ExclusiveGatewayDe
         } catch (NumberFormatException numberFormatException) {
             return false;
         }
+    }
+    
+    private static boolean containsOperator(String s) {
+    	for(Operator operator : Operator.values()) {
+    		for(String token : operator.tokens) {
+    			if(s.contains(token))return true;
+    		}
+    	}
+    	return false;
     }
 
 }
