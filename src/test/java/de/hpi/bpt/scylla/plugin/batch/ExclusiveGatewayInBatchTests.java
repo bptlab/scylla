@@ -5,13 +5,9 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.lang.reflect.Field;
-import java.util.Deque;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import de.hpi.bpt.scylla.SimulationTest;
@@ -29,8 +25,8 @@ public class ExclusiveGatewayInBatchTests extends SimulationTest{
 		x.testSequentialCasebased();
 		//x.testParallel();
 	}
-	
-	protected String getFolder() {return "src\\test\\resources\\BatchPlugin\\";}
+
+	protected String getFolderName() {return "BatchPlugin";}
 	
 	@Test
 	public void testSequentialTaskbased() {

@@ -15,7 +15,7 @@ import de.hpi.bpt.scylla.exception.ScyllaValidationException;
 public abstract class SimulationTest {
 
 
-	protected abstract String getFolder();
+	protected abstract String getFolderName();
 	protected SimulationManager simulationManager;
 	protected String outputPath;
 
@@ -61,5 +61,9 @@ public abstract class SimulationTest {
 	}
 	
 	protected void afterParsing() {}
+	
+	protected String getFolder() {
+		return TestUtils.RESOURCEFOLDER+getFolderName()+"\\";
+	}
 	
 }

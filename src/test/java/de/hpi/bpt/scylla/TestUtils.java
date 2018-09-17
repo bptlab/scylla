@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class TestUtils {
 	
-
+	public static final String RESOURCEFOLDER = "src\\test\\resources\\";
 	
 	public static void cleanupOutputs(String path) {
 		File folder = new File(path);

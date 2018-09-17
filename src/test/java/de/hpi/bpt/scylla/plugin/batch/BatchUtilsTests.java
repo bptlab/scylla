@@ -10,7 +10,7 @@ public class BatchUtilsTests extends SimulationTest{
 	
 
 	@Override
-	protected String getFolder() {return "src\\test\\resources\\BatchPlugin\\";}
+	protected String getFolderName() {return "BatchPlugin";}
 	
 	@Test
 	public void testFreshInstance() {

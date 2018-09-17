@@ -17,8 +17,8 @@ public class ParallelTests extends SimulationTest{
 		ParallelTests x = new ParallelTests();
 		x.testParallelGateway();
 	}
-	
-	protected String getFolder() {return "src\\test\\resources\\BatchPlugin\\";}
+
+	protected String getFolderName() {return "BatchPlugin";}
 	
 	@Test
 	public void testParallelGateway() {

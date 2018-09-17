@@ -19,8 +19,8 @@ public class SequentialCasebasedTests extends SimulationTest{
 		SequentialCasebasedTests x = new SequentialCasebasedTests();
 		x.testParallelGateway();
 	}
-	
-	protected String getFolder() {return "src\\test\\resources\\BatchPlugin\\";}
+
+	protected String getFolderName() {return "BatchPlugin";}
 	
 	@Test
 	public void testParallelGateway() {

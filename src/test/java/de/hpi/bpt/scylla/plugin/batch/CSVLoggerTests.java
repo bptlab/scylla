@@ -15,7 +15,7 @@ import de.hpi.bpt.scylla.TestUtils;
 public class CSVLoggerTests extends SimulationTest{
 
 	@Override
-	protected String getFolder() {return "src\\test\\resources\\BatchPlugin\\";}
+	protected String getFolderName() {return "BatchPlugin";}
 	
 	@Test
 	public void testNaturalEnablementTaskbased() {

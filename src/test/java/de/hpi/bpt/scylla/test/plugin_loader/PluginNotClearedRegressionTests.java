@@ -22,7 +22,7 @@ public class PluginNotClearedRegressionTests extends SimulationTest{
 	}
 
 	@Override
-	protected String getFolder() {return "src\\test\\resources\\BatchPlugin\\";}
+	protected String getFolderName() {return "BatchPlugin";}
 	
 
 

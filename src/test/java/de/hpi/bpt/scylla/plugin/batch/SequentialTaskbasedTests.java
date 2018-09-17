@@ -26,8 +26,8 @@ public class SequentialTaskbasedTests extends SimulationTest{
 		//x.testParallelGateway();
 		x.testResourceStable();
 	}
-	
-	protected String getFolder() {return "src\\test\\resources\\BatchPlugin\\";}
+
+	protected String getFolderName() {return "BatchPlugin";}
 	
 	@Test(timeout=3000)
 	public void testActivitiesAreSequential() {
