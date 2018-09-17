@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.net.JarURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -97,7 +99,7 @@ public class PluginLoader {
 		private T getInstance(){
 			try {
 				return PluginLoader.this.getInstance(plugin);
-			} catch (InstantiationException | IllegalAccessException e) {
+			} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
 				System.err.println("Failed to instantiate plugin "+plugin.getSimpleName());
 				e.printStackTrace();
 				return null;
@@ -325,10 +327,16 @@ public class PluginLoader {
 			.collect(Collectors.toList());
 	}
 	
-	private <T extends IPluggable> T getInstance(Class<T> entryPoint) throws InstantiationException, IllegalAccessException {
+	private <T extends IPluggable> T getInstance(Class<T> entryPoint) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
 		T inst = getCachedInstance(entryPoint);
 		if(inst == null) {
-			inst = (T)(entryPoint.newInstance());
+			@SuppressWarnings("unchecked")
+			Class<? extends IPluggable> enclosingClass = (Class<? extends IPluggable>) entryPoint.getEnclosingClass();
+			if(enclosingClass == null || Modifier.isStatic(entryPoint.getModifiers())){
+				inst = (T)(entryPoint.newInstance());
+			} else {
+				inst = (T)(entryPoint.getDeclaredConstructor(enclosingClass).newInstance(getInstance(enclosingClass)));
+			}
 			cacheInstance(entryPoint, inst);
 		}
 		return inst;
