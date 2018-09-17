@@ -17,8 +17,6 @@ abstract class ScyllaEventPluggable<T extends ScyllaEvent> implements IPluggable
     protected static void runPlugins(Class<? extends ScyllaEventPluggable<? extends ScyllaEvent>> clazz,
             ScyllaEvent desmojEvent, ProcessInstance processInstance) throws ScyllaRuntimeException {
 
-        // TODO: invoke serviceloader only once at start of Scylla
-
         /*ServiceLoader<? extends ScyllaEventPluggable<ScyllaEvent>> serviceLoader = (ServiceLoader<? extends ScyllaEventPluggable<ScyllaEvent>>) ServiceLoader
                 .load(clazz);
         Iterator<? extends ScyllaEventPluggable<ScyllaEvent>> plugins = serviceLoader.iterator();*/
