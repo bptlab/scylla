@@ -3,9 +3,6 @@ package de.hpi.bpt.scylla.plugin.gateway_exclusive;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 
 import de.hpi.bpt.scylla.exception.ScyllaRuntimeException;
@@ -13,10 +10,6 @@ import de.hpi.bpt.scylla.exception.ScyllaValidationException;
 import de.hpi.bpt.scylla.model.process.ProcessModel;
 import de.hpi.bpt.scylla.model.process.graph.exception.NodeNotFoundException;
 import de.hpi.bpt.scylla.model.process.node.GatewayType;
-import de.hpi.bpt.scylla.plugin.dataobject.DataObjectField;
-import de.hpi.bpt.scylla.plugin_loader.PluginLoader;
-import de.hpi.bpt.scylla.plugin_loader.PluginLoader.PluginWrapper;
-import de.hpi.bpt.scylla.plugin_type.parser.SimulationConfigurationParserPluggable;
 import de.hpi.bpt.scylla.plugin_type.simulation.event.GatewayEventPluggable;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
 import de.hpi.bpt.scylla.simulation.ProcessSimulationComponents;
@@ -34,22 +27,15 @@ public class ExclusiveGatewayEventPlugin extends GatewayEventPluggable {
         return ExclusiveGatewayPluginUtils.PLUGIN_NAME;
     }
 
-    private void scheduleNextEvent(GatewayEvent desmojEvent, ProcessInstance processInstance, ProcessModel processModel, Integer nextFlowId) {
+    private void scheduleNextEvent(GatewayEvent desmojEvent, ProcessInstance processInstance, ProcessModel processModel, Integer nextFlowId) throws ScyllaValidationException {
         Set<Integer> nodeIds = null;
         try {
             nodeIds = processModel.getTargetObjectIds(nextFlowId);
         } catch (NodeNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        	throw new ScyllaValidationException("Flow with id " + nextFlowId + " not found.");
         }
         if (nodeIds.size() != 1) {
-            try {
-                throw new ScyllaValidationException(
-                        "Flow " + nextFlowId + " does not connect to 1 node, but" + nodeIds.size() + " .");
-            } catch (ScyllaValidationException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+        	throw new ScyllaValidationException("Flow with id " + nextFlowId + " does not connect to 1 node, but" + nodeIds.size() + " .");
         }
         int nextNodeId = nodeIds.iterator().next();
 
@@ -81,137 +67,35 @@ public class ExclusiveGatewayEventPlugin extends GatewayEventPluggable {
         ProcessSimulationComponents simulationComponents = desmojEvent.getSimulationComponents();
 
         try {
-            Set<Integer> idsOfNextNodes = processModel.getIdsOfNextNodes(nodeId);
-
-            if (idsOfNextNodes.size() > 1) { // split
+            if (processModel.getIdsOfNextNodes(nodeId).size() > 1) { // split
                 if (type == GatewayType.DEFAULT || type == GatewayType.EXCLUSIVE) {
-                    Map<Integer, Object> branchingDistributions = simulationComponents.getExtensionDistributions()
-                            .get(getName());
-                    DiscreteDistEmpirical<Integer> distribution = (DiscreteDistEmpirical<Integer>) branchingDistributions
-                            .get(nodeId);
-                    // decide on next node
-                    if (distribution != null) { //if a distribution is given take this
-                        Integer nextFlowId = distribution.sample().intValue();
-                        if (!processModel.getIdentifiers().keySet().contains(nextFlowId)) {
-                            throw new ScyllaValidationException("Flow with id " + nextFlowId + " does not exist.");
+                	Integer nextFlowId = null;
+                	
+                	//Does any plugin want to decide the gateway?
+                	nextFlowId = ExclusiveGatewayDecisionPluggable.runPlugins(desmojEvent, processInstance);
+                	
+                	if(nextFlowId == null) {//try to decide according to given distribution
+                        Map<Integer, Object> branchingDistributions = simulationComponents.getExtensionDistributions().get(getName());
+                        DiscreteDistEmpirical<Integer> distribution = (DiscreteDistEmpirical<Integer>) branchingDistributions.get(nodeId);
+                        // decide on next node
+                        if (distribution != null) { //if a distribution is given take this
+                            nextFlowId = distribution.sample().intValue();
+                            if (!processModel.getIdentifiers().keySet().contains(nextFlowId)) {
+                                throw new ScyllaValidationException("Distribution sample flow with id " + nextFlowId + " does not exist.");
+                            }
                         }
+                	}
+                	
+                	if(nextFlowId == null) { //try to find default path
+                        String defaultFlowId = processModel.getNodeAttributes().get(nodeId).get("default");
+                        Integer defaultFlowNodeId = processModel.getIdentifiersToNodeIds().getOrDefault(defaultFlowId, null);
+                        nextFlowId = defaultFlowNodeId;
+                    }
+                	
+                    if (nextFlowId != null) {
                         scheduleNextEvent(desmojEvent, processInstance, processModel, nextFlowId);
-
-                    } else { //otherwise try to get information out of the describing branches and branch on the basis of this
-                        //TODO: refactored the following lines, now correct but still a bit messy, might need further work (other plugins stuff should not be here)
-                    	@SuppressWarnings("rawtypes")
-						List<PluginWrapper> scParser = PluginLoader.getDefaultPluginLoader().getExtensions().get(SimulationConfigurationParserPluggable.class);
-                    	@SuppressWarnings("rawtypes")
-						Optional<PluginWrapper> dataObjectScParser = scParser.stream().filter(each -> each.toString().equals("DataObjectSCParserPlugin")).findAny();
-                    	Boolean dataObjectPluginOn = dataObjectScParser.isPresent() && dataObjectScParser.get().getState();
-
-                        if (dataObjectPluginOn) {
-                            Object[] outgoingRefs = processModel.getGraph().getTargetObjects(nodeId).toArray();
-                            Integer DefaultPath = null;
-                            Boolean foundAWay = false;
-                            for (Object or : outgoingRefs) { //go through all outgoing references
-                                if (or.equals(getKeyByValue(processModel.getIdentifiers(), processModel.getNodeAttributes().get(desmojEvent.getNodeId()).get("default")))) { //if it's the default path jump it
-                                    DefaultPath = (Integer) or;
-                                    continue;
-                                }
-                                String[] conditions = processModel.getDisplayNames().get(or).split("&&");
-                                Integer nextFlowId = (Integer) or;
-                                List<Boolean> test = new ArrayList<>();
-                                for (String condition : conditions) {
-                                    condition = condition.trim();
-                                    String field = null;
-                                    String value = null;
-                                    String comparison = null;
-
-                                    if (condition.contains("==")) {
-                                        field = condition.split("==")[0];
-                                        value = condition.split("==")[1];
-                                        //value = processModel.getDisplayNames().get(or).substring(2, processModel.getDisplayNames().get(or).length());
-                                        comparison = "equal";
-                                    } else if (condition.contains(">=")) {
-                                        field = condition.split(">=")[0];
-                                        value = condition.split(">=")[1];
-                                        comparison = "greaterOrEqual";
-                                    } else if (condition.contains("<=")) {
-                                        field = condition.split("<=")[0];
-                                        value = condition.split("<=")[1];
-                                        comparison = "lessOrEqual";
-                                    } else if (condition.contains("!=")) {
-                                        field = condition.split("!=")[0];
-                                        value = condition.split("!=")[1];
-                                        comparison = "notEqual";
-                                    } else if (condition.contains("=")) {
-                                        field = condition.split("=")[0];
-                                        value = condition.split("=")[1];
-                                        comparison = "equal";
-                                    } else if (condition.contains("<")) {
-                                        field = condition.split("<")[0];
-                                        value = condition.split("<")[1];
-                                        comparison = "less";
-                                    } else if (condition.contains(">")) {
-                                        field = condition.split(">")[0];
-                                        value = condition.split(">")[1];
-                                        comparison = "greater";
-                                    } else {
-                                        throw new ScyllaValidationException("Condition " + condition + " does not have a comparison-operator");
-                                    }
-                                    value = value.trim();
-                                    field = field.trim();
-
-                                    Object fieldValue = DataObjectField.getDataObjectValue(processInstance.getId(), field);
-
-                                    if (!isParsableAsLong(value) || !isParsableAsLong((String.valueOf(fieldValue)))) { //try a long comparison
-                                        Integer comparisonResult = (String.valueOf(fieldValue)).trim().compareTo(String.valueOf(value));
-                                        if (comparison.equals("equal") && comparisonResult == 0) {
-                                            break;
-                                        } else if (comparison.equals("notEqual") && comparisonResult != 0) {
-                                            break;
-                                        } else {
-                                            test.add(false);
-                                        }
-
-                                    } else { //otherwise do a string compare
-                                        Long LongValue = Long.valueOf(value);
-                                        Long dOValue = Long.valueOf((String.valueOf(fieldValue)));
-                                        Integer comparisonResult = (dOValue.compareTo(LongValue));
-
-                                        if (comparison.equals("equal") && comparisonResult == 0) {
-                                        } else if (comparison.equals("less") && comparisonResult < 0) {
-                                        } else if (comparison.equals("greater") && comparisonResult > 0) {
-                                        } else if (comparison.equals("greaterOrEqual") && comparisonResult >= 0) {
-                                        } else if (comparison.equals("lessOrEqual") && comparisonResult <= 0) {
-                                        } else {
-                                            test.add(false);
-                                        }
-                                    }
-
-                                }
-                                if (test.size() == 0) {
-                                    scheduleNextEvent(desmojEvent, processInstance, processModel, nextFlowId);
-                                    foundAWay = true;
-                                }
-                            }
-                            if (!foundAWay && DefaultPath != null) {
-                                scheduleNextEvent(desmojEvent, processInstance, processModel, DefaultPath);
-                            } else if (!foundAWay && DefaultPath == null) {
-                                //everything will be killed, logical error
-                                throw new ScyllaValidationException("No Default Path for " + desmojEvent.getDisplayName() + " given and outgoing branches not complete. No branch matches, abort.");
-                            }
-                        } else {
-                            Object[] outgoingRefs = processModel.getGraph().getTargetObjects(nodeId).toArray();
-                            Integer DefaultPath = null;
-                            for (Object or : outgoingRefs) { //try to find default path
-                                if (or.equals(getKeyByValue(processModel.getIdentifiers(), processModel.getNodeAttributes().get(desmojEvent.getNodeId()).get("default")))) {
-                                    DefaultPath = (Integer) or;
-                                    break;
-                                }
-                            }
-                            if (DefaultPath != null) {
-                                scheduleNextEvent(desmojEvent, processInstance, processModel, DefaultPath);
-                            } else {
-                                throw new ScyllaValidationException("No Distribution for " + desmojEvent.getDisplayName() + " given, no DefaultPath given and DataObject PlugIn not activated.");
-                            }
-                        }
+                    } else {
+                        throw new ScyllaValidationException("Could not decide on gateway " + desmojEvent.getDisplayName() + ". No distribution, no default path or plugin aided decision given.");
                     }
                 }
             }
@@ -221,23 +105,5 @@ public class ExclusiveGatewayEventPlugin extends GatewayEventPluggable {
             SimulationUtils.abort(model, processInstance, nodeId, showInTrace);
             return;
         }
-    }
-
-    private static boolean isParsableAsLong(final String s) {
-        try {
-            Long.valueOf(s);
-            return true;
-        } catch (NumberFormatException numberFormatException) {
-            return false;
-        }
-    }
-
-    public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
-        for (Entry<T, E> entry : map.entrySet()) {
-            if (Objects.equals(value, entry.getValue())) {
-                return entry.getKey();
-            }
-        }
-        return null;
     }
 }
