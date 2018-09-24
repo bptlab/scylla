@@ -2,6 +2,6 @@
 <bsim:globalConfiguration xmlns:bsim="http://bsim.hpi.uni-potsdam.de/scylla/simModel" targetNamespace="http://www.hpi.de" id="BatchTestGlobalConfiguration">
   <bsim:zoneOffset>+01:00</bsim:zoneOffset>
   <bsim:resourceData>
-    <bsim:dynamicResource id="Resource" defaultQuantity="1" defaultCost="0.0" defaultTimeUnit="SECONDS" />
+    <bsim:dynamicResource id="Resource" defaultQuantity="2" defaultCost="0.0" defaultTimeUnit="SECONDS" />
   </bsim:resourceData>
 </bsim:globalConfiguration>

@@ -266,32 +266,32 @@ class BatchCluster extends Entity {
     }
 
     //TODO Stashing is specific for task-based clusters => use polymorphism and subclass BatchCluster
-    private Map<Integer, ResourceObjectTuple> stashedResources = new HashMap<>();
     private Map<Integer, BatchStashResourceEvent> stashEvents = new HashMap<>();
     
 
+    /**
+     * Schedule a stash event for the given resources so they are not released when the task ends
+     * @param event
+     * @param assignedResources
+     */
 	public void scheduleStashEvent(TaskBeginEvent event, ResourceObjectTuple assignedResources) {
 		BatchStashResourceEvent stashEvent = getStashResourceEvent(event, assignedResources);
-		BatchPluginUtils.getInstance().getStashEvents().add(stashEvent);
+		BatchPluginUtils.getInstance().scheduleStashEvent(stashEvent);
 	}
     
 	public BatchStashResourceEvent getStashResourceEvent(TaskBeginEvent beginEvent, ResourceObjectTuple assignedResources) {
 		Integer nodeId = beginEvent.getNodeId();
-		if(hasStashedResourcesFor(nodeId))return stashEvents.get(nodeId);
-		assert !stashEvents.containsKey(nodeId);
-		BatchStashResourceEvent stashEvent = new BatchStashResourceEvent(this, beginEvent, assignedResources);
-		stashResources(stashEvent, assignedResources);
-		return stashEvent;
-	}
-	
-	public void stashResources(BatchStashResourceEvent stashEvent, ResourceObjectTuple assignedResources) {
-		stashedResources.put(stashEvent.getNodeId(), assignedResources);
-		stashEvents.put(stashEvent.getNodeId(), stashEvent);
-		QueueManager.assignResourcesToEvent((SimulationModel)getModel(), stashEvent, assignedResources);
+		if(hasStashedResourcesFor(nodeId)) {
+			return stashEvents.get(nodeId);
+		} else {
+			assert !stashEvents.containsKey(nodeId);
+			BatchStashResourceEvent stashEvent = new BatchStashResourceEvent(this, beginEvent, assignedResources);
+			stashEvents.put(nodeId, stashEvent);
+			return stashEvent;
+		}
 	}
 	
 	public void discardResources(ScyllaEvent event) {
-		stashedResources.remove(event.getNodeId());
 		BatchStashResourceEvent stashEvent = stashEvents.remove(event.getNodeId());
 		try {
 			QueueManager.releaseResourcesAndScheduleQueuedEvents((SimulationModel) event.getModel(), stashEvent);
@@ -305,9 +305,9 @@ class BatchCluster extends Entity {
 	 * force-assign them to the task begin event and assure execution of event.
 	 * @param event : Enable event of a task inside a sequential task-based batch region
 	 */
-	public void checkForStashedResources(TaskEnableEvent event) {
+	public void assignStashedResources(TaskEnableEvent event) {
 		if(hasStashedResourcesFor(event.getNodeId())) {
-			ResourceObjectTuple resources = stashedResources.get(event.getNodeId());
+			ResourceObjectTuple resources = stashEvents.get(event.getNodeId()).getResources();
 			TaskBeginEvent beginEvent = event.getBeginEvent();
 			if(!event.getNextEventMap().isEmpty()) {//Event has assigned resources - but not the ones that are stashed for it
 				assert event.getNextEventMap().size() == 1;
@@ -325,7 +325,7 @@ class BatchCluster extends Entity {
 	}
 	
 	public boolean hasStashedResourcesFor(Integer nodeId) {
-		return stashedResources.containsKey(nodeId);
+		return stashEvents.containsKey(nodeId);
 	}
 
 

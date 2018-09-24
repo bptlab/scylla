@@ -61,7 +61,7 @@ public class BatchTBPlugin extends TaskBeginEventPluggable {
 
             if (cluster != null && cluster.hasExecutionType(BatchClusterExecutionType.SEQUENTIAL_TASKBASED)) {
             	ResourceObjectTuple assignedResources = processInstance.getAssignedResources().get(event.getSource());
-            	if(assignedResources != null) {
+            	if(assignedResources != null && !assignedResources.getResourceObjects().isEmpty()) {
             		cluster.scheduleStashEvent(event, assignedResources);
             	}
                 

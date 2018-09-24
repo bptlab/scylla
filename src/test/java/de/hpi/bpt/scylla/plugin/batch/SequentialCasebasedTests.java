@@ -1,7 +1,12 @@
 package de.hpi.bpt.scylla.plugin.batch;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
+import java.util.Deque;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,7 +22,7 @@ public class SequentialCasebasedTests extends SimulationTest{
 	
 	public static void main(String[] args) {
 		SequentialCasebasedTests x = new SequentialCasebasedTests();
-		x.testParallelGateway();
+		x.testResourceStable();
 	}
 
 	protected String getFolderName() {return "BatchPlugin";}
@@ -36,6 +41,35 @@ public class SequentialCasebasedTests extends SimulationTest{
 		Map<String, List<String[]>> clusters = TestUtils.groupByCluster(table);
 		for(List<String[]> cluster : clusters.values()) {
 			assertClusterIsCaseBased(cluster);
+		}
+	}
+	
+	@Test
+	public void testResourceStable() {
+		runSimpleSimulation(
+				"BatchTestGlobalConfiguration.xml", 
+				"CasebasedModelGatewayParallel.bpmn", 
+				"BatchTestSimulationConfigurationWithResources.xml");
+		File f = new File(".\\"+outputPath+"Process_1_processBatchActivityStats.csv");
+		assertTrue(f.exists());
+		List<String[]> table = TestUtils.readCSV(f);
+		
+		assertEquals(30, table.size());
+		
+		Map<String, List<String[]>> resources = table.stream()
+				.filter((row)->{return !row[5].isEmpty();})
+				.collect(Collectors.groupingBy((each)->{return each[5];}));
+		assertEquals(2, resources.size());
+		for(List<String[]> activitiesPerResource : resources.values()) {
+			activitiesPerResource.sort((a,b) -> {return a[4].compareTo(b[4]);});
+			Deque<String> seenClusters = new LinkedList<>();
+			for(String[] activity : activitiesPerResource) {
+				String cluster = activity[6];
+				System.err.print(cluster+" ");
+				assertTrue(!seenClusters.contains(cluster) || seenClusters.removeFirst().equals(cluster));
+				seenClusters.addFirst(cluster);
+			}
+			System.err.println();
 		}
 	}
 	

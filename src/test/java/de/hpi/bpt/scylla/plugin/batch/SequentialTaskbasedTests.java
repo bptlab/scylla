@@ -70,6 +70,10 @@ public class SequentialTaskbasedTests extends SimulationTest{
 		}
 	}
 	
+	/*
+	 *Regression seeds:
+	 *- -3207906028196791040 
+	 */
 	@Test
 	public void testResourceStable() {
 		runSimpleSimulation(
@@ -85,7 +89,7 @@ public class SequentialTaskbasedTests extends SimulationTest{
 		Map<String, List<String[]>> resources = table.stream()
 				.filter((row)->{return !row[5].isEmpty();})
 				.collect(Collectors.groupingBy((each)->{return each[5];}));
-		assertEquals(1, resources.size());
+		assertEquals(2, resources.size());
 		for(List<String[]> activitiesPerResource : resources.values()) {
 			activitiesPerResource.sort((a,b) -> {return a[4].compareTo(b[4]);});
 			Deque<String> seenClusters = new LinkedList<>();

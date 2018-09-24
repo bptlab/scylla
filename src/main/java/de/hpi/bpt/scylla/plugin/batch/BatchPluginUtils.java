@@ -461,4 +461,8 @@ public class BatchPluginUtils {
 	public Set<BatchStashResourceEvent> getStashEvents() {
 		return stashEvents;
 	}
+	
+	public void scheduleStashEvent(BatchStashResourceEvent event) {
+		stashEvents.add(event);
+	}
 }

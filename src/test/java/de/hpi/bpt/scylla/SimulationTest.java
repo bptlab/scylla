@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Optional;
 
 import org.jdom2.JDOMException;
 import org.junit.After;
@@ -11,6 +12,9 @@ import org.junit.Before;
 
 import de.hpi.bpt.scylla.SimulationManager;
 import de.hpi.bpt.scylla.exception.ScyllaValidationException;
+import de.hpi.bpt.scylla.model.configuration.SimulationConfiguration;
+import de.hpi.bpt.scylla.model.global.GlobalConfiguration;
+import de.hpi.bpt.scylla.model.global.resource.Resource;
 
 public abstract class SimulationTest {
 
@@ -21,6 +25,8 @@ public abstract class SimulationTest {
 
 	protected PrintStream errorLog;
 	protected PrintStream outputLog;
+	
+	protected Optional<Runnable> afterParsing = Optional.empty();
 	
 	@Before
 	public void setUp() {
@@ -46,6 +52,7 @@ public abstract class SimulationTest {
 			protected void parseInput() throws ScyllaValidationException, JDOMException, IOException {
 				super.parseInput();
 				SimulationTest.this.afterParsing();
+				afterParsing.ifPresent(Runnable::run);
 			}
 		};
 	}
@@ -56,11 +63,34 @@ public abstract class SimulationTest {
 		TestUtils.cleanupOutputs(".\\"+getFolder());
 	}
 	
-	protected int numberOfInstances() {
-		return simulationManager.getSimulationConfigurations().values().iterator().next().getNumberOfProcessInstances();
+	protected GlobalConfiguration getGlobalConfiguration() {
+		return simulationManager.getGlobalConfiguration();
 	}
 	
+	protected SimulationConfiguration getSimulationConfiguration() {
+		return simulationManager.getSimulationConfigurations().values().iterator().next();
+	}
+	
+	protected Resource getResource() {
+		return getGlobalConfiguration().getResources().values().iterator().next();
+	}
+	
+	protected int numberOfInstances() {
+		return getSimulationConfiguration().getNumberOfProcessInstances();
+	}
+	
+	/**
+	 * Allows to add special after parsing behavior for all tests of one class, can be overriden
+	 */
 	protected void afterParsing() {}
+	
+	/**
+	 * Allows to add special after parsing behavior for one test of a class (for all tests of one class use {@link #afterParsing()})
+	 * @param r : A runnable to  be executed after parsing
+	 */
+	protected final void afterParsing(Runnable r) {
+		afterParsing = Optional.of(r);
+	}
 	
 	protected String getFolder() {
 		return TestUtils.RESOURCEFOLDER+getFolderName()+"\\";
