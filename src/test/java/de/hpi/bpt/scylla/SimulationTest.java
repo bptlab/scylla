@@ -38,9 +38,9 @@ public abstract class SimulationTest {
 	protected void createSimpleSimulationManager(String globalConfiguration, String simulationModel, String simulationConfiguration) {
 		simulationManager = new SimulationManager(
 				getFolder(), 
-				new String[] {getFolder()+simulationModel}, 
-				new String[] {getFolder()+simulationConfiguration}, 
-				getFolder()+globalConfiguration,
+				new String[] {getPath(simulationModel)}, 
+				new String[] {getPath(simulationConfiguration)}, 
+				getPath(globalConfiguration),
                 true, false) {
 			@Override
 			protected void parseInput() throws ScyllaValidationException, JDOMException, IOException {
@@ -64,6 +64,16 @@ public abstract class SimulationTest {
 	
 	protected String getFolder() {
 		return TestUtils.RESOURCEFOLDER+getFolderName()+"\\";
+	}
+	
+	protected String getPath(String fileName) {
+		String path = TestUtils.RESOURCEFOLDER;
+		if(fileName.startsWith(".\\")) {
+			path += fileName.substring(2);
+		} else {
+			path += getFolderName()+"\\"+fileName;
+		}
+		return path;
 	}
 	
 }
