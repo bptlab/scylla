@@ -25,6 +25,7 @@ public class BatchClusterStartEvent extends Event<BatchCluster> {
         super(owner, "BCStart_" + name, showInTrace);
     }
 
+    //TODO think of moving this stuff to batch cluster class
     @Override
     public void eventRoutine(BatchCluster cluster) throws SuspendExecution {
 

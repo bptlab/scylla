@@ -297,18 +297,21 @@ abstract class BatchCluster extends Entity {
 	}
 	
     
+	public ScyllaEvent handleStashEvent(BatchStashResourceEvent event) {
+		return event;
+	}
 
     /**
      * Schedule a stash event for the given resources so they are not released when the task ends
      * @param event
      * @param assignedResources
      */
-	public void scheduleStashEvent(TaskBeginEvent event, ResourceObjectTuple assignedResources) {
+	protected void scheduleStashEvent(TaskBeginEvent event, ResourceObjectTuple assignedResources) {
 		BatchStashResourceEvent stashEvent = getOrCreateStashEvent(event, assignedResources);
 		BatchPluginUtils.getInstance().scheduleStashEvent(stashEvent);
 	}
 	
-	public BatchStashResourceEvent getOrCreateStashEvent(TaskBeginEvent beginEvent, ResourceObjectTuple assignedResources) {
+	protected BatchStashResourceEvent getOrCreateStashEvent(TaskBeginEvent beginEvent, ResourceObjectTuple assignedResources) {
 		if(hasStashedResourcesFor(beginEvent)) {
 			return getStashEventFor(beginEvent);
 		} else {
@@ -316,7 +319,7 @@ abstract class BatchCluster extends Entity {
 		}
 	}
     
-	public BatchStashResourceEvent createStashEventFor(TaskBeginEvent beginEvent, ResourceObjectTuple assignedResources) {
+	protected BatchStashResourceEvent createStashEventFor(TaskBeginEvent beginEvent, ResourceObjectTuple assignedResources) {
 		return new BatchStashResourceEvent(this, beginEvent, assignedResources);
 	}
 	
@@ -325,7 +328,7 @@ abstract class BatchCluster extends Entity {
 	 * force-assign them to the task begin event and assure execution of event.
 	 * @param event : Enable event of a task inside a sequential task-based batch region
 	 */
-	public void assignStashedResources(TaskEnableEvent event) {
+	protected void assignStashedResources(TaskEnableEvent event) {
 		assert hasStashedResourcesFor(event);
 		ResourceObjectTuple resources = getStashEventFor(event).getResources();
 		TaskBeginEvent beginEvent = event.getBeginEvent();
@@ -343,11 +346,11 @@ abstract class BatchCluster extends Entity {
 		QueueManager.assignResourcesToEvent((SimulationModel) beginEvent.getModel(), beginEvent, resources);
 	}
 	
-	public BatchStashResourceEvent getStashEventFor(ScyllaEvent event) {
+	protected BatchStashResourceEvent getStashEventFor(ScyllaEvent event) {
 		return null;
 	}
 	
-	public boolean hasStashedResourcesFor(ScyllaEvent event) {
+	protected boolean hasStashedResourcesFor(ScyllaEvent event) {
 		return false;
 	}
 	

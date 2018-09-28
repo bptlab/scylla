@@ -80,7 +80,6 @@ public class TaskbasedBatchCluster extends BatchCluster {
      * For execution type sequential-taskbased:
      * Scheduling the next event for the current node,
      * or the first event for the next node
-     * Currently called for start and task terminate events
      * @param event : Event of the current node
      */
     private void scheduleNextEventInBatchProcess(ScyllaEvent event) {
@@ -117,6 +116,11 @@ public class TaskbasedBatchCluster extends BatchCluster {
         }
     }
     
+    @Override
+    public ScyllaEvent handleStashEvent(BatchStashResourceEvent event) {
+		event.makeResourcesUnavailable();
+		return super.handleStashEvent(event);
+    }
 	
     public BatchStashResourceEvent createStashEventFor(TaskBeginEvent beginEvent, ResourceObjectTuple assignedResources) {
     	Integer nodeId = beginEvent.getNodeId();

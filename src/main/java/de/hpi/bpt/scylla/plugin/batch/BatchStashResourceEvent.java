@@ -14,10 +14,12 @@ import desmoj.core.simulator.TimeInstant;
 public class BatchStashResourceEvent extends ScyllaEvent {
 
 	private ResourceObjectTuple resources;
+	private BatchCluster cluster;
 
 	public BatchStashResourceEvent(BatchCluster cluster, TaskBeginEvent taskBeginEvent, ResourceObjectTuple resources) {
 		super(cluster.getModel(), cluster.getName()+"_stashNode#"+taskBeginEvent.getNodeId(), new TimeInstant(0), cluster.getProcessSimulationComponents(), taskBeginEvent.getProcessInstance(), taskBeginEvent.getNodeId());
 		this.resources = resources;
+		this.cluster = cluster;
 	}
 
 	@Override
@@ -29,7 +31,8 @@ public class BatchStashResourceEvent extends ScyllaEvent {
 		SimulationModel model = (SimulationModel)getModel();
 		for(ResourceObject resource : resources.getResourceObjects()) {
 			Collection<ResourceObject> typeQueue = model.getResourceObjects().get(resource.getResourceType());
-			assert typeQueue.remove(resource);
+			boolean removed = typeQueue.remove(resource);
+			assert removed;
 		}
         processInstance.getAssignedResources().put(source, resources);
 	}
@@ -41,15 +44,23 @@ public class BatchStashResourceEvent extends ScyllaEvent {
 	 */
 	public boolean interestedInResources(Set<String> resourceIds) {
 		return resources.getResourceObjects().stream().anyMatch((any)->{return resourceIds.contains(any.getResourceType());})
-				&& resources.getResourceObjects().stream().allMatch((each)->{
-					Collection<ResourceObject> typeQueue = ((SimulationModel)getModel()).getResourceObjects().get(each.getResourceType());
-					return typeQueue.contains(each);
-				});
+				&& resourcesFree();
 		//return !processInstance.getAssignedResources().containsKey(taskSource);
+	}
+	
+	public boolean resourcesFree() {
+		return resources.getResourceObjects().stream().allMatch((each)->{
+			Collection<ResourceObject> typeQueue = ((SimulationModel)getModel()).getResourceObjects().get(each.getResourceType());
+			return typeQueue.contains(each);
+		});
 	}
 	
 	public ResourceObjectTuple getResources() {
 		return resources;
+	}
+	
+	public BatchCluster getCluster() {
+		return cluster;
 	}
 
 }

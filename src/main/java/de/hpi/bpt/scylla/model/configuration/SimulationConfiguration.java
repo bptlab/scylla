@@ -1,6 +1,5 @@
 package de.hpi.bpt.scylla.model.configuration;
 
-import java.sql.Time;
 import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Map;
