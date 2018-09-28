@@ -149,7 +149,7 @@ public class BatchPluginUtils {
             boolean showInTrace = processInstance.traceIsOn();
             String dataView = this.getDataViewOfInstance(processInstance.getId(), batchActivity);
             TimeInstant currentSimulationTime = processInstance.presentTime();
-            cluster = new BatchCluster(model, currentSimulationTime, simulationComponents, batchActivity, nodeId, dataView,
+            cluster = BatchCluster.create(model, currentSimulationTime, simulationComponents, batchActivity, nodeId, dataView,
                     showInTrace);
 
             // schedule BatchClusterStart at current time plus maximum timeout
@@ -344,6 +344,7 @@ public class BatchPluginUtils {
     }
 
     // If the execution type is parallel this makes the entry for the not really simulated process instances for events
+    //TODO this is specific for parallel clusters => move there
     void logBPMNEventForNonResponsiblePI(BPMNEvent event, ProcessInstance processInstance) {
 
         ProcessModel processModel = processInstance.getProcessModel();
@@ -386,6 +387,7 @@ public class BatchPluginUtils {
     }
 
     // If the execution type is parallel this makes the entry for the not really simulated process instances for tasks
+    //TODO this is specific for parallel clusters => move there
     void logTaskEventForNonResponsiblePI(TaskEvent event, ProcessInstance processInstance)
             throws ScyllaRuntimeException {
 

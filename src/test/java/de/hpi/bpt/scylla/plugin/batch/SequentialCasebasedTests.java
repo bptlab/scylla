@@ -71,6 +71,14 @@ public class SequentialCasebasedTests extends SimulationTest{
 			}
 			System.err.println();
 		}
+		
+		Map<String, List<String[]>> clusters = TestUtils.groupByCluster(table);
+		for(List<String[]> cluster : clusters.values()) {
+			int numberOfResourcesPerCluster = cluster.stream()
+				.filter(each -> (each[1].equals("Activity A") || each[1].equals("Activity B")))
+				.collect(Collectors.groupingBy(each -> each[6])).size();
+			assertEquals(1, numberOfResourcesPerCluster);
+		}
 	}
 	
 	private static void assertExecutionType(List<String[]> table) {

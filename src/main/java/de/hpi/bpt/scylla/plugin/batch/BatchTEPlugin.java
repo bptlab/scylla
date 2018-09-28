@@ -22,7 +22,6 @@ public class BatchTEPlugin extends TaskEnableEventPluggable {
     public void eventRoutine(TaskEnableEvent event, ProcessInstance processInstance) throws ScyllaRuntimeException {
 
     	BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
-        pluginInstance.logTaskEventForNonResponsiblePI(event, processInstance);
 
         //ProcessSimulationComponents desmojObjects = event.getDesmojObjects();
         // SimulationModel model = (SimulationModel) desmojEvent.getModel();
@@ -54,9 +53,7 @@ public class BatchTEPlugin extends TaskEnableEventPluggable {
         }
 
         BatchCluster cluster = pluginInstance.getCluster(processInstance);
-        if (cluster != null && cluster.hasExecutionType(BatchClusterExecutionType.SEQUENTIAL_TASKBASED)) {
-            cluster.assignStashedResources(event);
-        }
+        if(cluster != null)cluster.taskEnableEvent(event);
     }
 
 }

@@ -15,12 +15,9 @@ public class BatchTTPlugin extends TaskTerminateEventPluggable {
     @Override
     public void eventRoutine(TaskTerminateEvent event, ProcessInstance processInstance) throws ScyllaRuntimeException {
         BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
-        pluginInstance.logTaskEventForNonResponsiblePI(event, processInstance);
         
         BatchCluster cluster = pluginInstance.getCluster(processInstance);
-        if (cluster != null && cluster.hasExecutionType(BatchClusterExecutionType.SEQUENTIAL_TASKBASED)) {
-            cluster.scheduleNextEventInBatchProcess(event);
-        }
+        if (cluster != null)cluster.taskTerminateEvent(event);
     }
 
 }

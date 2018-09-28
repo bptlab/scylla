@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.stream.Collectors;
 
 import de.hpi.bpt.scylla.exception.ScyllaRuntimeException;
 import de.hpi.bpt.scylla.model.process.ProcessModel;
@@ -16,8 +15,13 @@ import de.hpi.bpt.scylla.simulation.ProcessSimulationComponents;
 import de.hpi.bpt.scylla.simulation.QueueManager;
 import de.hpi.bpt.scylla.simulation.ResourceObjectTuple;
 import de.hpi.bpt.scylla.simulation.SimulationModel;
+import de.hpi.bpt.scylla.simulation.event.BPMNEndEvent;
+import de.hpi.bpt.scylla.simulation.event.BPMNIntermediateEvent;
+import de.hpi.bpt.scylla.simulation.event.BPMNStartEvent;
+import de.hpi.bpt.scylla.simulation.event.GatewayEvent;
 import de.hpi.bpt.scylla.simulation.event.ScyllaEvent;
 import de.hpi.bpt.scylla.simulation.event.TaskBeginEvent;
+import de.hpi.bpt.scylla.simulation.event.TaskCancelEvent;
 import de.hpi.bpt.scylla.simulation.event.TaskEnableEvent;
 import de.hpi.bpt.scylla.simulation.event.TaskTerminateEvent;
 import desmoj.core.simulator.Entity;
@@ -25,7 +29,7 @@ import desmoj.core.simulator.Model;
 import desmoj.core.simulator.TimeInstant;
 import desmoj.core.simulator.TimeSpan;
 
-class BatchCluster extends Entity {
+abstract class BatchCluster extends Entity {
 
     private TimeInstant creationTime;
     private ProcessSimulationComponents pSimComponents;
@@ -51,9 +55,18 @@ class BatchCluster extends Entity {
      * For sequential taskbased: All start events, task enable events and end events are stored there, and are scheduled sequentially. More events might follow in the future*/
     private Map<Integer,Queue<ScyllaEvent>> queuedEvents;
     // this is needed for all types of sequential execution to determine when to schedule the completion of the batch actvity
-    private Integer finishedProcessInstances = 0;
+    protected Integer finishedProcessInstances = 0;
+    
+    public static BatchCluster create(Model owner, TimeInstant creationTime, ProcessSimulationComponents pSimComponents, BatchActivity batchActivity, int nodeId, String dataView, boolean showInTrace) {
+    	switch(batchActivity.getExecutionType()) {
+    	case PARALLEL : return new ParallelBatchCluster(owner, creationTime, pSimComponents, batchActivity, nodeId, dataView, showInTrace);
+    	case SEQUENTIAL_CASEBASED : return new CasebasedBatchCluster(owner, creationTime, pSimComponents, batchActivity, nodeId, dataView, showInTrace);
+    	case SEQUENTIAL_TASKBASED : return new TaskbasedBatchCluster(owner, creationTime, pSimComponents, batchActivity, nodeId, dataView, showInTrace);
+    	default : return null;
+    	}
+    }
 
-    BatchCluster(Model owner, TimeInstant creationTime, ProcessSimulationComponents pSimComponents,
+    protected BatchCluster(Model owner, TimeInstant creationTime, ProcessSimulationComponents pSimComponents,
                  BatchActivity batchActivity, int nodeId, String dataView, boolean showInTrace) {
         super(owner, buildBatchClusterName(pSimComponents, nodeId), showInTrace);
         this.creationTime = creationTime;
@@ -85,9 +98,13 @@ class BatchCluster extends Entity {
         }
         return prependProcessModelIds(processModel.getParent()) + processModel.getId() + "_";
     }
+    
+    public BatchClusterExecutionType getExecutionType() {
+    	return getBatchActivity().getExecutionType();
+    }
 
     public boolean hasExecutionType(BatchClusterExecutionType executionType){
-        return this.getBatchActivity().getExecutionType().equals(executionType);
+        return getExecutionType().equals(executionType);
     }
     public Integer getStartNodeId() {
         return startNodeId;
@@ -211,62 +228,74 @@ class BatchCluster extends Entity {
 		this.currentTimeOut = currentTimeOut;
 	}
 	
-    /**
-     * For execution type sequential-casebased:
-     * Poll and schedule the start event for the next case if existent
-     */
-    void scheduleNextCaseInBatchProcess() {
-        // Get the start event of the next process instance and schedule it
-        ScyllaEvent eventToSchedule = pollNextQueuedEvent(getStartNodeId());
-        if (eventToSchedule != null) {
-            eventToSchedule.schedule(eventToSchedule.getProcessInstance());
-            //System.out.println("Scheduled " + eventToSchedule.getValue0().getDisplayName() + " for process instance " + eventToSchedule.getValue1());
-        }
-    }
-    
-    /**
-     * For execution type sequential-taskbased:
-     * Scheduling the next event for the current node,
-     * or the first event for the next node
-     * Currently called for start and task terminate events
-     * @param event : Event of the current node
-     */
-    void scheduleNextEventInBatchProcess(ScyllaEvent event) {
-        // The event that would come next in default flow
-        List<ScyllaEvent> nextEvents = event.getNextEventMap().values().stream().collect(Collectors.toList());
-       //Integer nodeIdOfNextElement = nextEvent != null ? nextEvent.getNodeId() : null;
-        
-        // Get next queued event for same node or for next node instead
-        List<ScyllaEvent> eventsToSchedule = new LinkedList<>();
-        ScyllaEvent nextEventOnCurrentNode = pollNextQueuedEvent(event.getNodeId());
-        // If existing take next event for current node, otherwise take first queued event for all next nodes
-        if (nextEventOnCurrentNode != null) {
-        	eventsToSchedule.add(nextEventOnCurrentNode);
-        } else {
-        	for(ScyllaEvent nextNodeEvent : nextEvents) {
-        		ScyllaEvent nextQueuedEvent = pollNextQueuedEvent(nextNodeEvent.getNodeId());
-        		if(nextQueuedEvent != null)eventsToSchedule.add(nextQueuedEvent);
-        	}
-        	//If events for next node are scheduled, this is the last event for this node, so stashed resources must be discarded
-        	if(hasStashedResourcesFor(event.getNodeId()))discardResources(event);
-        }
-        
-        if (!eventsToSchedule.isEmpty()) {
-        	// Schedule selected events
-        	for(ScyllaEvent eventToSchedule : eventsToSchedule)eventToSchedule.schedule();
-       
-        	// "Unschedule" normal flow next event, but queue it instead
-            //assert event.getNextEventMap().size() == 1;
-            event.getNextEventMap().clear();
-            for(ScyllaEvent nextEvent : nextEvents) {
-                Integer nodeIdOfNextElement = nextEvent.getNodeId();
-                queueEvent(nodeIdOfNextElement, nextEvent);
+	
+	
+	
+	
+	public void startEvent(BPMNStartEvent event) {}
+	
+	public void intermediateEvent(BPMNIntermediateEvent event) {}
+	
+	public void endEvent(BPMNEndEvent event) {
+		ProcessInstance processInstance = event.getProcessInstance();
+        BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
+        setProcessInstanceToFinished();
+        // Schedule them only if either all process instances has passed the last event of the batch activity or the execution type is parallel
+        if (isFinished()) {
+
+            if (pluginInstance.isProcessInstanceCompleted(processInstance)) {
+                List<TaskTerminateEvent> parentalEndEvents = getParentalEndEvents();
+                for (TaskTerminateEvent pee : parentalEndEvents) {
+                    pee.schedule();
+                }
+
+                parentalEndEvents.clear();
+
+            	ProcessInstance parentProcessInstance = processInstance.getParent();
+                ProcessModel processModel = processInstance.getProcessModel();
+                int parentNodeId = processModel.getNodeIdInParent();
+                pluginInstance.setClusterToTerminated(parentProcessInstance, parentNodeId);
+            }
+
+            // Prevent parental task terminate event from scheduling, if there is any (from subprocess plugin)
+
+            Map<Integer, ScyllaEvent> nextEventMap = event.getNextEventMap();
+            if (!nextEventMap.isEmpty()) {
+                Map<Integer, TimeSpan> timeSpanToNextEventMap = event.getTimeSpanToNextEventMap();
+                int indexOfParentalTaskTerminateEvent = 0;
+
+                nextEventMap.remove(indexOfParentalTaskTerminateEvent);
+                timeSpanToNextEventMap.remove(indexOfParentalTaskTerminateEvent);
             }
         }
-    }
+	}
+	
+	public void gatewayEvent(GatewayEvent event) {}
+	
+	public void taskEnableEvent(TaskEnableEvent event) throws ScyllaRuntimeException {}
+	public void taskBeginEvent(TaskBeginEvent event) throws ScyllaRuntimeException {}
+	public void taskTerminateEvent(TaskTerminateEvent event) throws ScyllaRuntimeException {}
+	public void taskCancelEvent(TaskCancelEvent event) throws ScyllaRuntimeException {
+        for (TaskTerminateEvent pee : parentalEndEvents) {
+            TaskCancelEvent cancelEvent = new TaskCancelEvent(pee.getModel(), pee.getSource(),
+                    pee.getSimulationTimeOfSource(), pee.getSimulationComponents(), pee.getProcessInstance(),
+                    pee.getNodeId());
+            cancelEvent.schedule(pee.getProcessInstance());
+        }
 
-    //TODO Stashing is specific for task-based clusters => use polymorphism and subclass BatchCluster
-    private Map<Integer, BatchStashResourceEvent> stashEvents = new HashMap<>();
+        parentalEndEvents.clear();
+
+        ProcessInstance processInstance = event.getProcessInstance();
+        ProcessInstance parentProcessInstance = processInstance.getParent();
+        ProcessModel processModel = processInstance.getProcessModel();
+        int parentNodeId = processModel.getNodeIdInParent();
+        BatchPluginUtils.getInstance().setClusterToTerminated(parentProcessInstance, parentNodeId);
+	}
+	
+	public boolean isFinished () {
+		return areAllProcessInstancesFinished();
+	}
+	
     
 
     /**
@@ -275,29 +304,20 @@ class BatchCluster extends Entity {
      * @param assignedResources
      */
 	public void scheduleStashEvent(TaskBeginEvent event, ResourceObjectTuple assignedResources) {
-		BatchStashResourceEvent stashEvent = getStashResourceEvent(event, assignedResources);
+		BatchStashResourceEvent stashEvent = getOrCreateStashEvent(event, assignedResources);
 		BatchPluginUtils.getInstance().scheduleStashEvent(stashEvent);
 	}
-    
-	public BatchStashResourceEvent getStashResourceEvent(TaskBeginEvent beginEvent, ResourceObjectTuple assignedResources) {
-		Integer nodeId = beginEvent.getNodeId();
-		if(hasStashedResourcesFor(nodeId)) {
-			return stashEvents.get(nodeId);
+	
+	public BatchStashResourceEvent getOrCreateStashEvent(TaskBeginEvent beginEvent, ResourceObjectTuple assignedResources) {
+		if(hasStashedResourcesFor(beginEvent)) {
+			return getStashEventFor(beginEvent);
 		} else {
-			assert !stashEvents.containsKey(nodeId);
-			BatchStashResourceEvent stashEvent = new BatchStashResourceEvent(this, beginEvent, assignedResources);
-			stashEvents.put(nodeId, stashEvent);
-			return stashEvent;
+			return createStashEventFor(beginEvent, assignedResources);
 		}
 	}
-	
-	public void discardResources(ScyllaEvent event) {
-		BatchStashResourceEvent stashEvent = stashEvents.remove(event.getNodeId());
-		try {
-			QueueManager.releaseResourcesAndScheduleQueuedEvents((SimulationModel) event.getModel(), stashEvent);
-		} catch (ScyllaRuntimeException e) {
-			e.printStackTrace();
-		}
+    
+	public BatchStashResourceEvent createStashEventFor(TaskBeginEvent beginEvent, ResourceObjectTuple assignedResources) {
+		return new BatchStashResourceEvent(this, beginEvent, assignedResources);
 	}
 	
 	/**
@@ -306,27 +326,32 @@ class BatchCluster extends Entity {
 	 * @param event : Enable event of a task inside a sequential task-based batch region
 	 */
 	public void assignStashedResources(TaskEnableEvent event) {
-		if(hasStashedResourcesFor(event.getNodeId())) {
-			ResourceObjectTuple resources = stashEvents.get(event.getNodeId()).getResources();
-			TaskBeginEvent beginEvent = event.getBeginEvent();
-			if(!event.getNextEventMap().isEmpty()) {//Event has assigned resources - but not the ones that are stashed for it
-				assert event.getNextEventMap().size() == 1;
-				assert event.getNextEventMap().get(0) == beginEvent;
-				try {
-					QueueManager.releaseResourcesAndScheduleQueuedEvents((SimulationModel) beginEvent.getModel(), beginEvent);
-				} catch (ScyllaRuntimeException e) { e.printStackTrace(); }
-			} else {//Event waits for resources
-		        QueueManager.removeFromEventQueues((SimulationModel) beginEvent.getModel(), beginEvent);
-	            event.getNextEventMap().put(0, beginEvent);
-	            event.getTimeSpanToNextEventMap().put(0, new TimeSpan(0));
-			}
-			QueueManager.assignResourcesToEvent((SimulationModel) beginEvent.getModel(), beginEvent, resources);
+		assert hasStashedResourcesFor(event);
+		ResourceObjectTuple resources = getStashEventFor(event).getResources();
+		TaskBeginEvent beginEvent = event.getBeginEvent();
+		if(!event.getNextEventMap().isEmpty()) {//Event has assigned resources - but not the ones that are stashed for it
+			assert event.getNextEventMap().size() == 1;
+			assert event.getNextEventMap().get(0) == beginEvent;
+			try {
+				QueueManager.releaseResourcesAndScheduleQueuedEvents((SimulationModel) beginEvent.getModel(), beginEvent);
+			} catch (ScyllaRuntimeException e) { e.printStackTrace(); }
+		} else {//Event waits for resources
+	        QueueManager.removeFromEventQueues((SimulationModel) beginEvent.getModel(), beginEvent);
+            event.getNextEventMap().put(0, beginEvent);
+            event.getTimeSpanToNextEventMap().put(0, new TimeSpan(0));
 		}
+		QueueManager.assignResourcesToEvent((SimulationModel) beginEvent.getModel(), beginEvent, resources);
 	}
 	
-	public boolean hasStashedResourcesFor(Integer nodeId) {
-		return stashEvents.containsKey(nodeId);
+	public BatchStashResourceEvent getStashEventFor(ScyllaEvent event) {
+		return null;
 	}
+	
+	public boolean hasStashedResourcesFor(ScyllaEvent event) {
+		return false;
+	}
+	
+
 
 
 }

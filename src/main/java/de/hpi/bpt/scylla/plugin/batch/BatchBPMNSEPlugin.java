@@ -16,12 +16,9 @@ public class BatchBPMNSEPlugin extends BPMNStartEventPluggable {
     public void eventRoutine(BPMNStartEvent event, ProcessInstance processInstance) throws ScyllaRuntimeException {
 
         BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
-        pluginInstance.logBPMNEventForNonResponsiblePI(event, processInstance);
         
         BatchCluster cluster = pluginInstance.getCluster(processInstance);
-        if (cluster != null && cluster.hasExecutionType(BatchClusterExecutionType.SEQUENTIAL_TASKBASED)) {
-            cluster.scheduleNextEventInBatchProcess(event);
-        }
+        if (cluster != null)cluster.startEvent(event);
     }
 
 }

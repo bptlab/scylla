@@ -16,10 +16,9 @@ public class BatchBPMNIEPlugin extends BPMNIntermediateEventPluggable {
     public void eventRoutine(BPMNIntermediateEvent event, ProcessInstance processInstance)
             throws ScyllaRuntimeException {
 
-        BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
-        pluginInstance.logBPMNEventForNonResponsiblePI(event, processInstance);
-
-        //pluginInstance.scheduleNextEventInBatchProcess(event, processInstance);
+        BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();        
+        BatchCluster cluster = pluginInstance.getCluster(processInstance);
+        if (cluster != null)cluster.intermediateEvent(event);
     }
 
 }

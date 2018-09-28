@@ -20,9 +20,7 @@ public class BatchGatewayPlugin extends GatewayEventPluggable{
 		BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
         
         BatchCluster cluster = pluginInstance.getCluster(processInstance);
-        if (cluster != null && cluster.hasExecutionType(BatchClusterExecutionType.SEQUENTIAL_TASKBASED)) {
-        	cluster.scheduleNextEventInBatchProcess(event);
-        }
+        if(cluster != null)cluster.gatewayEvent(event);
 	}
 
 }

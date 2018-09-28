@@ -8,7 +8,6 @@ import de.hpi.bpt.scylla.model.process.ProcessModel;
 import de.hpi.bpt.scylla.plugin_type.simulation.event.TaskBeginEventPluggable;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
 import de.hpi.bpt.scylla.simulation.ProcessSimulationComponents;
-import de.hpi.bpt.scylla.simulation.ResourceObjectTuple;
 import de.hpi.bpt.scylla.simulation.event.BPMNStartEvent;
 import de.hpi.bpt.scylla.simulation.event.ScyllaEvent;
 import de.hpi.bpt.scylla.simulation.event.TaskBeginEvent;
@@ -30,7 +29,6 @@ public class BatchTBPlugin extends TaskBeginEventPluggable {
 
 
         BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
-        pluginInstance.logTaskEventForNonResponsiblePI(event, processInstance);
 
         ProcessSimulationComponents simulationComponents = event.getSimulationComponents();
         // SimulationModel model = (SimulationModel) desmojEvent.getModel();
@@ -59,13 +57,7 @@ public class BatchTBPlugin extends TaskBeginEventPluggable {
                 event.getTimeSpanToNextEventMap().put(0, timeForTaskWithSetUp);
             }
 
-            if (cluster != null && cluster.hasExecutionType(BatchClusterExecutionType.SEQUENTIAL_TASKBASED)) {
-            	ResourceObjectTuple assignedResources = processInstance.getAssignedResources().get(event.getSource());
-            	if(assignedResources != null && !assignedResources.getResourceObjects().isEmpty()) {
-            		cluster.scheduleStashEvent(event, assignedResources);
-            	}
-                
-            }
+            if (cluster != null)cluster.taskBeginEvent(event);
 
         }
         //SimulationConfiguration simulationConfiguration = desmojObjects.getSimulationConfiguration();
