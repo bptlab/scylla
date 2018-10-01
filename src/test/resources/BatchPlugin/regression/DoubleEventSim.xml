@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bsim:definitions xmlns:bsim="http://bsim.hpi.uni-potsdam.de/scylla/simModel" targetNamespace="http://www.hpi.de">
+  <bsim:simulationConfiguration startDateTime="2018-08-17T10:25:01.984+02:00[Europe/Berlin]" id="BatchGlobalConfiguration" processRef="Simple_seq_casebased" processInstances="1000">
+    <bsim:startEvent id="StartEvent_1">
+      <bsim:arrivalRate timeUnit="MINUTES">
+        <bsim:exponentialDistribution>
+          <bsim:mean>10.0</bsim:mean>
+        </bsim:exponentialDistribution>
+      </bsim:arrivalRate>
+    </bsim:startEvent>
+    <bsim:subProcess id="BatchSubProcess" name="Batch Activity">
+		<bsim:Task id="B" name="B">
+        <bsim:duration timeUnit="MINUTES">
+          <bsim:exponentialDistribution>
+            <bsim:mean>2.0</bsim:mean>
+          </bsim:exponentialDistribution>
+        </bsim:duration>
+        <bsim:resources>
+          <bsim:resource id="WorkerC" amount="1" />
+        </bsim:resources>
+      </bsim:Task>
+      <bsim:Task id="C" name="C">
+        <bsim:duration timeUnit="MINUTES">
+          <bsim:exponentialDistribution>
+            <bsim:mean>3.0</bsim:mean>
+          </bsim:exponentialDistribution>
+        </bsim:duration>
+        <bsim:resources>
+          <bsim:resource id="WorkerC" amount="1" />
+        </bsim:resources>
+      </bsim:Task>
+    </bsim:subProcess>
+    <bsim:Task id="A" name="A">
+      <bsim:duration timeUnit="MINUTES">
+        <bsim:uniformDistribution>
+          <bsim:lower>4.0</bsim:lower>
+          <bsim:upper>6.0</bsim:upper>
+        </bsim:uniformDistribution>
+      </bsim:duration>
+      <bsim:resources>
+        <bsim:resource id="WorkerA" amount="1" />
+      </bsim:resources>
+    </bsim:Task>
+    <bsim:Task id="E" name="E">
+      <bsim:duration timeUnit="MINUTES">
+        <bsim:exponentialDistribution>
+          <bsim:mean>12.0</bsim:mean>
+        </bsim:exponentialDistribution>
+      </bsim:duration>
+      <bsim:resources>
+        <bsim:resource id="WorkerE" amount="1" />
+      </bsim:resources>
+    </bsim:Task>
+  </bsim:simulationConfiguration>
+</bsim:definitions>

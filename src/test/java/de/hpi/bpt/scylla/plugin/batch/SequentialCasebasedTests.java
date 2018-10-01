@@ -81,6 +81,16 @@ public class SequentialCasebasedTests extends SimulationTest{
 		}
 	}
 	
+	@Test
+	public void testEventScheduledDoubleRegression() {
+		runSimpleSimulation(
+				"regression\\DoubleEventGlobal.xml", 
+				"regression\\DoubleEvent.bpmn", 
+				"regression\\DoubleEventSim.xml");
+		File f = new File(".\\"+outputPath+"Simple_seq_casebased_processBatchActivityStats.csv");
+		assertTrue(f.exists());
+	}
+	
 	private static void assertExecutionType(List<String[]> table) {
 		table.stream().forEach((each)->{Assert.assertEquals(BatchClusterExecutionType.SEQUENTIAL_CASEBASED.toString(), each[7]);});
 	}

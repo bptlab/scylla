@@ -37,6 +37,7 @@ public class CasebasedBatchCluster extends BatchCluster {
 	public void endEvent(BPMNEndEvent event) {
 		super.endEvent(event);
 		if(!isFinished())scheduleNextCaseInBatchProcess();
+		else if(hasStashedResources())discardResources();
 	}
 	
 	@Override
@@ -63,9 +64,7 @@ public class CasebasedBatchCluster extends BatchCluster {
 	    	//If an assignment exist, use it for all further assignments
 	    	if(assignedResources != null && !assignedResources.getResourceObjects().isEmpty()) {
 	    		createStashEventFor(beginEvent, assignedResources);//so all other events know these are the resources to be used for stashing
-	    	} else {
-	    		waitingTaskBegins.add(beginEvent);
-	    	}
+	    	}//else wait until natural assignment is done
 		}
 	}
 	
@@ -93,8 +92,6 @@ public class CasebasedBatchCluster extends BatchCluster {
         if (eventToSchedule != null) {
             eventToSchedule.schedule(eventToSchedule.getProcessInstance());
             //System.out.println("Scheduled " + eventToSchedule.getValue0().getDisplayName() + " for process instance " + eventToSchedule.getValue1());
-        } else {
-        	if(hasStashedResources())discardResources();
         }
     }
 	
