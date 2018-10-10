@@ -7,8 +7,6 @@ import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.hpi.bpt.scylla.TestUtils;
-
 public class ParallelTests extends BatchSimulationTest{
 	
 	{
@@ -29,11 +27,10 @@ public class ParallelTests extends BatchSimulationTest{
 				"BatchTestSimulationConfiguration.xml");
 		
 		Assert.assertEquals(30, table.size());
-		assertExecutionType(table);
+		assertExecutionType();
 		assertNoNaturalArrivalTime(table);
-		Map<String, List<String[]>> clusters = TestUtils.groupByCluster(table);
 		
-		for(List<String[]> cluster : clusters.values()) {
+		for(List<String[]> cluster : getClusters().values()) {
 			assertActivityGroupsAreEqual(cluster);
 		}
 	}
@@ -57,8 +54,5 @@ public class ParallelTests extends BatchSimulationTest{
 		table.stream().forEach((each)->{Assert.assertTrue(each[8].isEmpty());});
 	}
 	
-	private static void assertExecutionType(List<String[]> table) {
-		table.stream().forEach((each)->{Assert.assertEquals(BatchClusterExecutionType.PARALLEL.toString(), each[7]);});
-	}
 
 }

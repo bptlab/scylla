@@ -50,18 +50,6 @@ public class TestUtils {
 		return table;
 	}
 	
-	//TODO Probably move to special batch-test-utils
-	public static Map<String, List<String[]>> groupByCluster(List<String[]> table){
-		/*Map<String, List<String[]>> clusters = new HashMap<String, List<String[]>>();
-		for(String[] row : table) {
-			String batchNumber = row[6];
-			if(!clusters.containsKey(batchNumber))clusters.put(batchNumber, new ArrayList<String[]>());
-			clusters.get(batchNumber).add(row);
-		}
-		return clusters;*/
-		return groupBy(table,6);
-	}
-	
 	public static Map<String, List<String[]>> groupBy(List<String[]> table, int column){
 		Map<String, List<String[]>> groups = new HashMap<String, List<String[]>>();
 		for(String[] row : table) {

@@ -9,10 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-import de.hpi.bpt.scylla.TestUtils;
 import de.hpi.bpt.scylla.logger.DebugLogger;
 
 public class SequentialTaskbasedTests extends BatchSimulationTest{
@@ -37,9 +35,8 @@ public class SequentialTaskbasedTests extends BatchSimulationTest{
 				"BatchTestSimulationConfiguration.xml");
 		
 		assertEquals(30, table.size());
-		assertExecutionType(table);
-		Map<String, List<String[]>> clusters = TestUtils.groupByCluster(table);
-		for(List<String[]> cluster : clusters.values()) {
+		assertExecutionType();
+		for(List<String[]> cluster : getClusters().values()) {
 			assertActivityIsSequential("Activity A", cluster);
 			assertActivityIsSequential("Activity B", cluster);
 			assertActivitiesDoNotIntersect("Activity A", "Activity B", cluster);
@@ -57,8 +54,7 @@ public class SequentialTaskbasedTests extends BatchSimulationTest{
 		assertActivityIsInEveryInstance("Activity A", table);
 		assertActivityIsInEveryInstance("Activity B", table);
 		
-		Map<String, List<String[]>> clusters = TestUtils.groupByCluster(table);
-		for(List<String[]> cluster : clusters.values()) {
+		for(List<String[]> cluster : getClusters().values()) {
 			assertActivityIsSequential("Activity A", cluster);
 			assertActivityIsSequential("Activity B", cluster);
 		}
@@ -121,10 +117,6 @@ public class SequentialTaskbasedTests extends BatchSimulationTest{
 				return row[0].equals(""+j) && row[1].equals(activityName);
 			}));
 		}
-	}
-	
-	private static void assertExecutionType(List<String[]> table) {
-		table.stream().forEach((each)->{Assert.assertEquals(BatchClusterExecutionType.SEQUENTIAL_TASKBASED.toString(), each[7]);});
 	}
 
 }

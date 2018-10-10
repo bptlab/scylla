@@ -10,7 +10,17 @@ import org.junit.Test;
 import de.hpi.bpt.scylla.TestUtils;
 
 public class CSVLoggerTests extends BatchSimulationTest{
-
+	
+	
+	@Test
+	public void testHeaderLength() {
+		runSimpleSimulation(
+				"BatchTestGlobalConfiguration.xml", 
+				"ModelSimple.bpmn", 
+				"BatchTestSimulationConfiguration.xml");
+		
+		assertEquals(BatchCSVLogger.headerLength(), table.get(0).length);		
+	}
 	
 	@Test
 	public void testNaturalEnablementTaskbased() {
@@ -19,9 +29,8 @@ public class CSVLoggerTests extends BatchSimulationTest{
 				"BatchTestGlobalConfiguration.xml", 
 				"ModelSimple.bpmn", 
 				"BatchTestSimulationConfiguration.xml");
-		assert table.get(0).length == BatchCSVLogger.headerLength();
-		Map<String, List<String[]>> clusters = TestUtils.groupByCluster(table);
-		for(List<String[]> cluster : clusters.values()) {
+		
+		for(List<String[]> cluster : getClusters().values()) {
 			Map<String, List<String[]>> activities = TestUtils.groupBy(cluster, 1);
 			assertInstanceWiseNaturalEnablement(activities.get("Batch Activity"), activities.get("Activity A"));
 			assertConstantNaturalEnablement(activities.get("Activity B"));
@@ -37,8 +46,7 @@ public class CSVLoggerTests extends BatchSimulationTest{
 				"ModelSimple.bpmn", 
 				"BatchTestSimulationConfiguration.xml");
 		
-		Map<String, List<String[]>> clusters = TestUtils.groupByCluster(table);
-		for(List<String[]> cluster : clusters.values()) {
+		for(List<String[]> cluster : getClusters().values()) {
 			Map<String, List<String[]>> activities = TestUtils.groupBy(cluster, 1);
 			assertInstanceWiseNaturalEnablement(activities.get("Batch Activity"), activities.get("Activity A"));
 		}

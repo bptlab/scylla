@@ -5,6 +5,9 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Map;
+
+import org.junit.Assert;
 
 import de.hpi.bpt.scylla.SimulationTest;
 import de.hpi.bpt.scylla.TestUtils;
@@ -21,7 +24,7 @@ public class BatchSimulationTest extends SimulationTest{
 	@Override
 	protected void afterParsing() {
 		super.afterParsing();
-		changeBatchType();
+		if(executionType != null)changeBatchType();
 	}
 	
 	@Override
@@ -48,6 +51,18 @@ public class BatchSimulationTest extends SimulationTest{
 		File f = new File(".\\"+outputPath+getProcessId()+"_processBatchActivityStats.csv");
 		assertTrue(f.exists());
 		table = TestUtils.readCSV(f);
+	}
+	
+	protected void assertExecutionType() {
+		table.stream().forEach((each)->{Assert.assertEquals(executionType.toString(), each[7]);});
+	}
+	
+	protected Map<String, List<String[]>> getClusters() {
+		return TestUtils.groupBy(table,6);
+	}
+	
+	protected Map<String, List<String[]>> getProcessInstances() {
+		return TestUtils.groupBy(table,0);
 	}
 	
 	protected BatchActivity getBatchActivity() {

@@ -3,7 +3,6 @@ package de.hpi.bpt.scylla.plugin.batch;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -14,8 +13,6 @@ import java.util.stream.Collectors;
 
 import org.junit.Assert;
 import org.junit.Test;
-
-import de.hpi.bpt.scylla.TestUtils;
 
 public class SequentialCasebasedTests extends BatchSimulationTest{
 	
@@ -35,9 +32,9 @@ public class SequentialCasebasedTests extends BatchSimulationTest{
 				"ModelGatewayParallel.bpmn", 
 				"BatchTestSimulationConfiguration.xml");
 		Assert.assertEquals(30, table.size());
-		assertExecutionType(table);
-		Map<String, List<String[]>> clusters = TestUtils.groupByCluster(table);
-		for(List<String[]> cluster : clusters.values()) {
+		assertExecutionType();
+		
+		for(List<String[]> cluster : getClusters().values()) {
 			assertClusterIsCaseBased(cluster);
 		}
 	}
@@ -67,8 +64,7 @@ public class SequentialCasebasedTests extends BatchSimulationTest{
 			System.err.println();
 		}
 		
-		Map<String, List<String[]>> clusters = TestUtils.groupByCluster(table);
-		for(List<String[]> cluster : clusters.values()) {
+		for(List<String[]> cluster : getClusters().values()) {
 			int numberOfResourcesPerCluster = cluster.stream()
 				.filter(each -> (each[1].equals("Activity A") || each[1].equals("Activity B")))
 				.collect(Collectors.groupingBy(each -> each[6])).size();
@@ -82,12 +78,6 @@ public class SequentialCasebasedTests extends BatchSimulationTest{
 				"regression\\DoubleEventGlobal.xml", 
 				"regression\\DoubleEvent.bpmn", 
 				"regression\\DoubleEventSim.xml");
-		File f = new File(".\\"+outputPath+"Simple_seq_casebased_processBatchActivityStats.csv");
-		assertTrue(f.exists());
-	}
-	
-	private static void assertExecutionType(List<String[]> table) {
-		table.stream().forEach((each)->{Assert.assertEquals(BatchClusterExecutionType.SEQUENTIAL_CASEBASED.toString(), each[7]);});
 	}
 	
 	public static void assertClusterIsCaseBased(List<String[]> cluster) {

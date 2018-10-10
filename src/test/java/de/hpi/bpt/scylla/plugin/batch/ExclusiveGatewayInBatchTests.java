@@ -4,11 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
-import java.util.Map;
 
 import org.junit.Test;
 
-import de.hpi.bpt.scylla.TestUtils;
 import de.hpi.bpt.scylla.logger.DebugLogger;
 
 public class ExclusiveGatewayInBatchTests extends BatchSimulationTest{
@@ -18,7 +16,7 @@ public class ExclusiveGatewayInBatchTests extends BatchSimulationTest{
 		ExclusiveGatewayInBatchTests x = new ExclusiveGatewayInBatchTests();
 		x.testSequentialTaskbased();
 		x.testSequentialCasebased();
-		//x.testParallel();
+		x.testParallel();
 	}
 
 	
@@ -31,13 +29,12 @@ public class ExclusiveGatewayInBatchTests extends BatchSimulationTest{
 				"BatchTestSimulationConfigurationWithXGateway.xml");
 		
 		assertEquals(20, table.size());
-		Map<String, List<String[]>> clusters = TestUtils.groupByCluster(table);
 		
-		for(List<String[]> cluster : clusters.values()) {
+		for(List<String[]> cluster : getClusters().values()) {
 			assertExclusiveness(cluster);
 		}
 		
-		for(List<String[]> processInstance : TestUtils.groupBy(table, 0).values()) {
+		for(List<String[]> processInstance : getProcessInstances().values()) {
 			assertExclusiveness(processInstance);
 		}
 	}
@@ -52,14 +49,13 @@ public class ExclusiveGatewayInBatchTests extends BatchSimulationTest{
 				"BatchTestSimulationConfigurationWithXGateway.xml");
 		
 		assertEquals(20, table.size());
-		Map<String, List<String[]>> clusters = TestUtils.groupByCluster(table);
 		
-		for(List<String[]> cluster : clusters.values()) {
+		for(List<String[]> cluster : getClusters().values()) {
 			SequentialCasebasedTests.assertClusterIsCaseBased(cluster);
 			assertExclusiveness(cluster);
 		}
 		
-		for(List<String[]> processInstance : TestUtils.groupBy(table, 0).values()) {
+		for(List<String[]> processInstance : getProcessInstances().values()) {
 			assertExclusiveness(processInstance);
 		}
 	}
@@ -73,13 +69,12 @@ public class ExclusiveGatewayInBatchTests extends BatchSimulationTest{
 				"BatchTestSimulationConfigurationWithXGateway.xml");
 		
 		assertEquals(20, table.size());
-		Map<String, List<String[]>> clusters = TestUtils.groupByCluster(table);
-
-		for(List<String[]> cluster : clusters.values()) {
+		
+		for(List<String[]> cluster : getClusters().values()) {
 			ParallelTests.assertActivityGroupsAreEqual(cluster);
 		}
 		
-		for(List<String[]> processInstance : TestUtils.groupBy(table, 0).values()) {
+		for(List<String[]> processInstance : getProcessInstances().values()) {
 			assertExclusiveness(processInstance);
 		}
 	}
