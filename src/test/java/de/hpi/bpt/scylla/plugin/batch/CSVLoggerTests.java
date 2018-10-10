@@ -1,15 +1,12 @@
 package de.hpi.bpt.scylla.plugin.batch;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.io.File;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
 
-import de.hpi.bpt.scylla.SimulationTest;
 import de.hpi.bpt.scylla.TestUtils;
 
 public class CSVLoggerTests extends BatchSimulationTest{
@@ -22,9 +19,6 @@ public class CSVLoggerTests extends BatchSimulationTest{
 				"BatchTestGlobalConfiguration.xml", 
 				"ModelSimple.bpmn", 
 				"BatchTestSimulationConfiguration.xml");
-		File f = new File(".\\"+outputPath+"Process_1_processBatchActivityStats.csv");
-		assertTrue(f.exists());
-		List<String[]> table = TestUtils.readCSV(f);
 		assert table.get(0).length == BatchCSVLogger.headerLength();
 		Map<String, List<String[]>> clusters = TestUtils.groupByCluster(table);
 		for(List<String[]> cluster : clusters.values()) {
@@ -42,9 +36,6 @@ public class CSVLoggerTests extends BatchSimulationTest{
 				"BatchTestGlobalConfiguration.xml", 
 				"ModelSimple.bpmn", 
 				"BatchTestSimulationConfiguration.xml");
-		File f = new File(".\\"+outputPath+"Process_1_processBatchActivityStats.csv");
-		assertTrue(f.exists());
-		List<String[]> table = TestUtils.readCSV(f);
 		
 		Map<String, List<String[]>> clusters = TestUtils.groupByCluster(table);
 		for(List<String[]> cluster : clusters.values()) {

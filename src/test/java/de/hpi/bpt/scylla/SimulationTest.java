@@ -15,6 +15,7 @@ import de.hpi.bpt.scylla.exception.ScyllaValidationException;
 import de.hpi.bpt.scylla.model.configuration.SimulationConfiguration;
 import de.hpi.bpt.scylla.model.global.GlobalConfiguration;
 import de.hpi.bpt.scylla.model.global.resource.Resource;
+import de.hpi.bpt.scylla.model.process.ProcessModel;
 
 public abstract class SimulationTest {
 
@@ -69,6 +70,14 @@ public abstract class SimulationTest {
 	
 	protected SimulationConfiguration getSimulationConfiguration() {
 		return simulationManager.getSimulationConfigurations().values().iterator().next();
+	}
+	
+	protected ProcessModel getProcessModel() {
+		return simulationManager.getProcessModels().values().iterator().next();
+	}
+	
+	protected String getProcessId() {
+		return getProcessModel().getId();
 	}
 	
 	protected Resource getResource() {

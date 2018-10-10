@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.hpi.bpt.scylla.SimulationTest;
 import de.hpi.bpt.scylla.TestUtils;
 
 public class SequentialCasebasedTests extends BatchSimulationTest{
@@ -35,9 +34,6 @@ public class SequentialCasebasedTests extends BatchSimulationTest{
 				"BatchTestGlobalConfiguration.xml", 
 				"ModelGatewayParallel.bpmn", 
 				"BatchTestSimulationConfiguration.xml");
-		File f = new File(".\\"+outputPath+"Process_1_processBatchActivityStats.csv");
-		Assert.assertTrue(f.exists());
-		List<String[]> table = TestUtils.readCSV(f);
 		Assert.assertEquals(30, table.size());
 		assertExecutionType(table);
 		Map<String, List<String[]>> clusters = TestUtils.groupByCluster(table);
@@ -52,9 +48,6 @@ public class SequentialCasebasedTests extends BatchSimulationTest{
 				"BatchTestGlobalConfiguration.xml", 
 				"ModelGatewayParallel.bpmn", 
 				"BatchTestSimulationConfigurationWithResources.xml");
-		File f = new File(".\\"+outputPath+"Process_1_processBatchActivityStats.csv");
-		assertTrue(f.exists());
-		List<String[]> table = TestUtils.readCSV(f);
 		
 		assertEquals(30, table.size());
 		

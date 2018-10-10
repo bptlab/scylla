@@ -1,6 +1,5 @@
 package de.hpi.bpt.scylla.plugin.batch;
 
-import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -8,7 +7,6 @@ import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.hpi.bpt.scylla.SimulationTest;
 import de.hpi.bpt.scylla.TestUtils;
 
 public class ParallelTests extends BatchSimulationTest{
@@ -29,10 +27,7 @@ public class ParallelTests extends BatchSimulationTest{
 				"BatchTestGlobalConfiguration.xml", 
 				"ModelGatewayParallel.bpmn", 
 				"BatchTestSimulationConfiguration.xml");
-		File f = new File(".\\"+outputPath+"Process_1_processBatchActivityStats.csv");
-		Assert.assertTrue(f.exists());
 		
-		List<String[]> table = TestUtils.readCSV(f);
 		Assert.assertEquals(30, table.size());
 		assertExecutionType(table);
 		assertNoNaturalArrivalTime(table);

@@ -3,7 +3,6 @@ package de.hpi.bpt.scylla.plugin.batch;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,7 +12,6 @@ import java.util.stream.Collectors;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.hpi.bpt.scylla.SimulationTest;
 import de.hpi.bpt.scylla.TestUtils;
 import de.hpi.bpt.scylla.logger.DebugLogger;
 
@@ -37,9 +35,6 @@ public class SequentialTaskbasedTests extends BatchSimulationTest{
 				"BatchTestGlobalConfiguration.xml", 
 				"ModelSimple.bpmn", 
 				"BatchTestSimulationConfiguration.xml");
-		File f = new File(".\\"+outputPath+"Process_1_processBatchActivityStats.csv");
-		assertTrue(f.exists());
-		List<String[]> table = TestUtils.readCSV(f);
 		
 		assertEquals(30, table.size());
 		assertExecutionType(table);
@@ -57,9 +52,6 @@ public class SequentialTaskbasedTests extends BatchSimulationTest{
 				"BatchTestGlobalConfiguration.xml", 
 				"ModelGatewayParallel.bpmn", 
 				"BatchTestSimulationConfiguration.xml");
-		File f = new File(".\\"+outputPath+"Process_1_processBatchActivityStats.csv");
-		assertTrue(f.exists());
-		List<String[]> table = TestUtils.readCSV(f);
 		
 		assertEquals(30, table.size());
 		assertActivityIsInEveryInstance("Activity A", table);
@@ -82,9 +74,6 @@ public class SequentialTaskbasedTests extends BatchSimulationTest{
 				"BatchTestGlobalConfiguration.xml", 
 				"ModelGatewayParallel.bpmn", 
 				"BatchTestSimulationConfigurationWithResources.xml");
-		File f = new File(".\\"+outputPath+"Process_1_processBatchActivityStats.csv");
-		assertTrue(f.exists());
-		List<String[]> table = TestUtils.readCSV(f);
 		
 		assertEquals(30, table.size());
 		

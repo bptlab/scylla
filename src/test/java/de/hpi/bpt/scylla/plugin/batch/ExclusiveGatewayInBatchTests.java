@@ -3,14 +3,11 @@ package de.hpi.bpt.scylla.plugin.batch;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
 
-import de.hpi.bpt.scylla.SimulationTest;
 import de.hpi.bpt.scylla.TestUtils;
 import de.hpi.bpt.scylla.logger.DebugLogger;
 
@@ -32,9 +29,6 @@ public class ExclusiveGatewayInBatchTests extends BatchSimulationTest{
 				"BatchTestGlobalConfiguration.xml", 
 				"ModelGatewayExclusive.bpmn", 
 				"BatchTestSimulationConfigurationWithXGateway.xml");
-		File f = new File(".\\"+outputPath+"Process_1_processBatchActivityStats.csv");
-		assertTrue(f.exists());
-		List<String[]> table = TestUtils.readCSV(f);
 		
 		assertEquals(20, table.size());
 		Map<String, List<String[]>> clusters = TestUtils.groupByCluster(table);
@@ -56,9 +50,6 @@ public class ExclusiveGatewayInBatchTests extends BatchSimulationTest{
 				"BatchTestGlobalConfiguration.xml", 
 				"ModelGatewayExclusive.bpmn", 
 				"BatchTestSimulationConfigurationWithXGateway.xml");
-		File f = new File(".\\"+outputPath+"Process_1_processBatchActivityStats.csv");
-		assertTrue(f.exists());
-		List<String[]> table = TestUtils.readCSV(f);
 		
 		assertEquals(20, table.size());
 		Map<String, List<String[]>> clusters = TestUtils.groupByCluster(table);
@@ -80,9 +71,6 @@ public class ExclusiveGatewayInBatchTests extends BatchSimulationTest{
 				"BatchTestGlobalConfiguration.xml", 
 				"ModelGatewayExclusive.bpmn", 
 				"BatchTestSimulationConfigurationWithXGateway.xml");
-		File f = new File(".\\"+outputPath+"Process_1_processBatchActivityStats.csv");
-		assertTrue(f.exists());
-		List<String[]> table = TestUtils.readCSV(f);
 		
 		assertEquals(20, table.size());
 		Map<String, List<String[]>> clusters = TestUtils.groupByCluster(table);
