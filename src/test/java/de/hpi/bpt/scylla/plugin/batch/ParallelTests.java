@@ -11,14 +11,13 @@ import org.junit.Test;
 import de.hpi.bpt.scylla.SimulationTest;
 import de.hpi.bpt.scylla.TestUtils;
 
-public class ParallelTests extends SimulationTest{
+public class ParallelTests extends BatchSimulationTest{
 	
 	public static void main(String[] args) {
 		ParallelTests x = new ParallelTests();
 		x.testParallelGateway();
 	}
 
-	protected String getFolderName() {return "BatchPlugin";}
 	
 	@Test
 	public void testParallelGateway() {

@@ -17,7 +17,7 @@ import de.hpi.bpt.scylla.SimulationTest;
 import de.hpi.bpt.scylla.TestUtils;
 import de.hpi.bpt.scylla.logger.DebugLogger;
 
-public class SequentialTaskbasedTests extends SimulationTest{
+public class SequentialTaskbasedTests extends BatchSimulationTest{
 	
 	public static void main(String[] args) {
 		DebugLogger.allowDebugLogging = false;
@@ -26,8 +26,6 @@ public class SequentialTaskbasedTests extends SimulationTest{
 		//x.testParallelGateway();
 		x.testResourceStable();
 	}
-
-	protected String getFolderName() {return "BatchPlugin";}
 	
 	@Test(timeout=3000)
 	public void testActivitiesAreSequential() {

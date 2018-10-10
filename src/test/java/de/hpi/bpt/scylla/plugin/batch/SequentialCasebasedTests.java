@@ -18,14 +18,12 @@ import org.junit.Test;
 import de.hpi.bpt.scylla.SimulationTest;
 import de.hpi.bpt.scylla.TestUtils;
 
-public class SequentialCasebasedTests extends SimulationTest{
+public class SequentialCasebasedTests extends BatchSimulationTest{
 	
 	public static void main(String[] args) {
 		SequentialCasebasedTests x = new SequentialCasebasedTests();
 		x.testResourceStable();
 	}
-
-	protected String getFolderName() {return "BatchPlugin";}
 	
 	@Test
 	public void testParallelGateway() {

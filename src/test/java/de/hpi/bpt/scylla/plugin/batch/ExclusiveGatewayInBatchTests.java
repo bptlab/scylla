@@ -14,7 +14,7 @@ import de.hpi.bpt.scylla.SimulationTest;
 import de.hpi.bpt.scylla.TestUtils;
 import de.hpi.bpt.scylla.logger.DebugLogger;
 
-public class ExclusiveGatewayInBatchTests extends SimulationTest{
+public class ExclusiveGatewayInBatchTests extends BatchSimulationTest{
 	
 	private BatchClusterExecutionType executionType;
 	
@@ -26,7 +26,6 @@ public class ExclusiveGatewayInBatchTests extends SimulationTest{
 		//x.testParallel();
 	}
 
-	protected String getFolderName() {return "BatchPlugin";}
 	
 	@Test
 	public void testSequentialTaskbased() {

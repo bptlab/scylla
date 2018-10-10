@@ -12,10 +12,8 @@ import org.junit.Test;
 import de.hpi.bpt.scylla.SimulationTest;
 import de.hpi.bpt.scylla.TestUtils;
 
-public class CSVLoggerTests extends SimulationTest{
+public class CSVLoggerTests extends BatchSimulationTest{
 
-	@Override
-	protected String getFolderName() {return "BatchPlugin";}
 	
 	@Test
 	public void testNaturalEnablementTaskbased() {
