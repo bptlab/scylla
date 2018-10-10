@@ -16,7 +16,7 @@ public class PluginNotClearedRegressionTests extends SimulationTest{
 		assertFalse(CallTestPlugin.getInstance().called);
 		runSimpleSimulation(
 				"BatchTestGlobalConfiguration.xml", 
-				"TaskbasedModelSimple.bpmn", 
+				"ModelSimple.bpmn", 
 				"BatchTestSimulationConfiguration.xml");
 		assertFalse(CallTestPlugin.getInstance().called);
 	}

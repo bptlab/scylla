@@ -19,6 +19,10 @@ import de.hpi.bpt.scylla.logger.DebugLogger;
 
 public class SequentialTaskbasedTests extends BatchSimulationTest{
 	
+	{
+		executionType = BatchClusterExecutionType.SEQUENTIAL_TASKBASED;
+	}
+	
 	public static void main(String[] args) {
 		DebugLogger.allowDebugLogging = false;
 		SequentialTaskbasedTests x = new SequentialTaskbasedTests();
@@ -31,7 +35,7 @@ public class SequentialTaskbasedTests extends BatchSimulationTest{
 	public void testActivitiesAreSequential() {
 		runSimpleSimulation(
 				"BatchTestGlobalConfiguration.xml", 
-				"TaskbasedModelSimple.bpmn", 
+				"ModelSimple.bpmn", 
 				"BatchTestSimulationConfiguration.xml");
 		File f = new File(".\\"+outputPath+"Process_1_processBatchActivityStats.csv");
 		assertTrue(f.exists());
@@ -51,7 +55,7 @@ public class SequentialTaskbasedTests extends BatchSimulationTest{
 	public void testParallelGateway() {
 		runSimpleSimulation(
 				"BatchTestGlobalConfiguration.xml", 
-				"TaskbasedModelGatewayParallel.bpmn", 
+				"ModelGatewayParallel.bpmn", 
 				"BatchTestSimulationConfiguration.xml");
 		File f = new File(".\\"+outputPath+"Process_1_processBatchActivityStats.csv");
 		assertTrue(f.exists());
@@ -76,7 +80,7 @@ public class SequentialTaskbasedTests extends BatchSimulationTest{
 	public void testResourceStable() {
 		runSimpleSimulation(
 				"BatchTestGlobalConfiguration.xml", 
-				"TaskbasedModelGatewayParallel.bpmn", 
+				"ModelGatewayParallel.bpmn", 
 				"BatchTestSimulationConfigurationWithResources.xml");
 		File f = new File(".\\"+outputPath+"Process_1_processBatchActivityStats.csv");
 		assertTrue(f.exists());

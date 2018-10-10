@@ -17,9 +17,10 @@ public class CSVLoggerTests extends BatchSimulationTest{
 	
 	@Test
 	public void testNaturalEnablementTaskbased() {
+		executionType = BatchClusterExecutionType.SEQUENTIAL_TASKBASED;
 		runSimpleSimulation(
 				"BatchTestGlobalConfiguration.xml", 
-				"TaskbasedModelSimple.bpmn", 
+				"ModelSimple.bpmn", 
 				"BatchTestSimulationConfiguration.xml");
 		File f = new File(".\\"+outputPath+"Process_1_processBatchActivityStats.csv");
 		assertTrue(f.exists());
@@ -36,9 +37,10 @@ public class CSVLoggerTests extends BatchSimulationTest{
 	
 	@Test
 	public void testNaturalEnablementCasebased() {
+		executionType = BatchClusterExecutionType.SEQUENTIAL_CASEBASED;
 		runSimpleSimulation(
 				"BatchTestGlobalConfiguration.xml", 
-				"CasebasedModelSimple.bpmn", 
+				"ModelSimple.bpmn", 
 				"BatchTestSimulationConfiguration.xml");
 		File f = new File(".\\"+outputPath+"Process_1_processBatchActivityStats.csv");
 		assertTrue(f.exists());

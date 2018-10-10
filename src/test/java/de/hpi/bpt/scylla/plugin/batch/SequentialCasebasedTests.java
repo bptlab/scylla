@@ -20,16 +20,20 @@ import de.hpi.bpt.scylla.TestUtils;
 
 public class SequentialCasebasedTests extends BatchSimulationTest{
 	
+	{
+		executionType = BatchClusterExecutionType.SEQUENTIAL_CASEBASED;
+	}
+	
 	public static void main(String[] args) {
 		SequentialCasebasedTests x = new SequentialCasebasedTests();
-		x.testResourceStable();
+		x.testEventScheduledDoubleRegression();
 	}
 	
 	@Test
 	public void testParallelGateway() {
 		runSimpleSimulation(
 				"BatchTestGlobalConfiguration.xml", 
-				"CasebasedModelGatewayParallel.bpmn", 
+				"ModelGatewayParallel.bpmn", 
 				"BatchTestSimulationConfiguration.xml");
 		File f = new File(".\\"+outputPath+"Process_1_processBatchActivityStats.csv");
 		Assert.assertTrue(f.exists());
@@ -46,7 +50,7 @@ public class SequentialCasebasedTests extends BatchSimulationTest{
 	public void testResourceStable() {
 		runSimpleSimulation(
 				"BatchTestGlobalConfiguration.xml", 
-				"CasebasedModelGatewayParallel.bpmn", 
+				"ModelGatewayParallel.bpmn", 
 				"BatchTestSimulationConfigurationWithResources.xml");
 		File f = new File(".\\"+outputPath+"Process_1_processBatchActivityStats.csv");
 		assertTrue(f.exists());

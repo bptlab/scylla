@@ -13,6 +13,10 @@ import de.hpi.bpt.scylla.TestUtils;
 
 public class ParallelTests extends BatchSimulationTest{
 	
+	{
+		executionType = BatchClusterExecutionType.PARALLEL;
+	}
+	
 	public static void main(String[] args) {
 		ParallelTests x = new ParallelTests();
 		x.testParallelGateway();
@@ -23,7 +27,7 @@ public class ParallelTests extends BatchSimulationTest{
 	public void testParallelGateway() {
 		runSimpleSimulation(
 				"BatchTestGlobalConfiguration.xml", 
-				"ParallelModelGatewayParallel.bpmn", 
+				"ModelGatewayParallel.bpmn", 
 				"BatchTestSimulationConfiguration.xml");
 		File f = new File(".\\"+outputPath+"Process_1_processBatchActivityStats.csv");
 		Assert.assertTrue(f.exists());

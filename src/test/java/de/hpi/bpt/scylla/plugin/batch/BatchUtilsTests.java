@@ -17,7 +17,7 @@ public class BatchUtilsTests extends SimulationTest{
 		assertFalse(BatchPluginUtils.isInitialized());
 		runSimpleSimulation(
 				"BatchTestGlobalConfiguration.xml", 
-				"TaskbasedModelSimple.bpmn", 
+				"ModelSimple.bpmn", 
 				"BatchTestSimulationConfiguration.xml");
 		assertFalse(BatchPluginUtils.isInitialized());
 	}

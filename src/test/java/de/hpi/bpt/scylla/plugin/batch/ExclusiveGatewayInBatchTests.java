@@ -16,8 +16,6 @@ import de.hpi.bpt.scylla.logger.DebugLogger;
 
 public class ExclusiveGatewayInBatchTests extends BatchSimulationTest{
 	
-	private BatchClusterExecutionType executionType;
-	
 	public static void main(String[] args) {
 		DebugLogger.allowDebugLogging = false;
 		ExclusiveGatewayInBatchTests x = new ExclusiveGatewayInBatchTests();
@@ -104,26 +102,6 @@ public class ExclusiveGatewayInBatchTests extends BatchSimulationTest{
 				^
 				processInstance.stream().anyMatch((any)->{return any[1].equals("Activity B");})
 		);
-	}
-	
-	@Override
-	protected void afterParsing() {
-		super.afterParsing();
-		changeBatchType();
-	}
-	
-	protected void changeBatchType() {
-		BatchActivity batchActivity = simulationManager.getProcessModels().get("Process_1").getBatchActivities().get(3);
-		assert batchActivity != null;
-		assert executionType != null;
-		try {
-			Field privateStringField = BatchActivity.class.getDeclaredField("executionType");
-			privateStringField.setAccessible(true);
-			privateStringField.set(batchActivity, executionType);
-		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
-			e.printStackTrace();
-		}
-		assert batchActivity.getExecutionType() == executionType;
 	}
 		
 
