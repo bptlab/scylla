@@ -30,7 +30,7 @@ public class BatchTEPlugin extends TaskEnableEventPluggable {
         //SimulationConfiguration simulationConfiguration = desmojObjects.getSimulationConfiguration();
         /*Map<Integer, BatchActivity> batchActivities = (Map<Integer, BatchActivity>) simulationConfiguration
                 .getExtensionValue(getName(), "batchActivities");*/
-        Map<Integer, BatchActivity> batchActivities = processModel.getBatchActivities();
+        Map<Integer, BatchActivity> batchActivities = BatchPluginUtils.getBatchActivities(processModel);
 
         /**If the task is a batch activity and a subprocess, cancel its normal execution 
          * and execute as batch activity instead*/

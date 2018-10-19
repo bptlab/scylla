@@ -37,6 +37,7 @@ import desmoj.core.simulator.TimeSpan;
 public class BatchPluginUtils {
 
     static final String PLUGIN_NAME = "batch";
+	static final String ATTRIBUTE_NAME = "batchClusters";
     private static BatchPluginUtils singleton;
 
     //Map of running instances
@@ -102,7 +103,7 @@ public class BatchPluginUtils {
         ProcessSimulationComponents simulationComponents = parentalBeginEvent.getSimulationComponents();
         /*Map<Integer, BatchActivity> batchActivities = (Map<Integer, BatchActivity>) pSimComponents.getSimulationConfiguration()
                 .getExtensionValue(PLUGIN_NAME, "batchActivities");*/
-        Map<Integer, BatchActivity> batchActivities = processModel.getBatchActivities();
+        Map<Integer, BatchActivity> batchActivities = getBatchActivities(processModel);
         BatchActivity batchActivity = batchActivities.get(nodeId);
 
         BatchCluster cluster = null;
@@ -466,5 +467,10 @@ public class BatchPluginUtils {
 	
 	public void scheduleStashEvent(BatchStashResourceEvent event) {
 		stashEvents.add(event);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static Map<Integer, BatchActivity> getBatchActivities(ProcessModel processModel) {
+		return (Map<Integer, BatchActivity>) processModel.getExtensionValue(PLUGIN_NAME, ATTRIBUTE_NAME);
 	}
 }

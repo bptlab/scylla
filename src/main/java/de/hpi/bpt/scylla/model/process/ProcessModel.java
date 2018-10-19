@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import de.hpi.bpt.scylla.plugin.batch.BatchActivity;
 import org.jdom2.Element;
 
 import de.hpi.bpt.scylla.exception.ScyllaValidationException;
@@ -52,7 +51,6 @@ public class ProcessModel extends SimulationInput {
     private Map<Integer, Map<EventDefinitionType, Map<String, String>>> eventDefinitions;
     private Map<Integer, Boolean> cancelActivities;
     private Map<Integer, List<Integer>> referencesToBoundaryEvents;
-    private Map<Integer, BatchActivity> batchActivities;//TODO move! this has no business here
 
     private Graph<Integer> dataObjectsGraph;
     private Map<Integer, DataObjectType> dataObjectTypes;
@@ -252,12 +250,6 @@ public class ProcessModel extends SimulationInput {
     public void setDataObjectReferences(Map<Integer, String> dataObjectReferences) {
     	this.dataObjectReferences = dataObjectReferences;
     }
-
-    public void setBatchActivities(Map<Integer, BatchActivity> batchActivities){
-        this.batchActivities = batchActivities;
-    }
-
-    public Map<Integer, BatchActivity>  getBatchActivities() { return batchActivities; }
     
     public String getParticipant() {
         return participant;

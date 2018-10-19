@@ -1,5 +1,6 @@
 package de.hpi.bpt.scylla.plugin_type.parser;
 
+import java.util.List;
 import java.util.Map;
 
 import org.jdom2.Element;
@@ -15,7 +16,10 @@ public abstract class ProcessModelParserPluggable extends ParserPluggable<Proces
             throws ScyllaValidationException {
         // run(simEnvironment, ProcessModelParserPluggable.class, processModel, rootElement);
 
-        runPluginsPerPM(simEnvironment, processModel, rootElement);
+        List<Element> processElements = rootElement.getChildren("process", rootElement.getNamespace());
+        for(Element processElement : processElements) {
+            runPluginsPerPM(simEnvironment, processModel, processElement);
+        }
     }
 
     private static void runPluginsPerPM(SimulationManager simEnvironment, ProcessModel processModel, Element sim)

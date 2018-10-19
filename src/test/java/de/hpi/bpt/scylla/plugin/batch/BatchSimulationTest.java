@@ -65,7 +65,7 @@ public class BatchSimulationTest extends SimulationTest{
 	}
 	
 	protected BatchActivity getBatchActivity() {
-		return getProcessModel().getBatchActivities().values().iterator().next();
+		return BatchPluginUtils.getBatchActivities(getProcessModel()).values().iterator().next();
 	}
 	
 

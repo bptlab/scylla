@@ -212,7 +212,7 @@ public class SimulationManager {
             // parse process model(s) from XML (BPMN)
             ProcessModelParser pmParser = new ProcessModelParser(this);
             pmParser.setCommonProcessElements(commonProcessElementsFromFile);
-            ProcessModel processModelFromFile = pmParser.parse(pmDoc.getRootElement());
+            ProcessModel processModelFromFile = pmParser.parse(pmRootElement);
             String processId = processModelFromFile.getId();
             if (processModels.containsKey(processId)) {
                 throw new ScyllaValidationException("Duplicate process model with id " + processId + ".");

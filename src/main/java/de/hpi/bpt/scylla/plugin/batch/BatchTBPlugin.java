@@ -64,7 +64,7 @@ public class BatchTBPlugin extends TaskBeginEventPluggable {
         /*Map<Integer, BatchActivity> batchActivities = (Map<Integer, BatchActivity>) simulationConfiguration
                 .getExtensionValue(getName(), "batchActivities");*/
 
-        Map<Integer, BatchActivity> batchActivities = processModel.getBatchActivities();
+        Map<Integer, BatchActivity> batchActivities = BatchPluginUtils.getBatchActivities(processModel);
         if (batchActivities.containsKey(nodeId) && processModel.getSubProcesses().containsKey(nodeId)) {
 
             // subprocess plugin wants to schedule BPMNStartEvents for subprocess
