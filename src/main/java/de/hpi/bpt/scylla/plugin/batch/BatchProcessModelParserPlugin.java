@@ -17,6 +17,14 @@ import de.hpi.bpt.scylla.exception.ScyllaValidationException;
 import de.hpi.bpt.scylla.model.process.ProcessModel;
 import de.hpi.bpt.scylla.plugin_type.parser.ProcessModelParserPluggable;
 
+/**
+ * I parse batch activities specified in the process model.<br>
+ * The activities that I parse can later be found at the {@link ProcessModel#getExtensionValue(String, String) extensions of the process model}
+ * with the {@link BatchPluginUtils#PLUGIN_NAME batch plugin name} and {@link BatchPluginUtils#ACTIVITIES_KEY batch activity key}.<br>
+ * Use the shortcut method {@link BatchPluginUtils#getBatchActivities(ProcessModel)} to access them.
+ * @author Leon Bein
+ *
+ */
 public class BatchProcessModelParserPlugin extends ProcessModelParserPluggable{
 
 	@Override
@@ -43,7 +51,7 @@ public class BatchProcessModelParserPlugin extends ProcessModelParserPluggable{
         batchActivities.forEach((key, value) -> value.setProcessModel(processModel));
         
 		Map<String, Object> extensionAttributes = new HashMap<String, Object>();
-        extensionAttributes.put(BatchPluginUtils.ATTRIBUTE_NAME, batchActivities);
+        extensionAttributes.put(BatchPluginUtils.ACTIVITIES_KEY, batchActivities);
         return extensionAttributes;
 	}
 	
