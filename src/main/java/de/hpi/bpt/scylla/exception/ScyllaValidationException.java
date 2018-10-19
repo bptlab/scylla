@@ -10,4 +10,8 @@ public class ScyllaValidationException extends Exception {
     public ScyllaValidationException(String message) {
         super(message);
     }
+    
+    public ScyllaValidationException(String message, Throwable cause) {
+    	super(message, cause);
+    }
 }
