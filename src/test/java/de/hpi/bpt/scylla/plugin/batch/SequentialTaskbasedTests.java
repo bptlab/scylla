@@ -1,7 +1,8 @@
 package de.hpi.bpt.scylla.plugin.batch;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Deque;
 import java.util.LinkedList;
@@ -9,8 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
+import de.hpi.bpt.scylla.TestSeeds;
 import de.hpi.bpt.scylla.logger.DebugLogger;
 
 public class SequentialTaskbasedTests extends BatchSimulationTest{
@@ -24,10 +26,10 @@ public class SequentialTaskbasedTests extends BatchSimulationTest{
 		SequentialTaskbasedTests x = new SequentialTaskbasedTests();
 		//x.testActivitiesAreSequential();
 		//x.testParallelGateway();
-		x.testResourceStable();
+		x.testResourceStable(-10L);
 	}
 	
-	@Test(timeout=3000)
+	@Test
 	public void testActivitiesAreSequential() {
 		runSimpleSimulation(
 				"BatchTestGlobalConfiguration.xml", 
@@ -59,18 +61,17 @@ public class SequentialTaskbasedTests extends BatchSimulationTest{
 			assertActivityIsSequential("Activity B", cluster);
 		}
 	}
-	
-	/*
-	 *Regression seeds:
-	 *- -3207906028196791040 
-	 */
-	@Test
-	public void testResourceStable() {
+
+
+	@TestSeeds(-3207906028196791040L)
+	public void testResourceStable(Long seed) {
+		setGlobalSeed(seed);
 		runSimpleSimulation(
 				"BatchTestGlobalConfiguration.xml", 
 				"ModelGatewayParallel.bpmn", 
 				"BatchTestSimulationConfigurationWithResources.xml");
 		
+		assert getGlobalConfiguration().getRandomSeed().equals(seed);
 		assertEquals(30, table.size());
 		
 		Map<String, List<String[]>> resources = table.stream()

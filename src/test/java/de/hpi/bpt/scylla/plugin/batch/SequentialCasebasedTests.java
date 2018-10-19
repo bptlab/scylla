@@ -1,7 +1,7 @@
 package de.hpi.bpt.scylla.plugin.batch;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Deque;
 import java.util.HashSet;
@@ -11,8 +11,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import de.hpi.bpt.scylla.TestSeeds;
+
 
 public class SequentialCasebasedTests extends BatchSimulationTest{
 	
@@ -31,15 +33,15 @@ public class SequentialCasebasedTests extends BatchSimulationTest{
 				"BatchTestGlobalConfiguration.xml", 
 				"ModelGatewayParallel.bpmn", 
 				"BatchTestSimulationConfiguration.xml");
-		Assert.assertEquals(30, table.size());
+		assertEquals(30, table.size());
 		assertExecutionType();
 		
 		for(List<String[]> cluster : getClusters().values()) {
 			assertClusterIsCaseBased(cluster);
 		}
 	}
-	
-	@Test
+
+	@TestSeeds(-3207906028196791040L)
 	public void testResourceStable() {
 		runSimpleSimulation(
 				"BatchTestGlobalConfiguration.xml", 
@@ -93,8 +95,8 @@ public class SequentialCasebasedTests extends BatchSimulationTest{
 			String instance = activity[0];
 			String startTime = activity[3];
 			if(!instance.equals(lastInstance)) {
-				Assert.assertFalse(seenInstances.contains(instance));
-				Assert.assertTrue(lastEndTime.compareTo(startTime) <= 0);
+				assertFalse(seenInstances.contains(instance));
+				assertTrue(lastEndTime.compareTo(startTime) <= 0);
 				seenInstances.add(instance);
 			}
 			lastInstance = instance;

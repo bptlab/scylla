@@ -1,8 +1,8 @@
 package de.hpi.bpt.scylla;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.function.Executable;
+
 import static org.junit.jupiter.api.Assertions.*;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -12,13 +12,13 @@ public class ArgumentTests {
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
     private final ByteArrayOutputStream errContent = new ByteArrayOutputStream();
 
-    @Before
+    @BeforeEach
     public void setUpStreams() {
         System.setOut(new PrintStream(outContent));
         System.setErr(new PrintStream(errContent));
     }
     
-    @After
+    @AfterEach
     public void cleanUpStreams() {
         System.setOut(null);
         System.setErr(null);

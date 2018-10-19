@@ -1,14 +1,15 @@
 package de.hpi.bpt.scylla.test.plugin_loader;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import de.hpi.bpt.scylla.plugin_loader.DependencyGraph;
 import de.hpi.bpt.scylla.plugin_loader.DependencyGraph.CycleException;
@@ -17,7 +18,7 @@ public class DependencyGraphTests {
 	
 	private DependencyGraph<Integer> graph;
 	
-	@Before
+	@BeforeEach
 	public void setUp() {
 		List<Integer> data = Arrays.asList(1,2,3,4,5,6,7,8);
 		Collections.shuffle(data);
@@ -50,11 +51,10 @@ public class DependencyGraphTests {
 		for(Integer b : bs)assertTrue(sortedList.indexOf(a) < sortedList.indexOf(b));
 	}
 	
-	@Test(expected = CycleException.class)
+	@Test
 	public void testCycleDetected() throws CycleException {
 		graph.createEdge(6, 2);
-		graph.resolve();
-		fail("Expected cycle has not been detected.");
+		assertThrows(CycleException.class, () -> graph.resolve());
 	}
 
 }

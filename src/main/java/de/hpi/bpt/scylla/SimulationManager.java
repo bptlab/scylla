@@ -186,25 +186,15 @@ public class SimulationManager {
     protected void parseInput() throws ScyllaValidationException, JDOMException, IOException {
         SAXBuilder builder = new SAXBuilder();
         
-        if (globalConfigurationFilename == null || globalConfigurationFilename.isEmpty()) {
+        if (globalConfigurationFilename == null || globalConfigurationFilename.isEmpty())
             throw new ScyllaValidationException("No global configuration provided.");
-        }
-        else {
-            // parse global configuration XML
-            Document gcDoc = builder.build(globalConfigurationFilename);
-            Element gcRootElement = gcDoc.getRootElement();
-            GlobalConfigurationParser globalConfigurationParser = new GlobalConfigurationParser(this);
-            globalConfiguration = globalConfigurationParser.parse(gcDoc.getRootElement());
-            String fileNameWithoutExtension = globalConfigurationFilename.substring(// filename.lastIndexOf("\\") +
-                                                                                    // 1,
-            		globalConfigurationFilename.lastIndexOf(Scylla.FILEDELIM)+1, globalConfigurationFilename.lastIndexOf(".xml"));
-            globalConfiguration.setFileNameWithoutExtension(fileNameWithoutExtension);
-            // plugins to parse global configuration
-            GlobalConfigurationParserPluggable.runPlugins(this, globalConfiguration, gcRootElement);
+        
+        // parse global configuration XML
+        Document gcDoc = builder.build(globalConfigurationFilename);
+        Element gcRootElement = gcDoc.getRootElement();
+        parseGlobalConfiguration(gcRootElement);
 
-            DateTimeUtils.setZoneId(globalConfiguration.getZoneId());
-        }
-
+        //TODO also extract other parsing methods
         CommonProcessElementsParser cpeParser = new CommonProcessElementsParser(this);
         for (String filename : processModelFilenames) {
             Document pmDoc = builder.build(filename);
@@ -251,6 +241,17 @@ public class SimulationManager {
 
             simulationConfigurations.put(processId, simulationConfigurationFromFile);
         }
+    }
+    
+    protected void parseGlobalConfiguration(Element gcRootElement) throws ScyllaValidationException {
+        GlobalConfigurationParser globalConfigurationParser = new GlobalConfigurationParser(this);
+        globalConfiguration = globalConfigurationParser.parse(gcRootElement);
+        String globalFileNameWithoutExtension = globalConfigurationFilename.substring(globalConfigurationFilename.lastIndexOf(Scylla.FILEDELIM)+1, globalConfigurationFilename.lastIndexOf(".xml"));
+        globalConfiguration.setFileNameWithoutExtension(globalFileNameWithoutExtension);
+        // plugins to parse global configuration
+        GlobalConfigurationParserPluggable.runPlugins(this, globalConfiguration, gcRootElement);
+
+        DateTimeUtils.setZoneId(globalConfiguration.getZoneId());
     }
 
     private void cleanup() {

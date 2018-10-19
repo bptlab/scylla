@@ -1,11 +1,12 @@
 package de.hpi.bpt.scylla.plugin.batch;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ParallelTests extends BatchSimulationTest{
 	
@@ -26,7 +27,7 @@ public class ParallelTests extends BatchSimulationTest{
 				"ModelGatewayParallel.bpmn", 
 				"BatchTestSimulationConfiguration.xml");
 		
-		Assert.assertEquals(30, table.size());
+		assertEquals(30, table.size());
 		assertExecutionType();
 		assertNoNaturalArrivalTime(table);
 		
@@ -44,14 +45,14 @@ public class ParallelTests extends BatchSimulationTest{
 			for(String[] activity : activityGroup) {
 				for(int i = 0; i < activity.length; i++) {
 					if(i == 0 || i == 2)continue;
-					Assert.assertEquals(first[i],activity[i]);
+					assertEquals(first[i],activity[i]);
 				}
 			};
 		}
 	}
 	
 	private static void assertNoNaturalArrivalTime(List<String[]> table) {
-		table.stream().forEach((each)->{Assert.assertTrue(each[8].isEmpty());});
+		table.stream().forEach((each)->{assertTrue(each[8].isEmpty());});
 	}
 	
 

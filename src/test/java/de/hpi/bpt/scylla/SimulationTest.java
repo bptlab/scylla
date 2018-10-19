@@ -4,13 +4,16 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 
+import org.jdom2.Element;
 import org.jdom2.JDOMException;
-import org.junit.After;
-import org.junit.Before;
+import org.jdom2.Namespace;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
-import de.hpi.bpt.scylla.SimulationManager;
 import de.hpi.bpt.scylla.exception.ScyllaValidationException;
 import de.hpi.bpt.scylla.model.configuration.SimulationConfiguration;
 import de.hpi.bpt.scylla.model.global.GlobalConfiguration;
@@ -26,10 +29,12 @@ public abstract class SimulationTest {
 
 	protected PrintStream errorLog;
 	protected PrintStream outputLog;
-	
+
+	protected List<Runnable> beforeParsingGlobal = new LinkedList<>();
+	protected Element globalConfigRoot;
 	protected Optional<Runnable> afterParsing = Optional.empty();
 	
-	@Before
+	@BeforeEach
 	public void setUp() {
 		errorLog = new PrintStream(new ByteArrayOutputStream());
 		outputLog = new PrintStream(new ByteArrayOutputStream());
@@ -50,6 +55,12 @@ public abstract class SimulationTest {
 				getPath(globalConfiguration),
                 true, false) {
 			@Override
+			protected void parseGlobalConfiguration(Element globalConfigRoot) throws ScyllaValidationException {
+				beforeParsingGlobal(globalConfigRoot);
+				super.parseGlobalConfiguration(globalConfigRoot);
+			}
+			
+			@Override
 			protected void parseInput() throws ScyllaValidationException, JDOMException, IOException {
 				super.parseInput();
 				SimulationTest.this.afterParsing();
@@ -57,8 +68,8 @@ public abstract class SimulationTest {
 			}
 		};
 	}
-	
-	@After
+
+	@AfterEach
 	public void tearDown() {
 		TestUtils.deleteFolder(new File(".\\"+outputPath));
 		TestUtils.cleanupOutputs(".\\"+getFolder());
@@ -86,6 +97,21 @@ public abstract class SimulationTest {
 	
 	protected int numberOfInstances() {
 		return getSimulationConfiguration().getNumberOfProcessInstances();
+	}
+	
+	protected void setGlobalSeed(Long seed) {
+		if(seed == null)return;
+		if(globalConfigRoot == null)beforeParsingGlobal.add(()->setGlobalSeed(seed));
+		else {		
+			Namespace nsp = globalConfigRoot.getNamespace();
+			if(globalConfigRoot.getChild("randomSeed",nsp) == null)globalConfigRoot.addContent(new Element("randomSeed",nsp));
+			globalConfigRoot.getChild("randomSeed",nsp).setText(seed.toString());
+		}
+	}
+	
+	protected void beforeParsingGlobal(Element globalConfigRoot) {
+		this.globalConfigRoot = globalConfigRoot;
+		beforeParsingGlobal.stream().forEach(Runnable::run);
 	}
 	
 	/**

@@ -1,8 +1,10 @@
 package de.hpi.bpt.scylla.plugin.batch;
 
-import static org.junit.Assert.assertFalse;
 
-import org.junit.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
+import org.junit.jupiter.api.Test;
 
 import de.hpi.bpt.scylla.SimulationTest;
 

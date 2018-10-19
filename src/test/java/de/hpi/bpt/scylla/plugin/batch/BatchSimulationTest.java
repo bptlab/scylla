@@ -1,13 +1,12 @@
 package de.hpi.bpt.scylla.plugin.batch;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
 
 import de.hpi.bpt.scylla.SimulationTest;
 import de.hpi.bpt.scylla.TestUtils;
@@ -54,7 +53,7 @@ public class BatchSimulationTest extends SimulationTest{
 	}
 	
 	protected void assertExecutionType() {
-		table.stream().forEach((each)->{Assert.assertEquals(executionType.toString(), each[7]);});
+		table.stream().forEach((each)->{assertEquals(executionType.toString(), each[7]);});
 	}
 	
 	protected Map<String, List<String[]>> getClusters() {

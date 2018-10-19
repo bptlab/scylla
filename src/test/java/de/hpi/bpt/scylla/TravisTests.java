@@ -1,7 +1,8 @@
 package de.hpi.bpt.scylla;
 
-import org.junit.Test;
-import org.junit.Assert;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 public class TravisTests {
     /**
@@ -9,6 +10,6 @@ public class TravisTests {
      */
     @Test
     public void TravisIsWorking() {
-        Assert.assertEquals(true, true);
+        assertEquals(true, true);
     }
 }
