@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bsim:globalConfiguration xmlns:bsim="http://bsim.hpi.uni-potsdam.de/scylla/simModel" targetNamespace="http://www.hpi.de" id="BatchGlobalConfiguration">
+  <bsim:zoneOffset>+01:00</bsim:zoneOffset>
+  <bsim:resourceData>
+    <bsim:dynamicResource id="WorkerA" defaultQuantity="1" defaultCost="0.0" defaultTimeUnit="SECONDS" />
+    <bsim:dynamicResource id="WorkerB" defaultQuantity="1" defaultCost="0.0" defaultTimeUnit="SECONDS" />
+    <bsim:dynamicResource id="WorkerC" defaultQuantity="1" defaultCost="0.0" defaultTimeUnit="SECONDS" />
+    <bsim:dynamicResource id="WorkerD" defaultQuantity="1" defaultCost="0.0" defaultTimeUnit="SECONDS" />
+    <bsim:dynamicResource id="WorkerE" defaultQuantity="2" defaultCost="0.0" defaultTimeUnit="SECONDS" />
+  </bsim:resourceData>
+</bsim:globalConfiguration>

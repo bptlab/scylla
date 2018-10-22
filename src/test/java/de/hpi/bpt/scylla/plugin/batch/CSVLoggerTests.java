@@ -63,9 +63,9 @@ public class CSVLoggerTests extends BatchSimulationTest{
 	@Test
 	public void testUnwantedActivityInBatchRegression() {
 		runSimpleSimulation(
-				"regression\\UnwantedActivityInBatchGlobal.xml", 
+				"regression\\XORSamplesGlobal.xml", 
 				"regression\\UnwantedActivityInBatch.bpmn", 
-				"regression\\UnwantedActivityInBatchSim.xml");
+				"regression\\UnwantedActivityInBatch.xml");
 		Map<String, List<String[]>> activities = table.stream().collect(Collectors.groupingBy(each -> each[1]));
 		activities.get("A").stream().forEach(each -> assertTrue(each[7].isEmpty(), each.toString()));
 		activities.get("E").stream().forEach(each -> assertTrue(each[7].isEmpty(), each.toString()));
