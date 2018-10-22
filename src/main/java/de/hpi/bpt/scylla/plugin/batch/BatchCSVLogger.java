@@ -21,6 +21,7 @@ import de.hpi.bpt.scylla.plugin_type.logger.OutputLoggerPluggable;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
 import de.hpi.bpt.scylla.simulation.SimulationModel;
 import de.hpi.bpt.scylla.simulation.utils.DateTimeUtils;
+import de.hpi.bpt.scylla.simulation.utils.SimulationUtils;
 
 /**
  * This is a logger for batch analysis.
@@ -72,7 +73,7 @@ public class BatchCSVLogger extends OutputLoggerPluggable{
         	table.add(header);
             
         	/**All data for all tasks of all instances of specific process in [processInstanceId, [taskNodeId, [taskInformation]]]*/
-        	Map<Integer, Map<Integer, Object[]>> instanceTasks = new HashMap<Integer, Map<Integer, Object[]>>();
+        	Map<Integer, Map<String, Object[]>> instanceTasks = new HashMap<Integer, Map<String, Object[]>>();
             
             //For all instances of that process
             for(Integer instanceId : nodeInfoOfProcessInstances.keySet()) {
@@ -80,11 +81,11 @@ public class BatchCSVLogger extends OutputLoggerPluggable{
             	/**Node infos for specific process instance*/
             	List<ProcessNodeInfo> infosOfInstance = nodeInfoOfProcessInstances.get(instanceId);
             	/**Map of tasks and their information in [taskNodeId, [taskInformation]]*/
-            	Map<Integer, Object[]> tasks = new HashMap<Integer, Object[]>();
+            	Map<String, Object[]> tasks = new HashMap<String, Object[]>();
             	//For all information element we have for the current process instance
             	for(ProcessNodeInfo nodeInfo : infosOfInstance) {
             		/**Identifier for the node the info belongs to*/
-            		Integer nodeId = nodeInfo.getId();
+            		String nodeId = nodeInfo.getProcessScopeNodeId();
             		/**Timestamp of node info in wanted format*/
             		String timeStamp = getTimeString(baseDateTime, nodeInfo.getTimestamp());
             		/**Check whether info belongs to a task and put all available data to table*/
@@ -136,15 +137,15 @@ public class BatchCSVLogger extends OutputLoggerPluggable{
                 	/**Add information to all tasks of cluster in all instances that participated in that cluster*/
                 	for(ProcessInstance instance : cluster.getProcessInstances()) {
                 		
-                		Map<Integer, Object[]> tasksOfInstance = instanceTasks.get(instance.getId());
+                		Map<String, Object[]> tasksOfProcessInstance = instanceTasks.get(instance.getId());
                 		/**Write information for cluster task*/
-                		tasksOfInstance.get(clusterNodeId)[6] = batchNumber;
-                		tasksOfInstance.get(clusterNodeId)[7] = batchType;
+                		tasksOfProcessInstance.get(clusterNodeId.toString())[6] = batchNumber;
+                		tasksOfProcessInstance.get(clusterNodeId.toString())[7] = batchType;
                 		/**Write information for all tasks inside cluster*/
                 		for(Integer taskId : tasksOfCluster) {
-                			Object[] task = tasksOfInstance.get(taskId);
+                			Object[] task = tasksOfProcessInstance.get(SimulationUtils.getProcessScopeNodeId(clusterSubProcess, taskId));
                 			if(task == null)continue; //Not all tasks are necessarily visited due to XOR-Gateways and similar
-                    		task[6] = batchNumber;
+                			task[6] = batchNumber;
                     		task[7] = batchType;
                     		tasksOfClusterInstance.add(task);
                 		}
@@ -166,7 +167,7 @@ public class BatchCSVLogger extends OutputLoggerPluggable{
             				.min((first, second)->{return ((String)first[2]).compareTo((String)second[2]);}).get();
             			tasksOfClusterInstance.stream()
             				.filter((each)->{return each[1].equals(firstActivity[1]);})
-            				.forEach((each)->{each[8] = instanceTasks.get(each[0]).get(clusterNodeId)[2];});
+            				.forEach((each)->{each[8] = instanceTasks.get(each[0]).get(clusterNodeId.toString())[2];});
             		}
             	}
             }

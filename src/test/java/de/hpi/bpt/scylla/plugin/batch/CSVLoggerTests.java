@@ -1,15 +1,22 @@
 package de.hpi.bpt.scylla.plugin.batch;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 
 import de.hpi.bpt.scylla.TestUtils;
 
 public class CSVLoggerTests extends BatchSimulationTest{
+	
+	public static void main(String[] args) {
+		new CSVLoggerTests().testUnwantedActivityInBatchRegression();
+	}
 	
 	
 	@Test
@@ -51,6 +58,20 @@ public class CSVLoggerTests extends BatchSimulationTest{
 			assertInstanceWiseNaturalEnablement(activities.get("Batch Activity"), activities.get("Activity A"));
 		}
 		
+	}
+	
+	@Test
+	public void testUnwantedActivityInBatchRegression() {
+		runSimpleSimulation(
+				"regression\\UnwantedActivityInBatchGlobal.xml", 
+				"regression\\UnwantedActivityInBatch.bpmn", 
+				"regression\\UnwantedActivityInBatchSim.xml");
+		Map<String, List<String[]>> activities = table.stream().collect(Collectors.groupingBy(each -> each[1]));
+		activities.get("A").stream().forEach(each -> assertTrue(each[7].isEmpty(), each.toString()));
+		activities.get("E").stream().forEach(each -> assertTrue(each[7].isEmpty(), each.toString()));
+		activities.get("B").stream().forEach(each -> assertFalse(each[7].isEmpty(), each.toString()));
+		activities.get("C").stream().forEach(each -> assertFalse(each[7].isEmpty(), each.toString()));
+		activities.get("D").stream().forEach(each -> assertFalse(each[7].isEmpty(), each.toString()));
 	}
 	
 	private static void assertConstantNaturalEnablement(List<String[]> activity) {
