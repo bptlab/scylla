@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
 import de.hpi.bpt.scylla.TestSeeds;
+import de.hpi.bpt.scylla.logger.DebugLogger;
 
 
 public class SequentialCasebasedTests extends BatchSimulationTest{
@@ -23,8 +24,9 @@ public class SequentialCasebasedTests extends BatchSimulationTest{
 	}
 	
 	public static void main(String[] args) {
+		DebugLogger.allowDebugLogging = false;
 		SequentialCasebasedTests x = new SequentialCasebasedTests();
-		x.testEventScheduledDoubleRegression();
+		x.testResourceStable(8619657395064501318L);
 	}
 	
 	@Test
@@ -41,8 +43,9 @@ public class SequentialCasebasedTests extends BatchSimulationTest{
 		}
 	}
 
-	@TestSeeds(-3207906028196791040L)
-	public void testResourceStable() {
+	@TestSeeds({-3207906028196791040L, 8619657395064501318L})
+	public void testResourceStable(long seed) {
+		setGlobalSeed(seed);
 		runSimpleSimulation(
 				"BatchTestGlobalConfiguration.xml", 
 				"ModelGatewayParallel.bpmn", 
@@ -80,6 +83,16 @@ public class SequentialCasebasedTests extends BatchSimulationTest{
 				"regression\\DoubleEventGlobal.xml", 
 				"regression\\DoubleEvent.bpmn", 
 				"regression\\DoubleEventSim.xml");
+	}
+	
+	@TestSeeds(-3923947980161818345L)
+	public void testDoubleResourceRegression(long seed) {
+		setGlobalSeed(seed);
+		runSimpleSimulation(
+				"BatchTestGlobalConfiguration.xml", 
+				"ModelGatewayParallel.bpmn", 
+				"BatchTestSimulationConfigurationWithResources.xml");
+		assertActivitiesDoNotIntersect("Activity A", "Activity B", table);
 	}
 	
 	public static void assertClusterIsCaseBased(List<String[]> cluster) {

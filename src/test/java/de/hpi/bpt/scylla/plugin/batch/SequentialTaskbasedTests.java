@@ -103,14 +103,6 @@ public class SequentialTaskbasedTests extends BatchSimulationTest{
 		}
 	}
 	
-	private static void assertActivitiesDoNotIntersect(String activityNameA, String activityNameB, List<String[]> cluster) {
-		Map<Object, List<String[]>> e = cluster.stream()
-				.collect(Collectors.groupingBy((row)->{return row[1];}));
-			String[] lastActivityA = e.get(activityNameA).stream().max((a,b) -> {return a[4].compareTo(b[4]);}).get();
-			String[] firstActivityB = e.get(activityNameB).stream().min((a,b) -> {return a[3].compareTo(b[3]);}).get();
-			assertTrue(lastActivityA[4].compareTo(firstActivityB[3]) <= 0);
-	}
-	
 	private void assertActivityIsInEveryInstance(String activityName, List<String[]> table) {
 		for(int i = 1; i <= numberOfInstances(); i++) {
 			final int j = i;

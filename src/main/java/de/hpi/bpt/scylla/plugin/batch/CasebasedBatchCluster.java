@@ -55,6 +55,8 @@ public class CasebasedBatchCluster extends BatchCluster {
 					assert removedEvent == beginEvent;
 					event.getTimeSpanToNextEventMap().remove(0);
 					QueueManager.releaseResourcesAndScheduleQueuedEvents((SimulationModel) beginEvent.getModel(), beginEvent);
+				} else {
+					QueueManager.removeFromEventQueues((SimulationModel) beginEvent.getModel(), beginEvent);
 				}
 				//Wait for resources in extra queue
 				waitingTaskBegins.add(beginEvent);
