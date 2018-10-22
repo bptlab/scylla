@@ -15,6 +15,7 @@ public class BatchStashResourceEvent extends ScyllaEvent {
 
 	private ResourceObjectTuple resources;
 	private BatchCluster cluster;
+	private boolean resourcesInStash = false;
 
 	public BatchStashResourceEvent(BatchCluster cluster, TaskBeginEvent taskBeginEvent, ResourceObjectTuple resources) {
 		super(cluster.getModel(), cluster.getName()+"_stashNode#"+taskBeginEvent.getNodeId(), new TimeInstant(0), cluster.getProcessSimulationComponents(), taskBeginEvent.getProcessInstance(), taskBeginEvent.getNodeId());
@@ -35,6 +36,7 @@ public class BatchStashResourceEvent extends ScyllaEvent {
 			assert removed;
 		}
         processInstance.getAssignedResources().put(source, resources);
+        setResourcesInStash(true);
 	}
 	
 	/**
@@ -61,6 +63,14 @@ public class BatchStashResourceEvent extends ScyllaEvent {
 	
 	public BatchCluster getCluster() {
 		return cluster;
+	}
+
+	public boolean areResourcesInStash() {
+		return resourcesInStash;
+	}
+
+	public void setResourcesInStash(boolean resourcesInStash) {
+		this.resourcesInStash = resourcesInStash;
 	}
 
 }

@@ -12,7 +12,7 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
  * @author Leon Bein
  *
  */
-@ParameterizedTest
+@ParameterizedTest(name = "#{index} with seed: {0}")
 @Retention(RetentionPolicy.RUNTIME)
 @ArgumentsSource(SeedProvider.class)
 public @interface TestSeeds {

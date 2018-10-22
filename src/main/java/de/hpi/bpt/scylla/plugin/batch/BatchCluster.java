@@ -330,7 +330,8 @@ abstract class BatchCluster extends Entity {
 	 */
 	protected void assignStashedResources(TaskEnableEvent event) {
 		assert hasStashedResourcesFor(event);
-		ResourceObjectTuple resources = getStashEventFor(event).getResources();
+		BatchStashResourceEvent stashEvent = getStashEventFor(event);
+		ResourceObjectTuple resources = stashEvent.getResources();
 		TaskBeginEvent beginEvent = event.getBeginEvent();
 		if(!event.getNextEventMap().isEmpty()) {//Event has assigned resources - but not the ones that are stashed for it
 			assert event.getNextEventMap().size() == 1;
@@ -344,6 +345,7 @@ abstract class BatchCluster extends Entity {
             event.getTimeSpanToNextEventMap().put(0, new TimeSpan(0));
 		}
 		QueueManager.assignResourcesToEvent((SimulationModel) beginEvent.getModel(), beginEvent, resources);
+		stashEvent.setResourcesInStash(false);
 	}
 	
 	protected BatchStashResourceEvent getStashEventFor(ScyllaEvent event) {

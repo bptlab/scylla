@@ -71,7 +71,7 @@ public class CasebasedBatchCluster extends BatchCluster {
 	}
 	
 	private boolean resourcesAreInStash() {
-		return stashEvent.getProcessInstance().getAssignedResources().get(stashEvent.getSource()) != null;
+		return stashEvent.areResourcesInStash();
 	}
 
 

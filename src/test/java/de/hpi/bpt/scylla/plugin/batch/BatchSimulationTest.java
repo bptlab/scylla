@@ -67,13 +67,16 @@ public class BatchSimulationTest extends SimulationTest{
 	protected BatchActivity getBatchActivity() {
 		return BatchPluginUtils.getBatchActivities(getProcessModel()).values().iterator().next();
 	}
-	
-	protected static final void assertActivitiesDoNotIntersect(String activityNameA, String activityNameB, List<String[]> cluster) {
-		Map<Object, List<String[]>> e = cluster.stream()
-				.collect(Collectors.groupingBy((row)->{return row[1];}));
-			String[] lastActivityA = e.get(activityNameA).stream().max((a,b) -> {return a[4].compareTo(b[4]);}).get();
-			String[] firstActivityB = e.get(activityNameB).stream().min((a,b) -> {return a[3].compareTo(b[3]);}).get();
-			assertTrue(lastActivityA[4].compareTo(firstActivityB[3]) <= 0);
+
+	protected void assertNoIntersections(List<String[]> rows) {
+		rows = rows.stream()
+				.sorted((a,b) -> {return a[3].compareTo(b[3]);})
+				.collect(Collectors.toList());
+		for(int i = 0; i < rows.size()-1; i++) {
+			String[] current = rows.get(i);
+			String[] next = rows.get(i+1);
+			assertTrue(current[4].compareTo(next[3]) <= 0);
+		}
 	}
 	
 

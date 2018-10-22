@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -26,7 +27,7 @@ public class SequentialCasebasedTests extends BatchSimulationTest{
 	public static void main(String[] args) {
 		DebugLogger.allowDebugLogging = false;
 		SequentialCasebasedTests x = new SequentialCasebasedTests();
-		x.testResourceStable(8619657395064501318L);
+		x.testDoubleResourceRegression(8619657395064501318L);
 	}
 	
 	@Test
@@ -78,7 +79,7 @@ public class SequentialCasebasedTests extends BatchSimulationTest{
 	}
 	
 	@Test
-	public void testEventScheduledDoubleRegression() {
+	public void testEventScheduledTwiceRegression() {
 		runSimpleSimulation(
 				"regression\\DoubleEventGlobal.xml", 
 				"regression\\DoubleEvent.bpmn", 
@@ -92,7 +93,11 @@ public class SequentialCasebasedTests extends BatchSimulationTest{
 				"BatchTestGlobalConfiguration.xml", 
 				"ModelGatewayParallel.bpmn", 
 				"BatchTestSimulationConfigurationWithResources.xml");
-		assertActivitiesDoNotIntersect("Activity A", "Activity B", table);
+		Map<String, List<String[]>> activitiesPerResources = table.stream().collect(Collectors.groupingBy(each -> each[5]));
+		for(Entry<String, List<String[]>> activities : activitiesPerResources.entrySet()) {
+			if(activities.getKey().isEmpty())continue;
+			assertNoIntersections(activities.getValue());
+		}
 	}
 	
 	public static void assertClusterIsCaseBased(List<String[]> cluster) {

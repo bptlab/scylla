@@ -4,6 +4,7 @@ package de.hpi.bpt.scylla.plugin.batch;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -112,4 +113,11 @@ public class SequentialTaskbasedTests extends BatchSimulationTest{
 		}
 	}
 
+	private static final void assertActivitiesDoNotIntersect(String activityNameA, String activityNameB, List<String[]> cluster) {
+		Map<Object, List<String[]>> e = cluster.stream()
+				.collect(Collectors.groupingBy((row)->{return row[1];}));
+			String[] lastActivityA = e.get(activityNameA).stream().max((a,b) -> {return a[4].compareTo(b[4]);}).get();
+			String[] firstActivityB = e.get(activityNameB).stream().min((a,b) -> {return a[3].compareTo(b[3]);}).get();
+			assertTrue(lastActivityA[4].compareTo(firstActivityB[3]) <= 0, Arrays.toString(lastActivityA)+" "+Arrays.toString(firstActivityB));
+	}
 }
