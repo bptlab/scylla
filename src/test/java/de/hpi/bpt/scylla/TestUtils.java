@@ -1,14 +1,19 @@
 package de.hpi.bpt.scylla;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.opentest4j.AssertionFailedError;
 
 public class TestUtils {
 	
@@ -58,6 +63,17 @@ public class TestUtils {
 			groups.get(key).add(row);
 		}
 		return groups;
+	}
+	
+	public static void assertAttribute(Object o, String attributeName, Object expectedValue) {
+		try {
+			Field field = o.getClass().getDeclaredField(attributeName);
+			field.setAccessible(true);
+			Object actualValue = field.get(o);
+			assertEquals(expectedValue, actualValue);
+		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+			throw new AssertionFailedError("Could not validate attribute "+attributeName+" in class named "+o.getClass().getSimpleName()+": Not existent or not accessible!", e);
+		}
 	}
 
 }

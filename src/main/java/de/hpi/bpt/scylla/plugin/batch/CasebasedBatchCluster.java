@@ -16,7 +16,7 @@ import de.hpi.bpt.scylla.simulation.event.TaskEnableEvent;
 import desmoj.core.simulator.Model;
 import desmoj.core.simulator.TimeInstant;
 
-public class CasebasedBatchCluster extends BatchCluster {
+public class CasebasedBatchCluster extends BatchCluster implements BatchCluster.StashingCluster{
 	
 	private BatchStashResourceEvent stashEvent;
 	

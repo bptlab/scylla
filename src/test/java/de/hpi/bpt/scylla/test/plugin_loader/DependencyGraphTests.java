@@ -33,18 +33,14 @@ public class DependencyGraphTests {
 	}
 	
 	@Test
-	public void testCorrectOrder() {
-		try {
-			List<Integer> sortedData = graph.resolve();
-			assertBeforeAll(sortedData, 1, 2,3,4,5,6);
-			assertBeforeAll(sortedData, 2, 3,4,5,6);
-			assertBeforeAll(sortedData, 3, 5,6);
-			assertBeforeAll(sortedData, 4, 6);
-			assertBeforeAll(sortedData, 5, 6);
-			assertBeforeAll(sortedData, 7, 8);
-		} catch (CycleException e) {
-			fail(e.getMessage());
-		}
+	public void testCorrectOrder() throws CycleException {
+		List<Integer> sortedData = graph.resolve();
+		assertBeforeAll(sortedData, 1, 2,3,4,5,6);
+		assertBeforeAll(sortedData, 2, 3,4,5,6);
+		assertBeforeAll(sortedData, 3, 5,6);
+		assertBeforeAll(sortedData, 4, 6);
+		assertBeforeAll(sortedData, 5, 6);
+		assertBeforeAll(sortedData, 7, 8);
 	}
 	
 	public void assertBeforeAll(List<Integer> sortedList, Integer a, Integer... bs) {

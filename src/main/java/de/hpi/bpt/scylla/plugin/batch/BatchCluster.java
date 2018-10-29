@@ -300,60 +300,60 @@ abstract class BatchCluster extends Entity {
 	public ScyllaEvent handleStashEvent(BatchStashResourceEvent event) {
 		return event;
 	}
-
-    /**
-     * Schedule a stash event for the given resources so they are not released when the task ends
-     * @param event
-     * @param assignedResources
-     */
-	protected void scheduleStashEvent(TaskBeginEvent event, ResourceObjectTuple assignedResources) {
-		BatchStashResourceEvent stashEvent = getOrCreateStashEvent(event, assignedResources);
-		BatchPluginUtils.getInstance().scheduleStashEvent(stashEvent);
-	}
 	
-	protected BatchStashResourceEvent getOrCreateStashEvent(TaskBeginEvent beginEvent, ResourceObjectTuple assignedResources) {
-		if(hasStashedResourcesFor(beginEvent)) {
-			return getStashEventFor(beginEvent);
-		} else {
-			return createStashEventFor(beginEvent, assignedResources);
-		}
-	}
-    
 	protected BatchStashResourceEvent createStashEventFor(TaskBeginEvent beginEvent, ResourceObjectTuple assignedResources) {
-		return new BatchStashResourceEvent(this, beginEvent, assignedResources);
+		return new BatchStashResourceEvent(BatchCluster.this, beginEvent, assignedResources);
 	}
 	
-	/**
-	 * Ensure that if there are stashed resources for a task,
-	 * force-assign them to the task begin event and assure execution of event.
-	 * @param event : Enable event of a task inside a sequential task-based batch region
-	 */
-	protected void assignStashedResources(TaskEnableEvent event) {
-		assert hasStashedResourcesFor(event);
-		BatchStashResourceEvent stashEvent = getStashEventFor(event);
-		ResourceObjectTuple resources = stashEvent.getResources();
-		TaskBeginEvent beginEvent = event.getBeginEvent();
-		if(!event.getNextEventMap().isEmpty()) {//Event has assigned resources - but not the ones that are stashed for it
-			assert event.getNextEventMap().size() == 1;
-			assert event.getNextEventMap().get(0) == beginEvent;
-			try {
-				QueueManager.releaseResourcesAndScheduleQueuedEvents((SimulationModel) beginEvent.getModel(), beginEvent);
-			} catch (ScyllaRuntimeException e) { e.printStackTrace(); }
-		} else {//Event waits for resources
-	        QueueManager.removeFromEventQueues((SimulationModel) beginEvent.getModel(), beginEvent);
-            event.getNextEventMap().put(0, beginEvent);
-            event.getTimeSpanToNextEventMap().put(0, new TimeSpan(0));
+	protected interface StashingCluster {
+		
+	    /**
+	     * Schedule a stash event for the given resources so they are not released when the task ends
+	     * @param event
+	     * @param assignedResources
+	     */
+		default void scheduleStashEvent(TaskBeginEvent event, ResourceObjectTuple assignedResources) {
+			BatchStashResourceEvent stashEvent = getOrCreateStashEvent(event, assignedResources);
+			BatchPluginUtils.getInstance().scheduleStashEvent(stashEvent);
 		}
-		QueueManager.assignResourcesToEvent((SimulationModel) beginEvent.getModel(), beginEvent, resources);
-		stashEvent.setResourcesInStash(false);
-	}
-	
-	protected BatchStashResourceEvent getStashEventFor(ScyllaEvent event) {
-		return null;
-	}
-	
-	protected boolean hasStashedResourcesFor(ScyllaEvent event) {
-		return false;
+	    
+		BatchStashResourceEvent createStashEventFor(TaskBeginEvent beginEvent, ResourceObjectTuple assignedResources);
+		
+		default BatchStashResourceEvent getOrCreateStashEvent(TaskBeginEvent beginEvent, ResourceObjectTuple assignedResources) {
+			if(hasStashedResourcesFor(beginEvent)) {
+				return getStashEventFor(beginEvent);
+			} else {
+				return createStashEventFor(beginEvent, assignedResources);
+			}
+		}
+		
+		/**
+		 * Ensure that if there are stashed resources for a task,
+		 * force-assign them to the task begin event and assure execution of event.
+		 * @param event : Enable event of a task inside a sequential task-based batch region
+		 */
+		default void assignStashedResources(TaskEnableEvent event) {
+			assert hasStashedResourcesFor(event);
+			BatchStashResourceEvent stashEvent = getStashEventFor(event);
+			ResourceObjectTuple resources = stashEvent.getResources();
+			TaskBeginEvent beginEvent = event.getBeginEvent();
+			if(!event.getNextEventMap().isEmpty()) {//Event has assigned resources - but not the ones that are stashed for it
+				assert event.getNextEventMap().size() == 1;
+				assert event.getNextEventMap().get(0) == beginEvent;
+				try {
+					QueueManager.releaseResourcesAndScheduleQueuedEvents((SimulationModel) beginEvent.getModel(), beginEvent);
+				} catch (ScyllaRuntimeException e) { e.printStackTrace(); }
+			} else {//Event waits for resources
+		        QueueManager.removeFromEventQueues((SimulationModel) beginEvent.getModel(), beginEvent);
+	            event.getNextEventMap().put(0, beginEvent);
+	            event.getTimeSpanToNextEventMap().put(0, new TimeSpan(0));
+			}
+			QueueManager.assignResourcesToEvent((SimulationModel) beginEvent.getModel(), beginEvent, resources);
+			stashEvent.setResourcesInStash(false);
+		}
+		
+		BatchStashResourceEvent getStashEventFor(ScyllaEvent event);
+		boolean hasStashedResourcesFor(ScyllaEvent event);
 	}
 	
 

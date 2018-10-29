@@ -21,7 +21,7 @@ import de.hpi.bpt.scylla.simulation.event.TaskTerminateEvent;
 import desmoj.core.simulator.Model;
 import desmoj.core.simulator.TimeInstant;
 
-public class TaskbasedBatchCluster extends BatchCluster {
+public class TaskbasedBatchCluster extends BatchCluster implements BatchCluster.StashingCluster{
 	
 	//Maps from task nodeIds to stash events for that tasks
     private Map<Integer, BatchStashResourceEvent> stashEvents = new HashMap<>();

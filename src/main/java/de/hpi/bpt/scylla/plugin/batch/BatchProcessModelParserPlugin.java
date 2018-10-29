@@ -48,7 +48,7 @@ public class BatchProcessModelParserPlugin extends ProcessModelParserPluggable{
                 }
     		}
         }
-        batchActivities.forEach((key, value) -> value.setProcessModel(processModel));
+        //Not needed batchActivities.forEach((key, value) -> value.setProcessModel(processModel));
         
 		Map<String, Object> extensionAttributes = new HashMap<String, Object>();
         extensionAttributes.put(BatchPluginUtils.ACTIVITIES_KEY, batchActivities);
@@ -129,15 +129,11 @@ public class BatchProcessModelParserPlugin extends ProcessModelParserPluggable{
 
 	private BatchClusterExecutionType parseExecutionType(Element property) throws ScyllaValidationException {
     	String executionTypeString = property.getAttributeValue("value");
-        switch (executionTypeString){
-            case "parallel":
-                return BatchClusterExecutionType.PARALLEL;
-            case "sequential-taskbased":
-                return BatchClusterExecutionType.SEQUENTIAL_TASKBASED;
-            case "sequential-casebased":
-                return BatchClusterExecutionType.SEQUENTIAL_CASEBASED;
-            default: throw new ScyllaValidationException("Execution type " + executionTypeString + " not supported. Supported types are: "+Arrays.toString(BatchClusterExecutionType.values()));
-        }
+    	try {
+        	return BatchClusterExecutionType.ofElementName(executionTypeString);
+    	} catch(IllegalArgumentException e) {
+    		throw new ScyllaValidationException("Execution type " + executionTypeString + " not supported. Supported types are: "+Arrays.toString(BatchClusterExecutionType.values()), e);
+    	}
     }
 	
 	private ActivationRule parseActivationRule(Element property) throws ScyllaValidationException {

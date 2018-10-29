@@ -2,19 +2,19 @@ package de.hpi.bpt.scylla;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.jdom2.Element;
-import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
-import de.hpi.bpt.scylla.exception.ScyllaValidationException;
 import de.hpi.bpt.scylla.model.configuration.SimulationConfiguration;
 import de.hpi.bpt.scylla.model.global.GlobalConfiguration;
 import de.hpi.bpt.scylla.model.global.resource.Resource;
@@ -24,7 +24,7 @@ public abstract class SimulationTest {
 
 
 	protected abstract String getFolderName();
-	protected SimulationManager simulationManager;
+	protected SimulationManagerForTests simulationManager;
 	protected String outputPath;
 
 	protected PrintStream errorLog;
@@ -32,6 +32,11 @@ public abstract class SimulationTest {
 
 	protected List<Runnable> beforeParsingGlobal = new LinkedList<>();
 	protected Element globalConfigRoot;
+	protected Map<String, List<Runnable>> beforeParsingSims = new HashMap<>();
+	protected Map<String, Element> simConfigRoots = new HashMap<>();
+	protected Map<String, List<Runnable>> beforeParsingModels = new HashMap<>();
+	protected Map<String, Element> processRoots = new HashMap<>();
+
 	protected Optional<Runnable> afterParsing = Optional.empty();
 	
 	@BeforeEach
@@ -48,25 +53,7 @@ public abstract class SimulationTest {
 	}
 	
 	protected void createSimpleSimulationManager(String globalConfiguration, String simulationModel, String simulationConfiguration) {
-		simulationManager = new SimulationManager(
-				getFolder(), 
-				new String[] {getPath(simulationModel)}, 
-				new String[] {getPath(simulationConfiguration)}, 
-				getPath(globalConfiguration),
-                true, false) {
-			@Override
-			protected void parseGlobalConfiguration(Element globalConfigRoot) throws ScyllaValidationException {
-				beforeParsingGlobal(globalConfigRoot);
-				super.parseGlobalConfiguration(globalConfigRoot);
-			}
-			
-			@Override
-			protected void parseInput() throws ScyllaValidationException, JDOMException, IOException {
-				super.parseInput();
-				SimulationTest.this.afterParsing();
-				afterParsing.ifPresent(Runnable::run);
-			}
-		};
+		simulationManager = new SimulationManagerForTests(this, globalConfiguration, simulationModel, simulationConfiguration);
 	}
 
 	@AfterEach
@@ -112,6 +99,27 @@ public abstract class SimulationTest {
 	protected void beforeParsingGlobal(Element globalConfigRoot) {
 		this.globalConfigRoot = globalConfigRoot;
 		beforeParsingGlobal.stream().forEach(Runnable::run);
+	}
+	
+	
+	protected void beforeParsingSimconfig(Element simConfigRoot) {
+        Namespace simNamespace = simConfigRoot.getNamespace();
+        List<Element> simElements = simConfigRoot.getChildren("simulationConfiguration", simNamespace);
+        for(Element simElement : simElements) {
+        	String id = simElement.getAttributeValue("id");
+        	simConfigRoots.put(id, simElement);
+        	beforeParsingSims.getOrDefault(id, Collections.emptyList()).forEach(Runnable::run);
+        }
+	}
+	
+	protected void beforeParsingModels(Element modelRoot) {
+        Namespace bpmnNamespace = modelRoot.getNamespace();
+        List<Element> processElements = modelRoot.getChildren("process", bpmnNamespace);
+        for(Element process : processElements) {
+        	String id = process.getAttributeValue("id");
+        	processRoots.put(id, process);
+        	beforeParsingModels.getOrDefault(id, Collections.emptyList()).forEach(Runnable::run);
+        }
 	}
 	
 	/**
