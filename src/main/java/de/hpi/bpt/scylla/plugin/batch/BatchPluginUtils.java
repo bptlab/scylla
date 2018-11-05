@@ -169,13 +169,14 @@ public class BatchPluginUtils {
             if (batchClustersOfProcess == null) {
                 batchClustersOfProcess = new HashMap<Integer, List<BatchCluster>>();
                 batchClusters.put(processId, batchClustersOfProcess);
+                //TODO the following line should always raise a nullpointer exception => what was its purpose?
                 List<BatchCluster> clusters = batchClustersOfProcess.get(nodeId);
                 if (clusters == null) {
                     clusters = new ArrayList<BatchCluster>();
                     batchClustersOfProcess.put(nodeId, clusters);
                 }
             }
-            batchClustersOfProcess.get(nodeId).add(cluster);
+            batchClustersOfProcess.computeIfAbsent(nodeId, ArrayList<BatchCluster>::new).add(cluster);
 
         }
 
@@ -191,11 +192,15 @@ public class BatchPluginUtils {
             // if the dueDate of the current instance is earlier as of the instances added before, the cluster begin event is rescheduled
             Duration timeoutForCurrentInstance = batchActivity.getActivationRule().getTimeOut(parentalBeginEvent, processInstance);
             //testing
-            TimeUnit epsilon = TimeUnit.SECONDS;
-            Duration durationBtwClusterStartAndInstanceTaskBegin = Duration.ofSeconds((long) (parentalBeginEvent.getSimulationTimeOfSource().getTimeAsDouble(epsilon)-cluster.getCreationTime().getTimeAsDouble(epsilon)));
+            TimeUnit timeUnit = TimeUnit.SECONDS;
+            /**Time since cluster was created*/
+            Duration durationBtwClusterStartAndInstanceTaskBegin = 
+            		Duration.ofSeconds((long) (parentalBeginEvent.getSimulationTimeOfSource().getTimeAsDouble(timeUnit)
+            		-cluster.getCreationTime().getTimeAsDouble(timeUnit)));
+            System.err.println("Duration: "+durationBtwClusterStartAndInstanceTaskBegin.toHours());
             //System.out.println("InstanceEnable: "+parentalBeginEvent.getSimulationTimeOfSource().getTimeAsDouble(epsilon)+" ClusterCreation: "+cluster.getCreationTime().getTimeAsDouble(epsilon)+" Duration "+durationBtwClusterStartAndInstanceTaskBegin);
             if (timeoutForCurrentInstance.plus(durationBtwClusterStartAndInstanceTaskBegin).compareTo(cluster.getCurrentTimeOut()) < 0){
-
+            	System.err.println("===============");
                 //set new timeout for the cluster for comparison
                 cluster.setCurrentTimeOut(timeoutForCurrentInstance);
 
