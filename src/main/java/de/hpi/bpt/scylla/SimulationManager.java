@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -163,13 +164,15 @@ public class SimulationManager {
 
             // log process execution
             // log resources, process, tasks
-        	String currentTime = new SimpleDateFormat("yy_MM_dd_HH_mm_ss_SSS").format(new Date());
-            StringBuilder strb = new StringBuilder(globalConfigurationFilename);
-            strb
-            	.delete(strb.lastIndexOf(Scylla.FILEDELIM)+1,strb.length())
-            	.append("output_")
-            	.append(currentTime);
-            outputPath = strb.toString()+Scylla.FILEDELIM;
+        	if(Objects.isNull(outputPath)) {
+            	String currentTime = new SimpleDateFormat("yy_MM_dd_HH_mm_ss_SSS").format(new Date());
+                StringBuilder strb = new StringBuilder(globalConfigurationFilename);
+                strb
+                	.delete(strb.lastIndexOf(Scylla.FILEDELIM)+1,strb.length())
+                	.append("output_")
+                	.append(currentTime);
+                outputPath = strb.toString()+Scylla.FILEDELIM;
+        	}
             File outputPathFolder = new File(outputPath);
             if(outputPathFolder.exists())throw new Error("Output already exists!");
             outputPathFolder.mkdir();
