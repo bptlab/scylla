@@ -175,39 +175,39 @@ public class BatchPluginUtils {
 
         cluster.addProcessInstance(processInstance, parentalBeginEvent);
 
-        // (3) check if bc can be started
 
-        //TODO check whether timeout should be updated
-        if (cluster.getState() == BatchClusterState.INIT && cluster.getProcessInstances().size() > 1) {
+        // (3) check whether cluster timeout should be updated (lowered)
+        // Cluster can be "started" when it is maxloaded => don't update
+        // Instance can be first in cluster => nothing to update
+        if (batchClusterHasNotStarted(cluster.getState()) && cluster.getProcessInstances().size() > 1) {
 
             // if the dueDate of the current instance is earlier as of the instances added before, the cluster begin event is rescheduled
             Duration timeoutForCurrentInstance = batchActivity.getActivationRule().getTimeOut(parentalBeginEvent, processInstance);
             //testing
             TimeUnit timeUnit = TimeUnit.SECONDS;
-            /**Time since cluster was created*/
-            Duration durationBtwClusterStartAndInstanceTaskBegin = 
-            		Duration.ofSeconds((long) (parentalBeginEvent.getSimulationTimeOfSource().getTimeAsDouble(timeUnit)
+            /**Time since cluster was created*/ //TODO: when updating to java9, please use TimeUnit.toChronoUnit() and then Duration#of(long,Chronounit)
+            Duration durationBtwClusterCreationAndInstanceTaskBegin = Duration.ofSeconds(
+            		(long) (parentalBeginEvent.getSimulationTimeOfSource().getTimeAsDouble(timeUnit)
             		-cluster.getCreationTime().getTimeAsDouble(timeUnit)));
-            System.err.println("Duration: "+durationBtwClusterStartAndInstanceTaskBegin.toHours());
-            //System.out.println("InstanceEnable: "+parentalBeginEvent.getSimulationTimeOfSource().getTimeAsDouble(epsilon)+" ClusterCreation: "+cluster.getCreationTime().getTimeAsDouble(epsilon)+" Duration "+durationBtwClusterStartAndInstanceTaskBegin);
-            if (timeoutForCurrentInstance.plus(durationBtwClusterStartAndInstanceTaskBegin).compareTo(cluster.getCurrentTimeOut()) < 0){
-            	System.err.println("===============");
-                //set new timeout for the cluster for comparison
+            //If the new timeout from the current point in time occurs before the current timeour
+            if (timeoutForCurrentInstance.plus(durationBtwClusterCreationAndInstanceTaskBegin).compareTo(cluster.getCurrentTimeOut()) < 0){
+            	//set new timeout for the cluster for comparison
                 cluster.setCurrentTimeOut(timeoutForCurrentInstance);
 
                 //reschedule the cluster beginEvent
                 long timeoutInSeconds = timeoutForCurrentInstance.get(ChronoUnit.SECONDS);
                 TimeSpan timeSpan = new TimeSpan(timeoutInSeconds, TimeUnit.SECONDS);
 
+                //Scheduled with timeout from current point in time
                 BatchClusterStartEvent clusterStartEvent = (BatchClusterStartEvent) cluster.getScheduledEvents().get(0);
                 cluster.cancel();
                 clusterStartEvent.schedule(cluster, timeSpan);
             }
 
         }
-
-
-        if (cluster.getState() == BatchClusterState.MAXLOADED) {
+        
+        // (4) check if bc can be started
+        if (cluster.getState() == BatchClusterState.MAXLOADED || cluster.getState() == BatchClusterState.READY) {
             // (2a) if bc is maxloaded, reschedule BatchClusterStart
             // there is only one event already scheduled for the cluster which is the BatchClusterStart
             BatchClusterStartEvent clusterStartEvent = (BatchClusterStartEvent) cluster.getScheduledEvents().get(0);
