@@ -35,7 +35,7 @@ import de.hpi.bpt.scylla.simulation.utils.SimulationUtils;
 public class BatchCSVLogger extends OutputLoggerPluggable{
 	
 	/**Standard time format for table*/
-	private static DateFormat timeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	public static final DateFormat timeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	/**The header for the table*/
 	private static Object[] header = new Object[] {"Process Instance", "Activity Name", "Arrival", "Start", "Complete", "Resources", "Batch Number", "Batch Type", "Natural Arrival Time"};

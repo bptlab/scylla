@@ -111,7 +111,7 @@ public class BatchPluginUtils {
         // (1) select the right batch cluster
         // (1a) check if there is already a batch with the data view (= a cluster the instance can be added to)
         String processId = processModel.getId();
-        Map<Integer, List<BatchCluster>> batchClustersOfProcess = batchClusters.get(processId);
+        Map<Integer, List<BatchCluster>> batchClustersOfProcess = batchClusters.computeIfAbsent(processId, (s) -> new HashMap<Integer, List<BatchCluster>>());
         if (batchClustersOfProcess != null) {
             List<BatchCluster> clusters = batchClustersOfProcess.get(nodeId);
             if (clusters != null) {
@@ -165,18 +165,9 @@ public class BatchPluginUtils {
             clusterStartEvent.schedule(cluster, timeSpan);
 
             // (4) add cluster to not started clusters
-
-            if (batchClustersOfProcess == null) {
-                batchClustersOfProcess = new HashMap<Integer, List<BatchCluster>>();
-                batchClusters.put(processId, batchClustersOfProcess);
-                //TODO the following line should always raise a nullpointer exception => what was its purpose?
-                List<BatchCluster> clusters = batchClustersOfProcess.get(nodeId);
-                if (clusters == null) {
-                    clusters = new ArrayList<BatchCluster>();
-                    batchClustersOfProcess.put(nodeId, clusters);
-                }
-            }
-            batchClustersOfProcess.computeIfAbsent(nodeId, ArrayList<BatchCluster>::new).add(cluster);
+            batchClustersOfProcess
+            	.computeIfAbsent(nodeId,(i) -> new ArrayList<BatchCluster>())
+            	.add(cluster);
 
         }
 

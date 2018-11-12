@@ -75,5 +75,15 @@ public class TestUtils {
 			throw new AssertionFailedError("Could not validate attribute "+attributeName+" in class named "+o.getClass().getSimpleName()+": Not existent or not accessible!", e);
 		}
 	}
+	
+	public static void setAttribute(Object o, String attributeName, Object value) {
+		try {
+			Field field = o.getClass().getDeclaredField(attributeName);
+			field.setAccessible(true);
+			field.set(o, value);
+		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
+	}
 
 }
