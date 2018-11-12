@@ -21,13 +21,20 @@ public class ThresholdRuleTests extends BatchSimulationTest {
 	}
 	//Shouldn't work, but does work ... why?
 	@Test
-	public void testDueDateDoesNotTriggerRegression() {
+	public void testDueDateTriggers() {
 		assertTimeout(Duration.ofSeconds(5), ()->{
 			runSimpleSimulation(
 				"BatchTestGlobalConfiguration.xml", 
-				"regression\\DueDateNotTrigger.bpmn", 
-				"regression\\DueDateNotTrigger.xml");
+				"DueDateModel.bpmn", 
+				"DueDateConfiguration.xml");
 		});
+		table.stream()
+			.filter(each -> each[1].equals("Batch Activity"))
+			.forEach(each -> {
+				assertEquals(each[6], "1");
+				assertStartTime(Duration.ofMinutes(10).toMillis() + Duration.ofDays(6).toMillis(), each[3]);	
+			}
+		);
 	}
 	
 	@Test
@@ -80,7 +87,7 @@ public class ThresholdRuleTests extends BatchSimulationTest {
 		return (int)Math.ceil((double)instance/instancesPerCluster);
 	}
 	
-	private void assertStartTime(int expectedOffsetMilli, String actualArrival) {
+	private void assertStartTime(long expectedOffsetMilli, String actualArrival) {
 		Date expectedArrival = new Date(getSimulationConfiguration().getStartDateTime().toInstant().toEpochMilli() + expectedOffsetMilli);
 		try {
 			assertEquals(expectedArrival, BatchCSVLogger.timeFormat.parse(actualArrival));

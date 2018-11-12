@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bsim:definitions xmlns:bsim="http://bsim.hpi.uni-potsdam.de/scylla/simModel" targetNamespace="http://www.hpi.de">
+  <bsim:simulationConfiguration id="simulation_1" processRef="Process_1" processInstances="3" startDateTime="2017-07-17T00:00+02:00">
+
+    <bsim:Task id="Task_W">
+      <bsim:duration timeUnit="MINUTES">
+        	<bsim:constantDistribution>
+          		<bsim:constantValue>10</bsim:constantValue>
+        	</bsim:constantDistribution>
+      </bsim:duration>
+    </bsim:Task>
+	<bsim:subProcess id="Task_B" name="Batch Activity">
+		<bsim:Task id="Task_A">
+		 <bsim:setUpDuration timeUnit="MINUTES">
+        	<bsim:constantDistribution>
+          		<bsim:constantValue>10</bsim:constantValue>
+        	</bsim:constantDistribution>
+     	 </bsim:setUpDuration>
+		  <bsim:duration timeUnit="MINUTES">
+			<bsim:constantDistribution>
+			  <bsim:constantValue>6</bsim:constantValue>
+			</bsim:constantDistribution>
+		  </bsim:duration>
+		</bsim:Task>
+	</bsim:subProcess>
+	<bsim:startEvent id="StartEvent_1">
+	  <bsim:arrivalRate timeUnit="DAYS">
+		<bsim:exponentialDistribution>
+		  <bsim:mean>1</bsim:mean>
+		</bsim:exponentialDistribution>
+	  </bsim:arrivalRate>
+	</bsim:startEvent>
+	<bsim:dataInput id="DataObjectReference_1">
+		<bsim:field name="Date" type="long">
+			<bsim:constantDistribution>
+			  <bsim:constantValue>6</bsim:constantValue>
+			</bsim:constantDistribution>
+		</bsim:field>
+	</bsim:dataInput>
+    </bsim:simulationConfiguration>
+</bsim:definitions>

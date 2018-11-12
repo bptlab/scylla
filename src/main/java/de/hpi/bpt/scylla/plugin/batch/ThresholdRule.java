@@ -69,10 +69,8 @@ public abstract class ThresholdRule implements ActivationRule{
 	        //SimulationModel model = (SimulationModel) desmojEvent.getModel();
 
 	        numberOfDays = (long) DataObjectField.getDataObjectValue(processInstance.getId(),dueDate);
-	        //TODO sysout ???
 	        //TODO make due date a real date and calculate remaining time until duedate
 	        //TODO should the result be fixed at some point?
-	        System.out.println("Due Date for "+ desmojEvent+" in: "+ numberOfDays);
 
 	        return numberOfDays;
 	    }
