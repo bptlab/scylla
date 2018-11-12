@@ -6,56 +6,79 @@ import de.hpi.bpt.scylla.plugin.dataobject.DataObjectField;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
 import de.hpi.bpt.scylla.simulation.event.TaskBeginEvent;
 
-
-public class ThresholdRule implements ActivationRule{
+/**
+ * 
+ * @author was not Leon Bein
+ *
+ */
+public abstract class ThresholdRule implements ActivationRule{
 
     private int threshold;
-    private Duration timeOut;
-    private String dueDate;
 
-    public ThresholdRule (int threshold, Duration timeout) {
-        this.threshold = threshold;
-        this.timeOut = timeout;
-        this.dueDate = null;
+    public static ThresholdRule create(int threshold, Duration timeout) {
+        return new TimeOutThresholdRule(threshold, timeout);
     }
 
-    public ThresholdRule (int threshold, String dueDate) {
+    public static ThresholdRule create(int threshold, String dueDate) {
+    	return new DueDateThresholdRule(threshold, dueDate);
+    }
+    
+    private ThresholdRule(int threshold) {
         this.threshold = threshold;
-        this.timeOut = null;
-        this.dueDate = dueDate;
     }
 
     public int getThreshold(TaskBeginEvent desmojEvent, ProcessInstance processInstance) {
-
         return threshold;
-
     }
+    
+    private static class TimeOutThresholdRule extends ThresholdRule {
 
-    public Duration getTimeOut(TaskBeginEvent desmojEvent, ProcessInstance processInstance){
-        if (timeOut != null){
-            return timeOut;
-        }else{
+    	private Duration timeOut;
 
-            return Duration.ofDays(getDurationForCurrentInstance(desmojEvent, processInstance));
+		public TimeOutThresholdRule(int threshold, Duration timeout) {
+			super(threshold);
+	        this.timeOut = timeout;
+		}
+		
+		public Duration getTimeOut(TaskBeginEvent desmojEvent, ProcessInstance processInstance) {
+			return this.timeOut;
+		}
+    	
+    }
+    
+    private static class DueDateThresholdRule extends ThresholdRule {
+
+        private String dueDate;
+
+        public DueDateThresholdRule (int threshold, String dueDate) {
+            super(threshold);
+            this.dueDate = dueDate;
         }
+		
+		public Duration getTimeOut(TaskBeginEvent desmojEvent, ProcessInstance processInstance) {
+            return Duration.ofDays(getDurationForCurrentInstance(desmojEvent, processInstance));
+		}
+		
+	    private long getDurationForCurrentInstance(TaskBeginEvent desmojEvent, ProcessInstance processInstance){
+	        long numberOfDays = 0;
 
+	        //***********
+	        // get the value of the dataObject
+	        //***********
+
+	        //SimulationModel model = (SimulationModel) desmojEvent.getModel();
+
+	        numberOfDays = (long) DataObjectField.getDataObjectValue(processInstance.getId(),dueDate);
+	        //TODO sysout ???
+	        //TODO make due date a real date and calculate remaining time until duedate
+	        //TODO should the result be fixed at some point?
+	        System.out.println("Due Date for "+ desmojEvent+" in: "+ numberOfDays);
+
+	        return numberOfDays;
+	    }
+    	
     }
 
-    private long getDurationForCurrentInstance(TaskBeginEvent desmojEvent, ProcessInstance processInstance){
-        long numberOfDays = 0;
-
-        //***********
-        // get the value of the dataObject
-        //***********
-
-        //SimulationModel model = (SimulationModel) desmojEvent.getModel();
-
-        numberOfDays = (long) DataObjectField.getDataObjectValue(processInstance.getId(),dueDate);
-        //TODO sysout ???
-        System.out.println("Due Date for "+ desmojEvent+" in: "+ numberOfDays);
-
-        return numberOfDays;
-    }
 
 
 }

@@ -9,6 +9,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,7 +68,7 @@ public class TestUtils {
 	
 	public static void assertAttribute(Object o, String attributeName, Object expectedValue) {
 		try {
-			Field field = o.getClass().getDeclaredField(attributeName);
+			Field field = getFieldNamed(o.getClass(), attributeName);
 			field.setAccessible(true);
 			Object actualValue = field.get(o);
 			assertEquals(expectedValue, actualValue);
@@ -78,12 +79,22 @@ public class TestUtils {
 	
 	public static void setAttribute(Object o, String attributeName, Object value) {
 		try {
-			Field field = o.getClass().getDeclaredField(attributeName);
+			Field field = getFieldNamed(o.getClass(), attributeName);
 			field.setAccessible(true);
 			field.set(o, value);
 		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private static Field getFieldNamed(Class<?> c, String name) throws NoSuchFieldException {
+		if(c == null) throw new NoSuchFieldException(name);
+		if(Arrays.stream(c.getDeclaredFields()).anyMatch(each -> each.getName().equals(name))) {
+			return c.getDeclaredField(name);
+		} else {
+			return getFieldNamed(c.getSuperclass(), name);
+		}
+		
 	}
 
 }

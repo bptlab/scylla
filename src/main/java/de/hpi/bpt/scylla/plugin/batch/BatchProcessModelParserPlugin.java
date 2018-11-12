@@ -174,9 +174,9 @@ public class BatchProcessModelParserPlugin extends ProcessModelParserPluggable{
 
         //either timeout or dueDate should not be null --> two different Constructors for the ThresholdRule
         if (timeout != null) {
-            return new ThresholdRule(threshold, timeout);
+            return ThresholdRule.create(threshold, timeout);
         } else if (dueDate != null) {
-            return new ThresholdRule(threshold, dueDate);
+            return ThresholdRule.create(threshold, dueDate);
         } else {
             throw new ScyllaValidationException("A threshold rule was selected, but neither timeout nor duedate were specified.");
         }
