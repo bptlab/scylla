@@ -46,6 +46,11 @@ public abstract class ThresholdRule implements ActivationRule{
     	
     }
     
+    /**
+     * 
+     * @author Leon Bein
+     * @deprecated see TODOs in {@link DueDateThresholdRule#getDurationForCurrentInstance(TaskBeginEvent, ProcessInstance)}
+     */
     private static class DueDateThresholdRule extends ThresholdRule {
 
         private String dueDate;

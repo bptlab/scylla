@@ -228,7 +228,9 @@ abstract class BatchCluster extends Entity {
 		this.currentTimeOut = currentTimeOut;
 	}
 	
-	
+    public boolean hasNotStarted() {
+        return getState() == BatchClusterState.INIT || getState() == BatchClusterState.READY;
+    }
 	
 	
 	

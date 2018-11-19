@@ -41,7 +41,7 @@ public class BatchPluginUtils {
     private static BatchPluginUtils singleton;
 
     //Map of running instances
-    public Map<Integer,TaskEnableEvent> runningInstances = new HashMap<Integer, TaskEnableEvent>();
+    private Map<Integer,TaskEnableEvent> runningInstances = new HashMap<Integer, TaskEnableEvent>();
     // processID:[nodeId:batchClusters]
     private Map<String, Map<Integer, List<BatchCluster>>> batchClusters = new HashMap<String, Map<Integer, List<BatchCluster>>>();
 
@@ -115,32 +115,10 @@ public class BatchPluginUtils {
         if (batchClustersOfProcess != null) {
             List<BatchCluster> clusters = batchClustersOfProcess.get(nodeId);
             if (clusters != null) {
-                for (BatchCluster bc : clusters) {
-
-                    if(batchClusterHasNotStarted(bc.getState())){
-                        if(isProcessInstanceMatchingToDataView(parentalBeginEvent, processInstance, bc)) {
-                            cluster = bc;
-                            break;
-
-                        }else{
-                        //TODO LB 180208 : What should have been done here and is it needed?
-                            //for MinMax-Rule --> check whether similar instance exists
-
-                            //set new timeout for the cluster for comparison
-//                    	Duration timeout = bc.getBatchRegion().getActivationRule()
-//                    			.getTimeOut(parentalBeginEvent, bc.getProcessInstances().get(0));
-//
-//                		//reschedule the cluster beginEvent
-//            	        long timeoutInSeconds = timeout.get(ChronoUnit.SECONDS);
-//            	        TimeSpan timeSpan = new TimeSpan(timeoutInSeconds, TimeUnit.SECONDS);
-//
-//                        BatchClusterStartEvent clusterStartEvent = (BatchClusterStartEvent) bc.getScheduledEvents().get(0);
-//                        bc.cancel();
-//                        clusterStartEvent.schedule(bc, timeSpan);
-                        }
-
-                    }
-                }
+            	cluster = clusters.stream()
+            		.filter(BatchCluster::hasNotStarted)
+            		.filter(eachCluster -> isProcessInstanceMatchingToDataView(parentalBeginEvent, processInstance, eachCluster))
+            		.findFirst().orElse(null);
             }
         }
 
@@ -179,7 +157,7 @@ public class BatchPluginUtils {
         // (3) check whether cluster timeout should be updated (lowered)
         // Cluster can be "started" when it is maxloaded => don't update
         // Instance can be first in cluster => nothing to update
-        if (batchClusterHasNotStarted(cluster.getState()) && cluster.getProcessInstances().size() > 1) {
+        if (cluster.hasNotStarted() && cluster.getProcessInstances().size() > 1) {
 
             // if the dueDate of the current instance is earlier as of the instances added before, the cluster begin event is rescheduled
             Duration timeoutForCurrentInstance = batchActivity.getActivationRule().getTimeOut(parentalBeginEvent, processInstance);
@@ -215,10 +193,6 @@ public class BatchPluginUtils {
             clusterStartEvent.schedule(cluster); // schedule for immediate execution
         }
 
-    }
-
-    private boolean batchClusterHasNotStarted(BatchClusterState state) {
-        return state == BatchClusterState.INIT || state == BatchClusterState.READY;
     }
 
     private boolean isProcessInstanceMatchingToDataView(TaskBeginEvent desmojEvent, ProcessInstance processInstance,
@@ -469,4 +443,9 @@ public class BatchPluginUtils {
 	public static Map<Integer, BatchActivity> getBatchActivities(ProcessModel processModel) {
 		return (Map<Integer, BatchActivity>) processModel.getExtensionValue(PLUGIN_NAME, ACTIVITIES_KEY);
 	}
+
+	public Map<Integer,TaskEnableEvent> getRunningInstances() {
+		return runningInstances;
+	}
+
 }

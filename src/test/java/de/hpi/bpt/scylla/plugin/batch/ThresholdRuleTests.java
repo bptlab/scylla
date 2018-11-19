@@ -19,7 +19,7 @@ public class ThresholdRuleTests extends BatchSimulationTest {
 		//new ThresholdRuleTests().testDueDateDoesNotTriggerRegression();
 		new ThresholdRuleTests().testTimeoutTriggersBeforeMaxbatchsize();
 	}
-	//Shouldn't work, but does work ... why?
+	
 	@Test
 	public void testDueDateTriggers() {
 		assertTimeout(Duration.ofSeconds(5), ()->{
