@@ -2,6 +2,7 @@ package de.hpi.bpt.scylla.plugin.batch;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,6 +14,7 @@ import de.hpi.bpt.scylla.model.process.ProcessModel;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
 import de.hpi.bpt.scylla.simulation.ProcessSimulationComponents;
 import de.hpi.bpt.scylla.simulation.QueueManager;
+import de.hpi.bpt.scylla.simulation.ResourceObject;
 import de.hpi.bpt.scylla.simulation.ResourceObjectTuple;
 import de.hpi.bpt.scylla.simulation.SimulationModel;
 import de.hpi.bpt.scylla.simulation.event.BPMNEndEvent;
@@ -232,6 +234,12 @@ abstract class BatchCluster extends Entity {
         return getState() == BatchClusterState.INIT || getState() == BatchClusterState.READY;
     }
 	
+    /**
+     * This cluster is a batch task, if there is no subprocess for its node id.
+     */
+    public boolean isBatchTask() {
+    	return !getProcessSimulationComponents().getProcessModel().getSubProcesses().containsKey(getBatchActivity().getNodeId());
+    }
 	
 	
 	public void startEvent(BPMNStartEvent event) {}
@@ -253,10 +261,7 @@ abstract class BatchCluster extends Entity {
 
                 parentalEndEvents.clear();
 
-            	ProcessInstance parentProcessInstance = processInstance.getParent();
-                ProcessModel processModel = processInstance.getProcessModel();
-                int parentNodeId = processModel.getNodeIdInParent();
-                pluginInstance.setClusterToTerminated(parentProcessInstance, parentNodeId);
+                pluginInstance.setClusterToTerminated(getResponsibleProcessInstance(), getBatchActivity().getNodeId());
             }
 
             // Prevent parental task terminate event from scheduling, if there is any (from subprocess plugin)
@@ -276,7 +281,11 @@ abstract class BatchCluster extends Entity {
 	
 	public void taskEnableEvent(TaskEnableEvent event) throws ScyllaRuntimeException {}
 	public void taskBeginEvent(TaskBeginEvent event) throws ScyllaRuntimeException {}
-	public void taskTerminateEvent(TaskTerminateEvent event) throws ScyllaRuntimeException {}
+	public void taskTerminateEvent(TaskTerminateEvent event) throws ScyllaRuntimeException {
+		if(isBatchTask()) {
+			setProcessInstanceToFinished();
+		}
+	}
 	public void taskCancelEvent(TaskCancelEvent event) throws ScyllaRuntimeException {
         for (TaskTerminateEvent pee : parentalEndEvents) {
             TaskCancelEvent cancelEvent = new TaskCancelEvent(pee.getModel(), pee.getSource(),

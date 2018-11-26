@@ -38,8 +38,7 @@ public class BatchClusterStartEvent extends Event<BatchCluster> {
         // Schedule all task begin events of the process instance
         // This does not schedule the activities inside the subprocess
         for (TaskBeginEvent pse : parentalStartEvents) {
-            ProcessInstance pi = pse.getProcessInstance();
-            pse.schedule(pi);
+            pse.schedule();
         }
         // schedule subprocess start events for all process instances in parent
         // processInstances and parentalStartEvents are ordered the same way
@@ -51,40 +50,51 @@ public class BatchClusterStartEvent extends Event<BatchCluster> {
         for (int j = 0; j < parentalStartEvents.size(); j++) {
             TaskBeginEvent startEvent = parentalStartEvents.get(j);
             ProcessInstance responsibleProcessInstance = startEvent.getProcessInstance();
+            
+            Integer nodeIdToSchedule = nodeId;
+            ScyllaEvent startEventToSchedule = startEvent;
+            ProcessInstance processInstanceToSchedule = responsibleProcessInstance;
+            
+            if(!cluster.isBatchTask()) {
+            	SimulationModel model = (SimulationModel) responsibleProcessInstance.getModel();
+            	String source = startEvent.getSource();
+            	TimeInstant currentSimulationTime = cluster.presentTime();
 
-
-            int processInstanceId = responsibleProcessInstance.getId();
-            boolean showInTrace = responsibleProcessInstance.traceIsOn();
-            SimulationModel model = (SimulationModel) responsibleProcessInstance.getModel();
-            String source = startEvent.getSource();
-            TimeInstant currentSimulationTime = cluster.presentTime();
-
-            ProcessSimulationComponents pSimComponentsOfSubprocess = cluster.getProcessSimulationComponents().getChildren()
-                    .get(nodeId);
-            ProcessModel subprocess = pSimComponentsOfSubprocess.getProcessModel();
-
-            try {
-                Integer startNodeId = subprocess.getStartNode();
+            	ProcessSimulationComponents pSimComponentsOfSubprocess = cluster.getProcessSimulationComponents().getChildren().get(nodeId);
+            	int processInstanceId = responsibleProcessInstance.getId();
+                boolean showInTrace = responsibleProcessInstance.traceIsOn();
+                ProcessModel subprocess = pSimComponentsOfSubprocess.getProcessModel();
+                Integer startNodeId;
+                try {
+                    startNodeId = subprocess.getStartNode();
+                } catch (NodeNotFoundException | MultipleStartNodesException | NoStartNodeException e) {
+                    DebugLogger.error("Start node of process model " + subprocess.getId() + " not found.");
+                    e.printStackTrace();
+                    SimulationUtils.abort(model, responsibleProcessInstance, nodeId, traceIsOn());
+                    return;
+                }
                 ProcessInstance subprocessInstance = new ProcessInstance(model, subprocess, processInstanceId, showInTrace);
                 subprocessInstance.setParent(responsibleProcessInstance);
 
                 ScyllaEvent subprocessEvent = new BPMNStartEvent(model, source, currentSimulationTime,
                         pSimComponentsOfSubprocess, subprocessInstance, startNodeId);
-                //System.out.println("Created BPMNStartEvent for PI " + subprocessInstance.getId() + " / " + responsibleProcessInstance.getId() + " in Batch Cluster");
-
-                if (j == 0) { // If it is the first process instance, schedule it...
-                    subprocessEvent.schedule(subprocessInstance);
-                    cluster.setStartNodeId(startNodeId);
-                } else { // ...if not, save them for later
-                    cluster.queueEvent(startNodeId, subprocessEvent);
-                }
-
-            } catch (NodeNotFoundException | MultipleStartNodesException | NoStartNodeException e) {
-                DebugLogger.error("Start node of process model " + subprocess.getId() + " not found.");
-                e.printStackTrace();
-                SimulationUtils.abort(model, responsibleProcessInstance, nodeId, traceIsOn());
-                return;
+                
+                nodeIdToSchedule = startNodeId;
+                startEventToSchedule = subprocessEvent;
+                processInstanceToSchedule = subprocessInstance;
+           
+            } else {
+            	startEvent.cancel();
             }
+            
+            if (j == 0) { // If it is the first process instance, schedule it...
+            	startEventToSchedule.schedule(processInstanceToSchedule);
+                cluster.setStartNodeId(nodeIdToSchedule);
+            } else { // ...if not, save them for later
+            	cluster.queueEvent(nodeIdToSchedule, startEventToSchedule);
+            }
+
+
         }
         // move batch cluster from list of not started ones to running ones
         BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();

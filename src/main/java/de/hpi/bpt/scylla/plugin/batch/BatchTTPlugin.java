@@ -17,6 +17,7 @@ public class BatchTTPlugin extends TaskTerminateEventPluggable {
         BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
         
         BatchCluster cluster = pluginInstance.getCluster(processInstance);
+        if(cluster == null)cluster = pluginInstance.getCluster(event);
         if (cluster != null)cluster.taskTerminateEvent(event);
     }
 

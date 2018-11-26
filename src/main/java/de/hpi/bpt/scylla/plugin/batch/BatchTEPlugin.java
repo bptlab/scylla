@@ -32,11 +32,11 @@ public class BatchTEPlugin extends TaskEnableEventPluggable {
                 .getExtensionValue(getName(), "batchActivities");*/
         Map<Integer, BatchActivity> batchActivities = BatchPluginUtils.getBatchActivities(processModel);
 
-        /**If the task is a batch activity and a subprocess, cancel its normal execution 
+        /**If the task is a batch activity task or subprocess, cancel its normal execution 
          * and execute as batch activity instead*/
-        if (batchActivities.containsKey(nodeId) && processModel.getSubProcesses().containsKey(nodeId)) {
-
-            // in any case: put taskbeginevent of subprocess container on hold
+        if (batchActivities.containsKey(nodeId) && (processModel.getSubProcesses().containsKey(nodeId) || processModel.getTasks().containsKey(nodeId))) {
+        	
+        	// in any case: put taskbeginevent of subprocess container on hold
             // String source = desmojEvent.getSource();
             int indexOfSubprocessBeginEvent = 0;
 
@@ -45,6 +45,7 @@ public class BatchTEPlugin extends TaskEnableEventPluggable {
             // Map<String, TaskBeginEvent> subprocessStartEventsOnHold =
             // pluginInstance.getSubprocessStartEventsOnHold();
 
+            /**Might also be a normal begin event when inside a batch task*/
             TaskBeginEvent subprocessBeginEvent = (TaskBeginEvent) nextEventMap.get(indexOfSubprocessBeginEvent);
             pluginInstance.assignToBatchCluster(processInstance, nodeId, subprocessBeginEvent);
 
@@ -53,6 +54,7 @@ public class BatchTEPlugin extends TaskEnableEventPluggable {
         }
 
         BatchCluster cluster = pluginInstance.getCluster(processInstance);
+        if(cluster == null)cluster = pluginInstance.getCluster(event);
         if(cluster != null)cluster.taskEnableEvent(event);
     }
 

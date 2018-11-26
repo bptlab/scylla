@@ -2,20 +2,45 @@ package de.hpi.bpt.scylla.plugin.batch;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.jdom2.JDOMException;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import de.hpi.bpt.scylla.TestUtils;
+import de.hpi.bpt.scylla.exception.ScyllaValidationException;
 
 public class CSVLoggerTests extends BatchSimulationTest{
 	
 	public static void main(String[] args) {
-		new CSVLoggerTests().testUnwantedActivityInBatchRegression();
+		try {
+			new CSVLoggerTests().testLogIsCreated("ModelBatchTask.bpmn", "BatchTestSimulationConfigurationBatchTask.xml");
+			//new CSVLoggerTests().testLogIsCreated("ModelSimple.bpmn", "BatchTestSimulationConfiguration.xml");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@ParameterizedTest
+	@CsvSource({
+		"ModelSimple.bpmn, BatchTestSimulationConfiguration.xml",
+		"ModelBatchTask.bpmn, BatchTestSimulationConfigurationBatchTask.xml"
+	})
+	public void testLogIsCreated(String model, String config) throws ScyllaValidationException, JDOMException, IOException {
+		runSimpleSimulation(
+				"BatchTestGlobalConfiguration.xml", 
+				model,
+				config);
+		
+		assertNotNull(table);
 	}
 	
 	

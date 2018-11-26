@@ -36,14 +36,13 @@ public class BatchTBPlugin extends TaskBeginEventPluggable {
         ProcessModel processModel = processInstance.getProcessModel();
 
 
+        BatchCluster cluster = pluginInstance.getCluster(processInstance);
+        if(cluster == null)cluster = pluginInstance.getCluster(event);
 
-
-        ProcessInstance parentProcessInstance = processInstance.getParent();
-        if (parentProcessInstance != null) {
-            int parentNodeId = processModel.getNodeIdInParent();
-            BatchCluster cluster = pluginInstance.getRunningCluster(parentProcessInstance, parentNodeId);
+        if (cluster != null) {
+            ProcessInstance parentProcessInstance = processInstance.getParent();
             // If we are the representative (first executed) process instance we add the setUp time for this task
-            if (cluster != null && parentProcessInstance == cluster.getResponsibleProcessInstance()) {
+            if (parentProcessInstance == cluster.getResponsibleProcessInstance()) {
 
                 // therefore we fist take a sample of the setUp distribution
                 double setUpTimeToAdd = simulationComponents.getSetUpDistributionSample(nodeId);
@@ -57,7 +56,7 @@ public class BatchTBPlugin extends TaskBeginEventPluggable {
                 event.getTimeSpanToNextEventMap().put(0, timeForTaskWithSetUp);
             }
 
-            if (cluster != null)cluster.taskBeginEvent(event);
+            cluster.taskBeginEvent(event);
 
         }
         //SimulationConfiguration simulationConfiguration = desmojObjects.getSimulationConfiguration();

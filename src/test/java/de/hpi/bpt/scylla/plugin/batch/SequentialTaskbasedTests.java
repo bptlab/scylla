@@ -26,8 +26,8 @@ public class SequentialTaskbasedTests extends BatchSimulationTest{
 		DebugLogger.allowDebugLogging = false;
 		SequentialTaskbasedTests x = new SequentialTaskbasedTests();
 		//x.testActivitiesAreSequential();
-		//x.testParallelGateway();
-		x.testResourceStable(-10L);
+		x.testParallelGateway();
+		//x.testResourceStable(-10L);
 	}
 	
 	@Test

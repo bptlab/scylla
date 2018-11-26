@@ -8,10 +8,12 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -123,7 +125,9 @@ public class BatchCSVLogger extends OutputLoggerPluggable{
             	
             	/**Get all tasks inside the cluster*/
             	ProcessModel clusterSubProcess = subProcesses.get(clusterNodeId);
-            	Set<Integer> tasksOfCluster = clusterSubProcess.getTasks().keySet();
+            	Set<Integer> tasksOfCluster = Objects.nonNull(clusterSubProcess) ?
+            			clusterSubProcess.getTasks().keySet() :
+            			Collections.emptySet();
             	
             	for(BatchCluster cluster : clustersOfProcess.get(clusterNodeId)) {
             		
@@ -164,7 +168,7 @@ public class BatchCSVLogger extends OutputLoggerPluggable{
             		
             		if(batchType == BatchClusterExecutionType.SEQUENTIAL_TASKBASED || batchType == BatchClusterExecutionType.SEQUENTIAL_CASEBASED) {
             			Object[] firstActivity = tasksOfClusterInstance.stream()
-            				.min((first, second)->{return ((String)first[2]).compareTo((String)second[2]);}).get();
+            				.min((first, second)->{return ((String)first[2]).compareTo((String)second[2]);}).orElse(null);
             			tasksOfClusterInstance.stream()
             				.filter((each)->{return each[1].equals(firstActivity[1]);})
             				.forEach((each)->{each[8] = instanceTasks.get(each[0]).get(clusterNodeId.toString())[2];});

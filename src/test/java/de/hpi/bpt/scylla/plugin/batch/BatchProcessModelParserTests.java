@@ -24,10 +24,30 @@ public class BatchProcessModelParserTests extends BatchSimulationTest {
 	
 	public static void main(String[] args) {
 		try {
-			new BatchProcessModelParserTests().testParseGroupingCharacteristic();
+			new BatchProcessModelParserTests().testBatchTaskIsParsed();
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
+	}
+	
+	@Test
+	public void testBatchSubprocessIsParsed() throws ScyllaValidationException, JDOMException, IOException {
+		createSimpleSimulationManager(
+				"BatchTestGlobalConfiguration.xml", 
+				"ModelSimple.bpmn", 
+				"BatchTestSimulationConfiguration.xml");
+		simulationManager._parseInput();
+		assertNotNull(getBatchActivity());
+	}
+	
+	@Test
+	public void testBatchTaskIsParsed() throws ScyllaValidationException, JDOMException, IOException {
+		createSimpleSimulationManager(
+				"BatchTestGlobalConfiguration.xml", 
+				"ModelBatchTask.bpmn", 
+				"BatchTestSimulationConfigurationBatchTask.xml");
+		simulationManager._parseInput();
+		assertNotNull(getBatchActivity());
 	}
 	
 	@Test

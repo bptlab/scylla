@@ -94,7 +94,6 @@ public class CasebasedBatchCluster extends BatchCluster implements BatchCluster.
 	@Override
 	public void taskTerminateEvent(TaskTerminateEvent event) throws ScyllaRuntimeException {
 		super.taskTerminateEvent(event);
-		System.err.println("End "+getProcessSimulationComponents().getProcessModel().getSubProcesses().get(getNodeId()).getIdentifiers().get(event.getNodeId())+" in "+event.getProcessInstance().getId());
 		if(isBatchTask()) {
 			if(!isFinished())scheduleNextCaseInBatchProcess();
 			else if(hasStashedResources())discardResources();

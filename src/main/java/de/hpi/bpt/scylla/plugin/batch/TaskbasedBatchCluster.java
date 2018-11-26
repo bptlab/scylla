@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import de.hpi.bpt.scylla.exception.ScyllaRuntimeException;
@@ -73,6 +74,13 @@ public class TaskbasedBatchCluster extends BatchCluster implements BatchCluster.
 	@Override
 	public void taskTerminateEvent(TaskTerminateEvent event) throws ScyllaRuntimeException {
 		super.taskTerminateEvent(event);
+		if(isBatchTask() && isFinished()) {
+			Integer nextNodeId = event.getNextEventMap().values().iterator().next().getNodeId();
+			ScyllaEvent nextEvent;
+			while(Objects.nonNull(nextEvent = pollNextQueuedEvent(nextNodeId))) {
+				nextEvent.schedule();
+			}
+		}
 		scheduleNextEventInBatchProcess(event);
 	}
 	

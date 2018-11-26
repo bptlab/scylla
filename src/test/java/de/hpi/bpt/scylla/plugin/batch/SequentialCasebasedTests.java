@@ -16,6 +16,9 @@ import org.junit.jupiter.api.Test;
 
 import de.hpi.bpt.scylla.TestSeeds;
 import de.hpi.bpt.scylla.logger.DebugLogger;
+import de.hpi.bpt.scylla.plugin.statslogger_nojar.StatisticsLogger;
+import de.hpi.bpt.scylla.plugin_loader.PluginLoader;
+import de.hpi.bpt.scylla.plugin_type.logger.OutputLoggerPluggable;
 
 
 public class SequentialCasebasedTests extends BatchSimulationTest{
@@ -25,9 +28,10 @@ public class SequentialCasebasedTests extends BatchSimulationTest{
 	}
 	
 	public static void main(String[] args) {
+		PluginLoader.getDefaultPluginLoader().getExtensions().get(OutputLoggerPluggable.class).stream().filter(each -> each.equals(StatisticsLogger.class)).findAny().get().stateChanged(false);
 		DebugLogger.allowDebugLogging = false;
 		SequentialCasebasedTests x = new SequentialCasebasedTests();
-		x.testDoubleResourceRegression(8619657395064501318L);
+		x.testResourceStable(8619657395064501318L);
 	}
 	
 	@Test
@@ -44,7 +48,7 @@ public class SequentialCasebasedTests extends BatchSimulationTest{
 		}
 	}
 
-	@TestSeeds({-3207906028196791040L, 8619657395064501318L})
+	@TestSeeds({-3207906028196791040L, 8619657395064501318L, 3525936635746277536L})
 	public void testResourceStable(long seed) {
 		setGlobalSeed(seed);
 		runSimpleSimulation(
@@ -73,7 +77,7 @@ public class SequentialCasebasedTests extends BatchSimulationTest{
 		for(List<String[]> cluster : getClusters().values()) {
 			int numberOfResourcesPerCluster = cluster.stream()
 				.filter(each -> (each[1].equals("Activity A") || each[1].equals("Activity B")))
-				.collect(Collectors.groupingBy(each -> each[6])).size();
+				.collect(Collectors.groupingBy(each -> each[5])).size();
 			assertEquals(1, numberOfResourcesPerCluster);
 		}
 	}

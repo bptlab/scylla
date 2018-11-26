@@ -16,7 +16,7 @@ public class BatchTCPlugin extends TaskCancelEventPluggable {
     public void eventRoutine(TaskCancelEvent event, ProcessInstance processInstance) throws ScyllaRuntimeException {
         BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
         BatchCluster cluster = pluginInstance.getCluster(processInstance);
-
+        if(cluster == null)cluster = pluginInstance.getCluster(event);
         if (cluster != null) {
         	cluster.taskCancelEvent(event);
         }
