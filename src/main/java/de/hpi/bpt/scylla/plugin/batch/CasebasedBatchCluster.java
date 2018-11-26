@@ -13,6 +13,7 @@ import de.hpi.bpt.scylla.simulation.event.BPMNStartEvent;
 import de.hpi.bpt.scylla.simulation.event.ScyllaEvent;
 import de.hpi.bpt.scylla.simulation.event.TaskBeginEvent;
 import de.hpi.bpt.scylla.simulation.event.TaskEnableEvent;
+import de.hpi.bpt.scylla.simulation.event.TaskTerminateEvent;
 import desmoj.core.simulator.Model;
 import desmoj.core.simulator.TimeInstant;
 
@@ -66,7 +67,11 @@ public class CasebasedBatchCluster extends BatchCluster implements BatchCluster.
 	    	//If an assignment exist, use it for all further assignments
 	    	if(assignedResources != null && !assignedResources.getResourceObjects().isEmpty()) {
 	    		createStashEventFor(beginEvent, assignedResources);//so all other events know these are the resources to be used for stashing
-	    	}//else wait until natural assignment is done
+	    	} else {
+	    		//else wait until natural assignment is done except when there are concurrent events waiting for this natural assignment - then, be the first
+	    		if(!waitingTaskBegins.isEmpty())QueueManager.removeFromEventQueues((SimulationModel) beginEvent.getModel(), beginEvent);
+	    		waitingTaskBegins.add(beginEvent);
+	    	}
 		}
 	}
 	
@@ -77,11 +82,23 @@ public class CasebasedBatchCluster extends BatchCluster implements BatchCluster.
 
 	@Override
 	public void taskBeginEvent(TaskBeginEvent event) throws ScyllaRuntimeException {
+		waitingTaskBegins.remove(event);
 		super.taskBeginEvent(event);
     	ResourceObjectTuple assignedResources = event.getProcessInstance().getAssignedResources().get(event.getSource());
     	if(assignedResources != null && !assignedResources.getResourceObjects().isEmpty()) {
     		scheduleStashEvent(event, assignedResources);
     	}
+	}
+	
+	
+	@Override
+	public void taskTerminateEvent(TaskTerminateEvent event) throws ScyllaRuntimeException {
+		super.taskTerminateEvent(event);
+		System.err.println("End "+getProcessSimulationComponents().getProcessModel().getSubProcesses().get(getNodeId()).getIdentifiers().get(event.getNodeId())+" in "+event.getProcessInstance().getId());
+		if(isBatchTask()) {
+			if(!isFinished())scheduleNextCaseInBatchProcess();
+			else if(hasStashedResources())discardResources();
+		}
 	}
 	
     /**
@@ -92,8 +109,8 @@ public class CasebasedBatchCluster extends BatchCluster implements BatchCluster.
         // Get the start event of the next process instance and schedule it
         ScyllaEvent eventToSchedule = pollNextQueuedEvent(getStartNodeId());
         if (eventToSchedule != null) {
-            eventToSchedule.schedule(eventToSchedule.getProcessInstance());
-            //System.out.println("Scheduled " + eventToSchedule.getValue0().getDisplayName() + " for process instance " + eventToSchedule.getValue1());
+            eventToSchedule.schedule();
+            //System.out.println("Scheduled " + eventToSchedule.getDisplayName() + " for process instance " + eventToSchedule.getProcessInstance().getId());
         }
     }
 	
