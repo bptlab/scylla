@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 public class ParallelTests extends BatchSimulationTest{
 	
@@ -16,7 +18,25 @@ public class ParallelTests extends BatchSimulationTest{
 	
 	public static void main(String[] args) {
 		ParallelTests x = new ParallelTests();
-		x.testParallelGateway();
+		x.testCasesAreParallel("ModelBatchTask.bpmn", "BatchTestSimulationConfigurationBatchTask.xml");
+	}
+	
+	@ParameterizedTest
+	@CsvSource({
+		"ModelSimple.bpmn, BatchTestSimulationConfiguration.xml",
+		"ModelBatchTask.bpmn, BatchTestSimulationConfigurationBatchTask.xml"
+	})
+	public void testCasesAreParallel(String model, String config) {
+		runSimpleSimulation(
+				"BatchTestGlobalConfiguration.xml", 
+				model,
+				config);
+		
+		assertEquals(30, table.size());
+		assertExecutionType();
+		for(List<String[]> cluster : getClusters().values()) {
+			assertActivityGroupsAreEqual(cluster);
+		}
 	}
 
 	

@@ -40,8 +40,7 @@ public class BatchTaskTests extends BatchSimulationTest {
 				e.printStackTrace();
 				fail(e);
 			}
-		});
-		
+		});		
 	}
 
 }

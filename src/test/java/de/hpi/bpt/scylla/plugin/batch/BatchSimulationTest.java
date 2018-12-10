@@ -53,11 +53,13 @@ public class BatchSimulationTest extends SimulationTest{
 	}
 	
 	protected void assertExecutionType() {
-		table.stream().forEach((each)->{assertEquals(executionType.toString(), each[7]);});
+		table.stream().forEach((each)->{if(!each[6].isEmpty())assertEquals(executionType.toString(), each[7]);});
 	}
 	
 	protected Map<String, List<String[]>> getClusters() {
-		return TestUtils.groupBy(table,6);
+		Map<String, List<String[]>> clusters = TestUtils.groupBy(table,6);
+		clusters.remove("");
+		return clusters;
 	}
 	
 	protected Map<String, List<String[]>> getProcessInstances() {

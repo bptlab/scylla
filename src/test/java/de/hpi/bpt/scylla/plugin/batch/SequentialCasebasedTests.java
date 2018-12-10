@@ -13,6 +13,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import de.hpi.bpt.scylla.TestSeeds;
 import de.hpi.bpt.scylla.logger.DebugLogger;
@@ -32,6 +34,24 @@ public class SequentialCasebasedTests extends BatchSimulationTest{
 		DebugLogger.allowDebugLogging = false;
 		SequentialCasebasedTests x = new SequentialCasebasedTests();
 		x.testResourceStable(8619657395064501318L);
+	}
+	
+	@ParameterizedTest
+	@CsvSource({
+		"ModelSimple.bpmn, BatchTestSimulationConfiguration.xml",
+		"ModelBatchTask.bpmn, BatchTestSimulationConfigurationBatchTask.xml"
+	})
+	public void testCasesAreSequential(String model, String config) {
+		runSimpleSimulation(
+				"BatchTestGlobalConfiguration.xml", 
+				model,
+				config);
+		
+		assertEquals(30, table.size());
+		assertExecutionType();
+		for(List<String[]> cluster : getClusters().values()) {
+			assertClusterIsCaseBased(cluster);
+		}
 	}
 	
 	@Test

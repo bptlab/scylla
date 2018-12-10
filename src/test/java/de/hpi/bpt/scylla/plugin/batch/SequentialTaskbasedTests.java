@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import de.hpi.bpt.scylla.TestSeeds;
 import de.hpi.bpt.scylla.logger.DebugLogger;
@@ -26,22 +28,38 @@ public class SequentialTaskbasedTests extends BatchSimulationTest{
 		DebugLogger.allowDebugLogging = false;
 		SequentialTaskbasedTests x = new SequentialTaskbasedTests();
 		//x.testActivitiesAreSequential();
-		x.testParallelGateway();
+		//x.testParallelGateway();
 		//x.testResourceStable(-10L);
+		x.testActivitiesAreSequential("ModelBatchTask.bpmn", "BatchTestSimulationConfigurationBatchTask.xml");
 	}
 	
-	@Test
-	public void testActivitiesAreSequential() {
+	@ParameterizedTest
+	@CsvSource({
+		"ModelSimple.bpmn, BatchTestSimulationConfiguration.xml",
+		"ModelBatchTask.bpmn, BatchTestSimulationConfigurationBatchTask.xml"
+	})
+	public void testActivitiesAreSequential(String model, String config) {
 		runSimpleSimulation(
 				"BatchTestGlobalConfiguration.xml", 
-				"ModelSimple.bpmn", 
-				"BatchTestSimulationConfiguration.xml");
+				model,
+				config);
 		
 		assertEquals(30, table.size());
 		assertExecutionType();
 		for(List<String[]> cluster : getClusters().values()) {
 			assertActivityIsSequential("Activity A", cluster);
 			assertActivityIsSequential("Activity B", cluster);
+		}
+	}
+	
+	@Test
+	public void testActivitiesDoNotIntersect() {
+		runSimpleSimulation(
+				"BatchTestGlobalConfiguration.xml", 
+				"ModelSimple.bpmn", 
+				"BatchTestSimulationConfiguration.xml");
+		
+		for(List<String[]> cluster : getClusters().values()) {
 			assertActivitiesDoNotIntersect("Activity A", "Activity B", cluster);
 		}
 	}
