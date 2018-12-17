@@ -25,6 +25,7 @@ public class BatchTBPlugin extends TaskBeginEventPluggable {
     @Override
     public void eventRoutine(TaskBeginEvent event, ProcessInstance processInstance) throws ScyllaRuntimeException {
 
+    	if(BatchPluginUtils.isBatchActivityEvent(event))return;
         //System.out.println(event + " with display name " + event.getDisplayName() + " || " + event.getNextEventMap() + " and source " + event.getSource());
 
 

@@ -2,7 +2,6 @@ package de.hpi.bpt.scylla.plugin.batch;
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,7 +13,6 @@ import de.hpi.bpt.scylla.model.process.ProcessModel;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
 import de.hpi.bpt.scylla.simulation.ProcessSimulationComponents;
 import de.hpi.bpt.scylla.simulation.QueueManager;
-import de.hpi.bpt.scylla.simulation.ResourceObject;
 import de.hpi.bpt.scylla.simulation.ResourceObjectTuple;
 import de.hpi.bpt.scylla.simulation.SimulationModel;
 import de.hpi.bpt.scylla.simulation.event.BPMNEndEvent;
@@ -33,6 +31,9 @@ import desmoj.core.simulator.TimeSpan;
 
 abstract class BatchCluster extends Entity {
 
+	private BatchClusterEnableEvent enableEvent;
+	private BatchClusterStartEvent startEvent;
+	
     private TimeInstant creationTime;
     private ProcessSimulationComponents pSimComponents;
     private BatchActivity batchActivity;
@@ -187,10 +188,26 @@ abstract class BatchCluster extends Entity {
             this.state = BatchClusterState.MAXLOADED;
         }
 
-        this.parentalStartEvents.add(parentalStartEvent);
+        getParentalStartEvents().add(parentalStartEvent);
     }
 
-    BatchClusterState getState() {
+    protected BatchClusterEnableEvent getEnableEvent() {
+		return enableEvent;
+	}
+
+    protected void setEnableEvent(BatchClusterEnableEvent enableEvent) {
+		this.enableEvent = enableEvent;
+	}
+
+	protected BatchClusterStartEvent getStartEvent() {
+		return startEvent;
+	}
+
+	protected void setStartEvent(BatchClusterStartEvent startEvent) {
+		this.startEvent = startEvent;
+	}
+
+	BatchClusterState getState() {
         return state;
     }
 
@@ -296,11 +313,7 @@ abstract class BatchCluster extends Entity {
 
         parentalEndEvents.clear();
 
-        ProcessInstance processInstance = event.getProcessInstance();
-        ProcessInstance parentProcessInstance = processInstance.getParent();
-        ProcessModel processModel = processInstance.getProcessModel();
-        int parentNodeId = processModel.getNodeIdInParent();
-        BatchPluginUtils.getInstance().setClusterToTerminated(parentProcessInstance, parentNodeId);
+        BatchPluginUtils.getInstance().setClusterToTerminated(getResponsibleProcessInstance(), getBatchActivity().getNodeId());
 	}
 	
 	public boolean isFinished () {

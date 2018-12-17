@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 import de.hpi.bpt.scylla.model.process.ProcessModel;
 import de.hpi.bpt.scylla.plugin.dataobject.DataObjectField;
@@ -115,15 +116,15 @@ public class BatchPluginUtils {
                     showInTrace);
 
             // schedule BatchClusterStart at current time plus maximum timeout
-            BatchClusterStartEvent clusterStartEvent = new BatchClusterStartEvent(model, cluster.getName(),
-                    showInTrace);
+            BatchClusterEnableEvent clusterStartEvent = new BatchClusterEnableEvent(processInstance, cluster);
+            cluster.setEnableEvent(clusterStartEvent);
 
             Duration timeout = batchActivity.getActivationRule().getTimeOut(parentalBeginEvent, processInstance);
             cluster.setCurrentTimeOut(timeout);
             long timeoutInSeconds = timeout.get(ChronoUnit.SECONDS);
             TimeSpan timeSpan = new TimeSpan(timeoutInSeconds, TimeUnit.SECONDS);
 
-            clusterStartEvent.schedule(cluster, timeSpan);
+            clusterStartEvent.schedule(timeSpan);
 
             // (4) add cluster to not started clusters
             batchClustersOfProcess
@@ -160,9 +161,9 @@ public class BatchPluginUtils {
                 TimeSpan timeSpan = new TimeSpan(timeoutInSeconds, TimeUnit.SECONDS);
 
                 //Scheduled with timeout from current point in time
-                BatchClusterStartEvent clusterStartEvent = (BatchClusterStartEvent) cluster.getScheduledEvents().get(0);
-                cluster.cancel();
-                clusterStartEvent.schedule(cluster, timeSpan);
+                BatchClusterEnableEvent clusterStartEvent = cluster.getEnableEvent();
+                clusterStartEvent.cancel();
+                clusterStartEvent.schedule(timeSpan);
             }
 
         }
@@ -171,9 +172,9 @@ public class BatchPluginUtils {
         if (cluster.getState() == BatchClusterState.MAXLOADED || cluster.getState() == BatchClusterState.READY) {
             // (2a) if bc is maxloaded, reschedule BatchClusterStart
             // there is only one event already scheduled for the cluster which is the BatchClusterStart
-            BatchClusterStartEvent clusterStartEvent = (BatchClusterStartEvent) cluster.getScheduledEvents().get(0);
-            cluster.cancel();
-            clusterStartEvent.schedule(cluster); // schedule for immediate execution
+        	BatchClusterEnableEvent clusterStartEvent = cluster.getEnableEvent();
+            clusterStartEvent.cancel();
+            clusterStartEvent.schedule(); // schedule for immediate execution
         }
 
     }
@@ -327,6 +328,13 @@ public class BatchPluginUtils {
 
 	public Map<Integer,TaskEnableEvent> getRunningInstances() {
 		return runningInstances;
+	}
+	
+	public static boolean isBatchActivityEvent(Object o) {
+		return Stream.of(
+			BatchClusterStartEvent.class, 
+			BatchClusterEnableEvent.class
+		).anyMatch(each -> each.isInstance(o));
 	}
 
 }

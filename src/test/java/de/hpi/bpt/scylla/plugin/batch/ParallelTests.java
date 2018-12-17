@@ -18,7 +18,9 @@ public class ParallelTests extends BatchSimulationTest{
 	
 	public static void main(String[] args) {
 		ParallelTests x = new ParallelTests();
-		x.testCasesAreParallel("ModelBatchTask.bpmn", "BatchTestSimulationConfigurationBatchTask.xml");
+		//x.runSimpleSimulation("BatchTestGlobalConfiguration.xml", "ModelSimple.bpmn", "BatchTestSimulationConfiguration.xml");
+		//x.testCasesAreParallelWithResources("ModelBatchTask.bpmn", "BatchTestSimulationConfigurationBatchTaskWithResources.xml");
+		x.testCasesAreParallel("ModelSimple.bpmn", "BatchTestSimulationConfiguration.xml");
 	}
 	
 	@ParameterizedTest
@@ -27,6 +29,24 @@ public class ParallelTests extends BatchSimulationTest{
 		"ModelBatchTask.bpmn, BatchTestSimulationConfigurationBatchTask.xml"
 	})
 	public void testCasesAreParallel(String model, String config) {
+		runSimpleSimulation(
+				"BatchTestGlobalConfiguration.xml", 
+				model,
+				config);
+		
+		assertEquals(30, table.size());
+		assertExecutionType();
+		for(List<String[]> cluster : getClusters().values()) {
+			assertActivityGroupsAreEqual(cluster);
+		}
+	}
+	
+	@ParameterizedTest
+	@CsvSource({
+		"ModelSimple.bpmn, BatchTestSimulationConfigurationWithResources.xml",
+		//TODO "ModelBatchTask.bpmn, BatchTestSimulationConfigurationBatchTaskWithResources.xml"
+	})
+	public void testCasesAreParallelWithResources(String model, String config) {
 		runSimpleSimulation(
 				"BatchTestGlobalConfiguration.xml", 
 				model,

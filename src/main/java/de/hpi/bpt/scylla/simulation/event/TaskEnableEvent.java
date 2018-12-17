@@ -43,7 +43,6 @@ public class TaskEnableEvent extends TaskEvent {
         super.eventRoutine(processInstance);
         SimulationModel model = (SimulationModel) getModel();
         source = getName();
-        TimeInstant currentSimulationTime = model.presentTime();
         ProcessModel processModel = processInstance.getProcessModel();
         // int processInstanceId = processInstance.getId();
 
@@ -90,8 +89,7 @@ public class TaskEnableEvent extends TaskEvent {
 
             // poll available resources and if not available, put TaskBeginEvent on hold
 
-            beginEvent = new TaskBeginEvent(model, source, currentSimulationTime, pSimComponents,
-                    processInstance, nodeId);
+            beginEvent = createBeginEvent();
 
             ResourceObjectTuple resources = QueueManager.getResourcesForEvent(model, beginEvent);
 
@@ -115,6 +113,12 @@ public class TaskEnableEvent extends TaskEvent {
             DebugLogger.error(e.getMessage());
             DebugLogger.log("Simulation aborted.");
         }
+    }
+    
+    protected TaskBeginEvent createBeginEvent() {
+        SimulationModel model = (SimulationModel) getModel();
+        TimeInstant currentSimulationTime = model.presentTime();
+    	return new TaskBeginEvent(model, source, currentSimulationTime, pSimComponents, processInstance, nodeId);
     }
 
     @Override

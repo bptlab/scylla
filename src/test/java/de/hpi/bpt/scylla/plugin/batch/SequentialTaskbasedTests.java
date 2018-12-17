@@ -30,7 +30,8 @@ public class SequentialTaskbasedTests extends BatchSimulationTest{
 		//x.testActivitiesAreSequential();
 		//x.testParallelGateway();
 		//x.testResourceStable(-10L);
-		x.testActivitiesAreSequential("ModelBatchTask.bpmn", "BatchTestSimulationConfigurationBatchTask.xml");
+		x.runSimpleSimulation("BatchTestGlobalConfiguration.xml", "ModelBatchTask.bpmn", "BatchTestSimulationConfigurationBatchTaskWithResources.xml");
+		//x.runSimpleSimulation("BatchTestGlobalConfiguration.xml", "ModelSimple.bpmn", "BatchTestSimulationConfigurationWithResources.xml");
 	}
 	
 	@ParameterizedTest
@@ -39,6 +40,25 @@ public class SequentialTaskbasedTests extends BatchSimulationTest{
 		"ModelBatchTask.bpmn, BatchTestSimulationConfigurationBatchTask.xml"
 	})
 	public void testActivitiesAreSequential(String model, String config) {
+		runSimpleSimulation(
+				"BatchTestGlobalConfiguration.xml", 
+				model,
+				config);
+		
+		assertEquals(30, table.size());
+		assertExecutionType();
+		for(List<String[]> cluster : getClusters().values()) {
+			assertActivityIsSequential("Activity A", cluster);
+			assertActivityIsSequential("Activity B", cluster);
+		}
+	}
+	
+	@ParameterizedTest
+	@CsvSource({
+		"ModelSimple.bpmn, BatchTestSimulationConfigurationWithResources.xml",
+		//"ModelBatchTask.bpmn, BatchTestSimulationConfigurationBatchTaskWithResources.xml"
+	})
+	public void testActivitiesAreSequentialWithResources(String model, String config) {
 		runSimpleSimulation(
 				"BatchTestGlobalConfiguration.xml", 
 				model,

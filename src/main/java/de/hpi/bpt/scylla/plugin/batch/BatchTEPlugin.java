@@ -6,6 +6,8 @@ import de.hpi.bpt.scylla.exception.ScyllaRuntimeException;
 import de.hpi.bpt.scylla.model.process.ProcessModel;
 import de.hpi.bpt.scylla.plugin_type.simulation.event.TaskEnableEventPluggable;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
+import de.hpi.bpt.scylla.simulation.QueueManager;
+import de.hpi.bpt.scylla.simulation.SimulationModel;
 import de.hpi.bpt.scylla.simulation.event.ScyllaEvent;
 import de.hpi.bpt.scylla.simulation.event.TaskBeginEvent;
 import de.hpi.bpt.scylla.simulation.event.TaskEnableEvent;
@@ -21,6 +23,7 @@ public class BatchTEPlugin extends TaskEnableEventPluggable {
     @Override
     public void eventRoutine(TaskEnableEvent event, ProcessInstance processInstance) throws ScyllaRuntimeException {
 
+    	if(BatchPluginUtils.isBatchActivityEvent(event))return;
     	BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
 
         //ProcessSimulationComponents desmojObjects = event.getDesmojObjects();
@@ -46,11 +49,13 @@ public class BatchTEPlugin extends TaskEnableEventPluggable {
             // pluginInstance.getSubprocessStartEventsOnHold();
 
             /**Might also be a normal begin event when inside a batch task*/
-            TaskBeginEvent subprocessBeginEvent = (TaskBeginEvent) nextEventMap.get(indexOfSubprocessBeginEvent);
+            TaskBeginEvent subprocessBeginEvent = event.getBeginEvent();
             pluginInstance.assignToBatchCluster(processInstance, nodeId, subprocessBeginEvent);
 
             nextEventMap.remove(indexOfSubprocessBeginEvent);
             timeSpanToNextEventMap.remove(indexOfSubprocessBeginEvent);
+            //If it is a normal task begin event, it might be on resource waiting queues
+            QueueManager.removeFromEventQueues((SimulationModel) subprocessBeginEvent.getModel(), subprocessBeginEvent);
         }
 
         BatchCluster cluster = pluginInstance.getCluster(processInstance);

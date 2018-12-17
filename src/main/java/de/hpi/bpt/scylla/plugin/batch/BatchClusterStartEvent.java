@@ -15,19 +15,23 @@ import de.hpi.bpt.scylla.simulation.event.BPMNStartEvent;
 import de.hpi.bpt.scylla.simulation.event.ScyllaEvent;
 import de.hpi.bpt.scylla.simulation.event.TaskBeginEvent;
 import de.hpi.bpt.scylla.simulation.utils.SimulationUtils;
-import desmoj.core.simulator.Event;
-import desmoj.core.simulator.Model;
 import desmoj.core.simulator.TimeInstant;
 
-public class BatchClusterStartEvent extends Event<BatchCluster> {
+public class BatchClusterStartEvent extends TaskBeginEvent {
+	
+	private BatchCluster cluster;
 
-    public BatchClusterStartEvent(Model owner, String name, boolean showInTrace) {
-        super(owner, "BCStart_" + name, showInTrace);
-    }
+	
+	public BatchClusterStartEvent(ProcessInstance processInstance, BatchCluster cluster) {
+		super(processInstance.getModel(), "BCStart_" + cluster.getName(), processInstance.getModel().presentTime(), cluster.getProcessSimulationComponents(), processInstance, cluster.getBatchActivity().getNodeId());
+		this.cluster = cluster;
+	}
 
     //TODO think of moving this stuff to batch cluster class
     @Override
-    public void eventRoutine(BatchCluster cluster) throws SuspendExecution {
+    public void eventRoutine(ProcessInstance processInstance) throws SuspendExecution {
+    	
+        sendTraceNote("Starting batch cluster "+cluster);
 
         BatchActivity activity = cluster.getBatchActivity();
         int nodeId = activity.getNodeId();
@@ -37,9 +41,12 @@ public class BatchClusterStartEvent extends Event<BatchCluster> {
 
         // Schedule all task begin events of the process instance
         // This does not schedule the activities inside the subprocess
-        for (TaskBeginEvent pse : parentalStartEvents) {
-            pse.schedule();
+        if(!cluster.isBatchTask()) {
+            for (TaskBeginEvent pse : parentalStartEvents) {
+                pse.schedule();
+            }
         }
+
         // schedule subprocess start events for all process instances in parent
         // processInstances and parentalStartEvents are ordered the same way
 
@@ -84,7 +91,15 @@ public class BatchClusterStartEvent extends Event<BatchCluster> {
                 processInstanceToSchedule = subprocessInstance;
            
             } else {
-            	startEvent.cancel();
+            	//startEvent.cancel();
+            	/*System.out.println("now: "+startEvent.getProcessInstance().getAssignedResources().get(startEvent.getSource()).getResourceObjects());
+    			try {
+					QueueManager.releaseResourcesAndScheduleQueuedEvents((SimulationModel) startEvent.getModel(), startEvent);
+				} catch (ScyllaRuntimeException e) {
+					e.printStackTrace();
+				}
+    			System.out.println("then: "+startEvent.getProcessInstance().getAssignedResources().get(startEvent.getSource()));
+    			*/
             }
             
             if (j == 0) { // If it is the first process instance, schedule it...
@@ -105,6 +120,11 @@ public class BatchClusterStartEvent extends Event<BatchCluster> {
 
         // only responsible subprocess instance is simulated
         // other subprocess instances of batch are covered in process logs
+    }
+    
+    @Override
+    protected void addToLog(ProcessInstance processInstance) {
+    	//Shhhh TODO
     }
 
 }

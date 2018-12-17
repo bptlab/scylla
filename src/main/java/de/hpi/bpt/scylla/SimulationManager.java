@@ -118,7 +118,7 @@ public class SimulationManager {
 
         String experimentName = Long.toString((new Date()).getTime());
         Experiment.setEpsilon(epsilon);
-        Experiment exp = new Experiment(experimentName, false);
+        Experiment exp = new Experiment(experimentName, enableDesLogging);
         exp.setShowProgressBar(false);
 
         // XXX each simulation configuration may have its own seed

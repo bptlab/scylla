@@ -151,7 +151,7 @@ public class ParallelBatchCluster extends BatchCluster {
         } else if (event instanceof TaskBeginEvent) {
             transition = ProcessNodeTransitionType.BEGIN;
 			ResourceObjectTuple commonResources = event.getProcessInstance().getAssignedResources().get(source);
-			getProcessInstances().forEach(each -> each.getAssignedResources().put(source, commonResources));
+			getParentalStartEvents().stream().forEach(each -> each.getProcessInstance().getAssignedResources().put(each.getSource(), commonResources));
         } else if (event instanceof TaskCancelEvent) {
             transition = ProcessNodeTransitionType.CANCEL;
         } else if (event instanceof TaskTerminateEvent) {
