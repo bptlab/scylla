@@ -1,6 +1,5 @@
 package de.hpi.bpt.scylla.simulation.event;
 
-import java.sql.Time;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -139,5 +138,9 @@ public abstract class ScyllaEvent extends Event<ProcessInstance> {
     
     public void schedule() {
     	schedule(getProcessInstance());
+    }
+    
+    public void schedule(TimeSpan timeSpan) {
+    	schedule(getProcessInstance(), timeSpan);
     }
 }
