@@ -19,8 +19,8 @@ public class ParallelTests extends BatchSimulationTest{
 	public static void main(String[] args) {
 		ParallelTests x = new ParallelTests();
 		//x.runSimpleSimulation("BatchTestGlobalConfiguration.xml", "ModelSimple.bpmn", "BatchTestSimulationConfiguration.xml");
-		//x.testCasesAreParallelWithResources("ModelBatchTask.bpmn", "BatchTestSimulationConfigurationBatchTaskWithResources.xml");
-		x.testCasesAreParallel("ModelSimple.bpmn", "BatchTestSimulationConfiguration.xml");
+		x.testCasesAreParallelWithResources("ModelBatchTask.bpmn", "BatchTestSimulationConfigurationBatchTaskWithResources.xml");
+		//x.testCasesAreParallel("ModelSimple.bpmn", "BatchTestSimulationConfiguration.xml");
 	}
 	
 	@ParameterizedTest
@@ -44,7 +44,7 @@ public class ParallelTests extends BatchSimulationTest{
 	@ParameterizedTest
 	@CsvSource({
 		"ModelSimple.bpmn, BatchTestSimulationConfigurationWithResources.xml",
-		//TODO "ModelBatchTask.bpmn, BatchTestSimulationConfigurationBatchTaskWithResources.xml"
+		"ModelBatchTask.bpmn, BatchTestSimulationConfigurationBatchTaskWithResources.xml"
 	})
 	public void testCasesAreParallelWithResources(String model, String config) {
 		runSimpleSimulation(

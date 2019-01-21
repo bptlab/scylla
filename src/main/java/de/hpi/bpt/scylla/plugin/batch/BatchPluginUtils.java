@@ -173,7 +173,7 @@ public class BatchPluginUtils {
             // (2a) if bc is maxloaded, reschedule BatchClusterStart
             // there is only one event already scheduled for the cluster which is the BatchClusterStart
         	BatchClusterEnableEvent clusterStartEvent = cluster.getEnableEvent();
-            clusterStartEvent.cancel();
+            if(clusterStartEvent.isScheduled())clusterStartEvent.cancel();
             clusterStartEvent.schedule(); // schedule for immediate execution
         }
 
