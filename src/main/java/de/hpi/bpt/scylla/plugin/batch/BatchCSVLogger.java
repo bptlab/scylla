@@ -8,6 +8,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -36,12 +37,43 @@ import de.hpi.bpt.scylla.simulation.utils.SimulationUtils;
  */
 public class BatchCSVLogger extends OutputLoggerPluggable{
 	
+	
+	
 	/**Standard time format for table*/
 	public static final DateFormat timeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	/**The header for the table*/
 	private static Object[] header = new Object[] {"Process Instance", "Activity Name", "Arrival", "Start", "Complete", "Resources", "Batch Number", "Batch Type", "Natural Arrival Time"};
-	
+
+	public static class BatchCSVEntry {
+		Integer instanceId;
+		String activityName;
+		String arrival;
+		String start;
+		String complete;
+		String resources;
+		String batchNumber;
+		BatchClusterExecutionType batchType;
+		String naturalArrival;
+		
+		Object[] toArray() {
+			Object[] result = new Object[] {instanceId, activityName, arrival, start, complete, resources, batchNumber, batchType, naturalArrival};
+			assert result.length == header.length;
+			return result;
+		}
+		
+		void fromArray(String[] array) {
+			instanceId = Integer.parseInt(array[0]);
+			activityName = array[1];
+			arrival = array[2];
+			start = array[3];
+			complete = array[4];
+			resources = array[5];
+			batchNumber = array[6];
+			batchType = BatchClusterExecutionType.valueOf(array[7]);
+			naturalArrival = array[8];
+		}
+	}
 	
 	@Override
 	public String getName() {
@@ -71,11 +103,10 @@ public class BatchCSVLogger extends OutputLoggerPluggable{
         	Map<Integer, ProcessModel> subProcesses = model.getDesmojObjectsMap().get(processId).getProcessModel().getSubProcesses();
             
         	/**The table to later be printed*/
-        	List<Object[]> table = new ArrayList<Object[]>();
-        	table.add(header);
+        	List<BatchCSVEntry> entries = new ArrayList<BatchCSVEntry>();
             
         	/**All data for all tasks of all instances of specific process in [processInstanceId, [taskNodeId, [taskInformation]]]*/
-        	Map<Integer, Map<String, Object[]>> instanceTasks = new HashMap<Integer, Map<String, Object[]>>();
+        	Map<Integer, Map<String, BatchCSVEntry>> instanceTasks = new HashMap<Integer, Map<String, BatchCSVEntry>>();
             
             //For all instances of that process
             for(Integer instanceId : nodeInfoOfProcessInstances.keySet()) {
@@ -83,7 +114,7 @@ public class BatchCSVLogger extends OutputLoggerPluggable{
             	/**Node infos for specific process instance*/
             	List<ProcessNodeInfo> infosOfInstance = nodeInfoOfProcessInstances.get(instanceId);
             	/**Map of tasks and their information in [taskNodeId, [taskInformation]]*/
-            	Map<String, Object[]> tasks = new HashMap<String, Object[]>();
+            	Map<String, BatchCSVEntry> tasks = new HashMap<String, BatchCSVEntry>();
             	//For all information element we have for the current process instance
             	for(ProcessNodeInfo nodeInfo : infosOfInstance) {
             		/**Identifier for the node the info belongs to*/
@@ -94,22 +125,22 @@ public class BatchCSVLogger extends OutputLoggerPluggable{
             		switch(nodeInfo.getTransition()) {
             		/**On enable: create new data array for task and save enable and general information*/
             		case ENABLE:
-            			Object[] taskData = new Object[headerLength()];
-            			taskData[0] = instanceId;
-            			taskData[1] = nodeInfo.getTaskName();
-            			taskData[2] = timeStamp;
+            			BatchCSVEntry taskData = new BatchCSVEntry();
+            			taskData.instanceId = instanceId;
+            			taskData.activityName = nodeInfo.getTaskName();
+            			taskData.arrival = timeStamp;
             			tasks.put(nodeId, taskData);
-            			table.add(taskData);
+            			entries.add(taskData);
             			break;
             		/**On begin: write time and resource information*/
             		case BEGIN:
-            			tasks.get(nodeId)[3] = timeStamp;
-            			tasks.get(nodeId)[5] = String.join(",",nodeInfo.getResources());
+            			tasks.get(nodeId).start = timeStamp;
+            			tasks.get(nodeId).resources = String.join(",",nodeInfo.getResources());
             			break;
             		/**On terminate or cancel: write time*/
             		case TERMINATE:
             		case CANCEL:
-            			tasks.get(nodeId)[4] = timeStamp;
+            			tasks.get(nodeId).complete = timeStamp;
             			break;
             		default: continue;
             		}
@@ -136,45 +167,50 @@ public class BatchCSVLogger extends OutputLoggerPluggable{
                 	/**Execution type information*/
                 	BatchClusterExecutionType batchType = cluster.getBatchActivity().getExecutionType();
                 	
-                	List<Object[]> tasksOfClusterInstance = new ArrayList<>();
+                	List<BatchCSVEntry> tasksOfClusterInstance = new ArrayList<>();
                 	
                 	/**Add information to all tasks of cluster in all instances that participated in that cluster*/
                 	for(ProcessInstance instance : cluster.getProcessInstances()) {
                 		
-                		Map<String, Object[]> tasksOfProcessInstance = instanceTasks.get(instance.getId());
+                		Map<String, BatchCSVEntry> tasksOfProcessInstance = instanceTasks.get(instance.getId());
                 		/**Write information for cluster task*/
-                		tasksOfProcessInstance.get(clusterNodeId.toString())[6] = batchNumber;
-                		tasksOfProcessInstance.get(clusterNodeId.toString())[7] = batchType;
+                		tasksOfProcessInstance.get(clusterNodeId.toString()).batchNumber = batchNumber;
+                		tasksOfProcessInstance.get(clusterNodeId.toString()).batchType = batchType;
                 		/**Write information for all tasks inside cluster*/
                 		for(Integer taskId : tasksOfCluster) {
-                			Object[] task = tasksOfProcessInstance.get(SimulationUtils.getProcessScopeNodeId(clusterSubProcess, taskId));
+                			BatchCSVEntry task = tasksOfProcessInstance.get(SimulationUtils.getProcessScopeNodeId(clusterSubProcess, taskId));
                 			if(task == null)continue; //Not all tasks are necessarily visited due to XOR-Gateways and similar
-                			task[6] = batchNumber;
-                    		task[7] = batchType;
+                			task.batchNumber = batchNumber;
+                    		task.batchType = batchType;
                     		tasksOfClusterInstance.add(task);
                 		}
                 	}
 
-        			Map<Object, List<Object[]>> activities = tasksOfClusterInstance.stream()
-            				.collect(Collectors.groupingBy((each)->{return each[1];}));
+        			Map<Object, List<BatchCSVEntry>> activities = tasksOfClusterInstance.stream()
+            				.collect(Collectors.groupingBy((each)->{return each.activityName;}));
             		if(batchType == BatchClusterExecutionType.SEQUENTIAL_TASKBASED) {
-            			for(List<Object[]> activity : activities.values()) {
-            				Object[] minEnable = activity.stream().min((first, second)->{
-            					return ((String)first[2]).compareTo((String)second[2]);
+            			for(List<BatchCSVEntry> activity : activities.values()) {
+            				BatchCSVEntry minEnable = activity.stream().min((first, second)->{
+            					return (first.arrival).compareTo(second.arrival);
             				}).get();
-            				for(Object[] activityInstance : activity)activityInstance[8] = minEnable[2];
+            				for(BatchCSVEntry activityInstance : activity)activityInstance.naturalArrival = minEnable.arrival;
             			}
             		}
             		
             		if(batchType == BatchClusterExecutionType.SEQUENTIAL_TASKBASED || batchType == BatchClusterExecutionType.SEQUENTIAL_CASEBASED) {
-            			Object[] firstActivity = tasksOfClusterInstance.stream()
-            				.min((first, second)->{return ((String)first[2]).compareTo((String)second[2]);}).orElse(null);
+            			BatchCSVEntry firstActivity = tasksOfClusterInstance.stream()
+            				.min((first, second)->{return ((String)first.arrival).compareTo((String)second.arrival);}).orElse(null);
             			tasksOfClusterInstance.stream()
-            				.filter((each)->{return each[1].equals(firstActivity[1]);})
-            				.forEach((each)->{each[8] = instanceTasks.get(each[0]).get(clusterNodeId.toString())[2];});
+            				.filter((each)->{return each.activityName.equals(firstActivity.activityName);})
+            					.forEach((each)->{each.naturalArrival = instanceTasks.get(each.instanceId).get(clusterNodeId.toString()).arrival;});
             		}
             	}
             }
+            
+            List<Object[]> table = entries.stream()
+            		.map(BatchCSVEntry::toArray)
+            		.collect(Collectors.toList());
+            table.add(0, header);
             
     		/**Build string for table*/
     		String s = buildString(table);
@@ -232,5 +268,9 @@ public class BatchCSVLogger extends OutputLoggerPluggable{
 	
 	public static int headerLength() {
 		return header.length;
+	}
+	
+	private static int indexOf(String column) {
+		return Arrays.asList(header).indexOf(column);
 	}
 }
