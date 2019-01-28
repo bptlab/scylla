@@ -18,6 +18,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import de.hpi.bpt.scylla.TestSeeds;
 import de.hpi.bpt.scylla.logger.DebugLogger;
+import de.hpi.bpt.scylla.plugin.batch.BatchCSVLogger.BatchCSVEntry;
 import de.hpi.bpt.scylla.plugin.statslogger_nojar.StatisticsLogger;
 import de.hpi.bpt.scylla.plugin_loader.PluginLoader;
 import de.hpi.bpt.scylla.plugin_type.logger.OutputLoggerPluggable;
@@ -49,7 +50,7 @@ public class SequentialCasebasedTests extends BatchSimulationTest{
 		
 		assertEquals(30, table.size());
 		assertExecutionType();
-		for(List<String[]> cluster : getClusters().values()) {
+		for(List<BatchCSVEntry> cluster : getClusters().values()) {
 			assertClusterIsCaseBased(cluster);
 		}
 	}
@@ -63,7 +64,7 @@ public class SequentialCasebasedTests extends BatchSimulationTest{
 		assertEquals(30, table.size());
 		assertExecutionType();
 		
-		for(List<String[]> cluster : getClusters().values()) {
+		for(List<BatchCSVEntry> cluster : getClusters().values()) {
 			assertClusterIsCaseBased(cluster);
 		}
 	}
@@ -78,15 +79,15 @@ public class SequentialCasebasedTests extends BatchSimulationTest{
 		
 		assertEquals(30, table.size());
 		
-		Map<String, List<String[]>> resources = table.stream()
-				.filter((row)->{return !row[5].isEmpty();})
-				.collect(Collectors.groupingBy((each)->{return each[5];}));
+		Map<String, List<BatchCSVEntry>> resources = table.stream()
+				.filter((row)->{return !row.getResources().isEmpty();})
+				.collect(Collectors.groupingBy(BatchCSVEntry::getResources));
 		assertEquals(2, resources.size());
-		for(List<String[]> activitiesPerResource : resources.values()) {
-			activitiesPerResource.sort((a,b) -> {return a[4].compareTo(b[4]);});
+		for(List<BatchCSVEntry> activitiesPerResource : resources.values()) {
+			activitiesPerResource.sort((a,b) -> {return a.getComplete().compareTo(b.getComplete());});
 			Deque<String> seenClusters = new LinkedList<>();
-			for(String[] activity : activitiesPerResource) {
-				String cluster = activity[6];
+			for(BatchCSVEntry activity : activitiesPerResource) {
+				String cluster = activity.getBatchNumber();
 				System.err.print(cluster+" ");
 				assertTrue(!seenClusters.contains(cluster) || seenClusters.removeFirst().equals(cluster));
 				seenClusters.addFirst(cluster);
@@ -94,10 +95,10 @@ public class SequentialCasebasedTests extends BatchSimulationTest{
 			System.err.println();
 		}
 		
-		for(List<String[]> cluster : getClusters().values()) {
+		for(List<BatchCSVEntry> cluster : getClusters().values()) {
 			int numberOfResourcesPerCluster = cluster.stream()
-				.filter(each -> (each[1].equals("Activity A") || each[1].equals("Activity B")))
-				.collect(Collectors.groupingBy(each -> each[5])).size();
+				.filter(each -> (each.getActivityName().equals("Activity A") || each.getActivityName().equals("Activity B")))
+				.collect(Collectors.groupingBy(BatchCSVEntry::getResources)).size();
 			assertEquals(1, numberOfResourcesPerCluster);
 		}
 	}
@@ -117,32 +118,32 @@ public class SequentialCasebasedTests extends BatchSimulationTest{
 				"BatchTestGlobalConfiguration.xml", 
 				"ModelGatewayParallel.bpmn", 
 				"BatchTestSimulationConfigurationWithResources.xml");
-		Map<String, List<String[]>> activitiesPerResources = table.stream().collect(Collectors.groupingBy(each -> each[5]));
-		for(Entry<String, List<String[]>> activities : activitiesPerResources.entrySet()) {
+		Map<String, List<BatchCSVEntry>> activitiesPerResources = table.stream().collect(Collectors.groupingBy(BatchCSVEntry::getResources));
+		for(Entry<String, List<BatchCSVEntry>> activities : activitiesPerResources.entrySet()) {
 			if(activities.getKey().isEmpty())continue;
 			assertNoIntersections(activities.getValue());
 		}
 	}
 	
-	public static void assertClusterIsCaseBased(List<String[]> cluster) {
-		List<String[]> sortedActivities = cluster.stream()
-				.filter((activity)->{return activity[1].equals("Activity A") || activity[1].equals("Activity B");})
-				.sorted((a,b)->{return a[4].compareTo(b[4]);})
+	public static void assertClusterIsCaseBased(List<BatchCSVEntry> cluster) {
+		List<BatchCSVEntry> sortedActivities = cluster.stream()
+				.filter((activity)->{return activity.getActivityName().equals("Activity A") || activity.getActivityName().equals("Activity B");})
+				.sorted((a,b)->{return a.getComplete().compareTo(b.getComplete());})
 				.collect(Collectors.toList());
 		
-		Set<String> seenInstances = new HashSet<String>();
-		String lastInstance = null;
+		Set<Integer> seenInstances = new HashSet<Integer>();
+		Integer lastInstance = null;
 		String lastEndTime = "";
-		for(String[] activity : sortedActivities) {
-			String instance = activity[0];
-			String startTime = activity[3];
+		for(BatchCSVEntry activity : sortedActivities) {
+			Integer instance = activity.getInstanceId();
+			String startTime = activity.getArrival();
 			if(!instance.equals(lastInstance)) {
 				assertFalse(seenInstances.contains(instance));
 				assertTrue(lastEndTime.compareTo(startTime) <= 0);
 				seenInstances.add(instance);
 			}
 			lastInstance = instance;
-			lastEndTime = activity[4].compareTo(lastEndTime) > 0 ? activity[4] : lastEndTime;
+			lastEndTime = activity.getComplete().compareTo(lastEndTime) > 0 ? activity.getComplete() : lastEndTime;
 		}
 	}
 

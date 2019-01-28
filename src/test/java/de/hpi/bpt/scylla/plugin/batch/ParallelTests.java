@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import de.hpi.bpt.scylla.plugin.batch.BatchCSVLogger.BatchCSVEntry;
+
 public class ParallelTests extends BatchSimulationTest{
 	
 	{
@@ -36,7 +38,7 @@ public class ParallelTests extends BatchSimulationTest{
 		
 		assertEquals(30, table.size());
 		assertExecutionType();
-		for(List<String[]> cluster : getClusters().values()) {
+		for(List<BatchCSVEntry> cluster : getClusters().values()) {
 			assertActivityGroupsAreEqual(cluster);
 		}
 	}
@@ -44,7 +46,7 @@ public class ParallelTests extends BatchSimulationTest{
 	@ParameterizedTest
 	@CsvSource({
 		"ModelSimple.bpmn, BatchTestSimulationConfigurationWithResources.xml",
-		"ModelBatchTask.bpmn, BatchTestSimulationConfigurationBatchTaskWithResources.xml"
+		//TODO "ModelBatchTask.bpmn, BatchTestSimulationConfigurationBatchTaskWithResources.xml"
 	})
 	public void testCasesAreParallelWithResources(String model, String config) {
 		runSimpleSimulation(
@@ -54,7 +56,7 @@ public class ParallelTests extends BatchSimulationTest{
 		
 		assertEquals(30, table.size());
 		assertExecutionType();
-		for(List<String[]> cluster : getClusters().values()) {
+		for(List<BatchCSVEntry> cluster : getClusters().values()) {
 			assertActivityGroupsAreEqual(cluster);
 		}
 	}
@@ -71,28 +73,28 @@ public class ParallelTests extends BatchSimulationTest{
 		assertExecutionType();
 		assertNoNaturalArrivalTime(table);
 		
-		for(List<String[]> cluster : getClusters().values()) {
+		for(List<BatchCSVEntry> cluster : getClusters().values()) {
 			assertActivityGroupsAreEqual(cluster);
 		}
 	}
 	
-	public static void assertActivityGroupsAreEqual(List<String[]> cluster) {
-		Map<String, List<String[]>> activityGroups = cluster.stream()
-				.collect(Collectors.groupingBy((activity)->{return activity[1];}));
+	public static void assertActivityGroupsAreEqual(List<BatchCSVEntry> cluster) {
+		Map<String, List<BatchCSVEntry>> activityGroups = cluster.stream()
+				.collect(Collectors.groupingBy(BatchCSVEntry::getActivityName));
 		//For each activity group assert that all information except process instance and arrival time are equal
-		for(List<String[]> activityGroup : activityGroups.values()) {
-			String[] first = activityGroup.get(0);
-			for(String[] activity : activityGroup) {
-				for(int i = 0; i < activity.length; i++) {
+		for(List<BatchCSVEntry> activityGroup : activityGroups.values()) {
+			Object[] first = activityGroup.get(0).toArray();
+			for(BatchCSVEntry activity : activityGroup) {
+				for(int i = 0; i < first.length; i++) {
 					if(i == 0 || i == 2)continue;
-					assertEquals(first[i],activity[i]);
+					assertEquals(first[i],activity.toArray()[i]);
 				}
 			};
 		}
 	}
 	
-	private static void assertNoNaturalArrivalTime(List<String[]> table) {
-		table.stream().forEach((each)->{assertTrue(each[8].isEmpty());});
+	private static void assertNoNaturalArrivalTime(List<BatchCSVEntry> table) {
+		table.stream().forEach((each)->{assertTrue(each.getNaturalArrival().isEmpty());});
 	}
 	
 

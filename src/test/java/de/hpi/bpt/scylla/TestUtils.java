@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.opentest4j.AssertionFailedError;
 
@@ -56,11 +57,15 @@ public class TestUtils {
 		return table;
 	}
 	
-	public static Map<String, List<String[]>> groupBy(List<String[]> table, int column){
-		Map<String, List<String[]>> groups = new HashMap<String, List<String[]>>();
-		for(String[] row : table) {
-			String key = row[column];
-			if(!groups.containsKey(key))groups.put(key, new ArrayList<String[]>());
+	public static <ValueType> Map<ValueType, List<ValueType[]>> groupBy(List<ValueType[]> table, int column){
+		return groupBy(table, row -> row[column]);
+	}
+	
+	public static <KeyType,Row> Map<KeyType, List<Row>> groupBy(List<Row> table, Function<Row, KeyType> keyFunction){
+		Map<KeyType, List<Row>> groups = new HashMap<KeyType, List<Row>>();
+		for(Row row : table) {
+			KeyType key = keyFunction.apply(row);
+			groups.putIfAbsent(key, new ArrayList<Row>());
 			groups.get(key).add(row);
 		}
 		return groups;

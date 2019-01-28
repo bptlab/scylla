@@ -7,6 +7,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import de.hpi.bpt.scylla.logger.DebugLogger;
+import de.hpi.bpt.scylla.plugin.batch.BatchCSVLogger.BatchCSVEntry;
 
 public class ExclusiveGatewayInBatchTests extends BatchSimulationTest{
 	
@@ -29,11 +30,11 @@ public class ExclusiveGatewayInBatchTests extends BatchSimulationTest{
 		
 		assertEquals(20, table.size());
 		
-		for(List<String[]> cluster : getClusters().values()) {
+		for(List<BatchCSVEntry> cluster : getClusters().values()) {
 			assertExclusiveness(cluster);
 		}
 		
-		for(List<String[]> processInstance : getProcessInstances().values()) {
+		for(List<BatchCSVEntry> processInstance : getProcessInstances().values()) {
 			assertExclusiveness(processInstance);
 		}
 	}
@@ -49,12 +50,12 @@ public class ExclusiveGatewayInBatchTests extends BatchSimulationTest{
 		
 		assertEquals(20, table.size());
 		
-		for(List<String[]> cluster : getClusters().values()) {
+		for(List<BatchCSVEntry> cluster : getClusters().values()) {
 			SequentialCasebasedTests.assertClusterIsCaseBased(cluster);
 			assertExclusiveness(cluster);
 		}
 		
-		for(List<String[]> processInstance : getProcessInstances().values()) {
+		for(List<BatchCSVEntry> processInstance : getProcessInstances().values()) {
 			assertExclusiveness(processInstance);
 		}
 	}
@@ -69,20 +70,20 @@ public class ExclusiveGatewayInBatchTests extends BatchSimulationTest{
 		
 		assertEquals(20, table.size());
 		
-		for(List<String[]> cluster : getClusters().values()) {
+		for(List<BatchCSVEntry> cluster : getClusters().values()) {
 			ParallelTests.assertActivityGroupsAreEqual(cluster);
 		}
 		
-		for(List<String[]> processInstance : getProcessInstances().values()) {
+		for(List<BatchCSVEntry> processInstance : getProcessInstances().values()) {
 			assertExclusiveness(processInstance);
 		}
 	}
 	
-	private static void assertExclusiveness(List<String[]> processInstance) {
+	private static void assertExclusiveness(List<BatchCSVEntry> processInstance) {
 		assertTrue(
-				processInstance.stream().anyMatch((any)->{return any[1].equals("Activity A");})
-				^
-				processInstance.stream().anyMatch((any)->{return any[1].equals("Activity B");})
+				processInstance.stream().anyMatch((any)->{return any.getActivityName().equals("Activity A");})
+				^ //XOR
+				processInstance.stream().anyMatch((any)->{return any.getActivityName().equals("Activity B");})
 		);
 	}
 		

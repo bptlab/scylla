@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.text.ParseException;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
@@ -33,9 +32,9 @@ public class BatchTaskTests extends BatchSimulationTest {
 		assertEquals(30, table.size());
 		table.stream().forEach(each -> {
 			try {
-				assertNotNull(BatchCSVLogger.timeFormat.parse(each[2]));
-				assertNotNull(BatchCSVLogger.timeFormat.parse(each[3]));
-				assertNotNull(BatchCSVLogger.timeFormat.parse(each[4]));
+				assertNotNull(BatchCSVLogger.timeFormat.parse(each.getArrival()));
+				assertNotNull(BatchCSVLogger.timeFormat.parse(each.getStart()));
+				assertNotNull(BatchCSVLogger.timeFormat.parse(each.getComplete()));
 			} catch (ParseException e) {
 				e.printStackTrace();
 				fail(e);

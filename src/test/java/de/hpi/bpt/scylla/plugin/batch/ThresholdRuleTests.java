@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.text.ParseException;
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.Date;
 
 import org.junit.jupiter.api.Test;
@@ -29,10 +28,10 @@ public class ThresholdRuleTests extends BatchSimulationTest {
 				"DueDateConfiguration.xml");
 		});
 		table.stream()
-			.filter(each -> each[1].equals("Batch Activity"))
+			.filter(each -> each.getActivityName().equals("Batch Activity"))
 			.forEach(each -> {
-				assertEquals(each[6], "1");
-				assertStartTime(Duration.ofMinutes(10).toMillis() + Duration.ofDays(6).toMillis(), each[3]);	
+				assertEquals(each.getBatchNumber(), "1");
+				assertStartTime(Duration.ofMinutes(10).toMillis() + Duration.ofDays(6).toMillis(), each.getStart());	
 			}
 		);
 	}
@@ -46,15 +45,15 @@ public class ThresholdRuleTests extends BatchSimulationTest {
 				"BatchTestSimulationConfigurationFixedArrival.xml");
 		int instancesPerCluster = getBatchActivity().getActivationRule().getThreshold(null, null);
 		table.stream()
-			.filter(each -> each[1].equals("Batch Activity"))
+			.filter(each -> each.getActivityName().equals("Batch Activity"))
 			.forEach(each -> {
-				int instance = Integer.parseInt(each[0]);
+				int instance = each.getInstanceId();
 				int expectedCluster = regularClusterOf(instance, instancesPerCluster);
-				assertEquals(expectedCluster, Integer.parseInt(each[6]));
+				assertEquals(expectedCluster, Integer.parseInt(each.getBatchNumber()));
 				if(expectedCluster != getSimulationConfiguration().getNumberOfProcessInstances()/instancesPerCluster + 1)
-					assertStartTime((expectedCluster * instancesPerCluster - 1) * arrival, each[3]);
+					assertStartTime((expectedCluster * instancesPerCluster - 1) * arrival, each.getStart());
 				else //last cluster is not filled => timeout
-					assertStartTime(((expectedCluster - 1) * instancesPerCluster) * arrival + timeout, each[3]);
+					assertStartTime(((expectedCluster - 1) * instancesPerCluster) * arrival + timeout, each.getStart());
 			}
 		);
 	}
@@ -72,13 +71,12 @@ public class ThresholdRuleTests extends BatchSimulationTest {
 				"ModelSimple.bpmn", 
 				"BatchTestSimulationConfigurationFixedArrival.xml");
 		table.stream()
-			.filter(each -> each[1].equals("Batch Activity"))
+			.filter(each -> each.getActivityName().equals("Batch Activity"))
 			.forEach(each -> {
-				System.err.println(Arrays.toString(each));
-				int instance = Integer.parseInt(each[0]);
+				int instance = each.getInstanceId();
 				int expectedCluster = regularClusterOf(instance, instancesPerCluster);
-				assertEquals(expectedCluster, Integer.parseInt(each[6]));
-				assertStartTime(timeout * expectedCluster, each[3]);
+				assertEquals(expectedCluster, Integer.parseInt(each.getBatchNumber()));
+				assertStartTime(timeout * expectedCluster, each.getStart());
 			}
 		);
 	}

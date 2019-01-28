@@ -46,23 +46,33 @@ public class BatchCSVLogger extends OutputLoggerPluggable{
 	private static Object[] header = new Object[] {"Process Instance", "Activity Name", "Arrival", "Start", "Complete", "Resources", "Batch Number", "Batch Type", "Natural Arrival Time"};
 
 	public static class BatchCSVEntry {
-		Integer instanceId;
-		String activityName;
-		String arrival;
-		String start;
-		String complete;
-		String resources;
-		String batchNumber;
-		BatchClusterExecutionType batchType;
-		String naturalArrival;
+		private Integer instanceId;
+		private String activityName;
+		private String arrival;
+		private String start;
+		private String complete;
+		private String resources;
+		private String batchNumber;
+		private BatchClusterExecutionType batchType;
+		private String naturalArrival;
 		
+		public Integer getInstanceId() {return instanceId;}
+		public String getActivityName() {return activityName;}
+		public String getArrival() {return arrival;}
+		public String getStart() {return start;}
+		public String getComplete() {return complete;}
+		public String getResources() {return resources;}
+		public String getBatchNumber() {return batchNumber;}
+		public BatchClusterExecutionType getBatchType() {return batchType;}
+		public String getNaturalArrival() {return naturalArrival;}
+
 		Object[] toArray() {
 			Object[] result = new Object[] {instanceId, activityName, arrival, start, complete, resources, batchNumber, batchType, naturalArrival};
 			assert result.length == header.length;
 			return result;
 		}
 		
-		void fromArray(String[] array) {
+		void fillFromArray(String[] array) {
 			instanceId = Integer.parseInt(array[0]);
 			activityName = array[1];
 			arrival = array[2];
@@ -70,8 +80,14 @@ public class BatchCSVLogger extends OutputLoggerPluggable{
 			complete = array[4];
 			resources = array[5];
 			batchNumber = array[6];
-			batchType = BatchClusterExecutionType.valueOf(array[7]);
+			if(!array[7].isEmpty())batchType = BatchClusterExecutionType.valueOf(array[7]);
 			naturalArrival = array[8];
+		}
+		
+		static BatchCSVEntry fromArray(String[] array) {
+			BatchCSVEntry entry = new BatchCSVEntry();
+			entry.fillFromArray(array);
+			return entry;
 		}
 	}
 	
@@ -268,9 +284,5 @@ public class BatchCSVLogger extends OutputLoggerPluggable{
 	
 	public static int headerLength() {
 		return header.length;
-	}
-	
-	private static int indexOf(String column) {
-		return Arrays.asList(header).indexOf(column);
 	}
 }

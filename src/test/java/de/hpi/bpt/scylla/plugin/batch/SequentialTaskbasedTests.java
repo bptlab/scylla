@@ -17,6 +17,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import de.hpi.bpt.scylla.TestSeeds;
 import de.hpi.bpt.scylla.logger.DebugLogger;
+import de.hpi.bpt.scylla.plugin.batch.BatchCSVLogger.BatchCSVEntry;
 
 public class SequentialTaskbasedTests extends BatchSimulationTest{
 	
@@ -47,7 +48,7 @@ public class SequentialTaskbasedTests extends BatchSimulationTest{
 		
 		assertEquals(30, table.size());
 		assertExecutionType();
-		for(List<String[]> cluster : getClusters().values()) {
+		for(List<BatchCSVEntry> cluster : getClusters().values()) {
 			assertActivityIsSequential("Activity A", cluster);
 			assertActivityIsSequential("Activity B", cluster);
 		}
@@ -66,7 +67,7 @@ public class SequentialTaskbasedTests extends BatchSimulationTest{
 		
 		assertEquals(30, table.size());
 		assertExecutionType();
-		for(List<String[]> cluster : getClusters().values()) {
+		for(List<BatchCSVEntry> cluster : getClusters().values()) {
 			assertActivityIsSequential("Activity A", cluster);
 			assertActivityIsSequential("Activity B", cluster);
 		}
@@ -79,7 +80,7 @@ public class SequentialTaskbasedTests extends BatchSimulationTest{
 				"ModelSimple.bpmn", 
 				"BatchTestSimulationConfiguration.xml");
 		
-		for(List<String[]> cluster : getClusters().values()) {
+		for(List<BatchCSVEntry> cluster : getClusters().values()) {
 			assertActivitiesDoNotIntersect("Activity A", "Activity B", cluster);
 		}
 	}
@@ -95,7 +96,7 @@ public class SequentialTaskbasedTests extends BatchSimulationTest{
 		assertActivityIsInEveryInstance("Activity A", table);
 		assertActivityIsInEveryInstance("Activity B", table);
 		
-		for(List<String[]> cluster : getClusters().values()) {
+		for(List<BatchCSVEntry> cluster : getClusters().values()) {
 			assertActivityIsSequential("Activity A", cluster);
 			assertActivityIsSequential("Activity B", cluster);
 		}
@@ -113,15 +114,15 @@ public class SequentialTaskbasedTests extends BatchSimulationTest{
 		assert getGlobalConfiguration().getRandomSeed().equals(seed);
 		assertEquals(30, table.size());
 		
-		Map<String, List<String[]>> resources = table.stream()
-				.filter((row)->{return !row[5].isEmpty();})
-				.collect(Collectors.groupingBy((each)->{return each[5];}));
+		Map<String, List<BatchCSVEntry>> resources = table.stream()
+				.filter((row)->{return !row.getResources().isEmpty();})
+				.collect(Collectors.groupingBy(BatchCSVEntry::getResources));
 		assertEquals(2, resources.size());
-		for(List<String[]> activitiesPerResource : resources.values()) {
-			activitiesPerResource.sort((a,b) -> {return a[4].compareTo(b[4]);});
+		for(List<BatchCSVEntry> activitiesPerResource : resources.values()) {
+			activitiesPerResource.sort((a,b) -> {return a.getComplete().compareTo(b.getComplete());});
 			Deque<String> seenClusters = new LinkedList<>();
-			for(String[] activity : activitiesPerResource) {
-				String cluster = activity[6];
+			for(BatchCSVEntry activity : activitiesPerResource) {
+				String cluster = activity.getBatchNumber();
 				System.err.print(cluster+" ");
 				assertTrue(!seenClusters.contains(cluster) || seenClusters.removeFirst().equals(cluster));
 				seenClusters.addFirst(cluster);
@@ -130,32 +131,32 @@ public class SequentialTaskbasedTests extends BatchSimulationTest{
 		}
 	}
 	
-	private static void assertActivityIsSequential(String activityName, List<String[]> rows) {
+	private static void assertActivityIsSequential(String activityName, List<BatchCSVEntry> rows) {
 		rows = rows.stream()
-				.filter((String[] row)->{return row[1].equals(activityName);})
-				.sorted((a,b) -> {return a[3].compareTo(b[3]);})
+				.filter(row -> {return row.getActivityName().equals(activityName);})
+				.sorted((a,b) -> {return a.getStart().compareTo(b.getStart());})
 				.collect(Collectors.toList());
 		for(int i = 0; i < rows.size()-1; i++) {
-			String[] current = rows.get(i);
-			String[] next = rows.get(i+1);
-			assertTrue(current[4].compareTo(next[3]) <= 0);
+			BatchCSVEntry current = rows.get(i);
+			BatchCSVEntry next = rows.get(i+1);
+			assertTrue(current.getComplete().compareTo(next.getStart()) <= 0);
 		}
 	}
 	
-	private void assertActivityIsInEveryInstance(String activityName, List<String[]> table) {
+	private void assertActivityIsInEveryInstance(String activityName, List<BatchCSVEntry> table) {
 		for(int i = 1; i <= numberOfInstances(); i++) {
 			final int j = i;
 			assertTrue(table.stream().anyMatch((row) -> {
-				return row[0].equals(""+j) && row[1].equals(activityName);
+				return row.getInstanceId().equals(j) && row.getActivityName().equals(activityName);
 			}));
 		}
 	}
 
-	private static final void assertActivitiesDoNotIntersect(String activityNameA, String activityNameB, List<String[]> cluster) {
-		Map<Object, List<String[]>> e = cluster.stream()
-				.collect(Collectors.groupingBy((row)->{return row[1];}));
-			String[] lastActivityA = e.get(activityNameA).stream().max((a,b) -> {return a[4].compareTo(b[4]);}).get();
-			String[] firstActivityB = e.get(activityNameB).stream().min((a,b) -> {return a[3].compareTo(b[3]);}).get();
-			assertTrue(lastActivityA[4].compareTo(firstActivityB[3]) <= 0, Arrays.toString(lastActivityA)+" "+Arrays.toString(firstActivityB));
+	private static final void assertActivitiesDoNotIntersect(String activityNameA, String activityNameB, List<BatchCSVEntry> cluster) {
+		Map<Object, List<BatchCSVEntry>> e = cluster.stream()
+				.collect(Collectors.groupingBy(BatchCSVEntry::getActivityName));
+			BatchCSVEntry lastActivityA = e.get(activityNameA).stream().max((a,b) -> {return a.getComplete().compareTo(b.getComplete());}).get();
+			BatchCSVEntry firstActivityB = e.get(activityNameB).stream().min((a,b) -> {return a.getStart().compareTo(b.getStart());}).get();
+			assertTrue(lastActivityA.getComplete().compareTo(firstActivityB.getStart()) <= 0, Arrays.toString(lastActivityA.toArray())+" "+Arrays.toString(firstActivityB.toArray()));
 	}
 }
