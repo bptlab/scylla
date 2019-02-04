@@ -31,7 +31,8 @@ public class SequentialTaskbasedTests extends BatchSimulationTest{
 		//x.testActivitiesAreSequential();
 		//x.testParallelGateway();
 		//x.testResourceStable(-10L);
-		x.runSimpleSimulation("BatchTestGlobalConfiguration.xml", "ModelBatchTask.bpmn", "BatchTestSimulationConfigurationBatchTaskWithResources.xml");
+		//x.runSimpleSimulation("BatchTestGlobalConfiguration.xml", "ModelBatchTask.bpmn", "BatchTestSimulationConfigurationBatchTaskWithResources.xml");
+		x.testActivitiesAreSequentialWithResources("ModelBatchTask.bpmn", "BatchTestSimulationConfigurationBatchTaskWithResources.xml");
 		//x.runSimpleSimulation("BatchTestGlobalConfiguration.xml", "ModelSimple.bpmn", "BatchTestSimulationConfigurationWithResources.xml");
 	}
 	
@@ -57,7 +58,7 @@ public class SequentialTaskbasedTests extends BatchSimulationTest{
 	@ParameterizedTest
 	@CsvSource({
 		"ModelSimple.bpmn, BatchTestSimulationConfigurationWithResources.xml",
-		//"ModelBatchTask.bpmn, BatchTestSimulationConfigurationBatchTaskWithResources.xml"
+		"ModelBatchTask.bpmn, BatchTestSimulationConfigurationBatchTaskWithResources.xml"
 	})
 	public void testActivitiesAreSequentialWithResources(String model, String config) {
 		runSimpleSimulation(

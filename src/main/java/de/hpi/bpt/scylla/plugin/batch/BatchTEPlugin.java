@@ -56,7 +56,9 @@ public class BatchTEPlugin extends TaskEnableEventPluggable {
             timeSpanToNextEventMap.remove(indexOfSubprocessBeginEvent);
             //If it is a normal task begin event, it might be on resource waiting queues
             QueueManager.removeFromEventQueues((SimulationModel) subprocessBeginEvent.getModel(), subprocessBeginEvent);
-            QueueManager.releaseResourcesAndScheduleQueuedEvents((SimulationModel) subprocessBeginEvent.getModel(), subprocessBeginEvent);            
+            if(processInstance.getAssignedResources().get(subprocessBeginEvent.getSource()) != null)
+            	QueueManager.releaseResourcesAndScheduleQueuedEvents((SimulationModel) subprocessBeginEvent.getModel(), subprocessBeginEvent);            
+            //QueueManager.assignResourcesToEvent((SimulationModel) subprocessBeginEvent.getModel(), subprocessBeginEvent, new ResourceObjectTuple());
         }
 
         BatchCluster cluster = pluginInstance.getCluster(processInstance);

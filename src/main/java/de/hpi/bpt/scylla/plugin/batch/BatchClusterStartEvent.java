@@ -44,11 +44,13 @@ public class BatchClusterStartEvent extends TaskBeginEvent {
 
         // Schedule all task begin events of the process instance
         // This does not schedule the activities inside the subprocess
-        if(!cluster.isBatchTask()) {
-            for (TaskBeginEvent pse : parentalStartEvents) {
-            	QueueManager.assignResourcesToEvent((SimulationModel) pse.getModel(), pse, new ResourceObjectTuple());
-                pse.schedule();
-            }
+        
+        ResourceObjectTuple resources = getProcessInstance().getAssignedResources().get(getSource());
+        assert Objects.nonNull(resources);
+        for (TaskBeginEvent pse : parentalStartEvents) {
+        	QueueManager.assignResourcesToEvent((SimulationModel) pse.getModel(), pse, resources);
+        	//QueueManager.assignResourcesToEvent((SimulationModel) pse.getModel(), pse, new ResourceObjectTuple());
+            if(!cluster.isBatchTask()) pse.schedule();
         }
 
         // schedule subprocess start events for all process instances in parent
@@ -107,11 +109,6 @@ public class BatchClusterStartEvent extends TaskBeginEvent {
             }
             
             if (j == 0) { // If it is the first process instance, schedule it...
-	            ResourceObjectTuple resources = getProcessInstance().getAssignedResources().get(getSource());
-	            if(Objects.nonNull(resources)) {
-	            	getProcessInstance().getAssignedResources().remove(getSource());
-	            	getProcessInstance().getAssignedResources().put(startEventToSchedule.getSource(), resources);
-	            }
             	startEventToSchedule.schedule(processInstanceToSchedule);
                 cluster.setStartNodeId(nodeIdToSchedule);
             } else { // ...if not, save them for later

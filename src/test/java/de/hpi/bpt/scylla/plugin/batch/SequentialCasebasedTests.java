@@ -34,7 +34,10 @@ public class SequentialCasebasedTests extends BatchSimulationTest{
 		PluginLoader.getDefaultPluginLoader().getExtensions().get(OutputLoggerPluggable.class).stream().filter(each -> each.equals(StatisticsLogger.class)).findAny().get().stateChanged(false);
 		DebugLogger.allowDebugLogging = false;
 		SequentialCasebasedTests x = new SequentialCasebasedTests();
-		x.testResourceStable(8619657395064501318L);
+		//x.testResourceStable(8619657395064501318L);
+		//x.testCasesAreSequential("ModelBatchTask.bpmn", "BatchTestSimulationConfigurationBatchTask.xml");
+		x.testCasesAreSequentialWithResources("ModelBatchTask.bpmn", "BatchTestSimulationConfigurationBatchTaskWithResources.xml");
+		
 	}
 	
 	@ParameterizedTest
@@ -43,6 +46,24 @@ public class SequentialCasebasedTests extends BatchSimulationTest{
 		"ModelBatchTask.bpmn, BatchTestSimulationConfigurationBatchTask.xml"
 	})
 	public void testCasesAreSequential(String model, String config) {
+		runSimpleSimulation(
+				"BatchTestGlobalConfiguration.xml", 
+				model,
+				config);
+		
+		assertEquals(30, table.size());
+		assertExecutionType();
+		for(List<BatchCSVEntry> cluster : getClusters().values()) {
+			assertClusterIsCaseBased(cluster);
+		}
+	}
+	
+	@ParameterizedTest
+	@CsvSource({
+		"ModelSimple.bpmn, BatchTestSimulationConfigurationWithResources.xml",
+		"ModelBatchTask.bpmn, BatchTestSimulationConfigurationBatchTaskWithResources.xml"
+	})
+	public void testCasesAreSequentialWithResources(String model, String config) {
 		runSimpleSimulation(
 				"BatchTestGlobalConfiguration.xml", 
 				model,
