@@ -15,9 +15,9 @@
           <bsim:upper>5.0</bsim:upper>
         </bsim:uniformDistribution>
       </bsim:duration>
-        <!--bsim:resources>
+        <bsim:resources>
 	        <bsim:resource id="Resource" amount="1"/>
-	    </bsim:resources-->
+	    </bsim:resources>
     </bsim:Task>
     <bsim:Task id="BatchTask" name="Batch_Task">
       <bsim:duration timeUnit="MINUTES">
@@ -36,9 +36,9 @@
           <bsim:mean>5.0</bsim:mean>
         </bsim:exponentialDistribution>
       </bsim:duration>
-        <!--bsim:resources>
+        <bsim:resources>
 	        <bsim:resource id="Resource" amount="1"/>
-	    </bsim:resources-->
+	    </bsim:resources>
     </bsim:Task>
   </bsim:simulationConfiguration>
 </bsim:definitions>

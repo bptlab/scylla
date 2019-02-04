@@ -1,6 +1,7 @@
 package de.hpi.bpt.scylla.plugin.batch;
 
 import java.util.List;
+import java.util.Objects;
 
 import co.paralleluniverse.fibers.SuspendExecution;
 import de.hpi.bpt.scylla.logger.DebugLogger;
@@ -10,6 +11,8 @@ import de.hpi.bpt.scylla.model.process.graph.exception.NoStartNodeException;
 import de.hpi.bpt.scylla.model.process.graph.exception.NodeNotFoundException;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
 import de.hpi.bpt.scylla.simulation.ProcessSimulationComponents;
+import de.hpi.bpt.scylla.simulation.QueueManager;
+import de.hpi.bpt.scylla.simulation.ResourceObjectTuple;
 import de.hpi.bpt.scylla.simulation.SimulationModel;
 import de.hpi.bpt.scylla.simulation.event.BPMNStartEvent;
 import de.hpi.bpt.scylla.simulation.event.ScyllaEvent;
@@ -43,6 +46,7 @@ public class BatchClusterStartEvent extends TaskBeginEvent {
         // This does not schedule the activities inside the subprocess
         if(!cluster.isBatchTask()) {
             for (TaskBeginEvent pse : parentalStartEvents) {
+            	QueueManager.assignResourcesToEvent((SimulationModel) pse.getModel(), pse, new ResourceObjectTuple());
                 pse.schedule();
             }
         }
@@ -103,6 +107,11 @@ public class BatchClusterStartEvent extends TaskBeginEvent {
             }
             
             if (j == 0) { // If it is the first process instance, schedule it...
+	            ResourceObjectTuple resources = getProcessInstance().getAssignedResources().get(getSource());
+	            if(Objects.nonNull(resources)) {
+	            	getProcessInstance().getAssignedResources().remove(getSource());
+	            	getProcessInstance().getAssignedResources().put(startEventToSchedule.getSource(), resources);
+	            }
             	startEventToSchedule.schedule(processInstanceToSchedule);
                 cluster.setStartNodeId(nodeIdToSchedule);
             } else { // ...if not, save them for later

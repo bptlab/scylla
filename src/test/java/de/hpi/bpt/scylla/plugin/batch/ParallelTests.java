@@ -46,7 +46,7 @@ public class ParallelTests extends BatchSimulationTest{
 	@ParameterizedTest
 	@CsvSource({
 		"ModelSimple.bpmn, BatchTestSimulationConfigurationWithResources.xml",
-		//TODO "ModelBatchTask.bpmn, BatchTestSimulationConfigurationBatchTaskWithResources.xml"
+		"ModelBatchTask.bpmn, BatchTestSimulationConfigurationBatchTaskWithResources.xml"
 	})
 	public void testCasesAreParallelWithResources(String model, String config) {
 		runSimpleSimulation(
