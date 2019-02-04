@@ -69,6 +69,12 @@ class ResourceQueue extends PriorityQueue<ResourceObject> {
 
     }
 
+    /**
+     * Poll all objects available at a specific point in time
+     * Unavailable objects are put back into the queue
+     * @param retrievalTime : The point in time the resources should be available
+     * @return 
+     */
     public List<ResourceObject> pollAvailable(TimeInstant retrievalTime) {
         Set<ResourceObject> unavailableResourceObjects = new HashSet<ResourceObject>();
         List<ResourceObject> availableResourceObjects = new ArrayList<ResourceObject>();

@@ -305,7 +305,7 @@ public class QueueManager {
      * Returns resource instances which are available for the given event.
      * 
      * @param model
-     *            the simulation model
+     *            the simulation model; providing time and resource queues
      * @param event
      *            the DesmoJ event in question
      * @return the resource instances which are available for the given event
@@ -349,6 +349,7 @@ public class QueueManager {
             }
         }
 
+        //Put back all already polled resources, they are not needed as there are not enough of them
         if (!enoughPotentialResourceInstancesAvailable) {
             for (String resourceId : availableResourceObjects.keySet()) {
                 List<ResourceObject> resourceObjects = availableResourceObjects.get(resourceId);

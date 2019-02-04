@@ -65,7 +65,7 @@ public class BatchStashResourceEvent extends ScyllaEvent {
 		return cluster;
 	}
 
-	public boolean areResourcesInStash() {
+	public boolean areResourcesInStash()/**or are they assigned in any way?*/ {
 		return resourcesInStash;
 	}
 
