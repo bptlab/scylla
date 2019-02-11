@@ -10,6 +10,8 @@ jdk:
   - oraclejdk9
 
 #script: mvn '-Dtest=de.hpi.bpt.scylla.*Tests' test
+script
+  mvn clean verify
 
 notifications:
   email: false
