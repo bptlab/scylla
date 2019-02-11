@@ -11,7 +11,7 @@ jdk:
 
 #script: mvn '-Dtest=de.hpi.bpt.scylla.*Tests' test
 script:
-  mvn clean verify
+  mvn -X clean test
 
 notifications:
   email: false
