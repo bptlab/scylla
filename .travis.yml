@@ -1,17 +1,22 @@
 sudo: false
 language: java
 
+os:
+  #not yet available for java - windows 
+  - linux
+  - osx
+
 git:
   depth: 3
   lfs_skip_smudge: true
 
 jdk:
-  - oraclejdk8
-  - oraclejdk9
+  - openjdk10
+  - openjdk11
 
 #script: mvn '-Dtest=de.hpi.bpt.scylla.*Tests' test
 script:
-  mvn -X clean test
+  mvn clean test
 
 notifications:
   email: false
