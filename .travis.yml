@@ -1,6 +1,11 @@
 sudo: false
 language: java
 
+os:
+  - windows
+  - linux
+  - osx
+
 git:
   depth: 3
   lfs_skip_smudge: true
