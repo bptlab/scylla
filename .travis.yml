@@ -11,8 +11,8 @@ git:
   lfs_skip_smudge: true
 
 jdk:
-  - oraclejdk8
-  - oraclejdk9
+  - oraclejdk10
+  - oraclejdk11
 
 #script: mvn '-Dtest=de.hpi.bpt.scylla.*Tests' test
 script:
