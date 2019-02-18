@@ -25,8 +25,6 @@ import de.hpi.bpt.scylla.model.process.node.GatewayType;
 import de.hpi.bpt.scylla.model.process.node.MessageFlow;
 import de.hpi.bpt.scylla.model.process.node.TaskType;
 
-import javax.xml.soap.Name;
-
 /**
  * Parses all elements of a process model which are relevant for simulation.
  * 
