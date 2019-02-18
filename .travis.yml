@@ -2,7 +2,7 @@ sudo: false
 language: java
 
 os:
-  - windows
+  #not yet available for java - windows 
   - linux
   - osx
 
