@@ -15,6 +15,8 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 
+import static de.hpi.bpt.scylla.Scylla.*;
+
 import de.hpi.bpt.scylla.exception.ScyllaValidationException;
 import de.hpi.bpt.scylla.logger.DebugLogger;
 import de.hpi.bpt.scylla.model.configuration.SimulationConfiguration;
@@ -81,10 +83,10 @@ public class SimulationManager {
     public SimulationManager(String folder, String[] processModelFilenames, String[] simulationConfigurationFilenames,
             String globalConfigurationFilename, boolean enableBpsLogging, boolean enableDesLogging) {
 
-        this.experimentOutputFolder = folder;
-        this.processModelFilenames = processModelFilenames;
-        this.simulationConfigurationFilenames = simulationConfigurationFilenames;
-        this.globalConfigurationFilename = globalConfigurationFilename;
+        this.experimentOutputFolder = normalizePath(folder);
+        this.processModelFilenames = normalizePaths(processModelFilenames);
+        this.simulationConfigurationFilenames = normalizePaths(simulationConfigurationFilenames);
+        this.globalConfigurationFilename = normalizePath(globalConfigurationFilename);
         this.enableBpsLogging = enableBpsLogging;
         this.enableDesLogging = enableDesLogging;
     }
@@ -229,8 +231,7 @@ public class SimulationManager {
     protected void parseProcessCommonsAndModel(CommonProcessElementsParser cpeParser, Element pmRootElement, String filename) throws ScyllaValidationException {
         // parse common process elements from XML (BPMN)
         CommonProcessElements commonProcessElementsFromFile = cpeParser.parse(pmRootElement);
-        String fileNameWithoutExtension = filename.substring(// filename.lastIndexOf("\\") + 1,
-                filename.lastIndexOf(Scylla.FILEDELIM)+1, filename.lastIndexOf(".bpmn"));
+        String fileNameWithoutExtension = filename.substring(filename.lastIndexOf(Scylla.FILEDELIM)+1, filename.lastIndexOf(".bpmn"));
         commonProcessElementsFromFile.setBpmnFileNameWithoutExtension(fileNameWithoutExtension);
 
         // plugins to parse common process elements
@@ -297,6 +298,6 @@ public class SimulationManager {
 	 * @param outputPath : A String path to a folder
 	 */
 	public void setOutputPath(String outputPath) {
-		this.outputPath = outputPath;
+		this.outputPath = normalizePath(outputPath);
 	}
 }

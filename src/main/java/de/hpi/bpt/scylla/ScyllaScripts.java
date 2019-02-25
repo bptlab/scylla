@@ -1,5 +1,7 @@
 package de.hpi.bpt.scylla;
 
+import static de.hpi.bpt.scylla.Scylla.*;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -15,18 +17,18 @@ public class ScyllaScripts {
 	
     
     public static void runAllBatchSimulations() {
-    	String folder = "..\\batch_tests\\2019_jan_28\\";
+    	String folder = normalizePath("../batch_tests/2019_jan_28/");
     	try {
 			Files.walk(Paths.get(folder))
 				.filter(each -> {return each.toString().endsWith(".bpmn");})
 				.forEach(each -> {
-					String fileName = each.getName(each.getNameCount()-1).toString().split("\\.")[0];
+					String fileName = each.getName(each.getNameCount()-1).toString().split(FILEDELIM)[0];
 					Path globalConf = each.resolveSibling("BatchGlobalConfiguration.xml");
 					assert globalConf.toFile().exists();
 					Path simConf = each.resolveSibling(fileName+".xml");
 					assert simConf.toFile().exists();
 					Path output = each.resolveSibling(fileName);
-					runSimulation(globalConf.toString(), each.toString(), simConf.toString(), output.toString()+"\\");
+					runSimulation(globalConf.toString(), each.toString(), simConf.toString(), output.toString()+FILEDELIM);
 			    	
 				});
 		} catch (IOException e) {
@@ -39,7 +41,7 @@ public class ScyllaScripts {
     public static void replaceDistributions() {
     	
     	/*folder = "";
-    	String f = "..\\batch_tests\\2019_jan_28\\";
+    	String f = "../batch_tests/2019_jan_28/";
     	try {
 			Files.walk(Paths.get(folder+f))
 				.filter(each -> {return each.toString().endsWith(".xml");})
@@ -85,17 +87,17 @@ public class ScyllaScripts {
 
     public static void oldRunAllBatchSimulations() {
     	
-    	/*runSimulation(f+"BatchGlobalConfiguration.xml", f+"Version1_parallel.bpmn", 	f+"Version1.xml", 			f+"results\\v1_parallel\\");
-    	runSimulation(f+"BatchGlobalConfiguration.xml", f+"Version1_seqTaskbased.bpmn",	f+"Version1.xml", 			f+"results\\v1_taskbased\\");
-    	runSimulation(f+"BatchGlobalConfiguration.xml", f+"Version1_seqTaskbased.bpmn",	f+"Version1_casebased.xml", f+"results\\v1_casebased\\");
+    	/*runSimulation(f+"BatchGlobalConfiguration.xml", f+"Version1_parallel.bpmn", 	f+"Version1.xml", 			f+"results/v1_parallel/");
+    	runSimulation(f+"BatchGlobalConfiguration.xml", f+"Version1_seqTaskbased.bpmn",	f+"Version1.xml", 			f+"results/v1_taskbased/");
+    	runSimulation(f+"BatchGlobalConfiguration.xml", f+"Version1_seqTaskbased.bpmn",	f+"Version1_casebased.xml", f+"results/v1_casebased/");
     	
-    	runSimulation(f+"BatchGlobalConfiguration.xml", f+"Version2_parallel.bpmn", 	f+"Version2.xml", 			f+"results\\v2_parallel\\");
-    	runSimulation(f+"BatchGlobalConfiguration.xml", f+"Version2_seqTaskbased.bpmn", f+"Version2.xml", 			f+"results\\v2_taskbased\\");
-    	runSimulation(f+"BatchGlobalConfiguration.xml", f+"Version2_seqCasebased.bpmn", f+"Version2_casebased.xml", f+"results\\v2_casebased\\");
+    	runSimulation(f+"BatchGlobalConfiguration.xml", f+"Version2_parallel.bpmn", 	f+"Version2.xml", 			f+"results/v2_parallel/");
+    	runSimulation(f+"BatchGlobalConfiguration.xml", f+"Version2_seqTaskbased.bpmn", f+"Version2.xml", 			f+"results/v2_taskbased/");
+    	runSimulation(f+"BatchGlobalConfiguration.xml", f+"Version2_seqCasebased.bpmn", f+"Version2_casebased.xml", f+"results/v2_casebased/");
     	
-    	runSimulation(f+"BatchGlobalConfiguration.xml", f+"Version3_parallel.bpmn", 	f+"Version3.xml", 			f+"results\\v3_parallel\\");
-    	runSimulation(f+"BatchGlobalConfiguration.xml", f+"Version3_seqTaskbased.bpmn", f+"Version3.xml", 			f+"results\\v3_taskbased\\");
-    	runSimulation(f+"BatchGlobalConfiguration.xml", f+"Version3_seqCasebased.bpmn", f+"Version3_casebased.xml", f+"results\\v3_casebased\\");*/
+    	runSimulation(f+"BatchGlobalConfiguration.xml", f+"Version3_parallel.bpmn", 	f+"Version3.xml", 			f+"results/v3_parallel/");
+    	runSimulation(f+"BatchGlobalConfiguration.xml", f+"Version3_seqTaskbased.bpmn", f+"Version3.xml", 			f+"results/v3_taskbased/");
+    	runSimulation(f+"BatchGlobalConfiguration.xml", f+"Version3_seqCasebased.bpmn", f+"Version3_casebased.xml", f+"results/v3_casebased/");*/
     }
     
     

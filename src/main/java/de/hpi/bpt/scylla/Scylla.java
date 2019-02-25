@@ -11,7 +11,7 @@ import java.util.Arrays;
  */
 public class Scylla {
     public static final String OS = System.getProperty("os.name");
-    public static final String FILEDELIM = (OS.contains("Linux") || OS.contains("Mac OS")) ? "/" : "\\";
+    public static final String FILEDELIM = "/";//(OS.contains("Linux") || OS.contains("Mac OS")) ? "/" : "\\";
   
     public static void main(String[] args) throws IllegalArgumentException {
 
@@ -69,5 +69,19 @@ public class Scylla {
                 enableBpsLogging, enableDesmojLogging);
         manager.run();
     }
+    
+	public static String normalizePath(String path) {
+		path = path.replace("\\", FILEDELIM);
+		path = path.replace("/", FILEDELIM);
+		return path;
+	}
+	
+	public static String[] normalizePaths(String[] paths) {
+		String[] normalized = new String[paths.length];
+		for(int i = 0; i < paths.length; i++) {
+			normalized[i] = normalizePath(paths[i]);
+		}
+		return normalized;
+	}
 
 }

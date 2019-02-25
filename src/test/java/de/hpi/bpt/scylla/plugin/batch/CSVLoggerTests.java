@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import static de.hpi.bpt.scylla.Scylla.*;
 import de.hpi.bpt.scylla.TestUtils;
 import de.hpi.bpt.scylla.exception.ScyllaValidationException;
 import de.hpi.bpt.scylla.plugin.batch.BatchCSVLogger.BatchCSVEntry;
@@ -88,9 +89,9 @@ public class CSVLoggerTests extends BatchSimulationTest{
 	@Test
 	public void testUnwantedActivityInBatchRegression() {
 		runSimpleSimulation(
-				"regression\\XORSamplesGlobal.xml", 
-				"regression\\UnwantedActivityInBatch.bpmn", 
-				"regression\\UnwantedActivityInBatch.xml");
+				"regression/XORSamplesGlobal.xml", 
+				"regression/UnwantedActivityInBatch.bpmn", 
+				"regression/UnwantedActivityInBatch.xml");
 		Map<String, List<BatchCSVEntry>> activities = table.stream().collect(Collectors.groupingBy(BatchCSVEntry::getActivityName));
 		activities.get("A").stream().forEach(each -> assertNull(each.getBatchType(), each.toString()));
 		activities.get("E").stream().forEach(each -> assertNull(each.getBatchType(), each.toString()));

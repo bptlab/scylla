@@ -127,9 +127,9 @@ public class SequentialCasebasedTests extends BatchSimulationTest{
 	@Test
 	public void testEventScheduledTwiceRegression() {
 		runSimpleSimulation(
-				"regression\\DoubleEventGlobal.xml", 
-				"regression\\DoubleEvent.bpmn", 
-				"regression\\DoubleEventSim.xml");
+				"regression/DoubleEventGlobal.xml", 
+				"regression/DoubleEvent.bpmn", 
+				"regression/DoubleEventSim.xml");
 	}
 	
 	@TestSeeds(-3923947980161818345L)

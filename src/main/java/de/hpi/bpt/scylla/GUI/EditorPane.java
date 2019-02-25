@@ -28,6 +28,8 @@ import javax.swing.ScrollPaneConstants;
 
 import org.jdom2.JDOMException;
 
+import static de.hpi.bpt.scylla.Scylla.*;
+
 
 
 @SuppressWarnings("serial")
@@ -297,7 +299,7 @@ public abstract class EditorPane extends JPanel implements FormManager{
 			}
 		};
 		if(getFile() != null && getFile().exists())chooser.setSelectedFile(getFile());
-		else if(!getId().equals("")) chooser.setSelectedFile(new File(ScyllaGUI.DEFAULTFILEPATH+"\\"+getId()+".xml"));
+		else if(!getId().equals("")) chooser.setSelectedFile(new File(normalizePath(ScyllaGUI.DEFAULTFILEPATH+"/"+getId()+".xml")));
 		chooser.setDialogTitle("Save");
 		int c = chooser.showDialog(null,"Save");
 		if(c == ScalingFileChooser.APPROVE_OPTION){

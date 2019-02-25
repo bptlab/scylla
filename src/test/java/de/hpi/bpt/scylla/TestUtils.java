@@ -17,9 +17,11 @@ import java.util.function.Function;
 
 import org.opentest4j.AssertionFailedError;
 
+import static de.hpi.bpt.scylla.Scylla.*;
+
 public class TestUtils {
 	
-	public static final String RESOURCEFOLDER = "src\\test\\resources\\";
+	public static final String RESOURCEFOLDER = normalizePath("src/test/resources/");
 	
 	public static void cleanupOutputs(String path) {
 		File folder = new File(path);

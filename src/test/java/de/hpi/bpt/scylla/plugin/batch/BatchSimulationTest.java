@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static de.hpi.bpt.scylla.Scylla.*;
 import de.hpi.bpt.scylla.SimulationTest;
 import de.hpi.bpt.scylla.TestUtils;
 import de.hpi.bpt.scylla.plugin.batch.BatchCSVLogger.BatchCSVEntry;
@@ -48,7 +49,7 @@ public class BatchSimulationTest extends SimulationTest{
 	}
 	
 	protected void parseTable() {
-		File f = new File(".\\"+outputPath+getProcessId()+"_processBatchActivityStats.csv");
+		File f = new File(normalizePath("./"+outputPath+getProcessId()+"_processBatchActivityStats.csv"));
 		assertTrue(f.exists());
 		table = TestUtils.readCSV(f).stream().map(BatchCSVEntry::fromArray).collect(Collectors.toList());
 	}

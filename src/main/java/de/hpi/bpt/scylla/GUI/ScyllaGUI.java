@@ -27,6 +27,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.ColorUIResource;
 
+import de.hpi.bpt.scylla.Scylla;
 import de.hpi.bpt.scylla.GUI.SimulationPane.SimulationPane;
 /**
  * Scylla UI Main class, provides UI constants and starts the UI.
@@ -42,9 +43,9 @@ public class ScyllaGUI extends JFrame {
 	public static final boolean INJAR = ScyllaGUI.class.getResource(ScyllaGUI.class.getSimpleName()+".class").toString().startsWith("jar:");
 	
 	/** Default path for input and output files*/
-	public static String DEFAULTFILEPATH = "samples\\";
+	public static String DEFAULTFILEPATH = "samples"+Scylla.FILEDELIM;
 	/** Path for desmoj output files*/
-	public static final String DESMOJOUTPUTPATH = "desmoj_output\\";
+	public static final String DESMOJOUTPUTPATH = "desmoj_output"+Scylla.FILEDELIM;
 
 	
 	/**Color for titles and other highlighted bars*/

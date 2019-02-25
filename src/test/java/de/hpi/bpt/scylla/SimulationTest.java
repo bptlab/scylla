@@ -15,6 +15,7 @@ import org.jdom2.Namespace;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
+import static de.hpi.bpt.scylla.Scylla.*;
 import de.hpi.bpt.scylla.model.configuration.SimulationConfiguration;
 import de.hpi.bpt.scylla.model.global.GlobalConfiguration;
 import de.hpi.bpt.scylla.model.global.resource.Resource;
@@ -58,8 +59,8 @@ public abstract class SimulationTest {
 
 	@AfterEach
 	public void tearDown() {
-		TestUtils.deleteFolder(new File(".\\"+outputPath));
-		TestUtils.cleanupOutputs(".\\"+getFolder());
+		TestUtils.deleteFolder(new File("."+FILEDELIM+outputPath));
+		TestUtils.cleanupOutputs("."+FILEDELIM+getFolder());
 	}
 	
 	protected GlobalConfiguration getGlobalConfiguration() {
@@ -136,15 +137,16 @@ public abstract class SimulationTest {
 	}
 	
 	protected String getFolder() {
-		return TestUtils.RESOURCEFOLDER+getFolderName()+"\\";
+		return TestUtils.RESOURCEFOLDER+getFolderName()+FILEDELIM;
 	}
 	
 	protected String getPath(String fileName) {
 		String path = TestUtils.RESOURCEFOLDER;
-		if(fileName.startsWith(".\\")) {
+		path = normalizePath(path);
+		if(fileName.startsWith("."+FILEDELIM)) {
 			path += fileName.substring(2);
 		} else {
-			path += getFolderName()+"\\"+fileName;
+			path += getFolderName()+FILEDELIM+fileName;
 		}
 		return path;
 	}
