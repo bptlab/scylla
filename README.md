@@ -1,4 +1,4 @@
-# Scylla - An extensible BPMN process simulator
+# Scylla - An extensible BPMN process simulator [![Build Status](https://travis-ci.org/bptlab/scylla.svg?branch=dev_ui)](https://travis-ci.org/bptlab/scylla)
 
 Scylla is an extensible BPMN process simulator which relies on the building blocks of discrete event simulation.  The process simulator offers an UI where BPMN models can be extended with simulation-specific information (e.g., inter-arrival time of instances, task duration). Resources are centrally specified in an extra file, such that the simulator also allows multi-process simulation (a simulation with several process models using the same resources).
 
