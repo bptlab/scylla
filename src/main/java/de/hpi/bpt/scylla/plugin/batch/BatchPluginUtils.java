@@ -17,7 +17,6 @@ import de.hpi.bpt.scylla.simulation.ProcessInstance;
 import de.hpi.bpt.scylla.simulation.ProcessSimulationComponents;
 import de.hpi.bpt.scylla.simulation.event.TaskBeginEvent;
 import de.hpi.bpt.scylla.simulation.event.TaskCancelEvent;
-import de.hpi.bpt.scylla.simulation.event.TaskEnableEvent;
 import de.hpi.bpt.scylla.simulation.event.TaskEvent;
 import de.hpi.bpt.scylla.simulation.event.TaskTerminateEvent;
 import desmoj.core.simulator.EventAbstract;
@@ -31,9 +30,7 @@ public class BatchPluginUtils {
 	static final String ACTIVITIES_KEY = "batchActivities";
     private static BatchPluginUtils singleton;
 
-    //Map of running instances
-    private Map<Integer,TaskEnableEvent> runningInstances = new HashMap<Integer, TaskEnableEvent>();
-    // processID:[nodeId:batchClusters]
+     // processID:[nodeId:batchClusters]
     private Map<String, Map<Integer, List<BatchCluster>>> batchClusters = new HashMap<String, Map<Integer, List<BatchCluster>>>();
     
     
@@ -95,14 +92,12 @@ public class BatchPluginUtils {
         // (1a) check if there is already a batch with the data view (= a cluster the instance can be added to)
         String processId = processModel.getId();
         Map<Integer, List<BatchCluster>> batchClustersOfProcess = batchClusters.computeIfAbsent(processId, (s) -> new HashMap<Integer, List<BatchCluster>>());
-        if (batchClustersOfProcess != null) {
-            List<BatchCluster> clusters = batchClustersOfProcess.get(nodeId);
-            if (clusters != null) {
-            	cluster = clusters.stream()
-            		.filter(BatchCluster::hasNotStarted)
-            		.filter(eachCluster -> eachCluster.isProcessInstanceMatchingGroupingCharacteristic(processInstance))
-            		.findFirst().orElse(null);
-            }
+        List<BatchCluster> clusters = batchClustersOfProcess.get(nodeId);
+        if (clusters != null) {
+        	cluster = clusters.stream()
+        		.filter(BatchCluster::hasNotStarted)
+        		.filter(eachCluster -> eachCluster.isProcessInstanceMatchingGroupingCharacteristic(processInstance))
+        		.findFirst().orElse(null);
         }
 
         // (1b) if not, create a new one
@@ -294,10 +289,6 @@ public class BatchPluginUtils {
 	@SuppressWarnings("unchecked")
 	public static Map<Integer, BatchActivity> getBatchActivities(ProcessModel processModel) {
 		return (Map<Integer, BatchActivity>) processModel.getExtensionValue(PLUGIN_NAME, ACTIVITIES_KEY);
-	}
-
-	public Map<Integer,TaskEnableEvent> getRunningInstances() {
-		return runningInstances;
 	}
 	
 	public static boolean isBatchActivityEvent(Object o) {

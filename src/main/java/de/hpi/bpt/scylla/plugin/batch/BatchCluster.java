@@ -285,6 +285,7 @@ abstract class BatchCluster extends Entity {
 
             Map<Integer, ScyllaEvent> nextEventMap = event.getNextEventMap();
             if (!nextEventMap.isEmpty()) {
+            	//TODO this is currently not covered, when is it called?
                 Map<Integer, TimeSpan> timeSpanToNextEventMap = event.getTimeSpanToNextEventMap();
                 int indexOfParentalTaskTerminateEvent = 0;
 

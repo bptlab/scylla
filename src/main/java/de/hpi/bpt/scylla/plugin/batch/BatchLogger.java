@@ -86,17 +86,13 @@ public class BatchLogger extends OutputLoggerPluggable {
 
         // print
 
-        if (outputPathWithoutExtension == null) {
-            System.out.println(sb.toString());
-        }
-        else {
-            String resourceUtilizationFileName = outputPathWithoutExtension + model.getGlobalConfiguration().getFileNameWithoutExtension() + "_batchactivitystats.txt";
-            PrintWriter writer = new PrintWriter(resourceUtilizationFileName, "UTF-8");
-            writer.println(sb.toString());
-            writer.close();
 
-            System.out.println("Wrote batch activity statistics to " + resourceUtilizationFileName);
-        }
+        String resourceUtilizationFileName = outputPathWithoutExtension + model.getGlobalConfiguration().getFileNameWithoutExtension() + "_batchactivitystats.txt";
+        PrintWriter writer = new PrintWriter(resourceUtilizationFileName, "UTF-8");
+        writer.println(sb.toString());
+        writer.close();
+
+        System.out.println("Wrote batch activity statistics to " + resourceUtilizationFileName);
     }
 
 }

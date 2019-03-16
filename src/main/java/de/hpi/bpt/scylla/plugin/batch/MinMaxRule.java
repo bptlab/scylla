@@ -1,6 +1,8 @@
 package de.hpi.bpt.scylla.plugin.batch;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
 import de.hpi.bpt.scylla.simulation.event.TaskBeginEvent;
@@ -28,13 +30,20 @@ public class MinMaxRule implements ActivationRule{
         this.maxInstances = maxInstances;
         this.maxTimeout = maxTimeout;
     }
+    
+    /**
+     * TODO
+     * @return this should return the information to all currently running process instances, i.o. to be able to identify similar instances that are to reach the batch region
+     */
+    public List<TaskEnableEvent> getRunningInstances() {
+    	return new ArrayList<>();
+    }
 
     public int getThreshold(TaskBeginEvent desmojEvent, ProcessInstance processInstance) {
 
 
         BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
-        for (Integer key : pluginInstance.getRunningInstances().keySet()) {
-            TaskEnableEvent currentEventOfInst = pluginInstance.getRunningInstances().get(key);
+        for (TaskEnableEvent currentEventOfInst : getRunningInstances()) {
 
             /*
              * TODO who wrote: currentEventOfInst.getNodeId() <= desmojEvent.getNodeId() ?!?!?
@@ -42,7 +51,7 @@ public class MinMaxRule implements ActivationRule{
              * Interpretation: check if nodeA is before nodeB
              * Problem: NodeIds do not follow flow e.g. o->A->B->0 may have NodeIds 4,2,1,3
              */
-            if (processInstance.getId() != key && currentEventOfInst.getNodeId() <= desmojEvent.getNodeId()) {
+            if (processInstance.getId() != currentEventOfInst.getProcessInstance().getId() && currentEventOfInst.getNodeId() <= desmojEvent.getNodeId()) {
 
 
                 BatchActivity batchActivity = pluginInstance.getBatchClusters().get(processInstance.getProcessModel().getId()).get(desmojEvent.getNodeId()).get(0).getBatchActivity();
@@ -59,11 +68,10 @@ public class MinMaxRule implements ActivationRule{
 
     public Duration getTimeOut(TaskBeginEvent desmojEvent, ProcessInstance processInstance) {
         BatchPluginUtils pluginInstance = BatchPluginUtils.getInstance();
-        for (Integer instance : pluginInstance.getRunningInstances().keySet()) {
-            TaskEnableEvent currentEventOfInst = pluginInstance.getRunningInstances().get(instance);
+        for (TaskEnableEvent currentEventOfInst : getRunningInstances()) {
 
 
-            if (processInstance.getId() != instance && currentEventOfInst.getNodeId() <= desmojEvent.getNodeId()) {
+            if (processInstance.getId() != currentEventOfInst.getProcessInstance().getId() && currentEventOfInst.getNodeId() <= desmojEvent.getNodeId()) {
 
                 if (!pluginInstance.getBatchClusters().isEmpty()) {
                     BatchActivity batchActivity = pluginInstance.getBatchClusters().get(processInstance.getProcessModel().getId()).get(desmojEvent.getNodeId()).get(0).getBatchActivity();
