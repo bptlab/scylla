@@ -31,8 +31,8 @@ import desmoj.core.simulator.TimeInstant;
 public class ParallelBatchCluster extends BatchCluster {
 
 	ParallelBatchCluster(Model owner, TimeInstant creationTime, ProcessSimulationComponents pSimComponents,
-			BatchActivity batchActivity, int nodeId, String dataView, boolean showInTrace) {
-		super(owner, creationTime, pSimComponents, batchActivity, nodeId, dataView, showInTrace);
+			BatchActivity batchActivity, int nodeId, boolean showInTrace) {
+		super(owner, creationTime, pSimComponents, batchActivity, nodeId, showInTrace);
 	}
 	
 	/**

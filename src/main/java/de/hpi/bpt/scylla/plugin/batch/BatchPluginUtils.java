@@ -74,10 +74,10 @@ public class BatchPluginUtils {
     }
 
     /**
-     * Called when a subprocess batch activity is started
+     * Called when a batch activity is enabled
      * Assigns the process instance to a cluster (creates a new one if needed)
      * Takes care of scheduling of the cluster start events
-     * @param processInstance : Instance of process where the batch cluster starts
+     * @param processInstance : Instance of process where the batch activity was started
      * @param nodeId : NodeId of the subprocess
      * @param parentalBeginEvent : Begin event of the subprocess task
      */
@@ -101,7 +101,7 @@ public class BatchPluginUtils {
             if (clusters != null) {
             	cluster = clusters.stream()
             		.filter(BatchCluster::hasNotStarted)
-            		.filter(eachCluster -> isProcessInstanceMatchingToDataView(parentalBeginEvent, processInstance, eachCluster))
+            		.filter(eachCluster -> eachCluster.isProcessInstanceMatchingGroupingCharacteristic(processInstance))
             		.findFirst().orElse(null);
             }
         }
@@ -110,10 +110,8 @@ public class BatchPluginUtils {
         if (cluster == null) {
             Model model = processInstance.getModel();
             boolean showInTrace = processInstance.traceIsOn();
-            String dataView = this.getDataViewOfInstance(processInstance.getId(), batchActivity);
             TimeInstant currentSimulationTime = processInstance.presentTime();
-            cluster = BatchCluster.create(model, currentSimulationTime, simulationComponents, batchActivity, nodeId, dataView,
-                    showInTrace);
+            cluster = BatchCluster.create(model, currentSimulationTime, simulationComponents, batchActivity, nodeId, showInTrace);
 
             // schedule BatchClusterStart at current time plus maximum timeout
             BatchClusterEnableEvent clusterStartEvent = new BatchClusterEnableEvent(processInstance, cluster);
@@ -179,16 +177,6 @@ public class BatchPluginUtils {
 
     }
 
-    private boolean isProcessInstanceMatchingToDataView(TaskBeginEvent desmojEvent, ProcessInstance processInstance,
-                                                        BatchCluster batchCluster) {
-
-        String bcDataView = batchCluster.getDataView();
-        String instanceDataView = getDataViewOfInstance(processInstance.getId(), batchCluster.getBatchActivity());
-
-        return Objects.equals(instanceDataView, bcDataView);
-
-    }
-
 
     String getDataViewOfInstance(Integer processInstanceID, BatchActivity batchRegion){
 
@@ -197,9 +185,9 @@ public class BatchPluginUtils {
         }else{
 
             String dataView = "";
-            for (String dataViewElement : batchRegion.getGroupingCharacteristic()){
+            for (BatchGroupingCharacteristic groupingCharacteristic : batchRegion.getGroupingCharacteristic()){
                 //TODO is currently only programmed for one Data View Element
-                dataView = (String) DataObjectField.getDataObjectValue(processInstanceID,dataViewElement);
+                dataView = (String) DataObjectField.getDataObjectValue(processInstanceID, groupingCharacteristic.getDataViewElement());
             }
 
             return dataView;

@@ -41,7 +41,6 @@ abstract class BatchCluster extends Entity {
 
     private List<ProcessInstance> processInstances;
     private List<TaskBeginEvent> parentalStartEvents;
-    private String dataView;
     private BatchClusterState state;
     private Duration currentTimeOut;
 
@@ -60,17 +59,17 @@ abstract class BatchCluster extends Entity {
     // this is needed for all types of sequential execution to determine when to schedule the completion of the batch actvity
     protected Integer finishedProcessInstances = 0;
     
-    public static BatchCluster create(Model owner, TimeInstant creationTime, ProcessSimulationComponents pSimComponents, BatchActivity batchActivity, int nodeId, String dataView, boolean showInTrace) {
+    public static BatchCluster create(Model owner, TimeInstant creationTime, ProcessSimulationComponents pSimComponents, BatchActivity batchActivity, int nodeId, boolean showInTrace) {
     	switch(batchActivity.getExecutionType()) {
-    	case PARALLEL : return new ParallelBatchCluster(owner, creationTime, pSimComponents, batchActivity, nodeId, dataView, showInTrace);
-    	case SEQUENTIAL_CASEBASED : return new CasebasedBatchCluster(owner, creationTime, pSimComponents, batchActivity, nodeId, dataView, showInTrace);
-    	case SEQUENTIAL_TASKBASED : return new TaskbasedBatchCluster(owner, creationTime, pSimComponents, batchActivity, nodeId, dataView, showInTrace);
+    	case PARALLEL : return new ParallelBatchCluster(owner, creationTime, pSimComponents, batchActivity, nodeId, showInTrace);
+    	case SEQUENTIAL_CASEBASED : return new CasebasedBatchCluster(owner, creationTime, pSimComponents, batchActivity, nodeId, showInTrace);
+    	case SEQUENTIAL_TASKBASED : return new TaskbasedBatchCluster(owner, creationTime, pSimComponents, batchActivity, nodeId, showInTrace);
     	default : return null;
     	}
     }
 
     protected BatchCluster(Model owner, TimeInstant creationTime, ProcessSimulationComponents pSimComponents,
-                 BatchActivity batchActivity, int nodeId, String dataView, boolean showInTrace) {
+                 BatchActivity batchActivity, int nodeId, boolean showInTrace) {
         super(owner, buildBatchClusterName(pSimComponents, nodeId), showInTrace);
         this.creationTime = creationTime;
         this.pSimComponents = pSimComponents;
@@ -79,7 +78,6 @@ abstract class BatchCluster extends Entity {
 
         this.processInstances = new ArrayList<ProcessInstance>();
         this.parentalStartEvents = new ArrayList<TaskBeginEvent>();
-        this.dataView = dataView;
         this.state = BatchClusterState.INIT;
 
         this.responsibleProcessInstance = null;
@@ -115,6 +113,12 @@ abstract class BatchCluster extends Entity {
 
     public void setStartNodeId(Integer startNodeId) {
         this.startNodeId = startNodeId;
+    }
+    
+    public boolean isProcessInstanceMatchingGroupingCharacteristic(ProcessInstance processInstance) {
+    	return getProcessInstances().isEmpty() || 
+	    	getBatchActivity().getGroupingCharacteristic().stream()
+	    		.allMatch(each -> each.isFulfilledBetween(getProcessInstances().get(0), processInstance));
     }
 
     public void setProcessInstanceToFinished(){
@@ -163,11 +167,7 @@ abstract class BatchCluster extends Entity {
     int getNodeId() {
         return nodeId;
     }
-
-    String getDataView() {
-        return dataView;
-    }
-
+    
     List<ProcessInstance> getProcessInstances() {
         return processInstances;
     }

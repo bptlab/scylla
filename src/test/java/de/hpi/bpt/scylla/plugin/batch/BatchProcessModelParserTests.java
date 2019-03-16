@@ -200,8 +200,8 @@ public class BatchProcessModelParserTests extends BatchSimulationTest {
 	
 	@Test
 	public void testParseGroupingCharacteristic() throws ScyllaValidationException, JDOMException, IOException {
-		String characteristic = "DataObjectX.ValueY";
-		before(() -> prepareGroupingCharacteristic().setAttribute("name", "processVariable").setAttribute("value", "DataObjectX.ValueY"));
+		BatchGroupingCharacteristic characteristic = new BatchGroupingCharacteristic("DataObjectX.ValueY");
+		before(() -> prepareGroupingCharacteristic().setAttribute("name", "processVariable").setAttribute("value", characteristic.getDataViewElement()));
 		createSimpleSimulationManager(
 				"BatchTestGlobalConfiguration.xml", 
 				"ModelSimple.bpmn", 

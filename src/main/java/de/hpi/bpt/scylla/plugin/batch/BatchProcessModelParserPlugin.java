@@ -77,7 +77,7 @@ public class BatchProcessModelParserPlugin extends ProcessModelParserPluggable{
         Integer maxBatchSize = null;
         BatchClusterExecutionType executionType = defaultExecutionType();
         ActivationRule activationRule = null;
-        List<String> groupingCharacteristic = new ArrayList<String>();
+        List<BatchGroupingCharacteristic> groupingCharacteristic = new ArrayList<BatchGroupingCharacteristic>();
 
         for (Element property : propertyList) {
 
@@ -116,12 +116,14 @@ public class BatchProcessModelParserPlugin extends ProcessModelParserPluggable{
         return Optional.of(ba);
     }
     
-    private List<String> parseGroupingCharacteristic(Element property) {
-        List<String> groupingCharacteristic = new ArrayList<>();
+    private List<BatchGroupingCharacteristic> parseGroupingCharacteristic(Element property) {
+        List<BatchGroupingCharacteristic> groupingCharacteristic = new ArrayList<>();
         List<Element> groupings = property.getChildren("property", property.getNamespace());
         for (Element grouping : groupings) {
-            if (grouping.getAttributeValue("name").equals("processVariable")) {
-				groupingCharacteristic.add(grouping.getAttributeValue("value"));
+        	//TODO Name means type => Should be renamed to type?
+        	String type = grouping.getAttributeValue("name");
+            if (type.equals("processVariable")) {
+				groupingCharacteristic.add(new BatchGroupingCharacteristic(grouping.getAttributeValue("value")));
             }
         }
         return groupingCharacteristic;
