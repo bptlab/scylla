@@ -13,7 +13,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import de.hpi.bpt.scylla.model.process.ProcessModel;
-import de.hpi.bpt.scylla.plugin.dataobject.DataObjectField;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
 import de.hpi.bpt.scylla.simulation.ProcessSimulationComponents;
 import de.hpi.bpt.scylla.simulation.event.TaskBeginEvent;
@@ -177,23 +176,6 @@ public class BatchPluginUtils {
 
     }
 
-
-    String getDataViewOfInstance(Integer processInstanceID, BatchActivity batchRegion){
-
-        if (batchRegion.getGroupingCharacteristic().isEmpty()){
-            return null;
-        }else{
-
-            String dataView = "";
-            for (BatchGroupingCharacteristic groupingCharacteristic : batchRegion.getGroupingCharacteristic()){
-                //TODO is currently only programmed for one Data View Element
-                dataView = (String) DataObjectField.getDataObjectValue(processInstanceID, groupingCharacteristic.getDataViewElement());
-            }
-
-            return dataView;
-        }
-
-    }
 
 
     BatchCluster getRunningCluster(ProcessInstance processInstance, int nodeId) {

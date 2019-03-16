@@ -68,13 +68,8 @@ public class MinMaxRule implements ActivationRule{
                 if (!pluginInstance.getBatchClusters().isEmpty()) {
                     BatchActivity batchActivity = pluginInstance.getBatchClusters().get(processInstance.getProcessModel().getId()).get(desmojEvent.getNodeId()).get(0).getBatchActivity();
 
-                    String dataView = pluginInstance.getDataViewOfInstance(processInstance.getId(), batchActivity);
-                    String dataViewOfOther = pluginInstance.getDataViewOfInstance(instance, batchActivity);
-
-
-                    if (dataView.equals(dataViewOfOther)) {
-                        return maxTimeout;
-                    }
+                    if(batchActivity.getGroupingCharacteristic().stream()
+                    	.allMatch(each -> each.isFulfilledBetween(processInstance, currentEventOfInst.getProcessInstance()))) return maxTimeout;
                 }
 
             }
