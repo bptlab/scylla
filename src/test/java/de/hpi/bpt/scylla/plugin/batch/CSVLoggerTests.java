@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import static de.hpi.bpt.scylla.Scylla.*;
 import de.hpi.bpt.scylla.TestUtils;
 import de.hpi.bpt.scylla.exception.ScyllaValidationException;
 import de.hpi.bpt.scylla.plugin.batch.BatchCSVLogger.BatchCSVEntry;
