@@ -273,7 +273,7 @@ public class PluginLoader {
 	public void resolveTemporalDependencies () throws CycleException {
 		//TODO ignore non selected plugin
 		for(Entry<Class<?>, List<PluginWrapper>> entryPoint : getExtensions().entrySet()) {
-			if(!entryPoint.getKey().equals(GatewayEventPluggable.class))continue;
+			if(!entryPoint.getKey().equals(GatewayEventPluggable.class))continue;//TODO why only gatewayevent?
 			try {
 				getExtensions().put(entryPoint.getKey(), resolveTemporalDependencies(entryPoint.getValue()));
 			} catch(CycleException e) {
