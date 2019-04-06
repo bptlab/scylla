@@ -1,7 +1,6 @@
 package de.hpi.bpt.scylla.plugin.batch;
 
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -10,11 +9,8 @@ import java.util.stream.Collectors;
 import de.hpi.bpt.scylla.exception.ScyllaRuntimeException;
 import de.hpi.bpt.scylla.model.process.ProcessModel;
 import de.hpi.bpt.scylla.model.process.graph.exception.NodeNotFoundException;
-import de.hpi.bpt.scylla.plugin_type.simulation.event.BPMNEndEventPluggable;
-import de.hpi.bpt.scylla.plugin_type.simulation.event.BPMNStartEventPluggable;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
-import de.hpi.bpt.scylla.simulation.event.BPMNEndEvent;
-import de.hpi.bpt.scylla.simulation.event.BPMNStartEvent;
+import de.hpi.bpt.scylla.simulation.SimulationModel;
 import de.hpi.bpt.scylla.simulation.event.ScyllaEvent;
 import de.hpi.bpt.scylla.simulation.event.TaskBeginEvent;
 
@@ -57,13 +53,18 @@ public class MinMaxRule implements ActivationRule {
     /**
      * @return the information to all currently running process instances, i.o. to be able to identify similar instances that are to reach the batch region
      */
-    private static List<ProcessInstance> getRunningInstances() {
-    	return ActiveInstanceLogger.instance.activeInstances;
+    private static List<ProcessInstance> getRunningInstances(ProcessInstance processInstance) {
+    	return ((SimulationModel)processInstance.getModel()).getEntities(true).stream()
+    			.filter(ProcessInstance.class::isInstance)
+    			.map(each -> (ProcessInstance) each)
+    			.filter(each -> each.getProcessModel().equals(processInstance.getProcessModel()))
+    			.collect(Collectors.toList());
     }
     
     private static boolean areSimilarInstancesAvailable(Integer forNodeId, ProcessInstance inProcessInstance) {
-        for (ProcessInstance runningInstance : getRunningInstances()) {
+        for (ProcessInstance runningInstance : getRunningInstances(inProcessInstance)) {
         	Set<Integer> activeNodes = runningInstance.getScheduledEvents().stream()
+        			.filter(ScyllaEvent.class::isInstance)//ProcessInstanceGenerationEvents and similar must be filtered out
         			.map(each -> (ScyllaEvent)each)
         			.map(ScyllaEvent::getNodeId)
         			.collect(Collectors.toSet());
@@ -71,7 +72,9 @@ public class MinMaxRule implements ActivationRule {
                 BatchActivity batchActivity = BatchPluginUtils.getBatchActivities(inProcessInstance.getProcessModel()).get(forNodeId);
                 if(batchActivity == null)throw new ScyllaRuntimeException("No batch activity found for node id "+forNodeId);
                 if(batchActivity.getGroupingCharacteristic().stream()
-                	.allMatch(each -> each.isFulfilledBetween(inProcessInstance, runningInstance))) return true;
+                	.allMatch(each -> each.isFulfilledBetween(inProcessInstance, runningInstance))) {
+                	return true;
+                }
             }
         }
         return false;
@@ -79,6 +82,7 @@ public class MinMaxRule implements ActivationRule {
     
     private static boolean willReach(ProcessModel processModel, Set<Integer> activeNodeIds, Integer targetNodeId) {
     	Set<Integer> active = activeNodeIds.stream().collect(Collectors.toSet());
+    	active.remove(targetNodeId);//Execution paths that have already reached the target node (e.g. batch region) should be excluded
     	Set<Integer> visited = new HashSet<>();
     	Integer current;
     	while(!active.isEmpty()) {
@@ -94,48 +98,8 @@ public class MinMaxRule implements ActivationRule {
 				throw new ScyllaRuntimeException("There has been an error at process model graph traversal", e);
 			}
     	}
-		return true;
+		return false;
     }
     
-    /**
-     * TODO: This is quite hacky
-     * => Refactor it!
-     * @author Leon Bein
-     *
-     */
-    public static class ActiveInstanceLogger extends BPMNStartEventPluggable{
-    	
-    	private static ActiveInstanceLogger instance;
-    	{
-    		instance = this;
-    	}
-    	
-    	private List<ProcessInstance> activeInstances = new ArrayList<>();
-
-		@Override
-		public String getName() {
-			return BatchPluginUtils.PLUGIN_NAME+"_"+"MinMaxRule";
-		}
-
-		@Override
-		public void eventRoutine(BPMNStartEvent startEvent, ProcessInstance processInstance) throws ScyllaRuntimeException {
-			activeInstances.add(processInstance);
-		}
-		
-		public class TerminatedTaskRemove extends BPMNEndEventPluggable {
-
-			@Override
-			public String getName() {
-				return ActiveInstanceLogger.this.getName();
-			}
-
-			@Override
-			public void eventRoutine(BPMNEndEvent endEvent, ProcessInstance processInstance) throws ScyllaRuntimeException {
-				activeInstances.remove(processInstance);
-			}
-			
-		}
-    	
-    }
 
 }
