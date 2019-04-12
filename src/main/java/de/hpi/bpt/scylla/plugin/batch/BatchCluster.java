@@ -181,10 +181,10 @@ abstract class BatchCluster extends Entity {
         this.processInstanceEntranceTimes.add(processInstance.presentTime());
         int numberOfProcessInstances = processInstances.size();
         // in case that the threshold is not defined, it never gets activated here
-        if (numberOfProcessInstances == batchActivity.getActivationRule().getThreshold(parentalStartEvent, processInstance)) {
+        if (numberOfProcessInstances >= batchActivity.getActivationRule().getThreshold(parentalStartEvent, processInstance)) {
             this.state = BatchClusterState.READY;
         }
-        if (numberOfProcessInstances == batchActivity.getMaxBatchSize()) {
+        if (numberOfProcessInstances >= batchActivity.getMaxBatchSize()) {
             this.state = BatchClusterState.MAXLOADED;
         }
 
