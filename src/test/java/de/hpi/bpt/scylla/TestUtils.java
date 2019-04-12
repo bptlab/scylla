@@ -75,12 +75,21 @@ public class TestUtils {
 	
 	public static void assertAttribute(Object o, String attributeName, Object expectedValue) {
 		try {
+			Object actualValue = getAttribute(o, attributeName);
+			assertEquals(expectedValue, actualValue);
+		} catch (SecurityException | IllegalArgumentException e) {
+			throw new AssertionFailedError("Could not validate attribute "+attributeName+" in class named "+o.getClass().getSimpleName()+": Not existent or not accessible!", e);
+		}
+	}
+	
+	
+	public static Object getAttribute(Object o, String attributeName) {
+		try {
 			Field field = getFieldNamed(o.getClass(), attributeName);
 			field.setAccessible(true);
-			Object actualValue = field.get(o);
-			assertEquals(expectedValue, actualValue);
+			return field.get(o);
 		} catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
-			throw new AssertionFailedError("Could not validate attribute "+attributeName+" in class named "+o.getClass().getSimpleName()+": Not existent or not accessible!", e);
+			throw new AssertionFailedError("Attribute "+attributeName+" in class named "+o.getClass().getSimpleName()+" was not found.");
 		}
 	}
 	

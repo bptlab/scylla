@@ -8,6 +8,9 @@
     </bpmn:extensionElements>
     <bpmn:startEvent id="StartEvent_1">
       <bpmn:outgoing>SequenceFlow_07kmdp0</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_0qcl2fn">
+        <bpmn:targetRef>DataObjectReference_1</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
     </bpmn:startEvent>
     <bpmn:sequenceFlow id="SequenceFlow_07kmdp0" sourceRef="StartEvent_1" targetRef="Task_A" />
     <bpmn:endEvent id="EndEvent_17xhu52">
@@ -16,9 +19,6 @@
     <bpmn:task id="Task_A" name="Activity A">
       <bpmn:incoming>SequenceFlow_07kmdp0</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0ewqm21</bpmn:outgoing>
-      <bpmn:dataOutputAssociation id="DataOutputAssociation_0qcl2fn">
-        <bpmn:targetRef>DataObjectReference_1</bpmn:targetRef>
-      </bpmn:dataOutputAssociation>
     </bpmn:task>
     <bpmn:sequenceFlow id="SequenceFlow_0ewqm21" sourceRef="Task_A" targetRef="BatchTask" />
     <bpmn:task id="Task_B" name="Activity B">
@@ -63,7 +63,7 @@
         <di:waypoint xsi:type="dc:Point" x="479" y="224" />
         <di:waypoint xsi:type="dc:Point" x="506" y="224" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="447.5" y="202.5" width="90" height="13" />
+          <dc:Bounds x="448" y="203" width="90" height="13" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Task_0hyoyrr_di" bpmnElement="Task_A">
@@ -113,8 +113,8 @@
         <di:waypoint xsi:type="dc:Point" x="671" y="264" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="DataOutputAssociation_0qcl2fn_di" bpmnElement="DataOutputAssociation_0qcl2fn">
-        <di:waypoint xsi:type="dc:Point" x="546" y="264" />
-        <di:waypoint xsi:type="dc:Point" x="599" y="336" />
+        <di:waypoint xsi:type="dc:Point" x="474" y="235" />
+        <di:waypoint xsi:type="dc:Point" x="599" y="339" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

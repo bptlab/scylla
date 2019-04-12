@@ -80,7 +80,7 @@ public class MinMaxRule implements ActivationRule {
         return false;
     }
     
-    private static boolean willReach(ProcessModel processModel, Set<Integer> activeNodeIds, Integer targetNodeId) {
+    public static boolean willReach(ProcessModel processModel, Set<Integer> activeNodeIds, Integer targetNodeId) {
     	Set<Integer> active = activeNodeIds.stream().collect(Collectors.toSet());
     	active.remove(targetNodeId);//Execution paths that have already reached the target node (e.g. batch region) should be excluded
     	Set<Integer> visited = new HashSet<>();

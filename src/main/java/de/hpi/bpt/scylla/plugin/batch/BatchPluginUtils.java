@@ -136,21 +136,28 @@ public class BatchPluginUtils {
         if (cluster.hasNotStarted() && cluster.getProcessInstances().size() > 1) {
 
             // if the dueDate of the current instance is earlier as of the instances added before, the cluster begin event is rescheduled
-            Duration timeoutForCurrentInstance = batchActivity.getActivationRule().getTimeOut(parentalBeginEvent, processInstance);
-            //testing
+        	//Duration timeoutForCurrentInstance = batchActivity.getActivationRule().getTimeOut(parentalBeginEvent, processInstance);
+        	
+        	
+        	//New situation; the timeouts might have changed so adapt the set timeout
+        	Duration newTimeout = cluster.getParentalStartEvents().stream()
+        			.map(each -> batchActivity.getActivationRule().getTimeOut(each, each.getProcessInstance()))
+        			.min(Duration::compareTo).get();
+        			
             TimeUnit timeUnit = TimeUnit.SECONDS;
-            /**Time since cluster was created*/ //TODO: when updating to java9, please use TimeUnit.toChronoUnit() and then Duration#of(long,Chronounit)
-            Duration durationBtwClusterCreationAndInstanceTaskBegin = Duration.ofSeconds(
-            		(long) (parentalBeginEvent.getSimulationTimeOfSource().getTimeAsDouble(timeUnit)
-            		-cluster.getCreationTime().getTimeAsDouble(timeUnit)));
-            //If the new timeout from the current point in time occurs before the current timeour
-            if (timeoutForCurrentInstance.plus(durationBtwClusterCreationAndInstanceTaskBegin).compareTo(cluster.getCurrentTimeOut()) < 0){
-            	//set new timeout for the cluster for comparison
-                cluster.setCurrentTimeOut(timeoutForCurrentInstance);
+            ChronoUnit chronoUnit = ChronoUnit.valueOf(timeUnit.toString());
+            //If the new timeout from the current point in time occurs before the current timeout
+            if (!newTimeout.equals(cluster.getCurrentTimeOut())){
+            	//set new timeout for the cluster
+                cluster.setCurrentTimeOut(newTimeout);
+                long clusterAge = 
+                		(long) (parentalBeginEvent.getSimulationTimeOfSource().getTimeAsDouble(timeUnit)
+                		-cluster.getCreationTime().getTimeAsDouble(timeUnit));
 
                 //reschedule the cluster beginEvent
-                long timeoutInSeconds = timeoutForCurrentInstance.get(ChronoUnit.SECONDS);
-                TimeSpan timeSpan = new TimeSpan(timeoutInSeconds, TimeUnit.SECONDS);
+                long timeoutFromNow = newTimeout.get(chronoUnit) - clusterAge;
+                if(timeoutFromNow < 0)timeoutFromNow = 0;
+                TimeSpan timeSpan = new TimeSpan(timeoutFromNow, timeUnit);
 
                 //Scheduled with timeout from current point in time
                 BatchClusterEnableEvent clusterStartEvent = cluster.getEnableEvent();
