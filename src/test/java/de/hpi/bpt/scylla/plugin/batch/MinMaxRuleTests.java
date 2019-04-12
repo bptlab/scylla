@@ -20,7 +20,6 @@ import java.util.stream.Stream;
 import org.javatuples.Pair;
 import org.jdom2.JDOMException;
 import org.junit.jupiter.api.Test;
-import org.opentest4j.AssertionFailedError;
 
 import de.hpi.bpt.scylla.TestSeeds;
 import de.hpi.bpt.scylla.TestUtils;
@@ -34,8 +33,6 @@ public class MinMaxRuleTests extends BatchSimulationTest {
 	
 	public static void main(String[] args) {
 		new MinMaxRuleTests().testExpectedTimeoutAndLoad(-7969201103926881908L);
-//		new MinMaxRuleTests().testMinInstancesIsUsed(806123754304894459L);
-//		new MinMaxRuleTests().testMaxInstancesIsUsed(1612247508609788918L);
 	}
 	
 	@Test
@@ -83,7 +80,7 @@ public class MinMaxRuleTests extends BatchSimulationTest {
 	}
 
 
-	private Pair<Integer, Duration> expectedLoadAndActivationTime(List<BatchCSVEntry> cluster) {
+	protected Pair<Integer, Duration> expectedLoadAndActivationTime(List<BatchCSVEntry> cluster) {
 		Pair<Integer, Duration> expected = Pair.with(-1, Duration.ofSeconds(0));
 		int currentLoad = 0;
 		Duration currentDuration = Duration.ofSeconds(0);
@@ -107,62 +104,14 @@ public class MinMaxRuleTests extends BatchSimulationTest {
 		return expected;
 	}
 	
+	protected boolean similarInstancesWereAvailableAt(Date aPointInTime, List<BatchCSVEntry> cluster) {
+		Object dataObjectValue = DataObjectField.getDataObjectValue(cluster.get(0).getInstanceId(),"DataObject.Value");
+		return availableDataObjects().get(dataObjectValue).stream()
+				.filter(each -> (aPointInTime.compareTo(each.getValue0()) >= 0 && aPointInTime.compareTo(each.getValue1()) <= 0))
+				.count() > 1;
+	}
 
-	//@TestSeeds({-1633284822204608005L, 806123754304894459L})
-	public void testMinInstancesIsUsed(long seed) {
-		setGlobalSeed(seed);
-		boolean hasAsserted = false;
-		while(!hasAsserted) {
-			runSimpleSimulation(
-					"BatchTestGlobalConfiguration.xml", 
-					"ModelWithGrouping.bpmn", 
-					"BatchTestSimulationConfigurationWithDataObject.xml");
-			for(List<BatchCSVEntry> cluster : getClusters().values()) {
-				Date firstEnableOfCluster = firstEnableOf(cluster);
-				if(!similarInstancesWereAvailableAt(firstEnableOfCluster, cluster)) {
-					hasAsserted = true;
-					int numberOfInstances = cluster.size();
-					Duration activationTime = Duration.between(firstEnableOfCluster.toInstant(), startOf(cluster).toInstant());
-					
-					assertTrue(
-							getMinInstances().equals(numberOfInstances) ||
-							getMinTimeOut().equals(activationTime));
-				};
-			}
-		}
-	}
-	
-	//@TestSeeds({1612247508609788918L, 806123754304894459L})
-	public void testMaxInstancesIsUsed(long seed) {
-		setGlobalSeed(seed);
-		boolean hasAsserted = false;
-		int remainingRetries = 10;
-		while(!hasAsserted) {
-			runSimpleSimulation(
-					"BatchTestGlobalConfiguration.xml", 
-					"ModelWithGrouping.bpmn", 
-					"BatchTestSimulationConfigurationWithDataObject.xml");
-			for(List<BatchCSVEntry> cluster : getClusters().values()) {
-				Date firstEnableOfCluster = firstEnableOf(cluster);
-				if(similarInstancesWereAvailableAt(firstEnableOfCluster, cluster)) {
-					hasAsserted = true;
-					int numberOfInstances = cluster.size();
-					Duration activationTime = Duration.between(firstEnableOfCluster.toInstant(), startOf(cluster).toInstant());
-					
-					assertTrue(
-						getMaxInstances().equals(numberOfInstances) ||
-						getMaxTimeOut().equals(activationTime),
-						"Cluster "+cluster.get(0).getBatchNumber()+" contained "+numberOfInstances+" instances and took "+activationTime+" to start.");
-				};
-			}
-			if(remainingRetries <= 0)throw new AssertionFailedError("No simulation run showed signs of a mexInstance case");
-			beforeParsingGlobal.add(()->setGlobalSeed(seed*2));
-			remainingRetries--;		
-			System.err.println();
-		}
-	}
-	
-	private Map<Object, List<Pair<Date, Date>>> availableDataObjects() {
+	protected Map<Object, List<Pair<Date, Date>>> availableDataObjects() {
 		//[ObjectValue:TimeWhenAnyProcessInstanceWithThatValueWasAvailable]
 		Map<Object, List<Pair<Date, Date>>> instanceWithDataObjectAvailabilities = new HashMap<>();
 		table.stream().filter(each -> each.getActivityName().equals("Activity A")).forEach(entry -> {
@@ -180,7 +129,22 @@ public class MinMaxRuleTests extends BatchSimulationTest {
 		});
 		return instanceWithDataObjectAvailabilities;
 	}
+
+	protected static Date firstEnableOf(List<BatchCSVEntry> cluster) {
+		return cluster.stream()
+			.map(BatchCSVEntry::getArrival)
+			.map(t -> {try {return BatchCSVLogger.timeFormat.parse(t);} catch (ParseException e) {fail(e); return null;}})
+			.min(Date::compareTo).get();
+	}
 	
+	protected static Date startOf(List<BatchCSVEntry> cluster) {
+		return cluster.stream()
+			.map(BatchCSVEntry::getStart)
+			.map(t -> {try {return BatchCSVLogger.timeFormat.parse(t);} catch (ParseException e) {fail(e); return null;}})
+			.min(Date::compareTo).get();
+	}
+	
+	//--- Activation rule setting and accessing ---
 	@Override
 	protected void afterParsing() {
 		super.afterParsing();
@@ -206,27 +170,6 @@ public class MinMaxRuleTests extends BatchSimulationTest {
 	
 	protected Duration getMaxTimeOut() {
 		return (Duration) TestUtils.getAttribute(getActivationRule(), "maxTimeout");
-	}
-	
-	protected boolean similarInstancesWereAvailableAt(Date aPointInTime, List<BatchCSVEntry> cluster) {
-		Object dataObjectValue = DataObjectField.getDataObjectValue(cluster.get(0).getInstanceId(),"DataObject.Value");
-		return availableDataObjects().get(dataObjectValue).stream()
-				.filter(each -> (aPointInTime.compareTo(each.getValue0()) >= 0 && aPointInTime.compareTo(each.getValue1()) <= 0))
-				.count() > 1;
-	}
-
-	protected static Date firstEnableOf(List<BatchCSVEntry> cluster) {
-		return cluster.stream()
-			.map(BatchCSVEntry::getArrival)
-			.map(t -> {try {return BatchCSVLogger.timeFormat.parse(t);} catch (ParseException e) {fail(e); return null;}})
-			.min(Date::compareTo).get();
-	}
-	
-	protected static Date startOf(List<BatchCSVEntry> cluster) {
-		return cluster.stream()
-			.map(BatchCSVEntry::getStart)
-			.map(t -> {try {return BatchCSVLogger.timeFormat.parse(t);} catch (ParseException e) {fail(e); return null;}})
-			.min(Date::compareTo).get();
 	}
 
 }
