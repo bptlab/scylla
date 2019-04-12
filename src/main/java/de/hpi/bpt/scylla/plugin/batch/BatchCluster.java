@@ -32,7 +32,6 @@ import desmoj.core.simulator.TimeSpan;
 abstract class BatchCluster extends Entity {
 
 	private BatchClusterEnableEvent enableEvent;
-	private BatchClusterStartEvent startEvent;
 	
     private TimeInstant creationTime;
     private ProcessSimulationComponents pSimComponents;
@@ -188,14 +187,6 @@ abstract class BatchCluster extends Entity {
 
     protected void setEnableEvent(BatchClusterEnableEvent enableEvent) {
 		this.enableEvent = enableEvent;
-	}
-
-	protected BatchClusterStartEvent getStartEvent() {
-		return startEvent;
-	}
-
-	protected void setStartEvent(BatchClusterStartEvent startEvent) {
-		this.startEvent = startEvent;
 	}
 
 	BatchClusterState getState() {
