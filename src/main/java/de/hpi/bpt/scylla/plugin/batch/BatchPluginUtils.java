@@ -105,7 +105,7 @@ public class BatchPluginUtils {
             Model model = processInstance.getModel();
             boolean showInTrace = processInstance.traceIsOn();
             TimeInstant currentSimulationTime = processInstance.presentTime();
-            cluster = BatchCluster.create(model, currentSimulationTime, simulationComponents, batchActivity, nodeId, showInTrace);
+            cluster = BatchCluster.create(model, currentSimulationTime, simulationComponents, batchActivity, showInTrace);
 
             // schedule BatchClusterStart at current time plus maximum timeout
             BatchClusterEnableEvent clusterStartEvent = new BatchClusterEnableEvent(processInstance, cluster);

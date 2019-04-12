@@ -24,8 +24,8 @@ public class CasebasedBatchCluster extends BatchCluster implements BatchCluster.
 	private Queue<TaskBeginEvent> waitingTaskBegins = new LinkedList<>();
 
 	CasebasedBatchCluster(Model owner, TimeInstant creationTime, ProcessSimulationComponents pSimComponents,
-			BatchActivity batchActivity, int nodeId, boolean showInTrace) {
-		super(owner, creationTime, pSimComponents, batchActivity, nodeId, showInTrace);
+			BatchActivity batchActivity, boolean showInTrace) {
+		super(owner, creationTime, pSimComponents, batchActivity, showInTrace);
 	}
 	
 	@Override

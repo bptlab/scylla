@@ -28,8 +28,8 @@ public class TaskbasedBatchCluster extends BatchCluster implements BatchCluster.
     private Map<Integer, BatchStashResourceEvent> stashEvents = new HashMap<>();
 
 	TaskbasedBatchCluster(Model owner, TimeInstant creationTime, ProcessSimulationComponents pSimComponents,
-			BatchActivity batchActivity, int nodeId, boolean showInTrace) {
-		super(owner, creationTime, pSimComponents, batchActivity, nodeId, showInTrace);
+			BatchActivity batchActivity, boolean showInTrace) {
+		super(owner, creationTime, pSimComponents, batchActivity, showInTrace);
 	}
 	
 	@Override
