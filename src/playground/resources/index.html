@@ -1,0 +1,97 @@
+<html>
+<head>
+  <title>bpmn-js url viewer demo</title>
+
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+    }
+    .header input[type=text] {
+      width: 500px;
+      max-width: 100%;
+    }
+    .console textarea {
+      width: 100%;
+      min-height: 80px;
+      border: none;
+      padding: 0;
+    }
+    .canvas {
+      border: solid 1px black;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h3>Open BPMN 2.0 diagram from URL</h3>
+    <p>
+      <button id="js-open">Open</button>
+    </p>
+  </div>
+
+  <div class="canvas">
+    <div id="js-canvas"></div>
+  </div>
+
+  <div class="console">
+    <h3>Console</h3>
+    <textarea id="js-console"></textarea>
+  </div>
+
+  <!-- viewer -->
+
+  <link rel="stylesheet" href="https://unpkg.com/bpmn-js@3.4.1/dist/assets/diagram-js.css" />
+  <link rel="stylesheet" href="https://unpkg.com/bpmn-js@3.4.1/dist/assets/bpmn-font/css/bpmn.css" />
+
+  <script src="https://unpkg.com/bpmn-js@3.4.1/dist/bpmn-modeler.development.js"></script>
+
+  <!-- jquery (required for example only) -->
+  <script src="https://unpkg.com/jquery@3.3.1/dist/jquery.js"></script>
+
+  <!-- app -->
+
+  <script>
+    var viewer = new BpmnJS({
+      container: $('#js-canvas'),
+      height: 600
+    });
+    function log(str) {
+      var console = $('#js-console');
+      console.val(console.val() + str + '\n');
+    }
+    function openFromUrl(url) {
+
+      log('attempting to open <' + url + '>');
+      $.ajax(url, { dataType : 'text' }).done(function(xml) {
+        openXML(xml);
+      });
+    }
+
+    function openXML(xml) {
+      viewer.importXML(xml, function(err) {
+          if (err) {
+            log('error: ' + err.message);
+            console.error(err);
+          } else {
+            viewer.get('canvas').zoom('fit-viewport');
+            log('success');
+          }
+      });
+    }
+
+    $('#js-open').click(function() {
+      java.loadDiagram();
+    });
+    ///// auto open ?url=diagram-url ///////////////////////
+    (function() {
+      var str = window.location.search;
+      var match = /(?:\&|\?)url=([^&]+)/.exec(str);
+      if (match) {
+        var url = decodeURIComponent(match[1]);
+        $('#js-url').val(url);
+        openFromUrl(url);
+      }
+    })();
+  </script>
+</html>
