@@ -23,6 +23,10 @@ import netscape.javascript.JSObject;
  * https://www.teamdev.com/jxbrowser
  * https://bpmn.io/toolkit/bpmn-js/
  * https://o7planning.org/de/11151/anleitung-javafx-webview-und-webengine
+ * 
+ * Basic bpmnjs pages
+ * https://github.com/bpmn-io/bpmn-js-examples/tree/master/pre-packaged
+ * https://github.com/bpmn-io/bpmn-js-examples/blob/master/modeler/app/app.js
  * @author Leon Bein
  *
  */
@@ -80,6 +84,7 @@ public class BpmnIOTests extends Application{
 	
 	private File selectFile() {
 		FileChooser fileChooser = new FileChooser();
+		fileChooser.setInitialDirectory(new File("./samples"));
 		fileChooser.setTitle("Open Resource File");
 		return fileChooser.showOpenDialog(stage);
 	}

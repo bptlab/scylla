@@ -19,6 +19,17 @@
     .canvas {
       border: solid 1px black;
     }
+    .diagram-note {
+      background-color: rgba(66, 180, 21, 0.7);
+      color: White;
+      border-radius: 5px;
+      font-family: Arial;
+      font-size: 12px;
+      padding: 5px;
+      min-height: 16px;
+      width: 50px;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -26,7 +37,7 @@
   <div class="header">
     <h3>Open BPMN 2.0 diagram from URL</h3>
     <p>
-      <button id="js-open">Open</button>
+      <button id="js-open">Open</button><button id="js-showOverlays">Show Overlays</button>
     </p>
   </div>
 
@@ -56,6 +67,9 @@
       container: $('#js-canvas'),
       height: 600
     });
+
+    var overlays = viewer.get('overlays');
+
     function log(str) {
       var console = $('#js-console');
       console.val(console.val() + str + '\n');
@@ -83,6 +97,24 @@
     $('#js-open').click(function() {
       java.loadDiagram();
     });
+
+    
+
+    $('#js-showOverlays').click(function() {
+      showOverlays();
+    });
+
+    function showOverlays() {
+      overlays.add('StartEvent_1', 'note', {
+          position: {
+            bottom: 0,
+            right: 0
+          },
+          scale: false,
+          html: '<div class="diagram-note">I don\'t scale</div>'
+      });
+    }
+
     ///// auto open ?url=diagram-url ///////////////////////
     (function() {
       var str = window.location.search;
