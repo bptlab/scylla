@@ -1,6 +1,10 @@
 <html>
 <head>
-  <title>bpmn-js url viewer demo</title>
+  <title>Scylla-js</title>
+
+  <link rel="stylesheet" href="dist/css/diagram-js.css" />
+  <link rel="stylesheet" href="dist/vendor/bpmn-font/css/bpmn-embedded.css" />
+  <link rel="stylesheet" href="dist/css/app.css" />
 
   <style>
     body {
@@ -37,12 +41,17 @@
   <div class="header">
     <h3>Open BPMN 2.0 diagram from URL</h3>
     <p>
+      <input type="text" id="js-url" placeholder="path to diagram" /><button id="js-open2">Open</button>
+    </p>
+    <p>
       <button id="js-open">Open</button><button id="js-showOverlays">Show Overlays</button>
     </p>
   </div>
 
-  <div class="canvas">
-    <div id="js-canvas"></div>
+  
+  <div class="content with-diagram" id="js-drop-zone">
+    <div class="canvas" id="js-canvas"></div>
+    <div class="properties-panel-parent" id="js-properties-panel"></div>
   </div>
 
   <div class="console">
@@ -50,80 +59,8 @@
     <textarea id="js-console"></textarea>
   </div>
 
-  <!-- viewer -->
-
-  <link rel="stylesheet" href="https://unpkg.com/bpmn-js@3.4.1/dist/assets/diagram-js.css" />
-  <link rel="stylesheet" href="https://unpkg.com/bpmn-js@3.4.1/dist/assets/bpmn-font/css/bpmn.css" />
-
-  <script src="https://unpkg.com/bpmn-js@3.4.1/dist/bpmn-modeler.development.js"></script>
-
-  <!-- jquery (required for example only) -->
-  <script src="https://unpkg.com/jquery@3.3.1/dist/jquery.js"></script>
-
   <!-- app -->
+  
+  <script src="app.bundled.js"></script>
 
-  <script>
-    var viewer = new BpmnJS({
-      container: $('#js-canvas'),
-      height: 600
-    });
-
-    var overlays = viewer.get('overlays');
-
-    function log(str) {
-      var console = $('#js-console');
-      console.val(console.val() + str + '\n');
-    }
-    function openFromUrl(url) {
-
-      log('attempting to open <' + url + '>');
-      $.ajax(url, { dataType : 'text' }).done(function(xml) {
-        openXML(xml);
-      });
-    }
-
-    function openXML(xml) {
-      viewer.importXML(xml, function(err) {
-          if (err) {
-            log('error: ' + err.message);
-            console.error(err);
-          } else {
-            viewer.get('canvas').zoom('fit-viewport');
-            log('success');
-          }
-      });
-    }
-
-    $('#js-open').click(function() {
-      java.loadDiagram();
-    });
-
-    
-
-    $('#js-showOverlays').click(function() {
-      showOverlays();
-    });
-
-    function showOverlays() {
-      overlays.add('StartEvent_1', 'note', {
-          position: {
-            bottom: 0,
-            right: 0
-          },
-          scale: false,
-          html: '<div class="diagram-note">I don\'t scale</div>'
-      });
-    }
-
-    ///// auto open ?url=diagram-url ///////////////////////
-    (function() {
-      var str = window.location.search;
-      var match = /(?:\&|\?)url=([^&]+)/.exec(str);
-      if (match) {
-        var url = decodeURIComponent(match[1]);
-        $('#js-url').val(url);
-        openFromUrl(url);
-      }
-    })();
-  </script>
 </html>

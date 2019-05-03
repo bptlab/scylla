@@ -25,8 +25,12 @@ import netscape.javascript.JSObject;
  * https://o7planning.org/de/11151/anleitung-javafx-webview-und-webengine
  * 
  * Basic bpmnjs pages
+ * https://bpmn.io/toolkit/bpmn-js/examples/
+ * https://cdn.rawgit.com/bpmn-io/bpmn-js-examples/dfceecba/url-viewer/resources/pizza-collaboration.bpmn
  * https://github.com/bpmn-io/bpmn-js-examples/tree/master/pre-packaged
  * https://github.com/bpmn-io/bpmn-js-examples/blob/master/modeler/app/app.js
+ * webpack ./app.js -o ./app.bundled.js --mode development
+ * grunt build
  * @author Leon Bein
  *
  */
@@ -71,11 +75,12 @@ public class BpmnIOTests extends Application{
 		//loadDiagram();
 	}
 	
-	public void loadDiagram() {
+	public void loadDiagram(JSObject callback) {
         //webEngine.executeScript("openFromUrl('https://cdn.rawgit.com/bpmn-io/bpmn-js-examples/dfceecba/url-viewer/resources/pizza-collaboration.bpmn');");
         File file = selectFile();
+        if(file == null)return;
         try {
-			window.call("openXML", new String(Files.readAllBytes(file.toPath())));
+        	callback.call("call", null, new String(Files.readAllBytes(file.toPath())));
 		} catch (JSException | IOException e) {
 			e.printStackTrace();
 		}
@@ -87,6 +92,10 @@ public class BpmnIOTests extends Application{
 		fileChooser.setInitialDirectory(new File("./samples"));
 		fileChooser.setTitle("Open Resource File");
 		return fileChooser.showOpenDialog(stage);
+	}
+	
+	public void log(String s) {
+		System.out.println(s);
 	}
    
 }

@@ -1,0 +1,24 @@
+{
+    "name": "Scylla",
+    "prefix": "scylla",
+    "uri": "http://scylla",
+    "xml": {
+      "tagAlias": "lowerCase"
+    },
+    "associations": [],
+    "types": [
+      {
+        "name": "ScyllaElement",
+        "extends": [
+          "bpmn:BaseElement"
+        ],
+        "properties": [
+          {
+            "name": "fluffiness",
+            "isAttr": true,
+            "type": "String"
+          }
+        ]
+      }
+    ]
+  }
