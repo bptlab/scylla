@@ -8,11 +8,14 @@ import java.nio.file.Files;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.stage.FileChooser;
+import javafx.scene.control.Button;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import javafx.scene.layout.Priority;
 
 import javafx.concurrent.Worker;
 import netscape.javascript.JSException;
@@ -38,6 +41,8 @@ import netscape.javascript.JSObject;
 public class BpmnIOTests extends Application{
 	
 	private Stage stage;
+	private Pane pane;
+	
 	private WebEngine webEngine;
 	private JSObject window;
 
@@ -48,25 +53,41 @@ public class BpmnIOTests extends Application{
 	@Override
 	public void start(Stage stage) throws Exception {
 		this.stage = stage;
+		pane = new VBox();
+		
+		Button reloadButton = new Button("Reload");
+		reloadButton.setOnAction(e -> {
+			pane.getChildren().remove(1);
+			initializeWebView();
+		});
+		pane.getChildren().add(reloadButton);
 		
 		initializeWebView();
-
+		
+        Scene scene = new Scene(pane);
+        stage.setScene(scene);
         stage.show();
 	}
 	
-	private void initializeWebView() throws MalformedURLException {
+	private void initializeWebView() {
 		WebView browser = new WebView();
 		webEngine = browser.getEngine();
 		webEngine.setJavaScriptEnabled(true);
          
 		File page = new File("./src/playground/resources/index.html");
-		URL url= page.toURI().toURL();
+		URL url;
+		try {
+			url = page.toURI().toURL();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+			return;
+		}
 		assert page.exists();
 		webEngine.load(url.toString());
 		webEngine.getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {if (newValue == Worker.State.SUCCEEDED) {postLoad();}});
 
-        Scene scene = new Scene(new StackPane(browser), 640, 480);
-        stage.setScene(scene);
+		pane.getChildren().add(browser);
+		VBox.setVgrow(browser, Priority.ALWAYS);
 	}
 	
 	private void postLoad() {
