@@ -27,10 +27,9 @@ try{
         }
     });
 } catch(err) {log(err)};
-container.removeClass('with-diagram');
-container.addClass('with-diagram');
 
 var overlays = viewer.get('overlays');
+var minimap = viewer.get('minimap');
 
 function log(str) {
     var console = $('#js-console');
@@ -49,11 +48,12 @@ function openXML(xml) {
     log("xml");
     viewer.importXML(xml, function(err) {
         if (err) {
-        log('error: ' + err.message);
-        console.error(err);
+            log('error: ' + err.message);
+            console.error(err);
         } else {
-        viewer.get('canvas').zoom('fit-viewport');
-        log('success');
+            viewer.get('canvas').zoom('fit-viewport');
+            minimap.open();
+            log('success');
         }
     });
 }

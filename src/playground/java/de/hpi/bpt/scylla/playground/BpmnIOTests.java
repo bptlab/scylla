@@ -66,6 +66,7 @@ public class BpmnIOTests extends Application{
 		
         Scene scene = new Scene(pane);
         stage.setScene(scene);
+        stage.setMaximized(true);
         stage.show();
 	}
 	
