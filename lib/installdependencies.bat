@@ -1,0 +1,3 @@
+call mvn install:install-file -Dfile=desmoj-2.5.1-adapted.jar -DgroupId=desmoj -DartifactId=desmoj -Dversion=2.5.1-adapted -Dpackaging=jar -DlocalRepositoryPath=./ 
+call mvn install:install-file -Dfile=OpenXES-20160212.jar -DgroupId=org.deckfour -DartifactId=openxes -Dversion=20160212 -Dpackaging=jar -DlocalRepositoryPath=./ 
+call mvn install:install-file -Dfile=Spex.jar -DgroupId=org.deckfour -DartifactId=ospex -Dversion=1.0 -Dpackaging=jar -DlocalRepositoryPath=./
