@@ -42,17 +42,16 @@
   <div class="header">
     <h3>Open BPMN 2.0 diagram from URL</h3>
     <p>
-      <input type="text" id="js-url" placeholder="path to diagram" /><button id="js-open2">Open</button>
+      <input type="text" id="js-url" placeholder="path to diagram" value="https://cdn.rawgit.com/bpmn-io/bpmn-js-examples/dfceecba/url-viewer/resources/pizza-collaboration.bpmn"/><button id="js-open2">Open</button>
     </p>
     <p>
       <button id="js-open">Open</button><button id="js-showOverlays">Show Overlays</button>
     </p>
   </div>
-
   
-  <div class="content with-diagram" id="js-drop-zone">
-    <div class="canvas" id="js-canvas" style="right: 260"></div>
-    <div class="properties-panel-parent" id="js-properties-panel"></div>
+  <div class="content with-diagram" id="js-drop-zone" style="display: flex; flex-direction: row">
+    <div class="canvas" id="js-canvas" style="flex: 1; right: unset; position: relative"></div>
+    <div class="properties-panel-parent" id="js-properties-panel" style="flex-shrink: 0; position: relative;"></div>
   </div>
 
   <div class="console">
