@@ -86,7 +86,8 @@ public class BpmnIOTests extends Application{
 		}
 		assert page.exists();
 		webEngine.load(url.toString());
-		webEngine.getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {if (newValue == Worker.State.SUCCEEDED) {postLoad();}});
+		webEngine.getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) 
+				-> {if (newValue == Worker.State.SUCCEEDED) {postLoad();}});
 
 		pane.getChildren().add(browser);
 		VBox.setVgrow(browser, Priority.ALWAYS);

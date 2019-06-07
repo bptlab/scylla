@@ -19,6 +19,10 @@
 			<id>libraries</id>
 			<url>file://${basedir}/lib</url>
 		</repository>
+		<repository>
+    <id>panda-repository</id>
+    <url>https://repo.panda-lang.org/</url>
+</repository>
 	</repositories>
 
 	<dependencies>
@@ -96,20 +100,26 @@
 		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-controls</artifactId>
-			<version>12</version>
+			<version>13-ea+8</version>
         </dependency>
 
 		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-web</artifactId>
-			<version>12</version>
+			<version>13-ea+8</version>
         </dependency>
         
         <dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-graphics</artifactId>
-			<version>12</version>
+			<version>13-ea+8</version>
         </dependency>
+        
+        <dependency>
+		    <groupId>org.panda-lang</groupId>
+		    <artifactId>pandomium</artifactId>
+		    <version>67.0.6</version>
+		</dependency>
         
 	</dependencies>
 
