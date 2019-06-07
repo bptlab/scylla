@@ -28,9 +28,6 @@ public class PandomiumTest {
 			return;
 		}
 		assert page.exists();
-        if (args.length > 0) {
-          url = args[0];
-        }
     
         System.out.println("starting "+url);
         PandomiumSettings settings = PandomiumSettings.getDefaultSettings();
