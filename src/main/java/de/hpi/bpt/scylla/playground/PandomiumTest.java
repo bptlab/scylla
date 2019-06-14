@@ -145,7 +145,6 @@ public class PandomiumTest {
 		scanner.skip(":");
 		scanner.useDelimiter(",");
 		ArrayList<Object> params = new ArrayList<>();
-		params.add(callback);
 		scanner.forEachRemaining(params::add);
 		scanner.close();
 		try {
@@ -153,12 +152,18 @@ public class PandomiumTest {
 				.filter(each -> Objects.nonNull(each.getAnnotation(ExposeToJS.class)))
 				.filter(each -> each.getName().equals(functionName))
 				.findAny().orElseThrow(NoSuchMethodException::new);
+			if(methodToCall.getParameterTypes().length > 0 && methodToCall.getParameterTypes()[0].equals(CefQueryCallback.class))params.add(callback);
 			methodToCall.invoke(this, params.toArray());
 //			getClass().getMethod(functionName, CefQueryCallback.class).invoke(this, callback);
 		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			e.printStackTrace();
 		}
 		//callback.success(request);
+	}
+	
+	@ExposeToJS
+	public void print(String s) {
+		System.out.println(s);
 	}
 	
 	@ExposeToJS

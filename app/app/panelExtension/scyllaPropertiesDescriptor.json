@@ -10,13 +10,18 @@
       {
         "name": "ScyllaElement",
         "extends": [
-          "bpmn:BaseElement"
+          "bpmn:Task"
         ],
         "properties": [
           {
             "name": "fluffiness",
             "isAttr": true,
             "type": "String"
+          },
+          {
+            "name": "isBatch",
+            "isAttr": true,
+            "type": "Boolean"
           }
         ]
       }

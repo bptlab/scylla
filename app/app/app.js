@@ -12,7 +12,7 @@ console.log = log;
 
 var container = $('#js-drop-zone');
 try{
-    var viewer = new BpmnModeler({
+    var modeler = new BpmnModeler({
         container: $('#js-canvas'),
         propertiesPanel: {
             parent: '#js-properties-panel'
@@ -23,13 +23,13 @@ try{
             minimapModule
         ],
         moddleExtensions: {
-            camunda: scyllaModdleDescriptor
+            scylla: scyllaModdleDescriptor //Saves all scylla extensions with prefix "scylla"
         }
     });
 } catch(err) {log(err)};
 
-var overlays = viewer.get('overlays');
-var minimap = viewer.get('minimap');
+var overlays = modeler.get('overlays');
+var minimap = modeler.get('minimap');
 
 function log(str) {
     var console = $('#js-console');
@@ -46,12 +46,12 @@ function openFromUrl(url) {
 
 function openXML(xml) {
     log("xml");
-    viewer.importXML(xml, function(err) {
+    modeler.importXML(xml, function(err) {
         if (err) {
             log('error: ' + err.message);
             console.error(err);
         } else {
-            viewer.get('canvas').zoom('fit-viewport');
+            modeler.get('canvas').zoom('fit-viewport');
             minimap.open();
             log('success');
         }
@@ -66,14 +66,11 @@ $('#js-open2').click(function() {
 
 $('#js-open').click(function() {
     log("trying to load...");
-    java.loadDiagram(openXML);
+    backend.loadDiagram(openXML);
 });
 
 
-
-$('#js-showOverlays').click(function() {
-    showOverlays();
-});
+$('#js-showOverlays').click(showOverlays);
 
 function showOverlays() {
     overlays.add('StartEvent_1', 'note', {
@@ -83,6 +80,15 @@ function showOverlays() {
         },
         scale: false,
         html: '<div class="diagram-note">I don\'t scale</div>'
+    });
+}
+
+
+$('#export-model').click(exportModel);
+
+function exportModel() {
+    modeler.saveXML({ format: true }, function(err, xml) {
+        if(!err) {backend.print(xml)};
     });
 }
 

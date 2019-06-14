@@ -10,12 +10,16 @@ var javaCall = function(name, values = [], callback = ()=>{}, onFailure = ()=>{}
 var javaBridger = {
     set : {},
     get: (target, key) => {
-        return function(callback, ...value){
-            javaCall(key, value, callback, (error_code, error_message)=>{
+        return function(callback, ...values){
+            if(!(callback instanceof Function)){
+                values.unshift(callback);
+                callback = ()=>{};
+            }
+            javaCall(key, values, callback, (error_code, error_message)=>{
                 alert('Failed to execute java method: '+key+' \n'+error_code+' '+error_message);
             })
         }
     }
 }
-var java = new Proxy(new Object(), javaBridger);
+var backend = new Proxy(new Object(), javaBridger);
 
