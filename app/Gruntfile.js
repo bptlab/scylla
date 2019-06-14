@@ -1,5 +1,7 @@
 var path = require('path');
 
+var target = '../src/playground/resources/'
+
 module.exports = function(grunt) {
 
   require('load-grunt-tasks')(grunt);
@@ -25,7 +27,7 @@ module.exports = function(grunt) {
       },
       app: {
         files: {
-          'app.bundled.js': [ 'app/**/*.js' ]
+          '../src/playground/resources/app.bundled.js': [ 'app/**/*.js' ]
         }
       }
     },
@@ -35,7 +37,7 @@ module.exports = function(grunt) {
         files: [
           {
             src: resolvePath('diagram-js', 'assets/diagram-js.css'),
-            dest: 'dist/css/diagram-js.css'
+            dest: target+'dist/css/diagram-js.css'
           }
         ]
       },
@@ -43,7 +45,7 @@ module.exports = function(grunt) {
         files: [
           {
             src: resolvePath('diagram-js-minimap', 'assets/diagram-js-minimap.css'),
-            dest: 'dist/css/diagram-js-minimap.css'
+            dest: target+'dist/css/diagram-js-minimap.css'
           }
         ]
       },
@@ -53,7 +55,7 @@ module.exports = function(grunt) {
             expand: true,
             cwd: resolvePath('bpmn-js', 'dist/assets'),
             src: ['**/*.*', '!**/*.js'],
-            dest: 'dist/vendor'
+            dest: target+'dist/vendor'
           }
         ]
       },
@@ -63,7 +65,7 @@ module.exports = function(grunt) {
             expand: true,
             cwd: 'app/',
             src: ['**/*.*', '!**/*.js'],
-            dest: 'dist'
+            dest: target+'dist'
           }
         ]
       }
@@ -79,7 +81,7 @@ module.exports = function(grunt) {
 
       styles: {
         files: {
-          'dist/css/app.css': 'styles/app.less'
+          '../src/playground/resources/dist/css/app.css': 'styles/app.less'
         }
       }
     }

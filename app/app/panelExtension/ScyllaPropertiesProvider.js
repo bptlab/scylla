@@ -10,6 +10,7 @@ import nameProps from 'bpmn-js-properties-panel/lib/provider/bpmn/parts/NameProp
 
 
 import xyzPluginProperties from './XyzPluginProperties';
+import batchPluginProperties from './BatchPluginProperties';
 
 
 export default function ScyllaPropertiesProvider(eventBus, bpmnFactory, elementRegistry, translate) {
@@ -84,9 +85,18 @@ function createScyllaTabGroups(element, elementRegistry) {
   
     // Add the xyz props to the xyz plugin group.
     xyzPluginProperties(xyzPluginGroup, element);
+
+    
+    var batchPluginGroup = {
+      id: 'batchPlugin',
+      label: 'Batch Plugin',
+      entries: []
+    };
+    batchPluginProperties(xyzPluginGroup, element);
   
     return [
-        xyzPluginGroup
+        xyzPluginGroup,
+        batchPluginGroup
     ];
   }
 
