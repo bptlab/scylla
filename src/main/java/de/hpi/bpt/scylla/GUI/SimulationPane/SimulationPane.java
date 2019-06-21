@@ -41,6 +41,7 @@ import de.hpi.bpt.scylla.GUI.ScalingCheckBoxIcon;
 import de.hpi.bpt.scylla.GUI.ScalingFileChooser;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
 import de.hpi.bpt.scylla.GUI.GlobalConfigurationPane.GlobalConfigurationPane;
+import de.hpi.bpt.scylla.GUI.ModelerPane.ModelerPane;
 import de.hpi.bpt.scylla.GUI.SimulationConfigurationPane.SimulationConfigurationPane;
 import de.hpi.bpt.scylla.logger.DebugLogger;
 import de.hpi.bpt.scylla.plugin_loader.PluginLoader;
@@ -63,12 +64,14 @@ public class SimulationPane extends JPanel{
 	private JLabel lblCurrentGlobalConfig;
 	private FileListEntry displayCurrentGlobalConfigChosen;
 	private JButton button_openglobalconfig;
+	private JButton button_newglobalconfig;
 	
 	//BPMN file components
 	private JLabel lblCurrentBpmnFiles;
 	private JScrollPane scrollPane_BpmnFiles;
 	private ListPanel<FileListEntry> list_CurrentBpmnFiles;
 	private JButton button_openBpmnFile;
+	private JButton button_newBpmnFile;
 //	private JButton button_removeBpmnFile;
 	
 	//Simulation file components
@@ -98,7 +101,6 @@ public class SimulationPane extends JPanel{
 	private JPanel panel_AdvancedOptions;
 	private JCheckBox checkbox_debug;
 	private JCheckBox checkbox_desmoj;
-	private JButton button_newglobalconfig;
 	
 	/**
 	 * Constructor
@@ -221,6 +223,9 @@ public class SimulationPane extends JPanel{
 		list_CurrentBpmnFiles.setFont(ScyllaGUI.DEFAULTFONT);
 		scrollPane_BpmnFiles.setViewportView(list_CurrentBpmnFiles);
 		
+		Container container_bpmnButtons = new Container();
+		container_bpmnButtons.setLayout(new GridLayout(2,1));
+		
 		button_openBpmnFile = new JButton("");
 		button_openBpmnFile.setFont(ScyllaGUI.DEFAULTFONT);
 		button_openBpmnFile.setToolTipText("Add BPMN file");
@@ -234,18 +239,38 @@ public class SimulationPane extends JPanel{
 				int c = chooser.showDialog(null,"Open");
 				if(c == ScalingFileChooser.APPROVE_OPTION){
 					chooser.getSelectedFile();
-					list_CurrentBpmnFiles.addElement(new FileListEntry(list_CurrentBpmnFiles,chooser.getSelectedFile().getPath(),null, true));
+					list_CurrentBpmnFiles.addElement(new FileListEntry(list_CurrentBpmnFiles,chooser.getSelectedFile().getPath(),(s)->{
+						EditorPane ep =  new ModelerPane();
+						File f = new File(s);
+						ep.openFile(f);
+						parent.addEditor(ep);
+					}, true));
 					ScyllaGUI.DEFAULTFILEPATH = chooser.getSelectedFile().getPath();
 				}
 			}
 		});
-		GridBagConstraints gbc_button_openBpmnFile = new GridBagConstraints();
-		gbc_button_openBpmnFile.fill = GridBagConstraints.BOTH;
-		gbc_button_openBpmnFile.insets = new Insets(0, 0, 0, COL1);
-		gbc_button_openBpmnFile.gridx = 1;
-		gbc_button_openBpmnFile.gridy = 3;
-		gbc_button_openBpmnFile.gridheight = 2;
-		this.add(button_openBpmnFile, gbc_button_openBpmnFile);
+		button_newBpmnFile = new JButton();
+		button_newBpmnFile.setIcon(ScyllaGUI.ICON_NEW);
+		button_newBpmnFile.setFont(ScyllaGUI.DEFAULTFONT);
+		button_newBpmnFile.setToolTipText("Create new bpmn model file");
+		button_newBpmnFile.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				EditorPane ep =  new ModelerPane();
+				ep.be_create();
+				parent.addEditor(ep);
+			}
+		});
+		
+		
+		GridBagConstraints gbc_container_bpmnButtons = new GridBagConstraints();
+		gbc_container_bpmnButtons.fill = GridBagConstraints.BOTH;
+		gbc_container_bpmnButtons.insets = new Insets(0, 0, 0, COL1);
+		gbc_container_bpmnButtons.gridx = 1;
+		gbc_container_bpmnButtons.gridy = 3;
+		gbc_container_bpmnButtons.gridheight = 2;
+		container_bpmnButtons.add(button_openBpmnFile);
+		container_bpmnButtons.add(button_newBpmnFile);
+		this.add(container_bpmnButtons, gbc_container_bpmnButtons);
 		
 //		button_removeBpmnFile = new JButton("");
 //		button_removeBpmnFile.setFont(ScyllaGUI.DEFAULTFONT);

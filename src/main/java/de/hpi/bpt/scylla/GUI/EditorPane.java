@@ -299,7 +299,7 @@ public abstract class EditorPane extends JPanel implements FormManager{
 			}
 		};
 		if(getFile() != null && getFile().exists())chooser.setSelectedFile(getFile());
-		else if(!getId().equals("")) chooser.setSelectedFile(new File(normalizePath(ScyllaGUI.DEFAULTFILEPATH+"/"+getId()+".xml")));
+		else if(!getDefaultFileName().equals("")) chooser.setSelectedFile(new File(normalizePath(ScyllaGUI.DEFAULTFILEPATH+"/"+getDefaultFileName()+".xml")));
 		chooser.setDialogTitle("Save");
 		int c = chooser.showDialog(null,"Save");
 		if(c == ScalingFileChooser.APPROVE_OPTION){
@@ -459,7 +459,7 @@ public abstract class EditorPane extends JPanel implements FormManager{
 		return file;
 	}
 	
-	protected abstract String getId();
+	protected abstract String getDefaultFileName();
 
 	/**
 	 * Sets the edited file, changes title labels etc. 

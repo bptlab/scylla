@@ -44,7 +44,7 @@ function openFromUrl(url) {
     });
 }
 
-function openXML(xml) {
+window.openXML = function openXML(xml) {
     log("xml");
     modeler.importXML(xml, function(err) {
         if (err) {

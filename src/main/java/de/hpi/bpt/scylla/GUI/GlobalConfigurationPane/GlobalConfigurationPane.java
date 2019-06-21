@@ -322,7 +322,7 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 		
 	}
 	
-	protected String getId(){
+	protected String getDefaultFileName(){
 		return creator.getId();
 	}
 	

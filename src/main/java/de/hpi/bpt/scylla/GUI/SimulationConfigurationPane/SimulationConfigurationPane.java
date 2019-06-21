@@ -776,7 +776,7 @@ public class SimulationConfigurationPane extends EditorPane {
 	}
 
 	@Override
-	protected String getId() {
+	protected String getDefaultFileName() {
 		return creator.getId();
 	}
 	
