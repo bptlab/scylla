@@ -175,10 +175,7 @@
           		<version>3.0.0-M3</version>
 				<configuration>
 					<trimStackTrace>false</trimStackTrace>
-					<systemPropertyVariables>
-						<propertyName>java.library.path</propertyName>
-						<buildDirectory>/natives</buildDirectory>
-					</systemPropertyVariables>
+					<argLine>-Djava.library.path="${basedir}\natives"</argLine>
 				</configuration>
         	</plugin>
 	       	<plugin>
