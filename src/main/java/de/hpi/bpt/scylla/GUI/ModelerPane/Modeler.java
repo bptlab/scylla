@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Scanner;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -32,18 +31,21 @@ import org.cef.browser.CefMessageRouter;
 import org.cef.callback.CefQueryCallback;
 import org.cef.handler.CefLoadHandlerAdapter;
 import org.cef.handler.CefMessageRouterHandlerAdapter;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
-import org.panda_lang.panda.framework.design.architecture.dynamic.block.looping.ForBlock;
 import org.panda_lang.pandomium.Pandomium;
 import org.panda_lang.pandomium.settings.PandomiumSettings;
 import org.panda_lang.pandomium.wrapper.PandomiumBrowser;
 import org.panda_lang.pandomium.wrapper.PandomiumClient;
 
 import de.hpi.bpt.scylla.playground.ExposeToJS;
-import de.hpi.bpt.scylla.playground.PandomiumTest;
 
 public class Modeler {
+	
+	private static final Pandomium pandomium;
+	static {
+        PandomiumSettings settings = PandomiumSettings.getDefaultSettings();
+        pandomium = new Pandomium(settings);
+        pandomium.initialize();
+	}
 	
 	private Component component;
 	private CefBrowser browser;
@@ -81,10 +83,7 @@ public class Modeler {
 		assert page.exists();
     
         System.out.println("starting "+url);
-        PandomiumSettings settings = PandomiumSettings.getDefaultSettings();
 
-        Pandomium pandomium = new Pandomium(settings);
-        pandomium.initialize();
 
         PandomiumClient client = pandomium.createClient();
         CefMessageRouter msgRouter = CefMessageRouter.create();
