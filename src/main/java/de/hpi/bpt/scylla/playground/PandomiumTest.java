@@ -46,6 +46,11 @@ public class PandomiumTest {
 	
 	public static void main(String[] args) {
 		
+		createFrame();
+       
+	}
+	
+	public static JFrame createFrame() {
 
         JFrame frame = new JFrame();
         frame.getContentPane().add(new PandomiumTest().component, BorderLayout.CENTER);
@@ -62,7 +67,7 @@ public class PandomiumTest {
         frame.setTitle("Pandomium");
         frame.setExtendedState(java.awt.Frame.MAXIMIZED_BOTH);
         frame.setVisible(true);
-       
+        return frame;
 	}
 	
 	public PandomiumTest() {
