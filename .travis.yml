@@ -14,6 +14,9 @@ jdk:
   - openjdk10
   - openjdk11
 
+services:
+  - xvfb
+
 #script: mvn '-Dtest=de.hpi.bpt.scylla.*Tests' test
 script:
   mvn clean test
