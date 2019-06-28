@@ -70,5 +70,10 @@ public class ModelerPane extends EditorPane {
 	protected String getDefaultFileName() {
 		return modeler.getProcessId();
 	}
+	
+	@Override
+	protected String getDefaultFileEnding() {
+		return ".bpmn";
+	}
 
 }

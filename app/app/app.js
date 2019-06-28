@@ -58,6 +58,18 @@ window.openXML = function openXML(xml) {
     });
 }
 
+window.clear = function() {
+    modeler.clear();
+}
+
+window.save = function(path) {
+    modeler.saveXML({ format: true }, function(err, xml) {
+        if(!err) {
+            backend.save(path, xml);
+        };
+    });
+}
+
 ///////Buttons
 $('#js-open2').click(function() {
     var url = $('#js-url').val();

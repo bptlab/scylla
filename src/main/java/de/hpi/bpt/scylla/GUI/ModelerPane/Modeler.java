@@ -248,8 +248,7 @@ public class Modeler {
 	}
 
 	public void clear() {
-		// TODO Auto-generated method stub
-		
+		callJavascript("clear");
 	}
 
 	public String getProcessId() {
