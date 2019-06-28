@@ -45,6 +45,9 @@ public class Modeler {
         PandomiumSettings settings = PandomiumSettings.getDefaultSettings();
         pandomium = new Pandomium(settings);
         pandomium.initialize();
+        Runtime.getRuntime().addShutdownHook(new Thread(()->{
+        	CefApp.getInstance().dispose();
+        }));
 	}
 	
 	private Component component;
@@ -60,7 +63,6 @@ public class Modeler {
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-            	CefApp.getInstance().dispose();
                 frame.dispose();
             }
         });
