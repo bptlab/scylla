@@ -1,5 +1,6 @@
 package de.hpi.bpt.scylla.playground;
 
+
 import javax.swing.JFrame;
 
 import org.junit.jupiter.api.Test;

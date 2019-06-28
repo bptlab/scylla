@@ -41,7 +41,7 @@ import org.panda_lang.pandomium.wrapper.PandomiumClient;
 
 public class PandomiumTest {
 	
-	private Component component;
+	Component component;
 	private CefBrowser browser;
 	
 	public static void main(String[] args) {
@@ -80,7 +80,7 @@ public class PandomiumTest {
 			return;
 		}
 		assert page.exists();
-    
+		assert url != null;
         System.out.println("starting "+url);
         PandomiumSettings settings = PandomiumSettings.getDefaultSettings();
 
