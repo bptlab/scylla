@@ -207,8 +207,9 @@ public class Modeler {
 	}
 
 	public void createNew() {
-		// TODO Auto-generated method stub
-		
+		File emptyDiagram = new File("./src/playground/resources/emptyDiagram.bpmn");
+		if(!emptyDiagram.exists())throw new RuntimeException("Could not create empty diagram: Template not found");
+		open(emptyDiagram);
 	}
 	
 	public void save(String path) throws IOException{

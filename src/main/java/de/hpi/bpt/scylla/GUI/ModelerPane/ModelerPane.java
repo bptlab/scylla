@@ -33,7 +33,7 @@ public class ModelerPane extends EditorPane {
 		setChangeFlag(true);
 		close();
 		setFile(new File("NewModel"+unnamedcount++ + ".bpmn"));
-		//TODO modeler.createNew();
+		modeler.createNew();
 		setSaved(false);
 		setEnabled(true);
 		setChangeFlag(false);
