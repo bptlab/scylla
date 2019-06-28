@@ -19,7 +19,7 @@ services:
 
 #script: mvn '-Dtest=de.hpi.bpt.scylla.*Tests' test
 script:
-  mvn clean test
+  mvn -e clean test
 
 notifications:
   email: false
