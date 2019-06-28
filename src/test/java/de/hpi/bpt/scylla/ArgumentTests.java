@@ -9,6 +9,8 @@ import java.io.PrintStream;
 import org.junit.jupiter.api.*;
 
 public class ArgumentTests {
+	private final PrintStream standardOut = System.out;
+	private final PrintStream standardErr = System.out;
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
     private final ByteArrayOutputStream errContent = new ByteArrayOutputStream();
 
@@ -20,8 +22,8 @@ public class ArgumentTests {
     
     @AfterEach
     public void cleanUpStreams() {
-        System.setOut(null);
-        System.setErr(null);
+        System.setOut(standardOut);
+        System.setErr(standardErr);
     }
     
     /**
