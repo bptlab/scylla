@@ -11,6 +11,7 @@ import nameProps from 'bpmn-js-properties-panel/lib/provider/bpmn/parts/NameProp
 
 import xyzPluginProperties from './XyzPluginProperties';
 import batchPluginProperties from './BatchPluginProperties';
+import scyllaGeneralProperties from './ScyllaGeneralProperties';
 
 
 export default function ScyllaPropertiesProvider(eventBus, bpmnFactory, elementRegistry, translate) {
@@ -50,6 +51,9 @@ function createGeneralTabGroups(element, bpmnFactory, elementRegistry, translate
     idProps(generalGroup, element, translate);
     nameProps(generalGroup, element, translate);
     processProps(generalGroup, element, translate);
+
+    var scyllaGeneralGroups = scyllaGeneralProperties(element);
+    
   
     var detailsGroup = {
       id: 'details',
@@ -67,11 +71,9 @@ function createGeneralTabGroups(element, bpmnFactory, elementRegistry, translate
   
     documentationProps(documentationGroup, element, bpmnFactory, translate);
   
-    return[
-      generalGroup,
-      detailsGroup,
-      documentationGroup
-    ];
+    return [generalGroup]
+      .concat(scyllaGeneralGroups)
+      .concat([detailsGroup, documentationGroup]);
 }
 
 function createScyllaTabGroups(element, elementRegistry) {

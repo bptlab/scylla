@@ -8,6 +8,8 @@
   <link rel="stylesheet" href="dist/css/app.css" />
 
   <style>
+    html { overflow-y: hidden; }
+
     body {
       font-family: 'Arial', sans-serif;
     }
@@ -39,7 +41,8 @@
 </head>
 <body>
 
-  <div class="header">
+  
+  <!-- <div class="header">
     <h3>Open BPMN 2.0 diagram from URL</h3>
     <p>
       <input type="text" id="js-url" placeholder="path to diagram" value="https://cdn.rawgit.com/bpmn-io/bpmn-js-examples/dfceecba/url-viewer/resources/pizza-collaboration.bpmn"/><button id="js-open2">Open</button>
@@ -51,17 +54,17 @@
       <button id="java-activate" onclick="alert(modeler)">Activate Java</button>
       <button id="export-model">Export Model</button>
     </p>
-  </div>
+  </div> -->
   
   <div class="content with-diagram" id="js-drop-zone" style="display: flex; flex-direction: row">
     <div class="canvas" id="js-canvas" style="flex: 1; right: unset; position: relative"></div>
     <div class="properties-panel-parent" id="js-properties-panel" style="flex-shrink: 0; position: relative;"></div>
   </div>
 
-  <div class="console">
+  <!-- <div class="console">
     <h3>Console</h3>
     <textarea id="js-console"></textarea>
-  </div>
+  </div> -->
 
   <!-- app -->
   
