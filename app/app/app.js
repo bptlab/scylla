@@ -26,6 +26,12 @@ try{
             scylla: scyllaModdleDescriptor //Saves all scylla extensions with prefix "scylla"
         }
     });
+    modeler.on('element.changed', function(event) { 
+        //Note: This is also called when an element is created or deleted
+        //var element = event.element;
+        backend.modelChanged();         
+    });
+
 } catch(err) {log(err)};
 
 var overlays = modeler.get('overlays');

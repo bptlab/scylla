@@ -16,7 +16,8 @@ public class ModelerPane extends EditorPane {
 	private Modeler modeler;
 	
 	public ModelerPane() {
-		modeler = new Modeler();		
+		modeler = new Modeler();
+		modeler.setFormManager(this);
 		GridBagConstraints gbc_modeler = new GridBagConstraints();
 		gbc_modeler.anchor = GridBagConstraints.PAGE_START;
 //		gbc_model.insets = new Insets(inset_b,inset_b,inset_b,inset_b);

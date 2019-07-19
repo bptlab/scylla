@@ -16,6 +16,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -36,9 +37,11 @@ import org.panda_lang.pandomium.settings.PandomiumSettings;
 import org.panda_lang.pandomium.wrapper.PandomiumBrowser;
 import org.panda_lang.pandomium.wrapper.PandomiumClient;
 
+import de.hpi.bpt.scylla.GUI.FormManager;
 import de.hpi.bpt.scylla.playground.ExposeToJS;
 
 public class Modeler {
+	//TODO: See if https://github.com/bpmn-io/diagram-js-origin looks good
 	
 	private static final Pandomium pandomium;
 	static {
@@ -53,6 +56,8 @@ public class Modeler {
 	private Component component;
 	private CefBrowser browser;
 	
+	private Optional<FormManager> formManager = Optional.empty();
+
 	public static void main(String[] args) {
 		
 
@@ -258,5 +263,22 @@ public class Modeler {
 	
 	private void validatePath(String path) {
 		Paths.get(path);//Invalid paths are not accepted		
+	}
+	
+	@ExposeToJS
+	public void modelChanged() {
+		setSaved(false);		
+	}
+	
+	public FormManager getFormManager() {
+		return formManager.orElse(null);
+	}
+
+	public void setFormManager(FormManager formManager) {
+		this.formManager = Optional.of(formManager);
+	}
+	
+	private void setSaved(boolean b) {
+		formManager.ifPresent(fm -> fm.setSaved(b));
 	}
 }
