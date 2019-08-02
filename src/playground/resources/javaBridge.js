@@ -14,7 +14,7 @@ var javaBridger = {
     set : {},
     get: (target, key) => {
         return function(callback, ...values){
-            if(!(callback instanceof Function)){
+            if(!(callback instanceof Function) && callback){
                 values.unshift(callback);
                 callback = ()=>{};
             }
