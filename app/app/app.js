@@ -110,6 +110,10 @@ function exportModel() {
     });
 }
 
+$('#testButton').click(()=>{
+    alert(JSON.stringify(modeler.get('moddle').create('bpmn:ExtensionElements')));
+});
+
 ///// auto open ?url=diagram-url ///////////////////////
 (function() {
     var str = window.location.search;
