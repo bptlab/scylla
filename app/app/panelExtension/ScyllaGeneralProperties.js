@@ -4,6 +4,8 @@ import {
   is, getBusinessObject
 } from 'bpmn-js/lib/util/ModelUtil';
 
+const indexOfDistribution = 0;
+
 
 function isActivity(element) {
   return is(element, 'bpmn:SubProcess') || is(element, 'bpmn:Task');
@@ -25,6 +27,18 @@ function distributions() {
         { value: "uniform", 					name: "Uniform", 			},//new String[]{"lower","upper"}, 			new AttributeType[]{AttributeType.DOUBLE,AttributeType.DOUBLE}),
         { value: "arbitraryFiniteProbability",  name: "Discrete", 		    },//new String[]{}, 						new AttributeType[]{}),
     ]
+}
+
+function timeUnits() {
+    return [
+        {value: "NANOSECONDS",  name: "Nanoseconds"},
+        {value: "MICROSECONDS", name: "Microseconds"},
+        {value: "MILLISECONDS", name: "Milliseconds"},
+        {value: "SECONDS",      name: "Seconds"},
+        {value: "MINUTES",      name: "Minutes"},
+        {value: "HOURS",        name: "Hours"},
+        {value: "DAYS",         name: "Days"}
+    ];
 }
 
 var entries = new Map();
@@ -63,11 +77,8 @@ function entriesOf(element) {
 }
 
 function getExtension(element, type) {
-    backend.print(JSON.stringify(element));
-    var newExtension = {"$type" : type};
     if (!element.extensionElements) {
         return;
-        //element.extensionElements = {"$type" : "bpmn:extensionElements", values : []};
     }
 
     return element.extensionElements.values.filter(function(e) {
@@ -93,7 +104,46 @@ export default function(element) {
             selectOptions : distributions(),
             get : element => {
                 const extensionElements = getExtension(getBusinessObject(element), 'scylla:Duration');
-                return extensionElements ? extensionElements.distribution : distributions()[0];
+                //backend.print(JSON.stringify(extensionElements));
+                let toReturn = extensionElements && extensionElements.$children && extensionElements.$children[indexOfDistribution]
+                    ? extensionElements.$children[indexOfDistribution].$type.replace('Distribution','').replace('scylla:','') : distributions()[0].value;
+                return {undefined : toReturn};
+            },
+            set: (element, value) => {
+                // getExtension(getBusinessObject(element), 'scylla:Duration').distribution = value
+                const moddle = modeler.get('moddle'),
+                    modeling = modeler.get('modeling');
+                let businessObject = getBusinessObject(element);
+                const extensionElements = businessObject.extensionElements || moddle.create('bpmn:ExtensionElements');
+                let duration = getExtension(businessObject, 'scylla:Duration');
+
+                let distributionElement = moddle.createAny('scylla:'+value.undefined+'Distribution');
+
+                if (!duration) {
+                    duration = moddle.createAny('scylla:Duration', 'http://scylla', {$children: []});
+                    extensionElements.get('values').push(duration);
+                }
+
+                duration.$children[indexOfDistribution] = distributionElement;
+            
+                //duration.distribution = value;
+                //analysisDetails.lastChecked = new Date().toISOString();
+            
+                modeling.updateProperties(element, {
+                  extensionElements
+                });
+            }
+        }));
+
+        durationGroup.entries.push(entryFactory.selectBox({
+            id : 'timeUnit',
+            description : 'Which timeUnit?',
+            label : 'TimeUnit',
+            //modelProperty : 'distribution',
+            selectOptions : timeUnits(),
+            get : element => {
+                const extensionElements = getExtension(getBusinessObject(element), 'scylla:Duration');
+                return {undefined : (extensionElements ? extensionElements.timeUnit : timeUnits()[0].value)};
             },
             set: (element, value) => {
                 // getExtension(getBusinessObject(element), 'scylla:Duration').distribution = value
@@ -104,11 +154,13 @@ export default function(element) {
                 let duration = getExtension(businessObject, 'scylla:Duration');
 
                 if (!duration) {
-                    duration = moddle.create('scylla:Duration');
+                    duration = moddle.createAny('scylla:Duration', 'http://scylla', {$children: []});
                     extensionElements.get('values').push(duration);
                 }
+
+                duration.timeUnit = value.undefined;
             
-                duration.distribution = value;
+                //duration.distribution = value;
                 //analysisDetails.lastChecked = new Date().toISOString();
             
                 modeling.updateProperties(element, {
