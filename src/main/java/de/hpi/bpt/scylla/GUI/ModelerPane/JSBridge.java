@@ -40,7 +40,7 @@ public class JSBridge {
 				params[0] = callback;
 			else
 				params = Arrays.copyOfRange(params, 1, params.length);
-			methodToCall.invoke(this, params);
+			methodToCall.invoke(javaPart, params);
 //			getClass().getMethod(functionName, CefQueryCallback.class).invoke(this, callback);
 		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			e.printStackTrace();
