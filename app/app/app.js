@@ -12,7 +12,7 @@ console.log = log;
 
 var container = $('#js-drop-zone');
 try{
-    var modeler = new BpmnModeler({
+    window.modeler = new BpmnModeler({
         container: $('#js-canvas'),
         propertiesPanel: {
             parent: '#js-properties-panel'
@@ -111,7 +111,8 @@ function exportModel() {
 }
 
 $('#testButton').click(()=>{
-    alert(JSON.stringify(modeler.get('moddle').create('bpmn:ExtensionElements')));
+    backend.print(JSON.stringify(modeler.get('moddle').create('bpmn:ExtensionElements')));
+    backend.print(JSON.stringify(modeler.get('moddle').createAny('scylla:Duration', 'http://scylla')));
 });
 
 ///// auto open ?url=diagram-url ///////////////////////

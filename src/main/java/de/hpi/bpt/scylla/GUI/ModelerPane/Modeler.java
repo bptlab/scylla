@@ -149,6 +149,7 @@ public class Modeler {
 		open(emptyDiagram);
 	}
 	
+	//I call js to call me back with their contents
 	public void save(String path) throws IOException{
 		validatePath(path);
 		bridge.callJavascript("save", path);

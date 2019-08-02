@@ -8,10 +8,8 @@
     "associations": [],
     "types": [
       {
-        "name": "ScyllaElement",
-        "extends": [
-          "bpmn:Task"
-        ],
+        "name": "ScyllaTask",
+        "extends": ["bpmn:Task"],
         "properties": [
           {
             "name": "fluffiness",
@@ -24,6 +22,63 @@
             "type": "Boolean"
           }
         ]
+      },
+
+      {
+        "name" : "Duration",
+        "extends": ["bpmn:Task"],
+        "superClass": [ "Element" ],
+        "properties" : [
+          {
+            "name" : "distribution",
+            "isAttr" :true,
+            "type" : "Distribution"
+          },
+          {
+            "name" : "timeUnit",
+            "isAttr" : "true",
+            "type" : "TimeUnit"
+          }
+        ]
+      },
+
+      {
+        "name" : "Distribution",
+        "superClass": [ "String" ]
+      },
+
+      {
+        "name" : "TimeUnit",
+        "superClass": [ "String" ]
+      },
+
+      {
+        "name" : "Resources",
+        "extends": ["bpmn:Task"],
+        "superClass": [ "Element" ],
+        "properties" : [
+          {
+            "name" : "assignments",
+            "isMany" : "true",
+            "type" : "Assignment"
+          }
+        ]
+      },
+
+      {
+        "name" : "Assignment",
+        "properties" : [
+          {
+            "name" : "resourceId",
+            "isAttr" : "true",
+            "type" : "String"
+          },
+          {
+            "name" : "quantity",
+            "isAttr" : true,
+            "type" : "Integer"
+          }
+        ]        
       }
     ]
   }

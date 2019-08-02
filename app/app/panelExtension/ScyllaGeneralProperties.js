@@ -62,6 +62,19 @@ function entriesOf(element) {
     return entries.get(element);
 }
 
+function getExtension(element, type) {
+    backend.print(JSON.stringify(element));
+    var newExtension = {"$type" : type};
+    if (!element.extensionElements) {
+        return;
+        //element.extensionElements = {"$type" : "bpmn:extensionElements", values : []};
+    }
+
+    return element.extensionElements.values.filter(function(e) {
+        return e.$instanceOf(type);
+    })[0];
+}
+
 
 export default function(element) {
 
@@ -76,8 +89,32 @@ export default function(element) {
             id : 'distribution',
             description : 'How is the duration distributed?',
             label : 'Distribution',
-            modelProperty : 'distribution',
-            selectOptions : distributions()
+            //modelProperty : 'distribution',
+            selectOptions : distributions(),
+            get : element => {
+                const extensionElements = getExtension(getBusinessObject(element), 'scylla:Duration');
+                return extensionElements ? extensionElements.distribution : distributions()[0];
+            },
+            set: (element, value) => {
+                // getExtension(getBusinessObject(element), 'scylla:Duration').distribution = value
+                const moddle = modeler.get('moddle'),
+                    modeling = modeler.get('modeling');
+                let businessObject = getBusinessObject(element);
+                const extensionElements = businessObject.extensionElements || moddle.create('bpmn:ExtensionElements');
+                let duration = getExtension(businessObject, 'scylla:Duration');
+
+                if (!duration) {
+                    duration = moddle.create('scylla:Duration');
+                    extensionElements.get('values').push(duration);
+                }
+            
+                duration.distribution = value;
+                //analysisDetails.lastChecked = new Date().toISOString();
+            
+                modeling.updateProperties(element, {
+                  extensionElements
+                });
+            }
         }));
 
         var resourcesGroup = {
