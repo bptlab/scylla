@@ -115,6 +115,11 @@ $('#testButton').click(()=>{
     backend.print(JSON.stringify(modeler.get('moddle').createAny('scylla:Duration', 'http://scylla')));
 });
 
+
+$('#exampleButton').click(()=> {
+    openFromUrl('https://cdn.rawgit.com/bpmn-io/bpmn-js-examples/dfceecba/url-viewer/resources/pizza-collaboration.bpmn');
+});
+
 ///// auto open ?url=diagram-url ///////////////////////
 (function() {
     var str = window.location.search;

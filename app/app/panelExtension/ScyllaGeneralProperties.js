@@ -15,19 +15,41 @@ function isBatchActivity(element) {
   return isActivity(element) && getBusinessObject(element).get('isBatch');
 }
 
+const distributionProperty = "duration.distribution";
+
+function getDistributionElement(element) {
+    const duration = getExtension(getBusinessObject(element), 'scylla:Duration');
+    return duration && duration.$children && duration.$children[indexOfDistribution];
+}
+
 function distributions() {
     return [
-        { value: "binomial",					name: "Binomial", 		    },//new String[]{"probability","amount"}, 	new AttributeType[]{AttributeType.DOUBLE,AttributeType.INT}),
-        { value: "constant", 				    name: "Constant", 		    },//new String[]{"constantValue"}, 			new AttributeType[]{AttributeType.DOUBLE}),
-        { value: "erlang", 					    name: "Erlang", 			},//new String[]{"order","mean"}, 			new AttributeType[]{AttributeType.INT,AttributeType.DOUBLE}),
-        { value: "exponential", 				name: "Exponential", 		},//new String[]{"mean"}, 					new AttributeType[]{AttributeType.DOUBLE}),
-        { value: "triangular", 				    name: "Triangluar", 		},//new String[]{"lower","peak","upper"}, 	new AttributeType[]{AttributeType.DOUBLE,AttributeType.DOUBLE,AttributeType.DOUBLE}),
-        { value: "normal", 					    name: "Normal", 			},//new String[]{"mean","standardDeviation"}, new AttributeType[]{AttributeType.DOUBLE,AttributeType.DOUBLE}),
-        { value: "poisson", 					name: "Poisson", 			},//new String[]{"mean"}, 					new AttributeType[]{AttributeType.DOUBLE}),
-        { value: "uniform", 					name: "Uniform", 			},//new String[]{"lower","upper"}, 			new AttributeType[]{AttributeType.DOUBLE,AttributeType.DOUBLE}),
-        { value: "arbitraryFiniteProbability",  name: "Discrete", 		    },//new String[]{}, 						new AttributeType[]{}),
+        { value: "binomial",					name: "Binomial",       attributes: ["probability","amount"]}, 	    //new AttributeType[]{AttributeType.DOUBLE,AttributeType.INT]}),
+        { value: "constant", 				    name: "Constant", 		attributes: ["constantValue"]}, 			    //new AttributeType[]{AttributeType.DOUBLE]}),
+        { value: "erlang", 					    name: "Erlang", 		attributes: ["order","mean"]}, 			    //new AttributeType[]{AttributeType.INT,AttributeType.DOUBLE]}),
+        { value: "exponential", 				name: "Exponential", 	attributes: ["mean"]}, 					    //new AttributeType[]{AttributeType.DOUBLE]}),
+        { value: "triangular", 				    name: "Triangluar", 	attributes: ["lower","peak","upper"]}, 	    //new AttributeType[]{AttributeType.DOUBLE,AttributeType.DOUBLE,AttributeType.DOUBLE]}),
+        { value: "normal", 					    name: "Normal", 		attributes: ["mean","standardDeviation"]},   //new AttributeType[]{AttributeType.DOUBLE,AttributeType.DOUBLE]}),
+        { value: "poisson", 					name: "Poisson", 		attributes: ["mean"]}, 					    //new AttributeType[]{AttributeType.DOUBLE]}),
+        { value: "uniform", 					name: "Uniform", 		attributes: ["lower","upper"]}, 			    //new AttributeType[]{AttributeType.DOUBLE,AttributeType.DOUBLE]}),
+        { value: "arbitraryFiniteProbability",  name: "Discrete", 		attributes: []}, 						    //new AttributeType[]{]}),
     ]
 }
+
+function distributionIdToElementName(id) {
+    return 'scylla:'+id+'Distribution';
+}
+
+function distributionElementToId(element) {
+    return element.$type.replace('Distribution','').replace('scylla:','');
+}
+
+function distributionById(id) {
+    return distributions().find(each => each.value == id);
+}
+
+
+
 
 function timeUnits() {
     return [
@@ -96,18 +118,17 @@ export default function(element) {
             entries: []
         };
 
-        durationGroup.entries.push(entryFactory.selectBox({
+        let distributionBox = entryFactory.selectBox({
             id : 'distribution',
-            description : 'How is the duration distributed?',
+            //description : 'How is the duration distributed?',
             label : 'Distribution',
-            //modelProperty : 'distribution',
+            modelProperty : distributionProperty,
             selectOptions : distributions(),
             get : element => {
-                const extensionElements = getExtension(getBusinessObject(element), 'scylla:Duration');
-                //backend.print(JSON.stringify(extensionElements));
-                let toReturn = extensionElements && extensionElements.$children && extensionElements.$children[indexOfDistribution]
-                    ? extensionElements.$children[indexOfDistribution].$type.replace('Distribution','').replace('scylla:','') : distributions()[0].value;
-                return {undefined : toReturn};
+                const distribution = getDistributionElement(element);
+                let toReturn = {};
+                toReturn[distributionProperty] = distribution ? distributionElementToId(distribution) : distributions()[0].value;
+                return toReturn;
             },
             set: (element, value) => {
                 // getExtension(getBusinessObject(element), 'scylla:Duration').distribution = value
@@ -116,13 +137,20 @@ export default function(element) {
                 let businessObject = getBusinessObject(element);
                 const extensionElements = businessObject.extensionElements || moddle.create('bpmn:ExtensionElements');
                 let duration = getExtension(businessObject, 'scylla:Duration');
-
-                let distributionElement = moddle.createAny('scylla:'+value.undefined+'Distribution');
+                let distributionId = value[distributionProperty];
+                let distributionType = distributionById(distributionId);
+                let distributionElement = moddle.createAny(distributionIdToElementName(distributionId));
 
                 if (!duration) {
                     duration = moddle.createAny('scylla:Duration', 'http://scylla', {$children: []});
                     extensionElements.get('values').push(duration);
                 }
+
+                distributionElement.$children = distributionType.attributes.map(each => {
+                    let element = moddle.createAny('scylla:'+each);
+                    element.$body = '0';
+                    return element;
+                });
 
                 duration.$children[indexOfDistribution] = distributionElement;
             
@@ -133,11 +161,42 @@ export default function(element) {
                   extensionElements
                 });
             }
-        }));
+        });
+        durationGroup.entries.push(distributionBox);
+
+        let distribution = getDistributionElement(element);
+        if(distribution) {
+            let type = distributionById(distributionElementToId(distribution)); 
+            type.attributes.forEach(attribute => {
+                let propertyName = distributionProperty+'.'+type.value+'.'+attribute;
+                let textField = entryFactory.textField({
+                    id : propertyName,
+                    label : attribute,
+                    modelProperty : propertyName,
+                    get : element => {
+                        let distribution = getDistributionElement(element);
+                        let attributeElement = distribution.$children.find(each => each.$type == 'scylla:'+attribute);
+                        let toReturn = {};
+                        toReturn[propertyName] = attributeElement.$body;
+                        return toReturn;
+                    },
+                    set: (element, value) => {
+                        let distribution = getDistributionElement(element);
+                        let attributeElement = distribution.$children.find(each => each.$type == 'scylla:'+attribute);
+                        attributeElement.$body = value && value[propertyName];
+                    }
+                });
+				textField.html = textField.html
+					.replace('<div', '<div style="padding-left: 30pt"')
+					.replace('<label', '<label style="padding-left: 30pt"');
+                durationGroup.entries.push(textField);
+            });
+        }
+        
 
         durationGroup.entries.push(entryFactory.selectBox({
             id : 'timeUnit',
-            description : 'Which timeUnit?',
+            //description : 'Which timeUnit?',
             label : 'TimeUnit',
             //modelProperty : 'distribution',
             selectOptions : timeUnits(),
