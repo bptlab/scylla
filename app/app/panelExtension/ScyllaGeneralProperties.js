@@ -22,8 +22,8 @@ function getDistributionElement(element) {
     return duration && duration.$children && duration.$children[indexOfDistribution];
 }
 
-function distributions() {
-    return [
+const distributions = 
+    [
         { 
             value: "binomial",					
             name: "Binomial",       
@@ -89,10 +89,11 @@ function distributions() {
         { 
             value: "arbitraryFiniteProbability",  
             name: "Discrete", 		
-            attributes: []
+            attributes: [
+                {name : "entryset", type : "entryset"}
+            ]
         }, 						    //new AttributeType[]{]}),
     ]
-}
 
 function getInput(attribute){
     let inputString = "";
@@ -124,7 +125,108 @@ function distributionElementToId(element) {
 }
 
 function distributionById(id) {
-    return distributions().find(each => each.value == id);
+    return distributions.find(each => each.value == id);
+}
+
+function createDistributionSelectBox(){
+    return entryFactory.selectBox({
+        id : 'distribution',
+        //description : 'How is the duration distributed?',
+        label : 'Distribution',
+        modelProperty : distributionProperty,
+        selectOptions : distributions,
+        get : element => {
+            const distribution = getDistributionElement(element);
+            let toReturn = {};
+            toReturn[distributionProperty] = distribution ? distributionElementToId(distribution) : distributions[0].value;
+            return toReturn;
+        },
+        set: (element, value) => {
+            // getExtension(getBusinessObject(element), 'scylla:duration').distribution = value
+            const moddle = modeler.get('moddle'),
+                modeling = modeler.get('modeling');
+            let businessObject = getBusinessObject(element);
+            const extensionElements = businessObject.extensionElements || moddle.create('bpmn:ExtensionElements');
+            let duration = getExtension(businessObject, 'scylla:duration');
+            let distributionId = value[distributionProperty];
+            let distributionType = distributionById(distributionId);
+            let distributionElement = moddle.createAny(distributionIdToElementName(distributionId));
+
+            if (!duration) {
+                duration = moddle.createAny('scylla:duration', 'http://scylla', {$children: []});
+                extensionElements.get('values').push(duration);
+            }
+
+            distributionElement.$children = distributionType.attributes.map(each => {
+                let element = moddle.createAny('scylla:'+each.name);
+                let defaultValue;
+                switch(each.range){
+                    case "positive" : defaultValue = 1; break;
+                    case "probability" : defaultValue = 0.5; break;
+                    default: ;
+                }
+                element.$body = each.default || defaultValue || '0';
+                return element;
+            });
+
+            duration.$children[indexOfDistribution] = distributionElement;
+        
+            //duration.distribution = value;
+            //analysisDetails.lastChecked = new Date().toISOString();
+        
+            modeling.updateProperties(element, {
+              extensionElements
+            });
+        }
+    });
+}
+
+function createDistributionAttributeInputs(distribution){
+    let distributionType = distributionById(distributionElementToId(distribution)); 
+    let prefix = distributionProperty+'.'+distributionType.value;
+    return distributionType.attributes.map(each => createDistributionAttributeInput(each, prefix));
+}
+
+function createDistributionAttributeInput(attribute, prefix) {
+    let attributeName = attribute.name;
+    let propertyName = prefix+'.'+attributeName;
+    let textField = entryFactory.textField({
+        id : propertyName,
+        label : attributeName,
+        modelProperty : propertyName,
+        get : element => {
+            let distribution = getDistributionElement(element);
+            let attributeElement = distribution.$children.find(each => each.$type == 'scylla:'+attributeName);
+            let toReturn = {};
+            toReturn[propertyName] = attributeElement.$body;
+            return toReturn;
+        },
+        set: (element, value) => {
+            let distribution = getDistributionElement(element);
+            let attributeElement = distribution.$children.find(each => each.$type == 'scylla:'+attributeName);
+            attributeElement.$body = value && value[propertyName];
+        },
+        validate: function(element, values) {
+            let value = values[propertyName];
+            let error = new Object();
+            if(attribute.type == "int" || attribute.type == "float"){
+                let type = attribute.type == "int" ? "an integer" : "a number";
+                if(isNaN(value) || value == "" || (attribute.type == "int" && !Number.isInteger(+value)))error[propertyName] = "Please enter "+type;
+                else if(attribute.range == "positive" && value <= 0)error[propertyName] = "Only strictly positive values allowed";
+                else if(attribute.range == "non-negative" && value < 0)error[propertyName] = "Only non-negative values allowed";
+                else if(attribute.range == "probability" && (value < 0 || value > 1))error[propertyName] = "Only values between 0 and 1 allowed";
+            }
+
+            
+            return error;
+        }
+    });
+    textField.html = textField.html
+        .replace('<div', '<div style="padding-left: 30pt"')
+        .replace('<label', '<label style="padding-left: 30pt"')
+        .replace('type="text"', getInput(attribute));
+    //backend.print(textField.html);
+    return textField;
 }
 
 
@@ -197,102 +299,11 @@ export default function(element) {
             entries: []
         };
 
-        let distributionBox = entryFactory.selectBox({
-            id : 'distribution',
-            //description : 'How is the duration distributed?',
-            label : 'Distribution',
-            modelProperty : distributionProperty,
-            selectOptions : distributions(),
-            get : element => {
-                const distribution = getDistributionElement(element);
-                let toReturn = {};
-                toReturn[distributionProperty] = distribution ? distributionElementToId(distribution) : distributions()[0].value;
-                return toReturn;
-            },
-            set: (element, value) => {
-                // getExtension(getBusinessObject(element), 'scylla:duration').distribution = value
-                const moddle = modeler.get('moddle'),
-                    modeling = modeler.get('modeling');
-                let businessObject = getBusinessObject(element);
-                const extensionElements = businessObject.extensionElements || moddle.create('bpmn:ExtensionElements');
-                let duration = getExtension(businessObject, 'scylla:duration');
-                let distributionId = value[distributionProperty];
-                let distributionType = distributionById(distributionId);
-                let distributionElement = moddle.createAny(distributionIdToElementName(distributionId));
-
-                if (!duration) {
-                    duration = moddle.createAny('scylla:duration', 'http://scylla', {$children: []});
-                    extensionElements.get('values').push(duration);
-                }
-
-                distributionElement.$children = distributionType.attributes.map(each => {
-                    let element = moddle.createAny('scylla:'+each.name);
-                    let defaultValue;
-                    switch(each.range){
-                        case "positive" : defaultValue = 1; break;
-                        case "probability" : defaultValue = 0.5; break;
-                        default: ;
-                    }
-                    element.$body = each.default || defaultValue || '0';
-                    return element;
-                });
-
-                duration.$children[indexOfDistribution] = distributionElement;
-            
-                //duration.distribution = value;
-                //analysisDetails.lastChecked = new Date().toISOString();
-            
-                modeling.updateProperties(element, {
-                  extensionElements
-                });
-            }
-        });
-        durationGroup.entries.push(distributionBox);
+        durationGroup.entries.push(createDistributionSelectBox());
 
         let distribution = getDistributionElement(element);
         if(distribution) {
-            let type = distributionById(distributionElementToId(distribution)); 
-            type.attributes.forEach(attribute => {
-                let attributeName = attribute.name;
-                let propertyName = distributionProperty+'.'+type.value+'.'+attributeName;
-                let textField = entryFactory.textField({
-                    id : propertyName,
-                    label : attributeName,
-                    modelProperty : propertyName,
-                    get : element => {
-                        let distribution = getDistributionElement(element);
-                        let attributeElement = distribution.$children.find(each => each.$type == 'scylla:'+attributeName);
-                        let toReturn = {};
-                        toReturn[propertyName] = attributeElement.$body;
-                        return toReturn;
-                    },
-                    set: (element, value) => {
-                        let distribution = getDistributionElement(element);
-                        let attributeElement = distribution.$children.find(each => each.$type == 'scylla:'+attributeName);
-                        attributeElement.$body = value && value[propertyName];
-                    },
-                    validate: function(element, values) {
-                        let value = values[propertyName];
-                        let error = new Object();
-                        if(attribute.type == "int" || attribute.type == "float"){
-                            let type = attribute.type == "int" ? "an integer" : "a number";
-                            if(isNaN(value) || value == "" || (attribute.type == "int" && !Number.isInteger(+value)))error[propertyName] = "Please enter "+type;
-                            else if(attribute.range == "positive" && value <= 0)error[propertyName] = "Only strictly positive values allowed";
-                            else if(attribute.range == "non-negative" && value < 0)error[propertyName] = "Only non-negative values allowed";
-                            else if(attribute.range == "probability" && (value < 0 || value > 1))error[propertyName] = "Only values between 0 and 1 allowed";
-                        }
-
-                        
-                        return error;
-                    }
-                });
-				textField.html = textField.html
-					.replace('<div', '<div style="padding-left: 30pt"')
-                    .replace('<label', '<label style="padding-left: 30pt"')
-                    .replace('type="text"', getInput(attribute));
-                //backend.print(textField.html);
-                durationGroup.entries.push(textField);
-            });
+            createDistributionAttributeInputs(distribution).forEach(each => durationGroup.entries.push(each));
         }
         
 
