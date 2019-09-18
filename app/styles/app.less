@@ -133,3 +133,13 @@ a:link {
     min-height:100%;
   }
 }
+
+// As input types are changed from text, this hack is needed to keep the style from "line 48, node_modules\bpmn-js-properties-panel\styles\properties.less"
+.bpp-properties-panel {
+  [type=number],
+  [contenteditable],
+  textarea,
+  select {
+    width: 100%;
+  }
+}
