@@ -19,7 +19,7 @@ public class Distribution extends ElementLink{
 	public enum AttributeType{DOUBLE,INT,ENTRYSET}
 	
 	/**Table of all distribution keywords (ids), their display name, their attribute keywords and attribute types.
-	 * (Note: id and name are listet here without an additional "Distribution" at the end, for better readability)
+	 * (Note: id and name are listed here without an additional "Distribution" at the end, for better readability)
 	 * @author Leon Bein
 	 */
 	public enum DistributionType{

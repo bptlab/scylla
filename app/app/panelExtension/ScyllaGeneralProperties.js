@@ -18,22 +18,101 @@ function isBatchActivity(element) {
 const distributionProperty = "duration.distribution";
 
 function getDistributionElement(element) {
-    const duration = getExtension(getBusinessObject(element), 'scylla:Duration');
+    const duration = getExtension(getBusinessObject(element), 'scylla:duration');
     return duration && duration.$children && duration.$children[indexOfDistribution];
 }
 
 function distributions() {
     return [
-        { value: "binomial",					name: "Binomial",       attributes: ["probability","amount"]}, 	    //new AttributeType[]{AttributeType.DOUBLE,AttributeType.INT]}),
-        { value: "constant", 				    name: "Constant", 		attributes: ["constantValue"]}, 			    //new AttributeType[]{AttributeType.DOUBLE]}),
-        { value: "erlang", 					    name: "Erlang", 		attributes: ["order","mean"]}, 			    //new AttributeType[]{AttributeType.INT,AttributeType.DOUBLE]}),
-        { value: "exponential", 				name: "Exponential", 	attributes: ["mean"]}, 					    //new AttributeType[]{AttributeType.DOUBLE]}),
-        { value: "triangular", 				    name: "Triangluar", 	attributes: ["lower","peak","upper"]}, 	    //new AttributeType[]{AttributeType.DOUBLE,AttributeType.DOUBLE,AttributeType.DOUBLE]}),
-        { value: "normal", 					    name: "Normal", 		attributes: ["mean","standardDeviation"]},   //new AttributeType[]{AttributeType.DOUBLE,AttributeType.DOUBLE]}),
-        { value: "poisson", 					name: "Poisson", 		attributes: ["mean"]}, 					    //new AttributeType[]{AttributeType.DOUBLE]}),
-        { value: "uniform", 					name: "Uniform", 		attributes: ["lower","upper"]}, 			    //new AttributeType[]{AttributeType.DOUBLE,AttributeType.DOUBLE]}),
-        { value: "arbitraryFiniteProbability",  name: "Discrete", 		attributes: []}, 						    //new AttributeType[]{]}),
+        { 
+            value: "binomial",					
+            name: "Binomial",       
+            attributes: [
+                {name : "probability", type : "float", range : "probability"},
+                {name : "amount", type : "int", range : "positive"}
+            ]
+        }, 	    //new AttributeType[]{AttributeType.DOUBLE,AttributeType.INT]}),
+        {  
+            value: "constant", 				    
+            name: "Constant", 		
+            attributes: [
+                {name : "constantValue", type : "float"}
+            ]
+        }, 			    //new AttributeType[]{AttributeType.DOUBLE]}),
+        { 
+            value: "erlang", 					    
+            name: "Erlang", 		
+            attributes: [
+                {name : "order", type : "int", range : "positive"},
+                {name : "mean", type : "float", range : "positive"}
+            ]
+        }, 			    //new AttributeType[]{AttributeType.INT,AttributeType.DOUBLE]}),
+        { 
+            value: "exponential", 				
+            name: "Exponential", 	
+            attributes: [
+                {name : "mean", type : "float", range : "positive"}
+            ]
+        }, 					    //new AttributeType[]{AttributeType.DOUBLE]}),
+        { 
+            value: "triangular", 				    
+            name: "Triangluar", 	
+            attributes: [
+                {name : "lower", type : "float"},
+                {name : "peak", type : "float"},
+                {name : "upper", type : "float"}
+            ]
+        }, 	    //new AttributeType[]{AttributeType.DOUBLE,AttributeType.DOUBLE,AttributeType.DOUBLE]}),
+        { 
+            value: "normal", 					    
+            name: "Normal", 		
+            attributes: [
+                {name : "mean", type : "float"},
+                {name : "standardDeviation", type : "float", range : "positive"}
+            ]
+        },   //new AttributeType[]{AttributeType.DOUBLE,AttributeType.DOUBLE]}),
+        { 
+            value: "poisson", 					
+            name: "Poisson", 		
+            attributes: [
+                {name : "mean", type : "float", range : "positive"}
+            ]
+        }, 					    //new AttributeType[]{AttributeType.DOUBLE]}),
+        { 
+            value: "uniform", 					
+            name: "Uniform", 		
+            attributes: [
+                {name : "lower", type : "float"},
+                {name : "upper", type : "float"}
+            ]
+        }, 			    //new AttributeType[]{AttributeType.DOUBLE,AttributeType.DOUBLE]}),
+        { 
+            value: "arbitraryFiniteProbability",  
+            name: "Discrete", 		
+            attributes: []
+        }, 						    //new AttributeType[]{]}),
     ]
+}
+
+function getInput(attribute){
+    let inputString = "";
+    switch(attribute.type){
+        case "int" : inputString += 'type="number" step="1" '; break;
+        case "float" : inputString += 'type="number" step="0.01" '; break;
+        default: throw "Unknown distribution attribute type";
+    }
+
+    switch(attribute.range){
+        case "positive" :
+        case "non-negative" : inputString += 'min="0" '; break;
+
+        case "probability" : inputString += 'min="0" max="1" '; break;
+
+        case "unlimited" :
+        default: ;
+    }
+
+    return inputString;
 }
 
 function distributionIdToElementName(id) {
@@ -131,24 +210,30 @@ export default function(element) {
                 return toReturn;
             },
             set: (element, value) => {
-                // getExtension(getBusinessObject(element), 'scylla:Duration').distribution = value
+                // getExtension(getBusinessObject(element), 'scylla:duration').distribution = value
                 const moddle = modeler.get('moddle'),
                     modeling = modeler.get('modeling');
                 let businessObject = getBusinessObject(element);
                 const extensionElements = businessObject.extensionElements || moddle.create('bpmn:ExtensionElements');
-                let duration = getExtension(businessObject, 'scylla:Duration');
+                let duration = getExtension(businessObject, 'scylla:duration');
                 let distributionId = value[distributionProperty];
                 let distributionType = distributionById(distributionId);
                 let distributionElement = moddle.createAny(distributionIdToElementName(distributionId));
 
                 if (!duration) {
-                    duration = moddle.createAny('scylla:Duration', 'http://scylla', {$children: []});
+                    duration = moddle.createAny('scylla:duration', 'http://scylla', {$children: []});
                     extensionElements.get('values').push(duration);
                 }
 
                 distributionElement.$children = distributionType.attributes.map(each => {
-                    let element = moddle.createAny('scylla:'+each);
-                    element.$body = '0';
+                    let element = moddle.createAny('scylla:'+each.name);
+                    let defaultValue;
+                    switch(each.range){
+                        case "positive" : defaultValue = 1; break;
+                        case "probability" : defaultValue = 0.5; break;
+                        default: ;
+                    }
+                    element.$body = each.default || defaultValue || '0';
                     return element;
                 });
 
@@ -168,27 +253,44 @@ export default function(element) {
         if(distribution) {
             let type = distributionById(distributionElementToId(distribution)); 
             type.attributes.forEach(attribute => {
-                let propertyName = distributionProperty+'.'+type.value+'.'+attribute;
+                let attributeName = attribute.name;
+                let propertyName = distributionProperty+'.'+type.value+'.'+attributeName;
                 let textField = entryFactory.textField({
                     id : propertyName,
-                    label : attribute,
+                    label : attributeName,
                     modelProperty : propertyName,
                     get : element => {
                         let distribution = getDistributionElement(element);
-                        let attributeElement = distribution.$children.find(each => each.$type == 'scylla:'+attribute);
+                        let attributeElement = distribution.$children.find(each => each.$type == 'scylla:'+attributeName);
                         let toReturn = {};
                         toReturn[propertyName] = attributeElement.$body;
                         return toReturn;
                     },
                     set: (element, value) => {
                         let distribution = getDistributionElement(element);
-                        let attributeElement = distribution.$children.find(each => each.$type == 'scylla:'+attribute);
+                        let attributeElement = distribution.$children.find(each => each.$type == 'scylla:'+attributeName);
                         attributeElement.$body = value && value[propertyName];
+                    },
+                    validate: function(element, values) {
+                        let value = values[propertyName];
+                        let error = new Object();
+                        if(attribute.type == "int" || attribute.type == "float"){
+                            let type = attribute.type == "int" ? "an integer" : "a number";
+                            if(isNaN(value) || value == "" || (attribute.type == "int" && !Number.isInteger(+value)))error[propertyName] = "Please enter "+type;
+                            else if(attribute.range == "positive" && value <= 0)error[propertyName] = "Only strictly positive values allowed";
+                            else if(attribute.range == "non-negative" && value < 0)error[propertyName] = "Only non-negative values allowed";
+                            else if(attribute.range == "probability" && (value < 0 || value > 1))error[propertyName] = "Only values between 0 and 1 allowed";
+                        }
+
+                        
+                        return error;
                     }
                 });
 				textField.html = textField.html
 					.replace('<div', '<div style="padding-left: 30pt"')
-					.replace('<label', '<label style="padding-left: 30pt"');
+                    .replace('<label', '<label style="padding-left: 30pt"')
+                    .replace('type="text"', getInput(attribute));
+                //backend.print(textField.html);
                 durationGroup.entries.push(textField);
             });
         }
@@ -197,23 +299,23 @@ export default function(element) {
         durationGroup.entries.push(entryFactory.selectBox({
             id : 'timeUnit',
             //description : 'Which timeUnit?',
-            label : 'TimeUnit',
+            label : 'Timeunit',
             //modelProperty : 'distribution',
             selectOptions : timeUnits(),
             get : element => {
-                const extensionElements = getExtension(getBusinessObject(element), 'scylla:Duration');
+                const extensionElements = getExtension(getBusinessObject(element), 'scylla:duration');
                 return {undefined : (extensionElements ? extensionElements.timeUnit : timeUnits()[0].value)};
             },
             set: (element, value) => {
-                // getExtension(getBusinessObject(element), 'scylla:Duration').distribution = value
+                // getExtension(getBusinessObject(element), 'scylla:duration').distribution = value
                 const moddle = modeler.get('moddle'),
                     modeling = modeler.get('modeling');
                 let businessObject = getBusinessObject(element);
                 const extensionElements = businessObject.extensionElements || moddle.create('bpmn:ExtensionElements');
-                let duration = getExtension(businessObject, 'scylla:Duration');
+                let duration = getExtension(businessObject, 'scylla:duration');
 
                 if (!duration) {
-                    duration = moddle.createAny('scylla:Duration', 'http://scylla', {$children: []});
+                    duration = moddle.createAny('scylla:duration', 'http://scylla', {$children: []});
                     extensionElements.get('values').push(duration);
                 }
 
