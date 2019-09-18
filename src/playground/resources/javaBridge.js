@@ -2,6 +2,9 @@ var javaCall = function(name, values = [], callback = ()=>{}, onFailure = ()=>{}
     var stringified = values
         .map(JSON.stringify)
         .map(each => each.replace(/\\/g, '\\\\'));
+
+    if(!window.cefQuery)return;
+    
     return window.cefQuery({
         request: name+'\\'+stringified.join('\\'),
         onSuccess: callback,
