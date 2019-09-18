@@ -157,17 +157,19 @@ function createDistributionSelectBox(){
                 extensionElements.get('values').push(duration);
             }
 
-            distributionElement.$children = distributionType.attributes.map(each => {
-                let element = moddle.createAny('scylla:'+each.name);
-                let defaultValue;
-                switch(each.range){
-                    case "positive" : defaultValue = 1; break;
-                    case "probability" : defaultValue = 0.5; break;
-                    default: ;
-                }
-                element.$body = each.default || defaultValue || '0';
-                return element;
-            });
+            distributionElement.$children = distributionType.attributes
+                .filter(each => (each.type != "entryset"))
+                .map(each => {
+                    let element = moddle.createAny('scylla:'+each.name);
+                    let defaultValue;
+                    switch(each.range){
+                        case "positive" : defaultValue = 1; break;
+                        case "probability" : defaultValue = 0.5; break;
+                        default: ;
+                    }
+                    element.$body = each.default || defaultValue || '0';
+                    return element;
+                });
 
             duration.$children[indexOfDistribution] = distributionElement;
         
@@ -184,10 +186,14 @@ function createDistributionSelectBox(){
 function createDistributionAttributeInputs(distribution){
     let distributionType = distributionById(distributionElementToId(distribution)); 
     let prefix = distributionProperty+'.'+distributionType.value;
-    return distributionType.attributes.map(each => createDistributionAttributeInput(each, prefix));
+    if(distributionType.value == "arbitraryFiniteProbability"){
+        return [createEntrysetInput(prefix)]
+    } else {
+        return distributionType.attributes.map(each => createNumberInput(each, prefix));
+    }
 }
 
-function createDistributionAttributeInput(attribute, prefix) {
+function createNumberInput(attribute, prefix) {
     let attributeName = attribute.name;
     let propertyName = prefix+'.'+attributeName;
     let textField = entryFactory.textField({
@@ -227,6 +233,57 @@ function createDistributionAttributeInput(attribute, prefix) {
         .replace('type="text"', getInput(attribute));
     //backend.print(textField.html);
     return textField;
+}
+
+function createEntrysetInput(prefix) {
+
+    let propertyName = prefix+'.entryset';
+    let valueProperty = propertyName+'.value';
+    let probabilityProperty = propertyName+'.probability';
+
+    return entryFactory.table({
+        id : propertyName,
+        modelProperty : propertyName,
+        labels: [ 'Value', 'Probability' ],
+        modelProperties: [ valueProperty, probabilityProperty ],
+        addLabel: 'New entry',
+        show: function(element, node) {
+          return true;
+        },
+        getElements: function(element) {
+            let distribution = getDistributionElement(element);
+            if(!distribution) return [];//For unknown reasons, the system tries to create the table for other elements than those it is actually created for
+            let entries = distribution.$children.filter(each => each.$type == 'scylla:'+'entry');
+            return entries.map(each => {
+                let entry = new Object();
+                entry[valueProperty] = ""+each.value;
+                entry[probabilityProperty] = ""+each.probability;
+                return entry;
+            });
+        },
+        addElement: function(element, node) {
+            const moddle = modeler.get('moddle');
+            let distribution = getDistributionElement(element);
+            let newEntry = moddle.createAny('scylla:'+'entry');
+            newEntry.value = 0;
+            newEntry.probability = 0;
+            distribution.$children.push(newEntry);
+            return;
+        },
+        removeElement: function(element, node, idx) {
+            let distribution = getDistributionElement(element);
+            distribution.$children.splice(idx,1);
+            return [];
+        },
+        updateElement: function(element, value, node, idx) {
+            let distribution = getDistributionElement(element);
+            let entry = distribution.$children[idx];
+            entry.value = value[valueProperty];
+            entry.probability = value[probabilityProperty];
+            return [];
+        },
+        validate: function(element, value, node, idx) {}
+    });
 }
 
 
@@ -314,8 +371,8 @@ export default function(element) {
             //modelProperty : 'distribution',
             selectOptions : timeUnits(),
             get : element => {
-                const extensionElements = getExtension(getBusinessObject(element), 'scylla:duration');
-                return {undefined : (extensionElements ? extensionElements.timeUnit : timeUnits()[0].value)};
+                const duration = getExtension(getBusinessObject(element), 'scylla:duration');
+                return {undefined : (duration ? duration.timeUnit : timeUnits()[0].value)};
             },
             set: (element, value) => {
                 // getExtension(getBusinessObject(element), 'scylla:duration').distribution = value
