@@ -17,9 +17,11 @@ function isBatchActivity(element) {
 
 const distributionProperty = "duration.distribution";
 
-function getDistributionElement(element) {
-    const duration = getExtension(getBusinessObject(element), 'scylla:duration');
-    return duration && duration.$children && duration.$children[indexOfDistribution];
+function distributionElementAccessor(parentName) {
+    return function(element){
+        const parent = getExtension(getBusinessObject(element), 'scylla:'+parentName);
+        return parent && parent.$children && parent.$children[indexOfDistribution];
+    }
 }
 
 const distributions = 
@@ -128,7 +130,8 @@ function distributionById(id) {
     return distributions.find(each => each.value == id);
 }
 
-function createDistributionSelectBox(){
+function createDistributionSelectBox(parentName){
+    let getDistributionElement = distributionElementAccessor(parentName);
     return entryFactory.selectBox({
         id : 'distribution',
         //description : 'How is the duration distributed?',
@@ -138,22 +141,21 @@ function createDistributionSelectBox(){
         get : element => {
             const distribution = getDistributionElement(element);
             let toReturn = {};
-            toReturn[distributionProperty] = distribution ? distributionElementToId(distribution) : distributions[0].value;
+            toReturn[distributionProperty] = distribution ? distributionElementToId(distribution) : undefined;
             return toReturn;
         },
         set: (element, value) => {
-            // getExtension(getBusinessObject(element), 'scylla:duration').distribution = value
             const moddle = modeler.get('moddle'),
                 modeling = modeler.get('modeling');
             let businessObject = getBusinessObject(element);
             const extensionElements = businessObject.extensionElements || moddle.create('bpmn:ExtensionElements');
-            let duration = getExtension(businessObject, 'scylla:duration');
+            let duration = getExtension(businessObject, 'scylla:'+parentName);
             let distributionId = value[distributionProperty];
             let distributionType = distributionById(distributionId);
             let distributionElement = moddle.createAny(distributionIdToElementName(distributionId));
 
             if (!duration) {
-                duration = moddle.createAny('scylla:duration', 'http://scylla', {$children: []});
+                duration = moddle.createAny('scylla:'+parentName, 'http://scylla', {$children: []});
                 extensionElements.get('values').push(duration);
             }
 
@@ -163,8 +165,8 @@ function createDistributionSelectBox(){
                     let element = moddle.createAny('scylla:'+each.name);
                     let defaultValue;
                     switch(each.range){
-                        case "positive" : defaultValue = 1; break;
-                        case "probability" : defaultValue = 0.5; break;
+                        case "positive" : defaultValue = '1'; break;
+                        case "probability" : defaultValue = '0.5'; break;
                         default: ;
                     }
                     element.$body = each.default || defaultValue || '0';
@@ -183,17 +185,18 @@ function createDistributionSelectBox(){
     });
 }
 
-function createDistributionAttributeInputs(distribution){
+function createDistributionAttributeInputs(distribution, parentName){
+    let getDistributionElement = distributionElementAccessor(parentName);
     let distributionType = distributionById(distributionElementToId(distribution)); 
     let prefix = distributionProperty+'.'+distributionType.value;
     if(distributionType.value == "arbitraryFiniteProbability"){
-        return [createEntrysetInput(prefix)]
+        return [createEntrysetInput(prefix, getDistributionElement)]
     } else {
-        return distributionType.attributes.map(each => createNumberInput(each, prefix));
+        return distributionType.attributes.map(each => createNumberInput(each, prefix, getDistributionElement));
     }
 }
 
-function createNumberInput(attribute, prefix) {
+function createNumberInput(attribute, prefix, getDistributionElement) {
     let attributeName = attribute.name;
     let propertyName = prefix+'.'+attributeName;
     let textField = entryFactory.textField({
@@ -231,11 +234,10 @@ function createNumberInput(attribute, prefix) {
         .replace('<div', '<div style="padding-left: 30pt"')
         .replace('<label', '<label style="padding-left: 30pt"')
         .replace('type="text"', getInput(attribute));
-    //backend.print(textField.html);
     return textField;
 }
 
-function createEntrysetInput(prefix) {
+function createEntrysetInput(prefix, getDistributionElement) {
 
     let propertyName = prefix+'.entryset';
     let valueProperty = propertyName+'.value';
@@ -301,7 +303,7 @@ function timeUnits() {
     ];
 }
 
-function createTimeUnitSelectBox() {
+function createTimeUnitSelectBox(parentName) {
     return entryFactory.selectBox({
         id : 'timeUnit',
         //description : 'Which timeUnit?',
@@ -309,19 +311,18 @@ function createTimeUnitSelectBox() {
         //modelProperty : 'distribution',
         selectOptions : timeUnits(),
         get : element => {
-            const duration = getExtension(getBusinessObject(element), 'scylla:duration');
+            const duration = getExtension(getBusinessObject(element), 'scylla:'+parentName);
             return {undefined : (duration ? duration.timeUnit : timeUnits()[0].value)};
         },
         set: (element, value) => {
-            // getExtension(getBusinessObject(element), 'scylla:duration').distribution = value
             const moddle = modeler.get('moddle'),
                 modeling = modeler.get('modeling');
             let businessObject = getBusinessObject(element);
             const extensionElements = businessObject.extensionElements || moddle.create('bpmn:ExtensionElements');
-            let duration = getExtension(businessObject, 'scylla:duration');
+            let duration = getExtension(businessObject, 'scylla:'+parentName);
 
             if (!duration) {
-                duration = moddle.createAny('scylla:duration', 'http://scylla', {$children: []});
+                duration = moddle.createAny('scylla:'+parentName, 'http://scylla', {$children: []});
                 extensionElements.get('values').push(duration);
             }
 
@@ -411,25 +412,29 @@ function getExtension(element, type) {
     })[0];
 }
 
+function distributionGroup(element, id, label){
+    var group = {
+        id: id,
+        label: label,
+        entries: []
+    };
+
+    group.entries.push(createDistributionSelectBox(id));
+
+    let distribution = distributionElementAccessor(id)(element);
+    if(distribution) {
+        createDistributionAttributeInputs(distribution, id).forEach(each => group.entries.push(each));
+    }
+    
+    group.entries.push(createTimeUnitSelectBox(id));
+    return group
+}
+
 
 export default function(element) {
 
     if(is(element, 'bpmn:Task')){
-        var durationGroup = {
-            id: 'duration',
-            label: 'Duration',
-            entries: []
-        };
-
-        durationGroup.entries.push(createDistributionSelectBox());
-
-        let distribution = getDistributionElement(element);
-        if(distribution) {
-            createDistributionAttributeInputs(distribution).forEach(each => durationGroup.entries.push(each));
-        }
-        
-
-        durationGroup.entries.push(createTimeUnitSelectBox());
+        var durationGroup = distributionGroup(element, 'duration', 'Duration');
 
         var resourcesGroup = {
             id: 'resources',
@@ -446,6 +451,13 @@ export default function(element) {
         resourcesGroup.entries.push(createResourceTable());
 
         return [durationGroup, resourcesGroup];
+    }
+
+    if(is(element,'bpmn:StartEvent')){
+
+        var arrivalRateGroup = distributionGroup(element, 'arrivalRate', 'Arrival Rate');
+
+        return [arrivalRateGroup];
     }
 
     return [];
