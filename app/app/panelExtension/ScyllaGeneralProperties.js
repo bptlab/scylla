@@ -301,10 +301,44 @@ function timeUnits() {
     ];
 }
 
-var entries = new Map();
+function createTimeUnitSelectBox() {
+    return entryFactory.selectBox({
+        id : 'timeUnit',
+        //description : 'Which timeUnit?',
+        label : 'Timeunit',
+        //modelProperty : 'distribution',
+        selectOptions : timeUnits(),
+        get : element => {
+            const duration = getExtension(getBusinessObject(element), 'scylla:duration');
+            return {undefined : (duration ? duration.timeUnit : timeUnits()[0].value)};
+        },
+        set: (element, value) => {
+            // getExtension(getBusinessObject(element), 'scylla:duration').distribution = value
+            const moddle = modeler.get('moddle'),
+                modeling = modeler.get('modeling');
+            let businessObject = getBusinessObject(element);
+            const extensionElements = businessObject.extensionElements || moddle.create('bpmn:ExtensionElements');
+            let duration = getExtension(businessObject, 'scylla:duration');
 
-function createResourceTable(group) {
-    group.entries.push(entryFactory.table({
+            if (!duration) {
+                duration = moddle.createAny('scylla:duration', 'http://scylla', {$children: []});
+                extensionElements.get('values').push(duration);
+            }
+
+            duration.timeUnit = value.undefined;
+        
+            //duration.distribution = value;
+            //analysisDetails.lastChecked = new Date().toISOString();
+        
+            modeling.updateProperties(element, {
+              extensionElements
+            });
+        }
+    })
+}
+
+function createResourceTable() {
+    return entryFactory.table({
         id : 'resource',
         description : 'Which resource to assign',
         modelProperty : 'resources',
@@ -314,26 +348,57 @@ function createResourceTable(group) {
         show: function(element, node) {
           return true;
         },
-        getElements: entriesOf,
+        getElements: resourcesOf,
         addElement: function(element, node) {
-            entriesOf(element).push({resourceName: 'foo', quantity: 1});
-            return [];
+            ensureResources(element);
+            const moddle = modeler.get('moddle');
+            let newAssignment = moddle.createAny('scylla:resource');
+            newAssignment.resourceName = 'foo';
+            newAssignment.quantity = 1;
+            resourcesOf(element).push(newAssignment);
         },
         removeElement: function(element, node, idx) {
-            entriesOf(element).splice(idx,1);
-            return [];
+            ensureResources(element);
+            resourcesOf(element).splice(idx,1);
         },
         updateElement: function(element, value, node, idx) {
-            entriesOf(element)[idx] = value;
-            return [];
+            let assignment = resourcesOf(element)[idx];
+            assignment.resourceName = value.resourceName;
+            assignment.quantity = value.quantity;
         },
-        validate: function(element, value, node, idx) {}
-      }));
+        validate: function(element, value, node) {
+            let validationResult = new Object();
+            if(!availableResources().includes(value.resourceName))validationResult.resourceName = "Unknown resource id";
+            if(!Number.isInteger(+value.quantity))validationResult.quantity = "Resource quantities must be integers";
+            return (validationResult.resourceName || validationResult.quantity) && validationResult;
+        }
+      });
 }
 
-function entriesOf(element) {
-    if(!entries.has(element))entries.set(element, []);
-    return entries.get(element);
+function availableResources(){
+    return ["foo", "bar", "baz"];
+}
+
+function ensureResources(element) {
+    const moddle = modeler.get('moddle');
+    const modeling = modeler.get('modeling');
+    const businessObject = getBusinessObject(element);
+    const extensionElements = businessObject.extensionElements || moddle.create('bpmn:ExtensionElements');
+    let resources = getExtension(businessObject, 'scylla:resources');
+    if (!resources) {
+        resources = moddle.createAny('scylla:resources', 'http://scylla', {$children: []});
+        extensionElements.get('values').push(resources);
+    }
+
+    modeling.updateProperties(element, {
+      extensionElements
+    });
+    return resources;
+}
+
+function resourcesOf(element) {
+    const resources = getExtension(getBusinessObject(element), 'scylla:resources');
+    return resources ? resources.$children : [];
 }
 
 function getExtension(element, type) {
@@ -364,39 +429,7 @@ export default function(element) {
         }
         
 
-        durationGroup.entries.push(entryFactory.selectBox({
-            id : 'timeUnit',
-            //description : 'Which timeUnit?',
-            label : 'Timeunit',
-            //modelProperty : 'distribution',
-            selectOptions : timeUnits(),
-            get : element => {
-                const duration = getExtension(getBusinessObject(element), 'scylla:duration');
-                return {undefined : (duration ? duration.timeUnit : timeUnits()[0].value)};
-            },
-            set: (element, value) => {
-                // getExtension(getBusinessObject(element), 'scylla:duration').distribution = value
-                const moddle = modeler.get('moddle'),
-                    modeling = modeler.get('modeling');
-                let businessObject = getBusinessObject(element);
-                const extensionElements = businessObject.extensionElements || moddle.create('bpmn:ExtensionElements');
-                let duration = getExtension(businessObject, 'scylla:duration');
-
-                if (!duration) {
-                    duration = moddle.createAny('scylla:duration', 'http://scylla', {$children: []});
-                    extensionElements.get('values').push(duration);
-                }
-
-                duration.timeUnit = value.undefined;
-            
-                //duration.distribution = value;
-                //analysisDetails.lastChecked = new Date().toISOString();
-            
-                modeling.updateProperties(element, {
-                  extensionElements
-                });
-            }
-        }));
+        durationGroup.entries.push(createTimeUnitSelectBox());
 
         var resourcesGroup = {
             id: 'resources',
@@ -410,7 +443,7 @@ export default function(element) {
         //     labels : 'Resources',
         //     modelProperty : 'resources'
         // }));
-        createResourceTable(resourcesGroup);
+        resourcesGroup.entries.push(createResourceTable());
 
         return [durationGroup, resourcesGroup];
     }

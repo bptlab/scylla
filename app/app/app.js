@@ -106,7 +106,8 @@ $('#export-model').click(exportModel);
 
 function exportModel() {
     modeler.saveXML({ format: true }, function(err, xml) {
-        if(!err) {backend.print(xml)};
+        if(!err) backend.print(xml);
+        else backend.print("An error occured while exporting model: "+JSON.stringify(err));
     });
 }
 

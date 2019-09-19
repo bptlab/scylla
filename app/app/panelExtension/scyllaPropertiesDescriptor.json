@@ -58,7 +58,7 @@
         "superClass": [ "Element" ],
         "properties" : [
           {
-            "name" : "assignments",
+            "name" : "resource",
             "isMany" : "true",
             "type" : "Assignment"
           }
