@@ -44,7 +44,7 @@
 
       {
         "name" : "Distribution",
-        "superClass": [ "String" ]
+        "superClass": [ "Element" ]
       },
 
       {
@@ -60,16 +60,16 @@
           {
             "name" : "resource",
             "isMany" : "true",
-            "type" : "Assignment"
+            "type" : "Resource"
           }
         ]
       },
 
       {
-        "name" : "Assignment",
+        "name" : "Resource",
         "properties" : [
           {
-            "name" : "resourceId",
+            "name" : "resourceName",
             "isAttr" : "true",
             "type" : "String"
           },

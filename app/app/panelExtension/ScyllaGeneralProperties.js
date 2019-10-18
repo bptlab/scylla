@@ -140,6 +140,9 @@ function createDistributionSelectBox(parentName){
         selectOptions : distributions,
         get : element => {
             const distribution = getDistributionElement(element);
+            backend.print("Element is "+JSON.stringify(element));
+            backend.print("Element is "+JSON.stringify(getBusinessObject(element)));
+            backend.print("Distribution is "+JSON.stringify(distribution));
             let toReturn = {};
             toReturn[distributionProperty] = distribution ? distributionElementToId(distribution) : undefined;
             return toReturn;
@@ -353,7 +356,7 @@ function createResourceTable() {
         addElement: function(element, node) {
             ensureResources(element);
             const moddle = modeler.get('moddle');
-            let newAssignment = moddle.createAny('scylla:resource');
+            let newAssignment = moddle.createAny('scylla:Resource');
             newAssignment.resourceName = 'foo';
             newAssignment.quantity = 1;
             resourcesOf(element).push(newAssignment);
@@ -387,9 +390,9 @@ function ensureResources(element) {
     const modeling = modeler.get('modeling');
     const businessObject = getBusinessObject(element);
     const extensionElements = businessObject.extensionElements || moddle.create('bpmn:ExtensionElements');
-    let resources = getExtension(businessObject, 'scylla:resources');
+    let resources = getExtension(businessObject, 'scylla:Resources');
     if (!resources) {
-        resources = moddle.createAny('scylla:resources', 'http://scylla', {$children: []});
+        resources = moddle.create('scylla:Resources', {resource: []});
         extensionElements.get('values').push(resources);
     }
 
@@ -400,8 +403,8 @@ function ensureResources(element) {
 }
 
 function resourcesOf(element) {
-    const resources = getExtension(getBusinessObject(element), 'scylla:resources');
-    return resources ? resources.$children : [];
+    const resources = getExtension(getBusinessObject(element), 'scylla:Resources');
+    return resources ? resources.resource || (resources.resource = []) : [];
 }
 
 function getExtension(element, type) {
