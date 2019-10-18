@@ -377,7 +377,9 @@ function createResourceTable() {
 }
 
 function availableResources(){
-    return ["foo", "bar", "baz"];
+    let allSet = [];
+    allSet.includes = (element) => true;
+    return allSet;
 }
 
 function ensureResources(element) {
