@@ -1,7 +1,7 @@
 var javaCall = function(name, values = [], callback = ()=>{}, onFailure = ()=>{}){
     var stringified = values
         .map(JSON.stringify)
-        .map(each => each.replace(/\\/g, '\\\\'));
+        .map(each => each.replace(/\\/g, '\\\\'));//Replace one slash with two
 
     if(!window.cefQuery)return;
     

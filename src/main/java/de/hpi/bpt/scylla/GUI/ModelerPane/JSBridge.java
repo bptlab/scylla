@@ -29,7 +29,7 @@ public class JSBridge {
 		Object[] params = requestWithoutEscaped.split("\\\\");//This means "one slash", but is a regex
 		String functionName = (String) params[0];
 		for(int i = 1; i < params.length; i++) {
-			params[i] = deJSONify(((String)params[i]).replace("␁", "\\"));
+			params[i] = deJSONify(((String)params[i]).replace("␁", "\\").replace("\\\\", "␁"));
 		}
 		try {
 			Method methodToCall = Arrays.stream(javaPart.getClass().getMethods())
@@ -60,7 +60,8 @@ public class JSBridge {
 				.replace("\\t", "\t")
 				.replace("\\\"", "\"")
 				.replace("\\\'", "\'")
-				.replace("\\\\", "\\");
+				.replace("\\\\", "\\")
+				.replace("␁", "\\\\");
 		}
 		return json;
 	}
