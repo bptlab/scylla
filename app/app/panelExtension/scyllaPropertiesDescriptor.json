@@ -31,7 +31,6 @@
         "properties" : [
           {
             "name" : "distribution",
-            "isAttr" :true,
             "type" : "Distribution"
           },
           {
@@ -46,6 +45,25 @@
         "name" : "Distribution",
         "superClass": [ "Element" ]
       },
+
+      {
+        "name" : "BinomialDistribution",
+        "superClass": [ "Distribution" ],
+        "properties" : [
+          {"name" : "probability", "type" : "String"},
+          {"name" : "amount", "type" : "Integer"}
+        ]
+      },
+
+      {
+        "name" : "ConstantDistribution",
+        "superClass": [ "Distribution" ],
+        "properties" : [
+          {"name" : "constantValue", "type" : "String"}
+        ]
+      },
+
+      
 
       {
         "name" : "TimeUnit",

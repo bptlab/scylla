@@ -20,14 +20,14 @@ const distributionProperty = "duration.distribution";
 function distributionElementAccessor(parentName) {
     return function(element){
         const parent = getExtension(getBusinessObject(element), 'scylla:'+parentName);
-        return parent && parent.$children && parent.$children[indexOfDistribution];
+        return parent && parent.distribution;
     }
 }
 
 const distributions = 
     [
         { 
-            value: "binomial",					
+            value: "Binomial",					
             name: "Binomial",       
             attributes: [
                 {name : "probability", type : "float", range : "probability"},
@@ -35,7 +35,7 @@ const distributions =
             ]
         }, 	    //new AttributeType[]{AttributeType.DOUBLE,AttributeType.INT]}),
         {  
-            value: "constant", 				    
+            value: "Constant", 				    
             name: "Constant", 		
             attributes: [
                 {name : "constantValue", type : "float"}
@@ -118,11 +118,11 @@ function getInput(attribute){
     return inputString;
 }
 
-function distributionIdToElementName(id) {
+function distributionIdToDescriptorProperty(id) {
     return 'scylla:'+id+'Distribution';
 }
 
-function distributionElementToId(element) {
+function distributionDescriptorPropertyToId(element) {
     return element.$type.replace('Distribution','').replace('scylla:','');
 }
 
@@ -144,7 +144,7 @@ function createDistributionSelectBox(parentName){
             backend.print("Element is "+JSON.stringify(getBusinessObject(element)));
             backend.print("Distribution is "+JSON.stringify(distribution));
             let toReturn = {};
-            toReturn[distributionProperty] = distribution ? distributionElementToId(distribution) : undefined;
+            toReturn[distributionProperty] = distribution ? distributionDescriptorPropertyToId(distribution) : undefined;
             return toReturn;
         },
         set: (element, value) => {
@@ -155,16 +155,16 @@ function createDistributionSelectBox(parentName){
             let duration = getExtension(businessObject, 'scylla:'+parentName);
             let distributionId = value[distributionProperty];
             let distributionType = distributionById(distributionId);
-            let distributionElement = moddle.createAny(distributionIdToElementName(distributionId));
+            let distributionElement = moddle.create(distributionIdToDescriptorProperty(distributionId));
 
             if (!duration) {
-                duration = moddle.createAny('scylla:'+parentName, 'http://scylla', {$children: []});
+                duration = moddle.create('scylla:'+parentName);
                 extensionElements.get('values').push(duration);
             }
 
-            distributionElement.$children = distributionType.attributes
+            distributionType.attributes
                 .filter(each => (each.type != "entryset"))
-                .map(each => {
+                .forEach(each => {
                     let element = moddle.createAny('scylla:'+each.name);
                     let defaultValue;
                     switch(each.range){
@@ -173,10 +173,10 @@ function createDistributionSelectBox(parentName){
                         default: ;
                     }
                     element.$body = each.default || defaultValue || '0';
-                    return element;
+                    distributionElement[each.name] = element;
                 });
 
-            duration.$children[indexOfDistribution] = distributionElement;
+            duration.distribution = distributionElement;
         
             //duration.distribution = value;
             //analysisDetails.lastChecked = new Date().toISOString();
@@ -190,7 +190,7 @@ function createDistributionSelectBox(parentName){
 
 function createDistributionAttributeInputs(distribution, parentName){
     let getDistributionElement = distributionElementAccessor(parentName);
-    let distributionType = distributionById(distributionElementToId(distribution)); 
+    let distributionType = distributionById(distributionDescriptorPropertyToId(distribution)); 
     let prefix = distributionProperty+'.'+distributionType.value;
     if(distributionType.value == "arbitraryFiniteProbability"){
         return [createEntrysetInput(prefix, getDistributionElement)]
@@ -208,15 +208,13 @@ function createNumberInput(attribute, prefix, getDistributionElement) {
         modelProperty : propertyName,
         get : element => {
             let distribution = getDistributionElement(element);
-            let attributeElement = distribution.$children.find(each => each.$type == 'scylla:'+attributeName);
             let toReturn = {};
-            toReturn[propertyName] = attributeElement.$body;
+            toReturn[propertyName] = distribution[attributeName];
             return toReturn;
         },
         set: (element, value) => {
             let distribution = getDistributionElement(element);
-            let attributeElement = distribution.$children.find(each => each.$type == 'scylla:'+attributeName);
-            attributeElement.$body = value && value[propertyName];
+            distribution[attributeName] = value && value[propertyName];
         },
         validate: function(element, values) {
             let value = values[propertyName];
@@ -258,7 +256,7 @@ function createEntrysetInput(prefix, getDistributionElement) {
         getElements: function(element) {
             let distribution = getDistributionElement(element);
             if(!distribution) return [];//For unknown reasons, the system tries to create the table for other elements than those it is actually created for
-            let entries = distribution.$children.filter(each => each.$type == 'scylla:'+'entry');
+            let entries = distribution.entries;
             return entries.map(each => {
                 let entry = new Object();
                 entry[valueProperty] = ""+each.value;
@@ -272,17 +270,17 @@ function createEntrysetInput(prefix, getDistributionElement) {
             let newEntry = moddle.createAny('scylla:'+'entry');
             newEntry.value = 0;
             newEntry.probability = 0;
-            distribution.$children.push(newEntry);
+            distribution.entryset.push(newEntry);
             return;
         },
         removeElement: function(element, node, idx) {
             let distribution = getDistributionElement(element);
-            distribution.$children.splice(idx,1);
+            distribution.entryset.splice(idx,1);
             return [];
         },
         updateElement: function(element, value, node, idx) {
             let distribution = getDistributionElement(element);
-            let entry = distribution.$children[idx];
+            let entry = distribution.entryset[idx];
             entry.value = value[valueProperty];
             entry.probability = value[probabilityProperty];
             return [];
@@ -325,7 +323,7 @@ function createTimeUnitSelectBox(parentName) {
             let duration = getExtension(businessObject, 'scylla:'+parentName);
 
             if (!duration) {
-                duration = moddle.createAny('scylla:'+parentName, 'http://scylla', {$children: []});
+                duration = moddle.create('scylla:'+parentName);
                 extensionElements.get('values').push(duration);
             }
 
@@ -356,7 +354,7 @@ function createResourceTable() {
         addElement: function(element, node) {
             ensureResources(element);
             const moddle = modeler.get('moddle');
-            let newAssignment = moddle.createAny('scylla:Resource');
+            let newAssignment = moddle.create('scylla:Resource');
             newAssignment.resourceName = 'foo';
             newAssignment.quantity = 1;
             resourcesOf(element).push(newAssignment);
@@ -439,7 +437,7 @@ function distributionGroup(element, id, label){
 export default function(element) {
 
     if(is(element, 'bpmn:Task')){
-        var durationGroup = distributionGroup(element, 'duration', 'Duration');
+        var durationGroup = distributionGroup(element, 'Duration', 'Duration');
 
         var resourcesGroup = {
             id: 'resources',
