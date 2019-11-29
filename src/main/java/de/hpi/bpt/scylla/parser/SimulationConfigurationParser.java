@@ -31,7 +31,6 @@ import de.hpi.bpt.scylla.model.configuration.distribution.UniformDistribution;
 import de.hpi.bpt.scylla.model.global.resource.Resource;
 import de.hpi.bpt.scylla.model.process.ProcessModel;
 import de.hpi.bpt.scylla.simulation.utils.DateTimeUtils;
-import org.jdom2.Parent;
 
 /**
  * Parses all process-specific simulation parameters which are necessary for conducting the simulation.

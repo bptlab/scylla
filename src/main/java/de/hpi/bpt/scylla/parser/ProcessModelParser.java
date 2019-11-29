@@ -1,10 +1,13 @@
 package de.hpi.bpt.scylla.parser;
 
-import java.time.Duration;
-import java.util.*;
-import java.util.function.Predicate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
-import org.jdom2.Attribute;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 
