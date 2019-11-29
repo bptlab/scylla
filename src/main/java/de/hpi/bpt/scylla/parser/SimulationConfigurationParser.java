@@ -40,9 +40,12 @@ import org.jdom2.Parent;
  * 
  */
 public class SimulationConfigurationParser extends Parser<SimulationConfiguration> {
+	
+	private Map<String, SimulationConfiguration> existingConfigurations;
 
     public SimulationConfigurationParser(SimulationManager simulationEnvironment) {
         super(simulationEnvironment);
+        existingConfigurations = new HashMap<>();
     }
 
     @Override
@@ -75,14 +78,17 @@ public class SimulationConfigurationParser extends Parser<SimulationConfiguratio
         // processModel.setGlobalTasks(globalTasks);
         // processModel.setGlobalTaskElements(globalTaskElements);
         // }
+        if(existingConfigurations.containsKey(processRef)) {
+        	simulationConfiguration = simulationConfiguration.mergeWith(existingConfigurations.get(processRef));
+        }
+        
+        existingConfigurations.put(processRef, simulationConfiguration);
         return simulationConfiguration;
     }
 
     private SimulationConfiguration parseSimulationConfiguration(Element sim, Namespace simNamespace,
             String processIdFromSimElement, ProcessModel processModel, Long randomSeed)
                     throws ScyllaValidationException {
-
-        Map<String, Resource> resources = simulationEnvironment.getGlobalConfiguration().getResources();
 
         if (processModel == null) {
             throw new ScyllaValidationException("Simulation configuration is for (sub)process '"
@@ -105,8 +111,7 @@ public class SimulationConfigurationParser extends Parser<SimulationConfiguratio
                     if (el.getChild("arrivalRate", simNamespace) != null) {
                         break;
                     }
-                    throw new ScyllaValidationException(
-                            "No arrival rate defined in any of the start events in simulation scenario.");
+                    throw new ScyllaValidationException("No arrival rate defined in any of the start events in simulation scenario.");
                 }
             }
             // store identifier of simulation configuration only if it is for top level process
@@ -128,13 +133,7 @@ public class SimulationConfigurationParser extends Parser<SimulationConfiguratio
             }
         }
 
-        Map<Integer, TimeDistributionWrapper> arrivalRates = new HashMap<Integer, TimeDistributionWrapper>();
-        Map<Integer, TimeDistributionWrapper> durations = new HashMap<Integer, TimeDistributionWrapper>();
-        Map<Integer, TimeDistributionWrapper> setUpDurations = new HashMap<Integer, TimeDistributionWrapper>();
         Map<Integer, Set<ResourceReference>> resourceReferences = new HashMap<Integer, Set<ResourceReference>>();
-        // gateways and events
-        // Map<Integer, BranchingBehavior> branchingBehaviors = new HashMap<Integer, BranchingBehavior>();
-        Map<Integer, SimulationConfiguration> configurationsOfSubProcesses = new HashMap<Integer, SimulationConfiguration>();
 
         // take resource definitions from process model
         Map<Integer, Set<String>> resourceReferencesFromProcessModel = processModel.getResourceReferences();
@@ -149,17 +148,30 @@ public class SimulationConfigurationParser extends Parser<SimulationConfiguratio
             }
             resourceReferences.put(nodeId, resourceRefs);
         }
+        
+        SimulationConfiguration simulationConfiguration = new SimulationConfiguration(
+        		simId, 
+        		processModel,
+                numberOfProcessInstances, 
+                startDateTime, 
+                endDateTime, 
+                randomSeed, 
+                new HashMap<Integer, TimeDistributionWrapper>(), 
+                new HashMap<Integer, TimeDistributionWrapper>(), 
+                new HashMap<Integer, TimeDistributionWrapper>(),
+                resourceReferences, 
+                new HashMap<Integer, SimulationConfiguration>());
+        parseElements(sim.getChildren(), simulationConfiguration, simNamespace);
+        return simulationConfiguration;
+    }
+    
+    private void parseElements(List<Element> elements, SimulationConfiguration simulationConfiguration, Namespace simNamespace) throws ScyllaValidationException {
 
-        for (Element el : sim.getChildren()) {
+    	Map<String, Resource> resources = simulationEnvironment.getGlobalConfiguration().getResources();
+        for (Element el : elements) {
             String elementName = el.getName();
             if (isKnownElement(elementName)) {
-
-                if (elementName.equals("resources")) {
-                    // are childs of subProcess element, but have already been handled like children of a task element
-                    // in parent process
-                    continue;
-                }
-
+            	
                 String identifier = el.getAttributeValue("id");
                 if (identifier == null) {
                     DebugLogger.log("Warning: Simulation configuration definition element '" + elementName
@@ -167,7 +179,14 @@ public class SimulationConfigurationParser extends Parser<SimulationConfiguratio
 
                     continue; // no matching element in process, so skip definition
                 }
-                Integer nodeId = processModel.getIdentifiersToNodeIds().get(identifier);
+
+                if (elementName.equals("resources")) {
+                    // are childs of subProcess element, but have already been handled like children of a task element
+                    // in parent process
+                    continue;
+                }
+
+                Integer nodeId = simulationConfiguration.getProcessModel().getIdentifiersToNodeIds().get(identifier);
                 if (nodeId == null) {
                     DebugLogger.log("Simulation configuration definition for process element '" + identifier
                             + "', but not available in process, skip.");
@@ -178,20 +197,19 @@ public class SimulationConfigurationParser extends Parser<SimulationConfiguratio
                     Element elem = el.getChild("arrivalRate", simNamespace);
                     if (elem != null) {
                         TimeDistributionWrapper distribution = getTimeDistributionWrapper(elem, simNamespace);
-                        arrivalRates.put(nodeId, distribution);
+                        simulationConfiguration.getArrivalRates().put(nodeId, distribution);
                     }
                 }
-                else if (elementName.equals("task") || elementName.endsWith("Task")
-                        || elementName.equals("subProcess")) {
+                else if (elementName.equals("task") || elementName.endsWith("Task") || elementName.equals("subProcess")) {
                     Element durationElem = el.getChild("duration", simNamespace);
                     if (durationElem != null) {
                     	TimeDistributionWrapper distribution = getTimeDistributionWrapper(durationElem, simNamespace);
-                        durations.put(nodeId, distribution);
+                    	simulationConfiguration.getDurations().put(nodeId, distribution);
                     }
                     Element setUpDurationElem = el.getChild("setUpDuration", simNamespace);
                     if (setUpDurationElem != null) {
                         TimeDistributionWrapper distribution = getTimeDistributionWrapper(setUpDurationElem, simNamespace);
-                        setUpDurations.put(nodeId, distribution);
+                        simulationConfiguration.getSetUpDurations().put(nodeId, distribution);
                     }
 
                     Element resourcesElem = el.getChild("resources", simNamespace);
@@ -205,11 +223,11 @@ public class SimulationConfigurationParser extends Parser<SimulationConfiguratio
                             for (Element elem : resourceElements) {
                                 String resourceId = elem.getAttributeValue("id");
                                 if (resources.get(resourceId) == null) {
-                                    throw new ScyllaValidationException("Simulation configuration " + simId
+                                    throw new ScyllaValidationException("Simulation configuration " + simulationConfiguration.getId()
                                             + " refers to unknown resource " + resourceId + ".");
                                 }
                                 if (resourceIdentifiers.contains(resourceId)) {
-                                    throw new ScyllaValidationException("Simulation configuration " + simId
+                                    throw new ScyllaValidationException("Simulation configuration " + simulationConfiguration.getId()
                                             + " defines multiple resources for task / subprocess " + identifier);
                                 }
                                 resourceIdentifiers.add(resourceId);
@@ -232,32 +250,27 @@ public class SimulationConfigurationParser extends Parser<SimulationConfiguratio
                                         assignmentDefinition);
                                 resourceRefs.add(resourceReference);
                             }
-                            resourceReferences.put(nodeId, resourceRefs);
+                            simulationConfiguration.getResourceReferences().put(nodeId, resourceRefs);
                         }
                     }
                     if (elementName.equals("subProcess")) {
-                        ProcessModel subProcess = processModel.getSubProcesses().get(nodeId);
-                        String subProcessIdFromSimElement = el.getAttributeValue("id");
-                        SimulationConfiguration simulationConfiguration = parseSimulationConfiguration(el, simNamespace,
-                                subProcessIdFromSimElement, subProcess, randomSeed);
-                        configurationsOfSubProcesses.put(nodeId, simulationConfiguration);
+                        ProcessModel subProcess = simulationConfiguration.getProcessModel().getSubProcesses().get(nodeId);
+                        String subProcessIdFromSimElement = identifier;
+                        SimulationConfiguration subProcessSimulationConfiguration = parseSimulationConfiguration(el, simNamespace,
+                                subProcessIdFromSimElement, subProcess, simulationConfiguration.getRandomSeed());
+                        simulationConfiguration.getConfigurationsOfSubProcesses().put(nodeId, subProcessSimulationConfiguration);
                     }
                 }
                 else {
-                    DebugLogger.log("Element " + el.getName()
+                    DebugLogger.log("Element " + elementName
                             + " of simulation scenario is expected to be known, but not supported.");
                 }
             }
             else {
-                DebugLogger.log("Element " + el.getName() + " of simulation scenario not supported.");
+                DebugLogger.log("Element " + elementName + " of simulation scenario not supported.");
             }
         }
 
-        SimulationConfiguration simulationConfiguration = new SimulationConfiguration(simId, processModel,
-                numberOfProcessInstances, startDateTime, endDateTime, randomSeed, arrivalRates, durations, setUpDurations,
-                resourceReferences, configurationsOfSubProcesses);
-
-        return simulationConfiguration;
     }
 
     private boolean isKnownElement(String name) {

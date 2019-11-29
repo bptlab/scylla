@@ -201,13 +201,14 @@ public class SimulationManager {
         parseGlobalConfiguration(gcRootElement);
 
         CommonProcessElementsParser cpeParser = new CommonProcessElementsParser(this);
+        SimulationConfigurationParser simParser = new SimulationConfigurationParser(this);
+        
         // parse each process model XML (.bpmn)
         for (String filename : processModelFilenames) {
             Document pmDoc = builder.build(filename);
             parseProcessCommonsAndModel(cpeParser, pmDoc.getRootElement(), filename);
+            //parseSimulationConfiguration(simParser, pmDoc);
         }
-
-        SimulationConfigurationParser simParser = new SimulationConfigurationParser(this);
         // parse each simulation configuration XML
         for (String filename : simulationConfigurationFilenames) {
             Document scDoc = builder.build(filename);
