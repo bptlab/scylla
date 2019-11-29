@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bsim:definitions xmlns:bsim="http://bsim.hpi.uni-potsdam.de/scylla/simModel" id="Simulation_2" targetNamespace="http://www.hpi.de">
+	<bsim:simulationConfiguration id="SimulationConfiguration_2" processRef="Process_2" processInstances="30" startDateTime="2016-08-01T09:00:00.000+02:00" endDateTime="2016-08-05T15:00:00.000+02:00" resourceAssignmentOrder="priority,simulationTime"><!-- randomSeed="9281">-->
+	    <bsim:startEvent id="StartEvent_1">
+	    	<bsim:arrivalRate timeUnit="MINUTES">
+	    		<bsim:exponentialDistribution>
+	    			<bsim:mean>150.5</bsim:mean>
+	    		</bsim:exponentialDistribution>
+	    	</bsim:arrivalRate>
+	    </bsim:startEvent>
+	    <bsim:exclusiveGateway id="ExclusiveGateway_0a6d35t">
+	      <bsim:outgoingSequenceFlow id="SequenceFlow_1237oxj">
+	      	<bsim:branchingProbability>0.8</bsim:branchingProbability>
+	      </bsim:outgoingSequenceFlow>
+	      <bsim:outgoingSequenceFlow id="SequenceFlow_1dvtw6t">
+	      	<bsim:branchingProbability>0.2</bsim:branchingProbability>
+	      </bsim:outgoingSequenceFlow>
+	    </bsim:exclusiveGateway>
+	</bsim:simulationConfiguration>
+</bsim:definitions>
