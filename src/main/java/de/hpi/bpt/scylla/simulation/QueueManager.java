@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -17,6 +18,7 @@ import de.hpi.bpt.scylla.logger.ResourceInfo;
 import de.hpi.bpt.scylla.logger.ResourceStatus;
 import de.hpi.bpt.scylla.model.configuration.ResourceReference;
 import de.hpi.bpt.scylla.model.global.resource.TimetableItem;
+import de.hpi.bpt.scylla.plugin_type.simulation.resource.ResourceAssignmentPluggable;
 import de.hpi.bpt.scylla.plugin_type.simulation.resource.ResourceQueueUpdatedPluggable;
 import de.hpi.bpt.scylla.simulation.event.ScyllaEvent;
 import de.hpi.bpt.scylla.simulation.utils.DateTimeUtils;
@@ -311,7 +313,10 @@ public class QueueManager {
      * @return the resource instances which are available for the given event
      */
     public static ResourceObjectTuple getResourcesForEvent(SimulationModel model, ScyllaEvent event) {
-
+    	
+    	Optional<ResourceObjectTuple> assignment = ResourceAssignmentPluggable.runPlugins(model, event);
+    	if(assignment.isPresent())return assignment.get();
+    	
         TimeInstant currentSimulationTime = model.presentTime();
 
         Map<String, List<ResourceObject>> availableResourceObjects = new TreeMap<String, List<ResourceObject>>();
