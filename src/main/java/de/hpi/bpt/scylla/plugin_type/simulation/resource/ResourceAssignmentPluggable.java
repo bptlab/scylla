@@ -24,7 +24,7 @@ public abstract class ResourceAssignmentPluggable implements IPluggable {
         	Optional<ResourceObjectTuple> assignment = plugin.getResourcesForEvent(model, event);
         	if(assignment.isPresent())return Optional.of(assignment.get());
         }
-        return null;
+        return Optional.empty();
     }
 
     public abstract Optional<ResourceObjectTuple> getResourcesForEvent(SimulationModel model, ScyllaEvent event);
