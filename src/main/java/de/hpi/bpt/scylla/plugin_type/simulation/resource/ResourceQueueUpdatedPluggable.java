@@ -7,6 +7,13 @@ import de.hpi.bpt.scylla.plugin_loader.PluginLoader;
 import de.hpi.bpt.scylla.plugin_type.IPluggable;
 import de.hpi.bpt.scylla.simulation.event.ScyllaEvent;
 
+/**
+ * This entry point allows to be notified when resources become available.
+ * Normally, this would lead to the execution of the event with lowest queue index.
+ * However, if an event is returned by any plugin of this entry point, it will be scheduled instead.
+ * @author Leon Bein
+ *
+ */
 public abstract class ResourceQueueUpdatedPluggable implements IPluggable{
 
     public static ScyllaEvent runPlugins(Set<String> resourceQueuesUpdated) {
