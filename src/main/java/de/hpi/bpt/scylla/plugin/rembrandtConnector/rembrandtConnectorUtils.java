@@ -35,7 +35,6 @@ public class rembrandtConnectorUtils {
             BufferedReader br = new BufferedReader(new InputStreamReader((con.getInputStream())));
 
             String output;
-            System.out.println("Output from Server .... \n");
             while ((output = br.readLine()) != null) {
                 jsonResult += output;
             }
