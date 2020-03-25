@@ -26,33 +26,41 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
 
     {
         resourceTaskMap.put("1", "5e7b762d7c6d5f10fce4b6a3");
-
+        String taskName = "SMile Tour Planning - Munkres";
+        String recipeId = "";
+        // find recipeID based on taskName
         try {
             // TODO: use correct link to backend
             JSONObject recipes = new JSONObject(rembrandtConnectorUtils.getResponse("https://rembrandt.voelker.dev/api/optimization/recipes"));
-            String recipeId = findRecipeForTask(recipes);
-            System.out.println(recipeId);
+            recipeId = findRecipeForTask(recipes, taskName);
         } catch (Exception e)
         {
             //TODO: write taskname and searched recipe into error message
            System.out.println("could not find recipe for this task");
         }
-
-        // how to specify which is the correct recipe?
-
-        //in the meantime: use task name
-        //get all recipes
-        // find ID of correct recipe by name
-        // Start resource Assignment
+        //start recipe by ID
+        //JSONObject execution = new JSONObject(rembrandtConnectorUtils.getResponse("https://rembrandt.voelker.dev/api/optimization/recipes/" + recipeId + "/execute"));
+        //wait for result
+        // readresult from execution
+        JSONObject execution = new JSONObject(rembrandtConnectorUtils.getResponse("https://rembrandt.voelker.dev/api/optimization/executions/5df739392b29e200119d8611"));
+        String resultTypeId = getResultTypeId(recipeId);
+        String resultInstanceId = execution.getJSONObject("data").getJSONObject("attributes").getJSONObject("result").getJSONObject("data").getJSONArray(resultTypeId).getJSONObject(0).getString("_id");
+        // write assigned Resource in map
         return Optional.empty();
     }
 
-    public String findRecipeForTask(JSONObject recipes) {
+    public String getResultTypeId(String recipeId) {
+        JSONObject recipe = new JSONObject(rembrandtConnectorUtils.getResponse("https://rembrandt.voelker.dev/api/optimization/recipes/"+recipeId));
+        Integer arrayLength = recipe.getJSONObject("data").getJSONObject("attributes").getJSONArray("ingredients").length();
+        return recipe.getJSONObject("data").getJSONObject("attributes").getJSONArray("ingredients").getJSONObject(arrayLength-1).getString("ingredientDefinition");
+    }
+
+
+    public String findRecipeForTask(JSONObject recipes, String taskName) {
         Integer i = 0;
         JSONArray recipearray = recipes.getJSONArray("data");
-
         while (i < recipearray.length()) {
-            if (recipearray.getJSONObject(i).getJSONObject("attributes").getString("name").equals("SMile Tour Planning - Munkres")){
+            if (recipearray.getJSONObject(i).getJSONObject("attributes").getString("name").equals(taskName)){
                 return recipearray.getJSONObject(i).getString("id");
             }
             else {
