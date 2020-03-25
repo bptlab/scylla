@@ -6,13 +6,6 @@ import de.hpi.bpt.scylla.simulation.event.TaskBeginEvent;
 import desmoj.core.simulator.TimeSpan;
 import org.json.*;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import java.util.concurrent.TimeUnit;
 
 public class DelayEndEventByResource extends TaskBeginEventPluggable {
@@ -50,7 +43,7 @@ public class DelayEndEventByResource extends TaskBeginEventPluggable {
     private Integer getResourceTime(String resourceId) {
         String timeAttribute = "";
         Integer additionalTime = 0;
-        JSONObject resource = new JSONObject(getResponse("http://localhost:3000/api/organization/resource-instances/" + resourceId));
+        JSONObject resource = new JSONObject(rembrandtConnectorUtils.getResponse("http://localhost:3000/api/organization/resource-instances/" + resourceId));
         try {
             JSONArray resourceType = resource.getJSONArray("included");
             timeAttribute = resourceType.getJSONObject(0).getJSONObject("attributes").getString("timeAttribute");
@@ -86,39 +79,4 @@ public class DelayEndEventByResource extends TaskBeginEventPluggable {
         return null;
     }
 
-    private String getResponse( String requestURL) {
-        String jsonResult = "";
-        try {
-            // get execution result
-            //get its time field in seconds
-
-            //establish connection
-            URL url = new URL(requestURL);
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            // set as get request
-            con.setRequestMethod("GET");
-            con.setRequestProperty("Content-Type", "application/vnd.api+json");
-            //if Request not ok throw error
-            if (con.getResponseCode() != 200) {
-                throw new RuntimeException("Failed : HTTP error code : "
-                        + con.getResponseCode());
-            }
-            // read response
-
-            BufferedReader br = new BufferedReader(new InputStreamReader((con.getInputStream())));
-
-            String output;
-            System.out.println("Output from Server .... \n");
-            while ((output = br.readLine()) != null) {
-                jsonResult += output;
-            }
-            con.disconnect();
-            return jsonResult;
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return jsonResult;
-
-    }
 }
