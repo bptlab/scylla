@@ -13,6 +13,11 @@ public class rembrandtConnectorUtils {
      */
     public static final String PLUGIN_NAME = "Rembrandt Connector";
 
+    public static String getBackendUrl(){
+        return "https://localhost:3000/api";
+    };
+
+
     public static String getResponse( String requestURL) {
         String jsonResult = "";
         try {

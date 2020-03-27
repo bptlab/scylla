@@ -43,7 +43,7 @@ public class DelayEndEventByResource extends TaskBeginEventPluggable {
     private Integer getResourceTime(String resourceId) {
         String timeAttribute = "";
         Integer additionalTime = 0;
-        JSONObject resource = new JSONObject(rembrandtConnectorUtils.getResponse("http://localhost:3000/api/organization/resource-instances/" + resourceId));
+        JSONObject resource = new JSONObject(rembrandtConnectorUtils.getResponse(rembrandtConnectorUtils.getBackendUrl() + "/organization/resource-instances/" + resourceId));
         try {
             JSONArray resourceType = resource.getJSONArray("included");
             timeAttribute = resourceType.getJSONObject(0).getJSONObject("attributes").getString("timeAttribute");
