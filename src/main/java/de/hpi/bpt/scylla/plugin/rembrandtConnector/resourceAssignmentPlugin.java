@@ -14,6 +14,8 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
     // Ask rembrandt to assign a ResourceInstance and convert it to scylla readable assignment --> see function in QueueManager
     // hold static map which source+nodeID has which asssignment, to free them in Endevent and to delay tasktime
 
+    //Todo: more than one resource assigned? (read result in loop + write all into map + free all later)
+
     public static Map<String, String> resourceTaskMap = new HashMap<>();
 
     @Override
@@ -26,9 +28,15 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
 
     {
         resourceTaskMap.put("1", "5e7b762d7c6d5f10fce4b6a3");
-        String taskName = "SMile Tour Planning - Munkres";
         String recipeId = "";
         // find recipeID based on taskName
+
+        String taskName = event.getDisplayName();
+        //Todo: delete this hardcoded name
+        taskName = "SMile Tour Planning - Munkres";
+
+
+
         try {
             // TODO: use correct link to backend
             JSONObject recipes = new JSONObject(rembrandtConnectorUtils.getResponse("https://rembrandt.voelker.dev/api/optimization/recipes"));
@@ -38,14 +46,21 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
             //TODO: write taskname and searched recipe into error message
            System.out.println("could not find recipe for this task");
         }
-        //start recipe by ID
+        //start recipe by ID Todo: include it
         //JSONObject execution = new JSONObject(rembrandtConnectorUtils.getResponse("https://rembrandt.voelker.dev/api/optimization/recipes/" + recipeId + "/execute"));
-        //wait for result
-        // readresult from execution
+        // Todo: wait for result
+        // read result from execution
         JSONObject execution = new JSONObject(rembrandtConnectorUtils.getResponse("https://rembrandt.voelker.dev/api/optimization/executions/5df739392b29e200119d8611"));
         String resultTypeId = getResultTypeId(recipeId);
         String resultInstanceId = execution.getJSONObject("data").getJSONObject("attributes").getJSONObject("result").getJSONObject("data").getJSONArray(resultTypeId).getJSONObject(0).getString("_id");
         // write assigned Resource in map
+
+        String taskId = Integer.toString(event.getNodeId());
+        String processInstanceId = Integer.toString(event.getProcessInstance().getId());
+
+        resourceTaskMap.put(taskId + "." + processInstanceId, resultInstanceId);
+
+        //Todo: return resource Object Tuple
         return Optional.empty();
     }
 
