@@ -1,9 +1,8 @@
 package de.hpi.bpt.scylla.plugin.rembrandtConnector;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import de.hpi.bpt.scylla.plugin_type.simulation.resource.ResourceAssignmentPluggable;
+import de.hpi.bpt.scylla.simulation.ResourceObject;
 import de.hpi.bpt.scylla.simulation.ResourceObjectTuple;
 import de.hpi.bpt.scylla.simulation.SimulationModel;
 import de.hpi.bpt.scylla.simulation.event.ScyllaEvent;
@@ -14,7 +13,8 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
     // Ask rembrandt to assign a ResourceInstance and convert it to scylla readable assignment --> see function in QueueManager
     // hold static map which source+nodeID has which asssignment, to free them in Endevent and to delay tasktime
 
-    //Todo: more than one resource assigned? (read result in loop + write all into map + free all later)
+
+    //Todo: more than one resource required by scylla? Rembrandt can only handle a single Output atm, start multiple times by resource Type or improve Rembrandt and read the result in a loop.
 
     public static Map<String, String> resourceTaskMap = new HashMap<>();
 
@@ -34,7 +34,7 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
         String taskName = event.getDisplayName();
         //Todo: delete this hardcoded name
         taskName = "SMile Tour Planning - Munkres";
-
+        System.out.println("looking for recipe: " + taskName);
 
 
         try {
@@ -44,12 +44,15 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
         } catch (Exception e)
         {
             //TODO: write taskname and searched recipe into error message
-           System.out.println("could not find recipe for this task");
+           System.out.println("could not find recipe wit name: " + taskName);
+           ResourceObjectTuple emptyTuple = new ResourceObjectTuple();
+           return Optional.of(emptyTuple);
         }
         //start recipe by ID Todo: include it
         //JSONObject execution = new JSONObject(rembrandtConnectorUtils.getResponse("https://rembrandt.voelker.dev/api/optimization/recipes/" + recipeId + "/execute"));
         // Todo: wait for result
         // read result from execution
+
         JSONObject execution = new JSONObject(rembrandtConnectorUtils.getResponse("https://rembrandt.voelker.dev/api/optimization/executions/5df739392b29e200119d8611"));
         String resultTypeId = getResultTypeId(recipeId);
         String resultInstanceId = execution.getJSONObject("data").getJSONObject("attributes").getJSONObject("result").getJSONObject("data").getJSONArray(resultTypeId).getJSONObject(0).getString("_id");
@@ -61,7 +64,14 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
         resourceTaskMap.put(taskId + "." + processInstanceId, resultInstanceId);
 
         //Todo: return resource Object Tuple
-        return Optional.empty();
+        //build resourceObject
+        ResourceObject assignedResource = new ResourceObject(resultTypeId, resultInstanceId);
+
+        //build resourceObjectTuple
+        ResourceObjectTuple assignedResourceTuple = new ResourceObjectTuple();
+        assignedResourceTuple.getResourceObjects().add(assignedResource);
+        Optional<ResourceObjectTuple> assignedTuple = Optional.ofNullable(assignedResourceTuple);
+        return assignedTuple;
     }
 
     public String getResultTypeId(String recipeId) {
