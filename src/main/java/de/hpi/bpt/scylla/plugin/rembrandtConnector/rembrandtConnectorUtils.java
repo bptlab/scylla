@@ -14,7 +14,7 @@ public class rembrandtConnectorUtils {
     public static final String PLUGIN_NAME = "Rembrandt Connector";
 
     public static String getBackendUrl(){
-        return "https://localhost:3000/api";
+        return "http://localhost:3000/api";
     };
 
 
