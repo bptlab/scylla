@@ -296,14 +296,19 @@ public class QueueManager {
 
         for (ResourceObject resourceObject : assignedResources) {
             String resourceId = resourceObject.getResourceType();
-            resourceObjects.get(resourceId).offer(presentTime, resourceObject, processInstance, nodeId);
-            String traceNote = "Dissociate resource " + resourceId + " (" + resourceObject.getId()
+            try {
+                System.out.println("Get :" + resourceObjects.get(resourceId));
+                resourceObjects.get(resourceId).offer(presentTime, resourceObject, processInstance, nodeId);
+                String traceNote = "Dissociate resource " + resourceId + " (" + resourceObject.getId()
                     + ") from process instance " + processInstance.getName();
-            if (nameOfResponsibleEvent != null) {
-                traceNote += ", source: " + nameOfResponsibleEvent;
+                if (nameOfResponsibleEvent != null) {
+                    traceNote += ", source: " + nameOfResponsibleEvent;
+                }
+                model.sendTraceNote(traceNote);
+                resourceQueuesUpdated.add(resourceId);
+            } catch (Exception e) {
+                System.out.println("error during resource disallocation! No matching resource found.");
             }
-            model.sendTraceNote(traceNote);
-            resourceQueuesUpdated.add(resourceId);
         }
         if (nameOfResponsibleEvent == null) {
             processInstance.getAssignedResources().clear();
