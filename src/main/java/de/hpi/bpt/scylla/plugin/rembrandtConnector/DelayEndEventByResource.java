@@ -24,32 +24,40 @@ public class DelayEndEventByResource extends TaskBeginEventPluggable {
         double standardTime = beginEvent.getTimeSpanToNextEventMap().get(0).getTimeAsDouble(TimeUnit.SECONDS);
 
         // find assigned resource
-        String resourceId = findAssignedResourceInstance();
+        String resourceId = findAssignedResourceInstance(beginEvent, processInstance);
+        System.out.println("looking for resourceID: " + resourceId);
         //  read/ calculate resource time.
-        int resourceBasedTime = getResourceTime(resourceAssignmentPlugin.resourceTaskMap.get("1"));
+        int resourceBasedTime = getResourceTime(resourceId);
         // and overwrite the time to the next task in the timeSpanToNextEventMap (=set the calculated time as the new time)
         TimeSpan timeForTaskByResource = new TimeSpan(standardTime + resourceBasedTime, TimeUnit.SECONDS);
         beginEvent.getTimeSpanToNextEventMap().put(0, timeForTaskByResource);
 
+        return;
     }
 
 
-    private String findAssignedResourceInstance(){
-        //look at map from assignment
-        //
-        return "ID";
+    private String findAssignedResourceInstance(TaskBeginEvent beginEvent, ProcessInstance processInstance){
+        //look at map from assignment and return the resourceID for current task
+        String taskId = Integer.toString(beginEvent.getNodeId());
+        String processInstanceId = Integer.toString(beginEvent.getProcessInstance().getId());
+        return resourceAssignmentPlugin.resourceTaskMap.get(taskId + "." + processInstanceId);
     }
 
     private Integer getResourceTime(String resourceId) {
         String timeAttribute = "";
         Integer additionalTime = 0;
-        JSONObject resource = new JSONObject(rembrandtConnectorUtils.getResponse(rembrandtConnectorUtils.getBackendUrl() + "/organization/resource-instances/" + resourceId));
+        JSONObject resource = new JSONObject();
+        try {
+            resource = new JSONObject(rembrandtConnectorUtils.getResponse(rembrandtConnectorUtils.getBackendUrl() + "/organization/resource-instances/" + resourceId));
+        } catch (Exception e) {
+            System.out.println("resource " + resourceId + " not found.");
+        }
         try {
             JSONArray resourceType = resource.getJSONArray("included");
             timeAttribute = resourceType.getJSONObject(0).getJSONObject("attributes").getString("timeAttribute");
         }
         catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("could not read timeAttribute of resourceType.");
         }
         try {
             JSONObject resourceInstance = resource.getJSONObject("data");

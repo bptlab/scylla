@@ -47,6 +47,7 @@ public class rembrandtConnectorUtils {
             return jsonResult;
 
         } catch (IOException e) {
+            System.out.println("No Rembrandt Backend Found!");
             e.printStackTrace();
         }
         return jsonResult;
