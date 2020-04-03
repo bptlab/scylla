@@ -19,7 +19,7 @@ import desmoj.core.simulator.TimeInstant;
  * 
  * @author Tsun Yin Wong
  */
-class ResourceQueue extends PriorityQueue<ResourceObject> {
+public class ResourceQueue extends PriorityQueue<ResourceObject> {
 
     private static final long serialVersionUID = 886409943987052123L;
 

@@ -2,12 +2,11 @@ package de.hpi.bpt.scylla.plugin.rembrandtConnector;
 import java.util.*;
 
 import de.hpi.bpt.scylla.plugin_type.simulation.resource.ResourceAssignmentPluggable;
-import de.hpi.bpt.scylla.simulation.ResourceObject;
-import de.hpi.bpt.scylla.simulation.ResourceObjectTuple;
-import de.hpi.bpt.scylla.simulation.SimulationModel;
+import de.hpi.bpt.scylla.simulation.*;
 import de.hpi.bpt.scylla.simulation.event.ScyllaEvent;
 import org.json.JSONArray;
 import org.json.JSONObject;
+
 
 public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
     // Ask rembrandt to assign a ResourceInstance and convert it to scylla readable assignment --> see function in QueueManager
@@ -66,6 +65,9 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
         //Todo: return resource Object Tuple
         //build resourceObject
         ResourceObject assignedResource = new ResourceObject(resultTypeId, resultInstanceId);
+        ResourceQueue resourceQueue = new ResourceQueue(1);
+        resourceQueue.add(assignedResource);
+        model.addToResourceObjects(resultTypeId, resourceQueue);
 
         //build resourceObjectTuple
         ResourceObjectTuple assignedResourceTuple = new ResourceObjectTuple();

@@ -297,7 +297,8 @@ public class QueueManager {
         for (ResourceObject resourceObject : assignedResources) {
             String resourceId = resourceObject.getResourceType();
             try {
-                System.out.println("Get :" + resourceObjects.get(resourceId));
+                System.out.println("trying to free resource: " + resourceId);
+                System.out.println("looking for resourceId in configuration, result: " + resourceObjects.get(resourceId));
                 resourceObjects.get(resourceId).offer(presentTime, resourceObject, processInstance, nodeId);
                 String traceNote = "Dissociate resource " + resourceId + " (" + resourceObject.getId()
                     + ") from process instance " + processInstance.getName();
