@@ -12,12 +12,18 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
 
 import de.hpi.bpt.scylla.exception.ScyllaRuntimeException;
 import de.hpi.bpt.scylla.logger.ResourceInfo;
 import de.hpi.bpt.scylla.logger.ResourceStatus;
 import de.hpi.bpt.scylla.model.configuration.ResourceReference;
+import de.hpi.bpt.scylla.model.global.GlobalConfiguration;
+import de.hpi.bpt.scylla.model.global.resource.DynamicResource;
+import de.hpi.bpt.scylla.model.global.resource.DynamicResourceInstance;
+import de.hpi.bpt.scylla.model.global.resource.Resource;
 import de.hpi.bpt.scylla.model.global.resource.TimetableItem;
+import de.hpi.bpt.scylla.plugin_type.parser.EventOrderType;
 import de.hpi.bpt.scylla.plugin_type.simulation.resource.ResourceAssignmentPluggable;
 import de.hpi.bpt.scylla.plugin_type.simulation.resource.ResourceQueueUpdatedPluggable;
 import de.hpi.bpt.scylla.simulation.event.ScyllaEvent;
@@ -36,6 +42,8 @@ import desmoj.core.simulator.TimeSpan;
 public class QueueManager {
 	
 	private SimulationModel model;
+    private Map<String, ResourceQueue> resourceObjects = new HashMap<String, ResourceQueue>();
+    
 
     private static Comparator<ResourceObjectTuple> resourceObjectTupleComparator = new Comparator<ResourceObjectTuple>() {
 
@@ -57,114 +65,53 @@ public class QueueManager {
     public QueueManager(SimulationModel simulationModel) {
 		this.model = simulationModel;
 	}
-
-	/**
-     * Immediately schedules all possible events that become ready through updates at the given resources
-     * (As multiple events might wait for one resource, most likely not all waiting events for that resource will be scheduled)
-     * @param resourceQueuesUpdated : Set of ids of resources that have been updated (usually have become available again)
-     * @throws ScyllaRuntimeException
-     */
-    public void scheduleAllEventsFromQueueReadyForSchedule(Set<String> resourceQueuesUpdated) throws ScyllaRuntimeException {
-    	ScyllaEvent eventFromQueue = getEventFromQueueReadyForSchedule(resourceQueuesUpdated);
-        while (eventFromQueue != null) {
-        	SimulationUtils.scheduleEvent(eventFromQueue, new TimeSpan(0));
-            eventFromQueue = getEventFromQueueReadyForSchedule(resourceQueuesUpdated);
-        }
-    }
-
-    /**
-     * Returns eventwhich is ready to be scheduled for immediate execution from event queues.
-     * 
-     * @param resourceQueuesUpdated
-     *            resource queues which have been updated recently -> only the events which require resources from these
-     *            queues are considered
-     * @return the DesmoJ event which is ready to be scheduled for immediate execution
-     */
-    public ScyllaEvent getEventFromQueueReadyForSchedule(Set<String> resourceQueuesUpdated) {
-    	
-    	ScyllaEvent eventFromPlugin = ResourceQueueUpdatedPluggable.runPlugins(resourceQueuesUpdated);
-    	if(eventFromPlugin != null)return eventFromPlugin;
-
-        List<ScyllaEvent> eventCandidates = new ArrayList<ScyllaEvent>();
-        int accumulatedIndex = Integer.MAX_VALUE;
-
-        for (String resourceId : resourceQueuesUpdated) {
-            ScyllaEventQueue eventQueue = model.getEventQueues().get(resourceId);
-            for (int i = 0; i < eventQueue.size(); i++) {
-                ScyllaEvent eventFromQueue = eventQueue.peek(i);
-                if (eventCandidates.contains(eventFromQueue)) {
-                    continue;
-                }
-
-                int index = 0;
-                boolean eventIsEligible = hasResourcesForEvent(eventFromQueue);
-
-                if (eventIsEligible) {
-                    ProcessSimulationComponents simulationComponents = eventFromQueue.getSimulationComponents();
-                    int nodeId = eventFromQueue.getNodeId();
-                    Set<ResourceReference> resourceReferences = simulationComponents.getSimulationConfiguration()
-                            .getResourceReferenceSet(nodeId);
-                    for (ResourceReference ref : resourceReferences) {
-                        // add position in queue and add to index
-                        String resId = ref.getResourceId();
-                        ScyllaEventQueue eventQ = model.getEventQueues().get(resId);
-                        index += eventQ.getIndex(eventFromQueue);
-
-                    }
-                    if (accumulatedIndex < index) {
-                        break;
-                    }
-                    else if (accumulatedIndex == index) {
-                        eventCandidates.add(eventFromQueue);
-                    }
-                    else if (accumulatedIndex > index) {
-                        accumulatedIndex = index;
-                        eventCandidates.clear();
-                        eventCandidates.add(eventFromQueue);
-                    }
-                }
-            }
-        }
-
-        if (eventCandidates.isEmpty()) {
-            return null;
-        }
-        else {
-            Collections.sort(eventCandidates, new Comparator<ScyllaEvent>() {
-                @Override
-                public int compare(ScyllaEvent e1, ScyllaEvent e2) {
-                    return e1.getSimulationTimeOfSource().compareTo(e2.getSimulationTimeOfSource());
-                }
-            });
-
-            ScyllaEvent event = eventCandidates.get(0);
-
-            // get and assign resources
-
-            ResourceObjectTuple resourcesObjectTuple = getResourcesForEvent(event);
-            assignResourcesToEvent(event, resourcesObjectTuple);
-
-            removeFromEventQueues(event);
-            return event;
-        }
+    
+    public Map<String, ResourceQueue> getResourceObjects() {
+        return resourceObjects;
     }
     
-    public void removeFromEventQueues(ScyllaEvent event) {
-        ProcessSimulationComponents simulationComponents = event.getSimulationComponents();
-        int nodeId = event.getNodeId();
-        Set<ResourceReference> resourceReferences = simulationComponents.getSimulationConfiguration()
-                .getResourceReferenceSet(nodeId);
-        for (ResourceReference ref : resourceReferences) {
-            // remove from event queues
-            String resourceId = ref.getResourceId();
-            ScyllaEventQueue eventQueue = model.getEventQueues().get(resourceId);
-            eventQueue.remove(event);
+    public Collection<String> getResourceTypes() {
+    	return resourceObjects.keySet();
+    }
+    
+    public void init(GlobalConfiguration globalConfiguration) throws InstantiationException{
+        convertToResourceObjects(globalConfiguration.getResources());
+    }
+    
+
+    private void convertToResourceObjects(Map<String, Resource> resources) throws InstantiationException {
+
+        resourceObjects = new HashMap<String, ResourceQueue>();
+        for (String resourceType : resources.keySet()) {
+            Resource resource = resources.get(resourceType);
+            int quantity = resource.getQuantity();
+            ResourceQueue resQueue = new ResourceQueue(quantity);
+            if (resource instanceof DynamicResource) {
+                DynamicResource dynResource = (DynamicResource) resource;
+                Map<String, DynamicResourceInstance> resourceInstances = dynResource.getResourceInstances();
+                for (String resourceInstanceName : resourceInstances.keySet()) {
+                    DynamicResourceInstance instance = resourceInstances.get(resourceInstanceName);
+                    double cost = instance.getCost();
+                    TimeUnit timeUnit = instance.getTimeUnit();
+                    List<TimetableItem> timetable = instance.getTimetable();
+                    ResourceObject resObject = new ResourceObject(resourceType, resourceInstanceName, cost, timeUnit, timetable);
+                    resQueue.add(resObject);
+
+                    boolean availableAtStart = resObject.isAvailable(model.getStartDateTime());
+                    //TODO model should not be first parameter here
+                    SimulationUtils.scheduleNextResourceAvailableEvent(model, resObject, model.getStartDateTime(), availableAtStart);
+                }
+            } else {
+                throw new InstantiationException("Type of resource " + resourceType + " not supported.");
+            }
+            resourceObjects.put(resourceType, resQueue);
         }
     }
+
 
     // public static boolean areResourcesAvailable(SimulationModel model, Set<ResourceReference> resourceReferences,
     // String displayName) {
-    // Map<String, ResourceQueue> resourceObjects = model.getResourceObjects();
+    // Map<String, ResourceQueue> resourceObjects = getResourceObjects();
     // for (ResourceReference resourceRef : resourceReferences) {
     // String resourceId = resourceRef.getResourceId();
     // int amount = resourceRef.getAmount();
@@ -237,7 +184,7 @@ public class QueueManager {
 
     // public static boolean areResourcesAvailable(SimulationModel model, Set<ResourceReference> resourceReferences,
     // String displayName) {
-    // Map<String, ResourceQueue> resourceObjects = model.getResourceObjects();
+    // Map<String, ResourceQueue> resourceObjects = getResourceObjects();
     // for (ResourceReference resourceRef : resourceReferences) {
     // String resourceId = resourceRef.getResourceId();
     // int amount = resourceRef.getAmount();
@@ -280,7 +227,7 @@ public class QueueManager {
      *            the DesmoJ event in question
      * @return true if resource instances are available for the given event
      */
-    private boolean hasResourcesForEvent(ScyllaEvent event) {
+    public boolean hasResourcesForEvent(ScyllaEvent event) {
         ResourceObjectTuple resourceObjectTuple = getResourcesForEvent(event);
         if (resourceObjectTuple == null) {
             return false;
@@ -290,7 +237,7 @@ public class QueueManager {
             for (ResourceObject obj : resourceObjects) {
                 String resourceId = obj.getResourceType();
                 // put not-chosen objects back into resource queues
-                model.getResourceObjects().get(resourceId).add(obj);
+                getResourceObjects().get(resourceId).add(obj);
             }
             return true;
         }
@@ -336,7 +283,7 @@ public class QueueManager {
         boolean enoughPotentialResourceInstancesAvailable = true;
         for (String resourceId : resourceIds) {
             int amount = resourcesRequired.get(resourceId);
-            ResourceQueue queue = model.getResourceObjects().get(resourceId);
+            ResourceQueue queue = getResourceObjects().get(resourceId);
             List<ResourceObject> resourceObjects = queue.pollAvailable(currentSimulationTime);
             availableResourceObjects.put(resourceId, resourceObjects);
             if (resourceObjects.size() < amount) { // less available than required
@@ -349,7 +296,7 @@ public class QueueManager {
         if (!enoughPotentialResourceInstancesAvailable) {
             for (String resourceId : availableResourceObjects.keySet()) {
                 List<ResourceObject> resourceObjects = availableResourceObjects.get(resourceId);
-                model.getResourceObjects().get(resourceId).addAll(resourceObjects);
+                getResourceObjects().get(resourceId).addAll(resourceObjects);
             }
             return null;
         }
@@ -393,7 +340,7 @@ public class QueueManager {
             // remove chosen objects from available resource objects
             availableResourceObjects.get(resourceId).removeAll(chosenObjects);
             // put not-chosen objects back into resource queues
-            model.getResourceObjects().get(resourceId).addAll(availableResourceObjects.get(resourceId));
+            getResourceObjects().get(resourceId).addAll(availableResourceObjects.get(resourceId));
         }
 
         return chosenTuple;
@@ -540,7 +487,7 @@ public class QueueManager {
             assignedResources
                     .addAll(processInstance.getAssignedResources().get(nameOfResponsibleEvent).getResourceObjects());
         }
-        Map<String, ResourceQueue> resourceObjects = model.getResourceObjects();
+        Map<String, ResourceQueue> resourceObjects = getResourceObjects();
         TimeInstant presentTime = model.presentTime();
 
         for (ResourceObject resourceObject : assignedResources) {
@@ -568,7 +515,7 @@ public class QueueManager {
          * 
          * --> solved by introduction of ResourceAvailableEvent
          */
-        scheduleAllEventsFromQueueReadyForSchedule(resourceQueuesUpdated);
+        model.scheduleAllEventsFromQueueReadyForSchedule(resourceQueuesUpdated);
     }
 
     /**
@@ -580,7 +527,7 @@ public class QueueManager {
      */
     public Set<ResourceObject> getAllResourceObjects() {
         Set<ResourceObject> objects = new HashSet<ResourceObject>();
-        Map<String, ResourceQueue> resources = model.getResourceObjects();
+        Map<String, ResourceQueue> resources = getResourceObjects();
         for (String resourceType : resources.keySet()) {
             ResourceQueue resourceQueue = resources.get(resourceType);
             ResourceObject obj = resourceQueue.poll();

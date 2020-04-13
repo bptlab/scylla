@@ -31,7 +31,7 @@ public class BatchStashResourceEvent extends ScyllaEvent {
 		//Remove resources from queues; they are not available anymore
 		SimulationModel model = (SimulationModel)getModel();
 		for(ResourceObject resource : resources.getResourceObjects()) {
-			Collection<ResourceObject> typeQueue = model.getResourceObjects().get(resource.getResourceType());
+			Collection<ResourceObject> typeQueue = model.getResourceManager().getResourceObjects().get(resource.getResourceType());
 			boolean removed = typeQueue.remove(resource);
 			assert removed;
 		}
@@ -52,7 +52,7 @@ public class BatchStashResourceEvent extends ScyllaEvent {
 	
 	public boolean resourcesFree() {
 		return resources.getResourceObjects().stream().allMatch((each)->{
-			Collection<ResourceObject> typeQueue = ((SimulationModel)getModel()).getResourceObjects().get(each.getResourceType());
+			Collection<ResourceObject> typeQueue = ((SimulationModel)getModel()).getResourceManager().getResourceObjects().get(each.getResourceType());
 			return typeQueue.contains(each);
 		});
 	}

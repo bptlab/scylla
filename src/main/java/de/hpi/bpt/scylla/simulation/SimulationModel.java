@@ -2,26 +2,29 @@ package de.hpi.bpt.scylla.simulation;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
+import de.hpi.bpt.scylla.exception.ScyllaRuntimeException;
 import de.hpi.bpt.scylla.logger.DebugLogger;
 import de.hpi.bpt.scylla.logger.ProcessNodeInfo;
 import de.hpi.bpt.scylla.logger.ResourceInfo;
+import de.hpi.bpt.scylla.model.configuration.ResourceReference;
 import de.hpi.bpt.scylla.model.configuration.SimulationConfiguration;
 import de.hpi.bpt.scylla.model.global.GlobalConfiguration;
-import de.hpi.bpt.scylla.model.global.resource.DynamicResource;
-import de.hpi.bpt.scylla.model.global.resource.DynamicResourceInstance;
-import de.hpi.bpt.scylla.model.global.resource.Resource;
-import de.hpi.bpt.scylla.model.global.resource.TimetableItem;
 import de.hpi.bpt.scylla.model.process.CommonProcessElements;
 import de.hpi.bpt.scylla.model.process.ProcessModel;
 import de.hpi.bpt.scylla.plugin_type.parser.EventOrderType;
+import de.hpi.bpt.scylla.plugin_type.simulation.resource.ResourceQueueUpdatedPluggable;
 import de.hpi.bpt.scylla.simulation.event.ProcessInstanceGenerationEvent;
 import de.hpi.bpt.scylla.simulation.event.ProcessSimulationStopEvent;
+import de.hpi.bpt.scylla.simulation.event.ScyllaEvent;
 import de.hpi.bpt.scylla.simulation.utils.DateTimeUtils;
 import de.hpi.bpt.scylla.simulation.utils.SimulationUtils;
 import desmoj.core.simulator.Model;
@@ -36,10 +39,10 @@ import desmoj.core.simulator.TimeSpan;
 public class SimulationModel extends Model {
 
     private GlobalConfiguration globalConfiguration;
-
-    private Map<String, ResourceQueue> resourceObjects = new HashMap<String, ResourceQueue>();
+    
     private QueueManager resourceManager = new QueueManager(this);
 
+    //Events that are waiting for resources
     private Map<String, ScyllaEventQueue> eventQueues = new HashMap<String, ScyllaEventQueue>();
 
     private ZonedDateTime startDateTime;
@@ -136,14 +139,12 @@ public class SimulationModel extends Model {
 
             DateTimeUtils.setStartDateTime(startDateTime);
 
-            if (globalConfiguration != null) {
-                convertToResourceObjects(globalConfiguration.getResources());
-            }
-
+            resourceManager.init(globalConfiguration);
+            
             // prepare queue and sorting order
             // TODO each resource has its own assignment order
             List<EventOrderType> resourceAssignmentOrder = globalConfiguration.getResourceAssignmentOrder();
-            for (String resourceId : resourceObjects.keySet()) {
+            for (String resourceId : resourceManager.getResourceTypes()) {
                 ScyllaEventQueue eventQueue = new ScyllaEventQueue(resourceId, resourceAssignmentOrder);
                 eventQueues.put(resourceId, eventQueue);
             }
@@ -151,37 +152,6 @@ public class SimulationModel extends Model {
         catch (InstantiationException e) {
             DebugLogger.error(e.getMessage());
             DebugLogger.error("Instantiation of simulation model failed.");
-        }
-    }
-
-    private void convertToResourceObjects(Map<String, Resource> resources) throws InstantiationException {
-
-        resourceObjects = new HashMap<String, ResourceQueue>();
-        for (String resourceType : resources.keySet()) {
-            Resource resource = resources.get(resourceType);
-            int quantity = resource.getQuantity();
-            ResourceQueue resQueue = new ResourceQueue(quantity);
-            if (resource instanceof DynamicResource) {
-                DynamicResource dynResource = (DynamicResource) resource;
-                Map<String, DynamicResourceInstance> resourceInstances = dynResource.getResourceInstances();
-                for (String resourceInstanceName : resourceInstances.keySet()) {
-                    DynamicResourceInstance instance = resourceInstances.get(resourceInstanceName);
-                    double cost = instance.getCost();
-                    TimeUnit timeUnit = instance.getTimeUnit();
-                    List<TimetableItem> timetable = instance.getTimetable();
-                    ResourceObject resObject = new ResourceObject(resourceType, resourceInstanceName, cost, timeUnit,
-                            timetable);
-                    resQueue.add(resObject);
-
-                    boolean availableAtStart = resObject.isAvailable(startDateTime);
-                    SimulationUtils.scheduleNextResourceAvailableEvent(this, resObject, startDateTime,
-                            availableAtStart);
-                }
-            }
-            else {
-                throw new InstantiationException("Type of resource " + resourceType + " not supported.");
-            }
-            resourceObjects.put(resourceType, resQueue);
         }
     }
 
@@ -231,10 +201,6 @@ public class SimulationModel extends Model {
 
     public List<EventOrderType> getResourceAssignmentOrder() {
         return globalConfiguration.getResourceAssignmentOrder();
-    }
-
-    public Map<String, ResourceQueue> getResourceObjects() {
-        return resourceObjects;
     }
 
 	public QueueManager getResourceManager() {
@@ -304,5 +270,109 @@ public class SimulationModel extends Model {
 
     public boolean isOutputLoggingOn() {
         return outputLoggingIsOn;
+    }
+    
+    /**
+     * Returns eventwhich is ready to be scheduled for immediate execution from event queues.
+     * 
+     * @param resourceQueuesUpdated
+     *            resource queues which have been updated recently -> only the events which require resources from these
+     *            queues are considered
+     * @return the DesmoJ event which is ready to be scheduled for immediate execution
+     */
+    public ScyllaEvent getEventFromQueueReadyForSchedule(Set<String> resourceQueuesUpdated) {
+    	
+    	ScyllaEvent eventFromPlugin = ResourceQueueUpdatedPluggable.runPlugins(resourceQueuesUpdated);
+    	if(eventFromPlugin != null)return eventFromPlugin;
+
+        List<ScyllaEvent> eventCandidates = new ArrayList<ScyllaEvent>();
+        int accumulatedIndex = Integer.MAX_VALUE;
+
+        for (String resourceId : resourceQueuesUpdated) {
+            ScyllaEventQueue eventQueue = getEventQueues().get(resourceId);
+            for (int i = 0; i < eventQueue.size(); i++) {
+                ScyllaEvent eventFromQueue = eventQueue.peek(i);
+                if (eventCandidates.contains(eventFromQueue)) {
+                    continue;
+                }
+
+                int index = 0;
+                boolean eventIsEligible = resourceManager.hasResourcesForEvent(eventFromQueue);
+
+                if (eventIsEligible) {
+                    ProcessSimulationComponents simulationComponents = eventFromQueue.getSimulationComponents();
+                    int nodeId = eventFromQueue.getNodeId();
+                    Set<ResourceReference> resourceReferences = simulationComponents.getSimulationConfiguration()
+                            .getResourceReferenceSet(nodeId);
+                    for (ResourceReference ref : resourceReferences) {
+                        // add position in queue and add to index
+                        String resId = ref.getResourceId();
+                        ScyllaEventQueue eventQ = getEventQueues().get(resId);
+                        index += eventQ.getIndex(eventFromQueue);
+
+                    }
+                    if (accumulatedIndex < index) {
+                        break;
+                    }
+                    else if (accumulatedIndex == index) {
+                        eventCandidates.add(eventFromQueue);
+                    }
+                    else if (accumulatedIndex > index) {
+                        accumulatedIndex = index;
+                        eventCandidates.clear();
+                        eventCandidates.add(eventFromQueue);
+                    }
+                }
+            }
+        }
+
+        if (eventCandidates.isEmpty()) {
+            return null;
+        }
+        else {
+            Collections.sort(eventCandidates, new Comparator<ScyllaEvent>() {
+                @Override
+                public int compare(ScyllaEvent e1, ScyllaEvent e2) {
+                    return e1.getSimulationTimeOfSource().compareTo(e2.getSimulationTimeOfSource());
+                }
+            });
+
+            ScyllaEvent event = eventCandidates.get(0);
+
+            // get and assign resources
+
+            ResourceObjectTuple resourcesObjectTuple = resourceManager.getResourcesForEvent(event);
+            resourceManager.assignResourcesToEvent(event, resourcesObjectTuple);
+
+            removeFromEventQueues(event);
+            return event;
+        }
+    }
+    
+    public void removeFromEventQueues(ScyllaEvent event) {
+        ProcessSimulationComponents simulationComponents = event.getSimulationComponents();
+        int nodeId = event.getNodeId();
+        Set<ResourceReference> resourceReferences = simulationComponents.getSimulationConfiguration()
+                .getResourceReferenceSet(nodeId);
+        for (ResourceReference ref : resourceReferences) {
+            // remove from event queues
+            String resourceId = ref.getResourceId();
+            ScyllaEventQueue eventQueue = getEventQueues().get(resourceId);
+            eventQueue.remove(event);
+        }
+    }
+    
+	/**
+     * Immediately schedules all possible events that become ready through updates at the given resources
+     * (As multiple events might wait for one resource, most likely not all waiting events for that resource will be scheduled)
+     * @param resourceQueuesUpdated : Set of ids of resources that have been updated (usually have become available again)
+     * @throws ScyllaRuntimeException
+     */
+    public void scheduleAllEventsFromQueueReadyForSchedule(Set<String> resourceQueuesUpdated) throws ScyllaRuntimeException {
+    	ScyllaEvent eventFromQueue = getEventFromQueueReadyForSchedule(resourceQueuesUpdated);
+        while (eventFromQueue != null) {
+        	SimulationUtils.scheduleEvent(eventFromQueue, new TimeSpan(0));
+            eventFromQueue = getEventFromQueueReadyForSchedule(resourceQueuesUpdated);
+        }
     }
 }

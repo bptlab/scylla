@@ -351,7 +351,7 @@ abstract class BatchCluster extends Entity {
 					model.getResourceManager().releaseResourcesAndScheduleQueuedEvents(beginEvent);
 				} catch (ScyllaRuntimeException e) { e.printStackTrace(); }
 			} else {//Event waits for resources
-		        model.getResourceManager().removeFromEventQueues(beginEvent);
+		        model.removeFromEventQueues(beginEvent);
 	            event.getNextEventMap().put(0, beginEvent);
 	            event.getTimeSpanToNextEventMap().put(0, new TimeSpan(0));
 			}

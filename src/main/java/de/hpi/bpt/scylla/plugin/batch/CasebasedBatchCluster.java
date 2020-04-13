@@ -57,7 +57,7 @@ public class CasebasedBatchCluster extends BatchCluster implements BatchCluster.
 					event.getTimeSpanToNextEventMap().remove(0);
 					model.getResourceManager().releaseResourcesAndScheduleQueuedEvents(beginEvent);
 				} else {
-					model.getResourceManager().removeFromEventQueues(beginEvent);
+					model.removeFromEventQueues(beginEvent);
 				}
 				//Wait for resources in extra queue
 				waitingTaskBegins.add(beginEvent);
@@ -69,7 +69,7 @@ public class CasebasedBatchCluster extends BatchCluster implements BatchCluster.
 	    		createStashEventFor(beginEvent, assignedResources);//so all other events know these are the resources to be used for stashing
 	    	} else {
 	    		//else wait until natural assignment is done except when there are concurrent events waiting for this natural assignment - then, be the first
-	    		if(!waitingTaskBegins.isEmpty())model.getResourceManager().removeFromEventQueues(beginEvent);
+	    		if(!waitingTaskBegins.isEmpty())model.removeFromEventQueues(beginEvent);
 	    		waitingTaskBegins.add(beginEvent);
 	    	}
 		}
@@ -120,7 +120,7 @@ public class CasebasedBatchCluster extends BatchCluster implements BatchCluster.
 			TaskBeginEvent nextEvent = waitingTaskBegins.poll();
 			SimulationModel model = (SimulationModel) nextEvent.getModel();
 			model.getResourceManager().assignResourcesToEvent(nextEvent, stashEvent.getResources());
-			model.getResourceManager().removeFromEventQueues(nextEvent);
+			model.removeFromEventQueues(nextEvent);
 			return nextEvent;
 		}
 		return stashEvent;

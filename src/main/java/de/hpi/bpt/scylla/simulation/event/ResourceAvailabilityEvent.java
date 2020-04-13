@@ -45,7 +45,7 @@ public class ResourceAvailabilityEvent extends ExternalEvent {
         String resourceType = resourceObject.getResourceType();
         resourceQueuesUpdated.add(resourceType);
         try {
-            model.getResourceManager().scheduleAllEventsFromQueueReadyForSchedule(resourceQueuesUpdated);
+            model.scheduleAllEventsFromQueueReadyForSchedule(resourceQueuesUpdated);
 
             ResourceAvailabilityEventPluggable.runPlugins(this);
 
