@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 
 import de.hpi.bpt.scylla.exception.ScyllaRuntimeException;
 import de.hpi.bpt.scylla.simulation.ProcessSimulationComponents;
-import de.hpi.bpt.scylla.simulation.QueueManager;
 import de.hpi.bpt.scylla.simulation.ResourceObjectTuple;
 import de.hpi.bpt.scylla.simulation.SimulationModel;
 import de.hpi.bpt.scylla.simulation.event.BPMNEndEvent;
@@ -148,8 +147,9 @@ public class TaskbasedBatchCluster extends BatchCluster implements BatchCluster.
 	
 	public void discardResources(ScyllaEvent event) {
 		BatchStashResourceEvent stashEvent = stashEvents.remove(event.getNodeId());
+		SimulationModel model = (SimulationModel) event.getModel();
 		try {
-			QueueManager.releaseResourcesAndScheduleQueuedEvents((SimulationModel) event.getModel(), stashEvent);
+			model.getResourceManager().releaseResourcesAndScheduleQueuedEvents(stashEvent);
 		} catch (ScyllaRuntimeException e) {
 			e.printStackTrace();
 		}

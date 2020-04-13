@@ -5,7 +5,6 @@ import java.util.Queue;
 
 import de.hpi.bpt.scylla.exception.ScyllaRuntimeException;
 import de.hpi.bpt.scylla.simulation.ProcessSimulationComponents;
-import de.hpi.bpt.scylla.simulation.QueueManager;
 import de.hpi.bpt.scylla.simulation.ResourceObjectTuple;
 import de.hpi.bpt.scylla.simulation.SimulationModel;
 import de.hpi.bpt.scylla.simulation.event.BPMNEndEvent;
@@ -45,6 +44,7 @@ public class CasebasedBatchCluster extends BatchCluster implements BatchCluster.
 	public void taskEnableEvent(TaskEnableEvent event) throws ScyllaRuntimeException {
 		super.taskEnableEvent(event);
 		TaskBeginEvent beginEvent = event.getBeginEvent();
+		SimulationModel model = (SimulationModel) beginEvent.getModel();
 		if(hasStashedResources()) {
 			if(resourcesAreInStash()) {//Resources are in stash => resources are available
 				//Force assign and assure execution
@@ -55,9 +55,9 @@ public class CasebasedBatchCluster extends BatchCluster implements BatchCluster.
 					ScyllaEvent removedEvent = event.getNextEventMap().remove(0);
 					assert removedEvent == beginEvent;
 					event.getTimeSpanToNextEventMap().remove(0);
-					QueueManager.releaseResourcesAndScheduleQueuedEvents((SimulationModel) beginEvent.getModel(), beginEvent);
+					model.getResourceManager().releaseResourcesAndScheduleQueuedEvents(beginEvent);
 				} else {
-					QueueManager.removeFromEventQueues((SimulationModel) beginEvent.getModel(), beginEvent);
+					model.getResourceManager().removeFromEventQueues(beginEvent);
 				}
 				//Wait for resources in extra queue
 				waitingTaskBegins.add(beginEvent);
@@ -69,7 +69,7 @@ public class CasebasedBatchCluster extends BatchCluster implements BatchCluster.
 	    		createStashEventFor(beginEvent, assignedResources);//so all other events know these are the resources to be used for stashing
 	    	} else {
 	    		//else wait until natural assignment is done except when there are concurrent events waiting for this natural assignment - then, be the first
-	    		if(!waitingTaskBegins.isEmpty())QueueManager.removeFromEventQueues((SimulationModel) beginEvent.getModel(), beginEvent);
+	    		if(!waitingTaskBegins.isEmpty())model.getResourceManager().removeFromEventQueues(beginEvent);
 	    		waitingTaskBegins.add(beginEvent);
 	    	}
 		}
@@ -118,8 +118,9 @@ public class CasebasedBatchCluster extends BatchCluster implements BatchCluster.
 		stashEvent.makeResourcesUnavailable();
 		if(!waitingTaskBegins.isEmpty()) {
 			TaskBeginEvent nextEvent = waitingTaskBegins.poll();
-			QueueManager.assignResourcesToEvent((SimulationModel) nextEvent.getModel(), nextEvent, stashEvent.getResources());
-			QueueManager.removeFromEventQueues((SimulationModel) nextEvent.getModel(), nextEvent);
+			SimulationModel model = (SimulationModel) nextEvent.getModel();
+			model.getResourceManager().assignResourcesToEvent(nextEvent, stashEvent.getResources());
+			model.getResourceManager().removeFromEventQueues(nextEvent);
 			return nextEvent;
 		}
 		return stashEvent;
@@ -145,7 +146,7 @@ public class CasebasedBatchCluster extends BatchCluster implements BatchCluster.
 	
 	public void discardResources() {
 		try {
-			QueueManager.releaseResourcesAndScheduleQueuedEvents((SimulationModel) stashEvent.getModel(), stashEvent);
+			((SimulationModel) stashEvent.getModel()).getResourceManager().releaseResourcesAndScheduleQueuedEvents(stashEvent);
 		} catch (ScyllaRuntimeException e) {
 			e.printStackTrace();
 		}

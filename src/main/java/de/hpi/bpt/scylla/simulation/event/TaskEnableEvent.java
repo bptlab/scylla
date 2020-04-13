@@ -13,7 +13,6 @@ import de.hpi.bpt.scylla.model.process.node.TaskType;
 import de.hpi.bpt.scylla.plugin_type.simulation.event.TaskEnableEventPluggable;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
 import de.hpi.bpt.scylla.simulation.ProcessSimulationComponents;
-import de.hpi.bpt.scylla.simulation.QueueManager;
 import de.hpi.bpt.scylla.simulation.ResourceObjectTuple;
 import de.hpi.bpt.scylla.simulation.SimulationModel;
 import de.hpi.bpt.scylla.simulation.utils.DateTimeUtils;
@@ -91,14 +90,14 @@ public class TaskEnableEvent extends TaskEvent {
 
             beginEvent = createBeginEvent();
 
-            ResourceObjectTuple resources = QueueManager.getResourcesForEvent(model, beginEvent);
+            ResourceObjectTuple resources = model.getResourceManager().getResourcesForEvent(beginEvent);
 
             if (resources == null) {
-                QueueManager.addToEventQueues(model, beginEvent);
+                model.getResourceManager().addToEventQueues(beginEvent);
                 sendTraceNote("Not enough resources available, task " + displayName + " is put in a queue.");
             }
             else {
-                QueueManager.assignResourcesToEvent(model, beginEvent, resources);
+                model.getResourceManager().assignResourcesToEvent(beginEvent, resources);
 
                 int index = getNewEventIndex();
                 nextEventMap.put(index, beginEvent);

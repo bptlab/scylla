@@ -8,7 +8,6 @@ import de.hpi.bpt.scylla.exception.ScyllaRuntimeException;
 import de.hpi.bpt.scylla.logger.DebugLogger;
 import de.hpi.bpt.scylla.plugin_type.simulation.event.ProcessSimulationStopEventPluggable;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
-import de.hpi.bpt.scylla.simulation.QueueManager;
 import de.hpi.bpt.scylla.simulation.SimulationModel;
 import de.hpi.bpt.scylla.simulation.utils.DateTimeUtils;
 import desmoj.core.simulator.Entity;
@@ -35,7 +34,7 @@ public class ProcessSimulationStopEvent extends ExternalEvent {
     public void eventRoutine() throws SuspendExecution {
         SimulationModel model = (SimulationModel) getModel();
 
-        Set<Integer> idsOfProcessInstancesToAbort = QueueManager.clearEventQueuesByProcessId(model, processId);
+        Set<Integer> idsOfProcessInstancesToAbort = model.getResourceManager().clearEventQueuesByProcessId(processId);
 
         try {
             ProcessSimulationStopEventPluggable.runPlugins(this);

@@ -13,7 +13,6 @@ import de.hpi.bpt.scylla.logger.ProcessNodeTransitionType;
 import de.hpi.bpt.scylla.logger.ResourceInfo;
 import de.hpi.bpt.scylla.logger.ResourceStatus;
 import de.hpi.bpt.scylla.plugin_type.logger.OutputLoggerPluggable;
-import de.hpi.bpt.scylla.simulation.QueueManager;
 import de.hpi.bpt.scylla.simulation.ResourceObject;
 import de.hpi.bpt.scylla.simulation.SimulationModel;
 import de.hpi.bpt.scylla.simulation.utils.DateTimeUtils;
@@ -40,7 +39,7 @@ public class StatisticsLogger extends OutputLoggerPluggable {
         Map<String, Map<Integer, List<ProcessNodeInfo>>> processNodeInfos = model.getProcessNodeInfos();
         Map<String, Map<String, List<ResourceInfo>>> resourceInfos = model.getResourceInfos();
 
-        Set<ResourceObject> resourceObjectsSet = QueueManager.getAllResourceObjects(model);
+        Set<ResourceObject> resourceObjectsSet = model.getResourceManager().getAllResourceObjects();
         Map<String, Double> costPerResourceInstance = new HashMap<String, Double>();
         Map<String, Map<String, ResourceObject>> resourceObjects = new HashMap<String, Map<String, ResourceObject>>();
         for (ResourceObject res : resourceObjectsSet) {

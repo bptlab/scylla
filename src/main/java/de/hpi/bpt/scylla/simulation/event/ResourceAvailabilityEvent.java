@@ -7,7 +7,6 @@ import java.util.Set;
 import co.paralleluniverse.fibers.SuspendExecution;
 import de.hpi.bpt.scylla.exception.ScyllaRuntimeException;
 import de.hpi.bpt.scylla.plugin_type.simulation.event.ResourceAvailabilityEventPluggable;
-import de.hpi.bpt.scylla.simulation.QueueManager;
 import de.hpi.bpt.scylla.simulation.ResourceObject;
 import de.hpi.bpt.scylla.simulation.SimulationModel;
 import de.hpi.bpt.scylla.simulation.utils.DateTimeUtils;
@@ -15,7 +14,6 @@ import de.hpi.bpt.scylla.simulation.utils.SimulationUtils;
 import desmoj.core.simulator.ExternalEvent;
 import desmoj.core.simulator.Model;
 import desmoj.core.simulator.TimeInstant;
-import desmoj.core.simulator.TimeSpan;
 
 /**
  * DesmoJ event responsible for scheduling queued events.
@@ -47,7 +45,7 @@ public class ResourceAvailabilityEvent extends ExternalEvent {
         String resourceType = resourceObject.getResourceType();
         resourceQueuesUpdated.add(resourceType);
         try {
-            QueueManager.scheduleAllEventsFromQueueReadyForSchedule(model, resourceQueuesUpdated);
+            model.getResourceManager().scheduleAllEventsFromQueueReadyForSchedule(resourceQueuesUpdated);
 
             ResourceAvailabilityEventPluggable.runPlugins(this);
 

@@ -12,7 +12,6 @@ import de.hpi.bpt.scylla.model.process.node.TaskType;
 import de.hpi.bpt.scylla.plugin_type.simulation.event.TaskCancelEventPluggable;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
 import de.hpi.bpt.scylla.simulation.ProcessSimulationComponents;
-import de.hpi.bpt.scylla.simulation.QueueManager;
 import de.hpi.bpt.scylla.simulation.ResourceObject;
 import de.hpi.bpt.scylla.simulation.SimulationModel;
 import de.hpi.bpt.scylla.simulation.utils.DateTimeUtils;
@@ -92,7 +91,7 @@ public class TaskCancelEvent extends TaskEvent {
 
             // 1: check queues if there are any events waiting, schedule them
 
-            QueueManager.releaseResourcesAndScheduleQueuedEvents(model, this);
+            model.getResourceManager().releaseResourcesAndScheduleQueuedEvents(this);
 
             // by default: cancel -> do not schedule any next event
             scheduleNextEvents();

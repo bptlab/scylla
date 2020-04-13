@@ -11,7 +11,6 @@ import de.hpi.bpt.scylla.model.process.node.EventDefinitionType;
 import de.hpi.bpt.scylla.plugin_type.simulation.event.BPMNEndEventPluggable;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
 import de.hpi.bpt.scylla.simulation.ProcessSimulationComponents;
-import de.hpi.bpt.scylla.simulation.QueueManager;
 import de.hpi.bpt.scylla.simulation.SimulationModel;
 import de.hpi.bpt.scylla.simulation.utils.SimulationUtils;
 import desmoj.core.simulator.Model;
@@ -94,7 +93,7 @@ public class BPMNEndEvent extends BPMNEvent {
 
             scheduleNextEvents();
 
-            if (!QueueManager.isAnyEventScheduledOrQueued(model)) {
+            if (!model.getResourceManager().isAnyEventScheduledOrQueued()) {
                 model.getExperiment().stop();
             }
         }

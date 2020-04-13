@@ -6,7 +6,6 @@ import de.hpi.bpt.scylla.exception.ScyllaRuntimeException;
 import de.hpi.bpt.scylla.model.process.ProcessModel;
 import de.hpi.bpt.scylla.plugin_type.simulation.event.TaskEnableEventPluggable;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
-import de.hpi.bpt.scylla.simulation.QueueManager;
 import de.hpi.bpt.scylla.simulation.SimulationModel;
 import de.hpi.bpt.scylla.simulation.event.ScyllaEvent;
 import de.hpi.bpt.scylla.simulation.event.TaskBeginEvent;
@@ -54,11 +53,12 @@ public class BatchTEPlugin extends TaskEnableEventPluggable {
 
             nextEventMap.remove(indexOfSubprocessBeginEvent);
             timeSpanToNextEventMap.remove(indexOfSubprocessBeginEvent);
+            SimulationModel model = (SimulationModel) subprocessBeginEvent.getModel();
             //If it is a normal task begin event, it might be on resource waiting queues
-            QueueManager.removeFromEventQueues((SimulationModel) subprocessBeginEvent.getModel(), subprocessBeginEvent);
+            model.getResourceManager().removeFromEventQueues(subprocessBeginEvent);
             if(processInstance.getAssignedResources().get(subprocessBeginEvent.getSource()) != null)
-            	QueueManager.releaseResourcesAndScheduleQueuedEvents((SimulationModel) subprocessBeginEvent.getModel(), subprocessBeginEvent);            
-            //QueueManager.assignResourcesToEvent((SimulationModel) subprocessBeginEvent.getModel(), subprocessBeginEvent, new ResourceObjectTuple());
+            	model.getResourceManager().releaseResourcesAndScheduleQueuedEvents(subprocessBeginEvent);            
+            //model.getResourceManager().assignResourcesToEvent((SimulationModel) subprocessBeginEvent.getModel(), subprocessBeginEvent, new ResourceObjectTuple());
         }
 
         BatchCluster cluster = pluginInstance.getCluster(processInstance);

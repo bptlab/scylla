@@ -12,7 +12,6 @@ import de.hpi.bpt.scylla.exception.ScyllaRuntimeException;
 import de.hpi.bpt.scylla.model.process.ProcessModel;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
 import de.hpi.bpt.scylla.simulation.ProcessSimulationComponents;
-import de.hpi.bpt.scylla.simulation.QueueManager;
 import de.hpi.bpt.scylla.simulation.ResourceObjectTuple;
 import de.hpi.bpt.scylla.simulation.SimulationModel;
 import de.hpi.bpt.scylla.simulation.event.BPMNEndEvent;
@@ -344,18 +343,19 @@ abstract class BatchCluster extends Entity {
 			BatchStashResourceEvent stashEvent = getStashEventFor(event);
 			ResourceObjectTuple resources = stashEvent.getResources();
 			TaskBeginEvent beginEvent = event.getBeginEvent();
+			SimulationModel model = (SimulationModel) beginEvent.getModel();
 			if(!event.getNextEventMap().isEmpty()) {//Event has assigned resources - but not the ones that are stashed for it
 				assert event.getNextEventMap().size() == 1;
 				assert event.getNextEventMap().get(0) == beginEvent;
 				try {
-					QueueManager.releaseResourcesAndScheduleQueuedEvents((SimulationModel) beginEvent.getModel(), beginEvent);
+					model.getResourceManager().releaseResourcesAndScheduleQueuedEvents(beginEvent);
 				} catch (ScyllaRuntimeException e) { e.printStackTrace(); }
 			} else {//Event waits for resources
-		        QueueManager.removeFromEventQueues((SimulationModel) beginEvent.getModel(), beginEvent);
+		        model.getResourceManager().removeFromEventQueues(beginEvent);
 	            event.getNextEventMap().put(0, beginEvent);
 	            event.getTimeSpanToNextEventMap().put(0, new TimeSpan(0));
 			}
-			QueueManager.assignResourcesToEvent((SimulationModel) beginEvent.getModel(), beginEvent, resources);
+			model.getResourceManager().assignResourcesToEvent(beginEvent, resources);
 			stashEvent.setResourcesInStash(false);
 		}
 		

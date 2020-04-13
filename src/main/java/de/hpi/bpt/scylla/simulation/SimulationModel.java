@@ -38,6 +38,7 @@ public class SimulationModel extends Model {
     private GlobalConfiguration globalConfiguration;
 
     private Map<String, ResourceQueue> resourceObjects = new HashMap<String, ResourceQueue>();
+    private QueueManager resourceManager = new QueueManager(this);
 
     private Map<String, ScyllaEventQueue> eventQueues = new HashMap<String, ScyllaEventQueue>();
 
@@ -235,6 +236,10 @@ public class SimulationModel extends Model {
     public Map<String, ResourceQueue> getResourceObjects() {
         return resourceObjects;
     }
+
+	public QueueManager getResourceManager() {
+		return resourceManager;
+	}
 
     public Map<String, ScyllaEventQueue> getEventQueues() {
         return eventQueues;

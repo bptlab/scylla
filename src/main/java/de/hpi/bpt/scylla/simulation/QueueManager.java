@@ -34,6 +34,8 @@ import desmoj.core.simulator.TimeSpan;
  *
  */
 public class QueueManager {
+	
+	private SimulationModel model;
 
     private static Comparator<ResourceObjectTuple> resourceObjectTupleComparator = new Comparator<ResourceObjectTuple>() {
 
@@ -52,33 +54,33 @@ public class QueueManager {
         }
     };
     
-    /**
+    public QueueManager(SimulationModel simulationModel) {
+		this.model = simulationModel;
+	}
+
+	/**
      * Immediately schedules all possible events that become ready through updates at the given resources
      * (As multiple events might wait for one resource, most likely not all waiting events for that resource will be scheduled)
-     * @param model : The simulation model; delivers the resource event queues
      * @param resourceQueuesUpdated : Set of ids of resources that have been updated (usually have become available again)
      * @throws ScyllaRuntimeException
      */
-    public static void scheduleAllEventsFromQueueReadyForSchedule(SimulationModel model, Set<String> resourceQueuesUpdated) throws ScyllaRuntimeException {
-    	ScyllaEvent eventFromQueue = getEventFromQueueReadyForSchedule(model, resourceQueuesUpdated);
+    public void scheduleAllEventsFromQueueReadyForSchedule(Set<String> resourceQueuesUpdated) throws ScyllaRuntimeException {
+    	ScyllaEvent eventFromQueue = getEventFromQueueReadyForSchedule(resourceQueuesUpdated);
         while (eventFromQueue != null) {
         	SimulationUtils.scheduleEvent(eventFromQueue, new TimeSpan(0));
-            eventFromQueue = getEventFromQueueReadyForSchedule(model, resourceQueuesUpdated);
+            eventFromQueue = getEventFromQueueReadyForSchedule(resourceQueuesUpdated);
         }
     }
 
     /**
      * Returns eventwhich is ready to be scheduled for immediate execution from event queues.
      * 
-     * @param model
-     *            the simulation model
      * @param resourceQueuesUpdated
      *            resource queues which have been updated recently -> only the events which require resources from these
      *            queues are considered
      * @return the DesmoJ event which is ready to be scheduled for immediate execution
      */
-    public static ScyllaEvent getEventFromQueueReadyForSchedule(SimulationModel model,
-            Set<String> resourceQueuesUpdated) {
+    public ScyllaEvent getEventFromQueueReadyForSchedule(Set<String> resourceQueuesUpdated) {
     	
     	ScyllaEvent eventFromPlugin = ResourceQueueUpdatedPluggable.runPlugins(resourceQueuesUpdated);
     	if(eventFromPlugin != null)return eventFromPlugin;
@@ -95,7 +97,7 @@ public class QueueManager {
                 }
 
                 int index = 0;
-                boolean eventIsEligible = hasResourcesForEvent(model, eventFromQueue);
+                boolean eventIsEligible = hasResourcesForEvent(eventFromQueue);
 
                 if (eventIsEligible) {
                     ProcessSimulationComponents simulationComponents = eventFromQueue.getSimulationComponents();
@@ -139,15 +141,15 @@ public class QueueManager {
 
             // get and assign resources
 
-            ResourceObjectTuple resourcesObjectTuple = getResourcesForEvent(model, event);
-            assignResourcesToEvent(model, event, resourcesObjectTuple);
+            ResourceObjectTuple resourcesObjectTuple = getResourcesForEvent(event);
+            assignResourcesToEvent(event, resourcesObjectTuple);
 
-            removeFromEventQueues(model, event);
+            removeFromEventQueues(event);
             return event;
         }
     }
     
-    public static void removeFromEventQueues(SimulationModel model, ScyllaEvent event) {
+    public void removeFromEventQueues(ScyllaEvent event) {
         ProcessSimulationComponents simulationComponents = event.getSimulationComponents();
         int nodeId = event.getNodeId();
         Set<ResourceReference> resourceReferences = simulationComponents.getSimulationConfiguration()
@@ -179,12 +181,10 @@ public class QueueManager {
     /**
      * Adds event to event queues.
      * 
-     * @param model
-     *            the simulation model
      * @param event
      *            the event to be added to event queues
      */
-    public static void addToEventQueues(SimulationModel model, ScyllaEvent event) {
+    public void addToEventQueues(ScyllaEvent event) {
         ProcessSimulationComponents simulationComponents = event.getSimulationComponents();
         int nodeId = event.getNodeId();
         Set<ResourceReference> resourceReferences = simulationComponents.getSimulationConfiguration()
@@ -202,13 +202,11 @@ public class QueueManager {
     /**
      * Removes all events which are related to the given process model from the event queues.
      * 
-     * @param model
-     *            the simulation model
      * @param processId
      *            the identifier of the process model
      * @return identifiers of the process instances which are affected by removing
      */
-    public static Set<Integer> clearEventQueuesByProcessId(SimulationModel model, String processId) {
+    public Set<Integer> clearEventQueuesByProcessId( String processId) {
         Set<Integer> idsOfProcessInstancesToAbort = new HashSet<Integer>();
 
         // remove events of process from queues
@@ -256,11 +254,9 @@ public class QueueManager {
     /**
      * Checks whether any event is scheduled or queued (if not, simulation may terminate).
      * 
-     * @param model
-     *            the simulation model
      * @return true if a event is either scheduled or queued
      */
-    public static boolean isAnyEventScheduledOrQueued(SimulationModel model) {
+    public boolean isAnyEventScheduledOrQueued() {
         List<Entity> entities = model.getEntities(false);
         for (Entity entity : entities) {
             TimeInstant timeInstant = entity.scheduledNext();
@@ -280,14 +276,12 @@ public class QueueManager {
     /**
      * Checks whether resource instances are available for the given event.
      * 
-     * @param model
-     *            the simulation model
      * @param event
      *            the DesmoJ event in question
      * @return true if resource instances are available for the given event
      */
-    private static boolean hasResourcesForEvent(SimulationModel model, ScyllaEvent event) {
-        ResourceObjectTuple resourceObjectTuple = getResourcesForEvent(model, event);
+    private boolean hasResourcesForEvent(ScyllaEvent event) {
+        ResourceObjectTuple resourceObjectTuple = getResourcesForEvent(event);
         if (resourceObjectTuple == null) {
             return false;
         }
@@ -305,14 +299,11 @@ public class QueueManager {
 
     /**
      * Returns resource instances which are available for the given event.
-     * 
-     * @param model
-     *            the simulation model; providing time and resource queues
      * @param event
      *            the DesmoJ event in question
      * @return the resource instances which are available for the given event
      */
-    public static ResourceObjectTuple getResourcesForEvent(SimulationModel model, ScyllaEvent event) {
+    public ResourceObjectTuple getResourcesForEvent(ScyllaEvent event) {
     	
     	Optional<ResourceObjectTuple> assignment = ResourceAssignmentPluggable.runPlugins(model, event);
     	if(assignment.isPresent())return assignment.get();
@@ -486,8 +477,7 @@ public class QueueManager {
 
     }
 
-    public static void assignResourcesToEvent(SimulationModel model, ScyllaEvent event,
-            ResourceObjectTuple resourceObjectTuple) {
+    public void assignResourcesToEvent(ScyllaEvent event, ResourceObjectTuple resourceObjectTuple) {
         ProcessInstance processInstance = event.getProcessInstance();
         String source = event.getSource();
         int nodeId = event.getNodeId();
@@ -528,14 +518,11 @@ public class QueueManager {
      * Releases the resource instances assigned to the given event, selects event(s) from the event queues which are due
      * next and schedules them immediately.
      * 
-     * @param model
-     *            the simulation model
      * @param releasingEvent
      *            the DesmoJ event whose resource instances may be released
      * @throws ScyllaRuntimeException
      */
-    public static void releaseResourcesAndScheduleQueuedEvents(SimulationModel model, ScyllaEvent releasingEvent)
-            throws ScyllaRuntimeException {
+    public void releaseResourcesAndScheduleQueuedEvents(ScyllaEvent releasingEvent) throws ScyllaRuntimeException {
     	ProcessInstance processInstance = releasingEvent.getProcessInstance();
         int nodeId = releasingEvent.getNodeId();
         String nameOfResponsibleEvent = releasingEvent.getSource();
@@ -581,7 +568,7 @@ public class QueueManager {
          * 
          * --> solved by introduction of ResourceAvailableEvent
          */
-        scheduleAllEventsFromQueueReadyForSchedule(model, resourceQueuesUpdated);
+        scheduleAllEventsFromQueueReadyForSchedule(resourceQueuesUpdated);
     }
 
     /**
@@ -591,9 +578,9 @@ public class QueueManager {
      *            the simulation model
      * @return resource instances of all resource types
      */
-    public static Set<ResourceObject> getAllResourceObjects(SimulationModel sm) {
+    public Set<ResourceObject> getAllResourceObjects() {
         Set<ResourceObject> objects = new HashSet<ResourceObject>();
-        Map<String, ResourceQueue> resources = sm.getResourceObjects();
+        Map<String, ResourceQueue> resources = model.getResourceObjects();
         for (String resourceType : resources.keySet()) {
             ResourceQueue resourceQueue = resources.get(resourceType);
             ResourceObject obj = resourceQueue.poll();

@@ -11,7 +11,6 @@ import de.hpi.bpt.scylla.model.process.graph.exception.NoStartNodeException;
 import de.hpi.bpt.scylla.model.process.graph.exception.NodeNotFoundException;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
 import de.hpi.bpt.scylla.simulation.ProcessSimulationComponents;
-import de.hpi.bpt.scylla.simulation.QueueManager;
 import de.hpi.bpt.scylla.simulation.ResourceObjectTuple;
 import de.hpi.bpt.scylla.simulation.SimulationModel;
 import de.hpi.bpt.scylla.simulation.event.BPMNStartEvent;
@@ -48,8 +47,8 @@ public class BatchClusterStartEvent extends TaskBeginEvent {
         ResourceObjectTuple resources = getProcessInstance().getAssignedResources().get(getSource());
         assert Objects.nonNull(resources);
         for (TaskBeginEvent pse : parentalStartEvents) {
-        	QueueManager.assignResourcesToEvent((SimulationModel) pse.getModel(), pse, resources);
-        	//QueueManager.assignResourcesToEvent((SimulationModel) pse.getModel(), pse, new ResourceObjectTuple());
+        	((SimulationModel) pse.getModel()).getResourceManager().assignResourcesToEvent(pse, resources);
+        	//model.getResourceManager().assignResourcesToEvent((SimulationModel) pse.getModel(), pse, new ResourceObjectTuple());
             if(!cluster.isBatchTask()) pse.schedule();
         }
 
@@ -100,7 +99,7 @@ public class BatchClusterStartEvent extends TaskBeginEvent {
             	//startEvent.cancel();
             	/*System.out.println("now: "+startEvent.getProcessInstance().getAssignedResources().get(startEvent.getSource()).getResourceObjects());
     			try {
-					QueueManager.releaseResourcesAndScheduleQueuedEvents((SimulationModel) startEvent.getModel(), startEvent);
+					model.getResourceManager().releaseResourcesAndScheduleQueuedEvents((SimulationModel) startEvent.getModel(), startEvent);
 				} catch (ScyllaRuntimeException e) {
 					e.printStackTrace();
 				}
