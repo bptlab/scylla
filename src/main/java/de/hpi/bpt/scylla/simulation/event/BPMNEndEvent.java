@@ -93,7 +93,7 @@ public class BPMNEndEvent extends BPMNEvent {
 
             scheduleNextEvents();
 
-            if (!model.getResourceManager().isAnyEventScheduledOrQueued()) {
+            if (!model.isAnyEventScheduledOrQueued()) {
                 model.getExperiment().stop();
             }
         }

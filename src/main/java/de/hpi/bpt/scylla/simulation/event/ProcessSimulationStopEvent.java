@@ -34,7 +34,7 @@ public class ProcessSimulationStopEvent extends ExternalEvent {
     public void eventRoutine() throws SuspendExecution {
         SimulationModel model = (SimulationModel) getModel();
 
-        Set<Integer> idsOfProcessInstancesToAbort = model.getResourceManager().clearEventQueuesByProcessId(processId);
+        Set<Integer> idsOfProcessInstancesToAbort = model.clearEventQueuesByProcessId(processId);
 
         try {
             ProcessSimulationStopEventPluggable.runPlugins(this);

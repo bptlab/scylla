@@ -93,7 +93,7 @@ public class TaskEnableEvent extends TaskEvent {
             ResourceObjectTuple resources = model.getResourceManager().getResourcesForEvent(beginEvent);
 
             if (resources == null) {
-                model.getResourceManager().addToEventQueues(beginEvent);
+                model.addToEventQueues(beginEvent);
                 sendTraceNote("Not enough resources available, task " + displayName + " is put in a queue.");
             }
             else {

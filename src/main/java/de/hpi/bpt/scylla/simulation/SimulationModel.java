@@ -2,9 +2,12 @@ package de.hpi.bpt.scylla.simulation;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,6 +30,7 @@ import de.hpi.bpt.scylla.simulation.event.ProcessSimulationStopEvent;
 import de.hpi.bpt.scylla.simulation.event.ScyllaEvent;
 import de.hpi.bpt.scylla.simulation.utils.DateTimeUtils;
 import de.hpi.bpt.scylla.simulation.utils.SimulationUtils;
+import desmoj.core.simulator.Entity;
 import desmoj.core.simulator.Model;
 import desmoj.core.simulator.TimeInstant;
 import desmoj.core.simulator.TimeSpan;
@@ -40,7 +44,7 @@ public class SimulationModel extends Model {
 
     private GlobalConfiguration globalConfiguration;
     
-    private QueueManager resourceManager = new QueueManager(this);
+    private QueueManager resourceManager;
 
     //Events that are waiting for resources
     private Map<String, ScyllaEventQueue> eventQueues = new HashMap<String, ScyllaEventQueue>();
@@ -139,7 +143,7 @@ public class SimulationModel extends Model {
 
             DateTimeUtils.setStartDateTime(startDateTime);
 
-            resourceManager.init(globalConfiguration);
+            resourceManager = new QueueManager(this);
             
             // prepare queue and sorting order
             // TODO each resource has its own assignment order
@@ -273,7 +277,28 @@ public class SimulationModel extends Model {
     }
     
     /**
-     * Returns eventwhich is ready to be scheduled for immediate execution from event queues.
+     * Adds event to event queues.
+     * 
+     * @param event
+     *            the event to be added to event queues
+     */
+    public void addToEventQueues(ScyllaEvent event) {
+        ProcessSimulationComponents simulationComponents = event.getSimulationComponents();
+        int nodeId = event.getNodeId();
+        Set<ResourceReference> resourceReferences = simulationComponents.getSimulationConfiguration()
+                .getResourceReferenceSet(nodeId);
+
+        Map<String, ScyllaEventQueue> eventQueues = getEventQueues();
+        for (ResourceReference resourceRef : resourceReferences) {
+            String resourceId = resourceRef.getResourceId();
+
+            ScyllaEventQueue eventQueue = eventQueues.get(resourceId);
+            eventQueue.offer(event);
+        }
+    }
+    
+    /**
+     * Returns event which is ready to be scheduled for immediate execution from event queues.
      * 
      * @param resourceQueuesUpdated
      *            resource queues which have been updated recently -> only the events which require resources from these
@@ -347,6 +372,64 @@ public class SimulationModel extends Model {
             removeFromEventQueues(event);
             return event;
         }
+    }
+    
+    /**
+     * Checks whether any event is scheduled or queued (if not, simulation may terminate).
+     * 
+     * @return true if a event is either scheduled or queued
+     */
+    public boolean isAnyEventScheduledOrQueued() {
+        List<Entity> entities = getEntities(false);
+        for (Entity entity : entities) {
+            TimeInstant timeInstant = entity.scheduledNext();
+            if (timeInstant != null) {
+                return true;
+            }
+        }
+        Collection<ScyllaEventQueue> eventQueues = getEventQueues().values();
+        for (ScyllaEventQueue queue : eventQueues) {
+            if (!queue.isEmpty()) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Removes all events which are related to the given process model from the event queues.
+     * 
+     * @param processId
+     *            the identifier of the process model
+     * @return identifiers of the process instances which are affected by removing
+     */
+    public Set<Integer> clearEventQueuesByProcessId( String processId) {
+        Set<Integer> idsOfProcessInstancesToAbort = new HashSet<Integer>();
+
+        // remove events of process from queues
+        Map<String, ScyllaEventQueue> eventQueues = getEventQueues();
+        for (String resourceId : eventQueues.keySet()) {
+            ScyllaEventQueue queue = eventQueues.get(resourceId);
+            Iterator<ScyllaEvent> iterator = queue.iterator();
+            Set<ScyllaEvent> eventsToRemove = new HashSet<ScyllaEvent>();
+            while (iterator.hasNext()) {
+                ScyllaEvent queuedEvent = iterator.next();
+                String eventNameOfQueuedEvent = queuedEvent.getName();
+                if (eventNameOfQueuedEvent.startsWith(processId)) {
+                    eventsToRemove.add(queuedEvent);
+
+                    ProcessInstance processInstance = queuedEvent.getProcessInstance();
+                    while (processInstance.getParent() != null) {
+                        // we want the id of the process instance, not of any sub process instance
+                        processInstance = processInstance.getParent();
+                    }
+                    int idOfTopProcessInstance = processInstance.getId();
+                    idsOfProcessInstancesToAbort.add(idOfTopProcessInstance);
+                }
+            }
+            queue.removeAll(eventsToRemove);
+        }
+        return idsOfProcessInstancesToAbort;
     }
     
     public void removeFromEventQueues(ScyllaEvent event) {

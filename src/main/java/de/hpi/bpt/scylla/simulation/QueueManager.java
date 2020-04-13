@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -18,20 +17,15 @@ import de.hpi.bpt.scylla.exception.ScyllaRuntimeException;
 import de.hpi.bpt.scylla.logger.ResourceInfo;
 import de.hpi.bpt.scylla.logger.ResourceStatus;
 import de.hpi.bpt.scylla.model.configuration.ResourceReference;
-import de.hpi.bpt.scylla.model.global.GlobalConfiguration;
 import de.hpi.bpt.scylla.model.global.resource.DynamicResource;
 import de.hpi.bpt.scylla.model.global.resource.DynamicResourceInstance;
 import de.hpi.bpt.scylla.model.global.resource.Resource;
 import de.hpi.bpt.scylla.model.global.resource.TimetableItem;
-import de.hpi.bpt.scylla.plugin_type.parser.EventOrderType;
 import de.hpi.bpt.scylla.plugin_type.simulation.resource.ResourceAssignmentPluggable;
-import de.hpi.bpt.scylla.plugin_type.simulation.resource.ResourceQueueUpdatedPluggable;
 import de.hpi.bpt.scylla.simulation.event.ScyllaEvent;
 import de.hpi.bpt.scylla.simulation.utils.DateTimeUtils;
 import de.hpi.bpt.scylla.simulation.utils.SimulationUtils;
-import desmoj.core.simulator.Entity;
 import desmoj.core.simulator.TimeInstant;
-import desmoj.core.simulator.TimeSpan;
 
 /**
  * Responsible for event queues and resource queues.
@@ -62,23 +56,11 @@ public class QueueManager {
         }
     };
     
-    public QueueManager(SimulationModel simulationModel) {
+    public QueueManager(SimulationModel simulationModel) throws InstantiationException {
 		this.model = simulationModel;
+        convertToResourceObjects(model.getGlobalConfiguration().getResources());
 	}
     
-    public Map<String, ResourceQueue> getResourceObjects() {
-        return resourceObjects;
-    }
-    
-    public Collection<String> getResourceTypes() {
-    	return resourceObjects.keySet();
-    }
-    
-    public void init(GlobalConfiguration globalConfiguration) throws InstantiationException{
-        convertToResourceObjects(globalConfiguration.getResources());
-    }
-    
-
     private void convertToResourceObjects(Map<String, Resource> resources) throws InstantiationException {
 
         resourceObjects = new HashMap<String, ResourceQueue>();
@@ -107,118 +89,18 @@ public class QueueManager {
             resourceObjects.put(resourceType, resQueue);
         }
     }
-
-
-    // public static boolean areResourcesAvailable(SimulationModel model, Set<ResourceReference> resourceReferences,
-    // String displayName) {
-    // Map<String, ResourceQueue> resourceObjects = getResourceObjects();
-    // for (ResourceReference resourceRef : resourceReferences) {
-    // String resourceId = resourceRef.getResourceId();
-    // int amount = resourceRef.getAmount();
-    // ResourceQueue queue = resourceObjects.get(resourceId);
-    // if (queue.size() < amount) {
-    // model.sendTraceNote("Not enough resources of type " + resourceId + " available, task " + displayName
-    // + " is put in a queue.");
-    // return true;
-    // }
-    // }
-    // return false;
-    // }
-
-    /**
-     * Adds event to event queues.
-     * 
-     * @param event
-     *            the event to be added to event queues
-     */
-    public void addToEventQueues(ScyllaEvent event) {
-        ProcessSimulationComponents simulationComponents = event.getSimulationComponents();
-        int nodeId = event.getNodeId();
-        Set<ResourceReference> resourceReferences = simulationComponents.getSimulationConfiguration()
-                .getResourceReferenceSet(nodeId);
-
-        Map<String, ScyllaEventQueue> eventQueues = model.getEventQueues();
-        for (ResourceReference resourceRef : resourceReferences) {
-            String resourceId = resourceRef.getResourceId();
-
-            ScyllaEventQueue eventQueue = eventQueues.get(resourceId);
-            eventQueue.offer(event);
-        }
+    
+    private Map<String, ResourceQueue> getResourceObjects() {
+        return resourceObjects;
     }
-
-    /**
-     * Removes all events which are related to the given process model from the event queues.
-     * 
-     * @param processId
-     *            the identifier of the process model
-     * @return identifiers of the process instances which are affected by removing
-     */
-    public Set<Integer> clearEventQueuesByProcessId( String processId) {
-        Set<Integer> idsOfProcessInstancesToAbort = new HashSet<Integer>();
-
-        // remove events of process from queues
-        Map<String, ScyllaEventQueue> eventQueues = model.getEventQueues();
-        for (String resourceId : eventQueues.keySet()) {
-            ScyllaEventQueue queue = eventQueues.get(resourceId);
-            Iterator<ScyllaEvent> iterator = queue.iterator();
-            Set<ScyllaEvent> eventsToRemove = new HashSet<ScyllaEvent>();
-            while (iterator.hasNext()) {
-                ScyllaEvent queuedEvent = iterator.next();
-                String eventNameOfQueuedEvent = queuedEvent.getName();
-                if (eventNameOfQueuedEvent.startsWith(processId)) {
-                    eventsToRemove.add(queuedEvent);
-
-                    ProcessInstance processInstance = queuedEvent.getProcessInstance();
-                    while (processInstance.getParent() != null) {
-                        // we want the id of the process instance, not of any sub process instance
-                        processInstance = processInstance.getParent();
-                    }
-                    int idOfTopProcessInstance = processInstance.getId();
-                    idsOfProcessInstancesToAbort.add(idOfTopProcessInstance);
-                }
-            }
-            queue.removeAll(eventsToRemove);
-        }
-        return idsOfProcessInstancesToAbort;
+    
+    public Collection<ResourceObject> availableResources(String typeId) {
+    	return resourceObjects.get(typeId);
     }
-
-    // public static boolean areResourcesAvailable(SimulationModel model, Set<ResourceReference> resourceReferences,
-    // String displayName) {
-    // Map<String, ResourceQueue> resourceObjects = getResourceObjects();
-    // for (ResourceReference resourceRef : resourceReferences) {
-    // String resourceId = resourceRef.getResourceId();
-    // int amount = resourceRef.getAmount();
-    // ResourceQueue queue = resourceObjects.get(resourceId);
-    // if (queue.size() < amount) {
-    // model.sendTraceNote("Not enough resources of type " + resourceId + " available, task " + displayName
-    // + " is put in a queue.");
-    // return true;
-    // }
-    // }
-    // return false;
-    // }
-
-    /**
-     * Checks whether any event is scheduled or queued (if not, simulation may terminate).
-     * 
-     * @return true if a event is either scheduled or queued
-     */
-    public boolean isAnyEventScheduledOrQueued() {
-        List<Entity> entities = model.getEntities(false);
-        for (Entity entity : entities) {
-            TimeInstant timeInstant = entity.scheduledNext();
-            if (timeInstant != null) {
-                return true;
-            }
-        }
-        Collection<ScyllaEventQueue> eventQueues = model.getEventQueues().values();
-        for (ScyllaEventQueue queue : eventQueues) {
-            if (!queue.isEmpty()) {
-                return true;
-            }
-        }
-        return false;
-    }
+    
+    public Collection<String> getResourceTypes() {
+    	return resourceObjects.keySet();
+    }    
 
     /**
      * Checks whether resource instances are available for the given event.
@@ -346,84 +228,6 @@ public class QueueManager {
         return chosenTuple;
     }
 
-    private static List<ResourceObjectTuple> findMatchingResourceObjectTuples(
-            Map<String, List<ResourceObjectTuple>> tuplesPerResource, String[] resourceIds) {
-        List<ResourceObjectTuple> tuples = new ArrayList<ResourceObjectTuple>();
-        List<ResourceObjectTuple> tuplesOfFirstResource = tuplesPerResource.get(resourceIds[0]);
-
-        for (int i = 0; i < tuplesOfFirstResource.size(); i++) {
-            ResourceObjectTuple potentiallyMergedTuple = tuplesOfFirstResource.get(i);
-            int indexOfResourceToBeCovered = 1; // potentiallyMergedTuple initially contains ResourceObjects from first
-                                                // resource type, so cover second resource type as next, whose index is
-                                                // 1
-            mergeAndAddToTuple(tuplesPerResource, resourceIds, potentiallyMergedTuple, indexOfResourceToBeCovered,
-                    tuples);
-        }
-
-        return tuples;
-    }
-
-    private static void mergeAndAddToTuple(Map<String, List<ResourceObjectTuple>> tuplesPerResource,
-            String[] resourceIds, ResourceObjectTuple potentiallyMergedTuple, int indexOfResourceToBeCovered,
-            List<ResourceObjectTuple> tuples) {
-        if (resourceIds.length == indexOfResourceToBeCovered) {
-            tuples.add(potentiallyMergedTuple);
-            return;
-        }
-        List<ResourceObjectTuple> tuplesOfResource = tuplesPerResource.get(resourceIds[indexOfResourceToBeCovered]);
-        for (int i = 0; i < tuplesOfResource.size(); i++) {
-            ResourceObjectTuple tupleOfResourceToBeCovered = tuplesOfResource.get(i);
-            List<TimetableItem> sharedTimetable = DateTimeUtils.intersectTimetables(
-                    potentiallyMergedTuple.getSharedTimetable(), tupleOfResourceToBeCovered.getSharedTimetable());
-            if (sharedTimetable != null && sharedTimetable.isEmpty()) { // intersection timetable is empty
-                continue;
-            }
-            // update tuple TODO avoid clone by recursive implementation
-            ResourceObjectTuple tuple = potentiallyMergedTuple.clone();
-            tuple.getResourceObjects().addAll(tupleOfResourceToBeCovered.getResourceObjects());
-            tuple.setSharedTimetable(sharedTimetable);
-            // continue
-            mergeAndAddToTuple(tuplesPerResource, resourceIds, tuple, indexOfResourceToBeCovered + 1, tuples);
-        }
-
-    }
-
-    private static List<ResourceObjectTuple> findMatchingResourceObjects(List<ResourceObject> resourceObjects,
-            int index, int amount) {
-        List<ResourceObjectTuple> tuples = new ArrayList<ResourceObjectTuple>();
-
-        ResourceObjectTuple potentialTuple = new ResourceObjectTuple();
-        ResourceObject firstObject = resourceObjects.get(index);
-        potentialTuple.getResourceObjects().add(firstObject);
-        potentialTuple.setSharedTimetable(firstObject.getTimetable());
-        addToTuple(resourceObjects, index, potentialTuple, amount, tuples);
-
-        return tuples;
-    }
-
-    private static void addToTuple(List<ResourceObject> resourceObjects, int index, ResourceObjectTuple potentialTuple,
-            int amount, List<ResourceObjectTuple> tuples) {
-        if (potentialTuple.size() == amount) {
-            tuples.add(potentialTuple);
-            return;
-        }
-        for (int i = index + 1; i < resourceObjects.size(); i++) {
-            ResourceObject obj = resourceObjects.get(i);
-            List<TimetableItem> sharedTimetable = DateTimeUtils.intersectTimetables(potentialTuple.getSharedTimetable(),
-                    obj.getTimetable());
-            if (sharedTimetable != null && sharedTimetable.isEmpty()) { // intersection timetable is empty
-                continue;
-            }
-            // update tuple TODO avoid clone by recursive implementation
-            ResourceObjectTuple tuple = potentialTuple.clone();
-            tuple.getResourceObjects().add(obj);
-            tuple.setSharedTimetable(sharedTimetable);
-            // continue
-            addToTuple(resourceObjects, i, tuple, amount, tuples);
-        }
-
-    }
-
     public void assignResourcesToEvent(ScyllaEvent event, ResourceObjectTuple resourceObjectTuple) {
         ProcessInstance processInstance = event.getProcessInstance();
         String source = event.getSource();
@@ -538,6 +342,82 @@ public class QueueManager {
             resourceQueue.addAll(objects);
         }
         return objects;
+
+    }
+    
+
+    private static List<ResourceObjectTuple> findMatchingResourceObjectTuples(Map<String, List<ResourceObjectTuple>> tuplesPerResource, String[] resourceIds) {
+        List<ResourceObjectTuple> tuples = new ArrayList<ResourceObjectTuple>();
+        List<ResourceObjectTuple> tuplesOfFirstResource = tuplesPerResource.get(resourceIds[0]);
+
+        for (int i = 0; i < tuplesOfFirstResource.size(); i++) {
+            ResourceObjectTuple potentiallyMergedTuple = tuplesOfFirstResource.get(i);
+            int indexOfResourceToBeCovered = 1; // potentiallyMergedTuple initially contains ResourceObjects from first
+                                                // resource type, so cover second resource type as next, whose index is
+                                                // 1
+            mergeAndAddToTuple(tuplesPerResource, resourceIds, potentiallyMergedTuple, indexOfResourceToBeCovered,
+                    tuples);
+        }
+
+        return tuples;
+    }
+
+    private static void mergeAndAddToTuple(Map<String, List<ResourceObjectTuple>> tuplesPerResource, String[] resourceIds, ResourceObjectTuple potentiallyMergedTuple, int indexOfResourceToBeCovered, List<ResourceObjectTuple> tuples) {
+        if (resourceIds.length == indexOfResourceToBeCovered) {
+            tuples.add(potentiallyMergedTuple);
+            return;
+        }
+        List<ResourceObjectTuple> tuplesOfResource = tuplesPerResource.get(resourceIds[indexOfResourceToBeCovered]);
+        for (int i = 0; i < tuplesOfResource.size(); i++) {
+            ResourceObjectTuple tupleOfResourceToBeCovered = tuplesOfResource.get(i);
+            List<TimetableItem> sharedTimetable = DateTimeUtils.intersectTimetables(
+                    potentiallyMergedTuple.getSharedTimetable(), tupleOfResourceToBeCovered.getSharedTimetable());
+            if (sharedTimetable != null && sharedTimetable.isEmpty()) { // intersection timetable is empty
+                continue;
+            }
+            // update tuple TODO avoid clone by recursive implementation
+            ResourceObjectTuple tuple = potentiallyMergedTuple.clone();
+            tuple.getResourceObjects().addAll(tupleOfResourceToBeCovered.getResourceObjects());
+            tuple.setSharedTimetable(sharedTimetable);
+            // continue
+            mergeAndAddToTuple(tuplesPerResource, resourceIds, tuple, indexOfResourceToBeCovered + 1, tuples);
+        }
+
+    }
+
+    private static List<ResourceObjectTuple> findMatchingResourceObjects(List<ResourceObject> resourceObjects,
+            int index, int amount) {
+        List<ResourceObjectTuple> tuples = new ArrayList<ResourceObjectTuple>();
+
+        ResourceObjectTuple potentialTuple = new ResourceObjectTuple();
+        ResourceObject firstObject = resourceObjects.get(index);
+        potentialTuple.getResourceObjects().add(firstObject);
+        potentialTuple.setSharedTimetable(firstObject.getTimetable());
+        addToTuple(resourceObjects, index, potentialTuple, amount, tuples);
+
+        return tuples;
+    }
+
+    private static void addToTuple(List<ResourceObject> resourceObjects, int index, ResourceObjectTuple potentialTuple,
+            int amount, List<ResourceObjectTuple> tuples) {
+        if (potentialTuple.size() == amount) {
+            tuples.add(potentialTuple);
+            return;
+        }
+        for (int i = index + 1; i < resourceObjects.size(); i++) {
+            ResourceObject obj = resourceObjects.get(i);
+            List<TimetableItem> sharedTimetable = DateTimeUtils.intersectTimetables(potentialTuple.getSharedTimetable(),
+                    obj.getTimetable());
+            if (sharedTimetable != null && sharedTimetable.isEmpty()) { // intersection timetable is empty
+                continue;
+            }
+            // update tuple TODO avoid clone by recursive implementation
+            ResourceObjectTuple tuple = potentialTuple.clone();
+            tuple.getResourceObjects().add(obj);
+            tuple.setSharedTimetable(sharedTimetable);
+            // continue
+            addToTuple(resourceObjects, i, tuple, amount, tuples);
+        }
 
     }
 
