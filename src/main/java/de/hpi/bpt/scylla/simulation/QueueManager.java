@@ -89,6 +89,11 @@ public class QueueManager {
             resourceObjects.put(resourceType, resQueue);
         }
     }
+
+    public void addToResourceObjects(String resourceType, ResourceQueue resourceQueue) {
+        resourceObjects.put(resourceType, resourceQueue);
+        return;
+    }
     
     private Map<String, ResourceQueue> getResourceObjects() {
         return resourceObjects;

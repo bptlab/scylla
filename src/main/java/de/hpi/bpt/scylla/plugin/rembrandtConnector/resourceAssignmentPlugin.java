@@ -67,7 +67,7 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
         ResourceObject assignedResource = new ResourceObject(resultTypeId, resultInstanceId);
         ResourceQueue resourceQueue = new ResourceQueue(1);
         resourceQueue.add(assignedResource);
-        model.addToResourceObjects(resultTypeId, resourceQueue);
+        model.getResourceManager().addToResourceObjects(resultTypeId, resourceQueue);
 
         //build resourceObjectTuple
         ResourceObjectTuple assignedResourceTuple = new ResourceObjectTuple();

@@ -211,10 +211,6 @@ public class SimulationModel extends Model {
 		return resourceManager;
 	}
 
-    public void addToResourceObjects(String resourceType, ResourceQueue resourceQueue) {
-        resourceObjects.put(resourceType, resourceQueue);
-        return;
-    }
 
     public Map<String, ScyllaEventQueue> getEventQueues() {
         return eventQueues;
