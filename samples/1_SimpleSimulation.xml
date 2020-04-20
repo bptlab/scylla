@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bsim:definitions xmlns:bsim="http://bsim.hpi.uni-potsdam.de/scylla/simModel" targetNamespace="http://www.hpi.de">
+  <bsim:simulationConfiguration startDateTime="2020-04-16T19:19:34.844706800+02:00[Europe/Berlin]" endDateTime="2020-04-16T19:19:34.847700700+02:00[Europe/Berlin]" id="1_SimpleSimulation" processRef="Process_0fh5hxd" processInstances="2">
+    <bsim:startEvent id="StartEvent_0o1lkph">
+      <bsim:arrivalRate timeUnit="SECONDS">
+        <bsim:constantDistribution>
+          <bsim:constantValue>50.0</bsim:constantValue>
+        </bsim:constantDistribution>
+      </bsim:arrivalRate>
+    </bsim:startEvent>
+    <bsim:Task id="Activity_00hycy4" name="do Something">
+      <bsim:duration timeUnit="SECONDS">
+        <bsim:constantDistribution>
+          <bsim:constantValue>10.0</bsim:constantValue>
+        </bsim:constantDistribution>
+      </bsim:duration>
+      <bsim:resources>
+        <bsim:resource id="Worker" amount="1" />
+      </bsim:resources>
+    </bsim:Task>
+  </bsim:simulationConfiguration>
+</bsim:definitions>

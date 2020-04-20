@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bsim:globalConfiguration xmlns:bsim="http://bsim.hpi.uni-potsdam.de/scylla/simModel" targetNamespace="http://www.hpi.de" id="1_SimpleGlobal">
+  <bsim:resourceData>
+    <bsim:dynamicResource id="Worker" defaultQuantity="2" defaultCost="1.0" defaultTimeUnit="SECONDS">
+      <bsim:instance name="Me" />
+      <bsim:instance name="Myself" />
+    </bsim:dynamicResource>
+  </bsim:resourceData>
+</bsim:globalConfiguration>
