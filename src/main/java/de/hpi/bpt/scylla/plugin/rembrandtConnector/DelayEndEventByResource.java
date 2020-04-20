@@ -53,6 +53,7 @@ public class DelayEndEventByResource extends TaskBeginEventPluggable {
             System.out.println("resource " + resourceId + " not found.");
         }
         try {
+
             JSONArray resourceType = resource.getJSONArray("included");
             timeAttribute = resourceType.getJSONObject(0).getJSONObject("attributes").getString("timeAttribute");
         }
@@ -67,7 +68,6 @@ public class DelayEndEventByResource extends TaskBeginEventPluggable {
         }
         catch (Exception e) {
             System.out.println("error during reading of timeAttribute of resource");
-            e.printStackTrace();
         }
         return additionalTime;
     }

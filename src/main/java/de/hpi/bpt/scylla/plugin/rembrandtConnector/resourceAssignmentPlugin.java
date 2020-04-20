@@ -1,6 +1,7 @@
 package de.hpi.bpt.scylla.plugin.rembrandtConnector;
 import java.util.*;
 
+import de.hpi.bpt.scylla.model.configuration.ResourceReference;
 import de.hpi.bpt.scylla.plugin_type.simulation.resource.ResourceAssignmentPluggable;
 import de.hpi.bpt.scylla.simulation.*;
 import de.hpi.bpt.scylla.simulation.event.ScyllaEvent;
@@ -20,6 +21,19 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
     @Override
     public String getName() {
         return rembrandtConnectorUtils.PLUGIN_NAME;
+    }
+
+    @Override
+    public boolean wantsToHandleAssignment(SimulationModel model, ScyllaEvent event) {
+        Set<ResourceReference> resourceReferences = event.getSimulationComponents().getSimulationConfiguration().getResourceReferenceSet(event.getNodeId());
+        for (ResourceReference ref : resourceReferences) {
+            // Todo: change to real resourcename
+            if(ref.getResourceId().equals("Worker")) {
+                System.out.println("starting Rembrandt Assignment");
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
