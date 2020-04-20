@@ -16,17 +16,23 @@ import de.hpi.bpt.scylla.simulation.event.ScyllaEvent;
  */
 public abstract class ResourceAssignmentPluggable implements IPluggable {
 	
-    public static Optional<ResourceObjectTuple> runPlugins(SimulationModel model, ScyllaEvent event) {
+	/**
+	 * Return first plugin that is interested to handle this assignment
+	 * @param model
+	 * @param event
+	 * @return
+	 */
+    public static Optional<ResourceAssignmentPluggable> getInterestedPlugin(SimulationModel model, ScyllaEvent event) {
         Class<ResourceAssignmentPluggable> clazz = ResourceAssignmentPluggable.class;
         Iterator<? extends ResourceAssignmentPluggable> plugins = PluginLoader.dGetPlugins(clazz);
         while (plugins.hasNext()) {
         	ResourceAssignmentPluggable plugin = plugins.next();
-        	Optional<ResourceObjectTuple> assignment = plugin.getResourcesForEvent(model, event);
-        	if(assignment.isPresent())return Optional.of(assignment.get());
+        	if(plugin.wantsToHandleAssignment(model, event))return Optional.of(plugin);
         }
         return Optional.empty();
     }
 
+    public abstract boolean wantsToHandleAssignment(SimulationModel model, ScyllaEvent event);
     public abstract Optional<ResourceObjectTuple> getResourcesForEvent(SimulationModel model, ScyllaEvent event);
 
 }
