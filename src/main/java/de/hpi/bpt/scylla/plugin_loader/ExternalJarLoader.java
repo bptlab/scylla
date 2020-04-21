@@ -34,7 +34,9 @@ public class ExternalJarLoader {
 	}
 	
 	private List<Path> getPluginPaths() throws IOException {
-		try (Stream<Path> paths = Files.walk(Paths.get("plugins"))) {
+		Path pluginsFolder = Paths.get("plugins");
+		if(!pluginsFolder.toFile().exists()) pluginsFolder.toFile().mkdir();
+		try (Stream<Path> paths = Files.walk(pluginsFolder)) {
 		    pluginPaths = paths
 		        .filter(Files::isRegularFile)
 		        .filter(ExternalJarLoader::hasJarEnding)
