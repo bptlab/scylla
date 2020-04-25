@@ -17,6 +17,7 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
     //Todo: more than one resource required by scylla? Rembrandt can only handle a single Output atm, start multiple times by resource Type or improve Rembrandt and read the result in a loop.
 
     public static Map<String, String> resourceTaskMap = new HashMap<>();
+    public static Map<String, String> eventsWaitingMap = new HashMap<>();
 
     @Override
     public String getName() {
@@ -74,9 +75,14 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
         String taskId = Integer.toString(event.getNodeId());
         String processInstanceId = Integer.toString(event.getProcessInstance().getId());
 
-        resourceTaskMap.put(taskId + "." + processInstanceId, resultInstanceId);
+        if (resourceTaskMap.containsValue(resultInstanceId)){
+            //put in waiting queue
+            eventsWaitingMap.put(taskId + "." + processInstanceId, resultInstanceId);
+            return null;
+        } else {
+            resourceTaskMap.put(taskId + "." + processInstanceId, resultInstanceId);
+        }
 
-        //Todo: return resource Object Tuple
         //build resourceObject
         ResourceObject assignedResource = new ResourceObject(resultTypeId, resultInstanceId);
         ResourceQueue resourceQueue = new ResourceQueue(1);
