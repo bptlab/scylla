@@ -307,7 +307,7 @@ public class SimulationModel extends Model {
      */
     public ScyllaEvent getEventFromQueueReadyForSchedule(Set<String> resourceQueuesUpdated) {
     	
-    	ScyllaEvent eventFromPlugin = ResourceQueueUpdatedPluggable.runPlugins(resourceQueuesUpdated);
+    	ScyllaEvent eventFromPlugin = ResourceQueueUpdatedPluggable.runPlugins(this, resourceQueuesUpdated);
     	if(eventFromPlugin != null)return eventFromPlugin;
 
         List<ScyllaEvent> eventCandidates = new ArrayList<ScyllaEvent>();
