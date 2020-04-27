@@ -17,6 +17,9 @@ public class rembrandtConnectorUtils {
         return "http://localhost:3000/api";
     };
 
+    //Todo change name of Pseudotype
+    public static String getPseudoResourceTypeName() { return "Worker"; };
+
 
     public static String getResponse( String requestURL) {
         String jsonResult = "";

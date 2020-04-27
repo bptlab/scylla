@@ -15,7 +15,7 @@ import de.hpi.bpt.scylla.simulation.utils.SimulationUtils;
  * 
  * @author Tsun Yin Wong
  */
-class ScyllaEventQueue extends PriorityQueue<ScyllaEvent> {
+public class ScyllaEventQueue extends PriorityQueue<ScyllaEvent> {
 
     /**
      * TODO towards performance: replace PriorityQueue with SortedList (since we use it as such and never call poll() /

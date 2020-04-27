@@ -29,7 +29,7 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
         Set<ResourceReference> resourceReferences = event.getSimulationComponents().getSimulationConfiguration().getResourceReferenceSet(event.getNodeId());
         for (ResourceReference ref : resourceReferences) {
             // Todo: change to real resourcename
-            if(ref.getResourceId().equals("Worker")) {
+            if(ref.getResourceId().equals(rembrandtConnectorUtils.getPseudoResourceTypeName())) {
                 System.out.println("starting Rembrandt Assignment");
                 return true;
             }
