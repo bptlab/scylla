@@ -5,6 +5,7 @@ import de.hpi.bpt.scylla.model.configuration.ResourceReference;
 import de.hpi.bpt.scylla.plugin_type.simulation.resource.ResourceAssignmentPluggable;
 import de.hpi.bpt.scylla.simulation.*;
 import de.hpi.bpt.scylla.simulation.event.ScyllaEvent;
+import org.javatuples.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -16,8 +17,7 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
 
     //Todo: more than one resource required by scylla? Rembrandt can only handle a single Output atm, start multiple times by resource Type or improve Rembrandt and read the result in a loop.
 
-    public static Map<String, String> resourceTaskMap = new HashMap<>();
-    public static Map<String, String> eventsWaitingMap = new HashMap<>();
+
 
     @Override
     public String getName() {
@@ -41,7 +41,7 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
     public Optional<ResourceObjectTuple> getResourcesForEvent(SimulationModel model, ScyllaEvent event)
 
     {
-        resourceTaskMap.put("1", "5e7b762d7c6d5f10fce4b6a3");
+        rembrandtConnectorUtils.resourceTaskMap.put("1", "5e7b762d7c6d5f10fce4b6a3");
         String recipeId = "";
         // find recipeID based on taskName
 
@@ -74,20 +74,22 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
 
         String taskId = Integer.toString(event.getNodeId());
         String processInstanceId = Integer.toString(event.getProcessInstance().getId());
+        Pair < String, String> resourceidentifier = new Pair<> (taskId, processInstanceId);
 
-        if (resourceTaskMap.containsValue(resultInstanceId)){
+        if (rembrandtConnectorUtils.resourceTaskMap.containsValue(resultInstanceId)){
             //put in waiting queue
-            eventsWaitingMap.put(taskId + "." + processInstanceId, resultInstanceId);
+            //Pair < String, String> resourceidentifier = new Pair<> (taskId, processInstanceId);
+            rembrandtConnectorUtils.eventsWaitingMap.get(resultInstanceId).add(resourceidentifier);
+
             return null;
         } else {
-            resourceTaskMap.put(taskId + "." + processInstanceId, resultInstanceId);
+            rembrandtConnectorUtils.resourceTaskMap.put(taskId + "." + processInstanceId, resultInstanceId);
         }
 
         //build resourceObject
-        ResourceObject assignedResource = new ResourceObject(resultTypeId, resultInstanceId);
-        ResourceQueue resourceQueue = new ResourceQueue(1);
-        resourceQueue.add(assignedResource);
-        model.getResourceManager().addToResourceObjects(resultTypeId, resourceQueue);
+        ResourceObject assignedResource = new ResourceObject(rembrandtConnectorUtils.getPseudoResourceTypeName(), resultInstanceId);
+
+        // does not have to be added to the queue, because it is assigned immediately (thus would be removed from the queue again)
 
         //build resourceObjectTuple
         ResourceObjectTuple assignedResourceTuple = new ResourceObjectTuple();
