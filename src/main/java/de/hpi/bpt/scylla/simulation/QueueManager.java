@@ -95,7 +95,7 @@ public class QueueManager {
         return;
     }
     
-    private Map<String, ResourceQueue> getResourceObjects() {
+    public Map<String, ResourceQueue> getResourceObjects() {
         return resourceObjects;
     }
     
