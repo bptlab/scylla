@@ -15,7 +15,6 @@ public class FreeResourceAtTerminateEvent extends TaskTerminateEventPluggable {
     @Override
     public void eventRoutine(TaskTerminateEvent terminateEvent, ProcessInstance processInstance) throws ScyllaRuntimeException {
         // TODO: free Resource in Rembrandt
-        System.out.println("free resource: " + resourceAssignmentPlugin.resourceTaskMap.get(Integer.toString(terminateEvent.getNodeId()) + "." + Integer.toString(terminateEvent.getProcessInstance().getId())));
         System.out.println("free resource: " + rembrandtConnectorUtils.resourceTaskMap.get(Integer.toString(terminateEvent.getNodeId()) + "." + Integer.toString(terminateEvent.getProcessInstance().getId())));
     }
 

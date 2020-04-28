@@ -18,7 +18,7 @@ public class rembrandtConnectorUtils {
     public static final String PLUGIN_NAME = "Rembrandt Connector";
 
     public static Map<String, String> resourceTaskMap = new HashMap<>();
-    public static Map<String, Queue<Pair<String, String>>> eventsWaitingMap = new HashMap<>();
+    public static Map<String, Queue<Pair<Integer, Integer>>> eventsWaitingMap = new HashMap<>();
 
     public static String getBackendUrl(){
         return "http://localhost:3000/api";
