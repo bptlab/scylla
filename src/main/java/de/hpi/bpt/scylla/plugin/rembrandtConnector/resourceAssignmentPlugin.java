@@ -38,9 +38,7 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
     }
 
     @Override
-    public Optional<ResourceObjectTuple> getResourcesForEvent(SimulationModel model, ScyllaEvent event)
-
-    {
+    public Optional<ResourceObjectTuple> getResourcesForEvent(SimulationModel model, ScyllaEvent event) {
         rembrandtConnectorUtils.resourceTaskMap.put("1", "5e7b762d7c6d5f10fce4b6a3");
         String recipeId = "";
         // find recipeID based on taskName
@@ -55,12 +53,11 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
             // TODO: use correct link to backend
             JSONObject recipes = new JSONObject(rembrandtConnectorUtils.getResponse("https://rembrandt.voelker.dev/api/optimization/recipes"));
             recipeId = findRecipeForTask(recipes, taskName);
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             //TODO: write taskname and searched recipe into error message
-           System.out.println("could not find recipe wit name: " + taskName);
-           ResourceObjectTuple emptyTuple = new ResourceObjectTuple();
-           return Optional.of(emptyTuple);
+            System.out.println("could not find recipe wit name: " + taskName);
+            ResourceObjectTuple emptyTuple = new ResourceObjectTuple();
+            return Optional.of(emptyTuple);
         }
         //start recipe by ID Todo: include it
         //JSONObject execution = new JSONObject(rembrandtConnectorUtils.getResponse("https://rembrandt.voelker.dev/api/optimization/recipes/" + recipeId + "/execute"));
@@ -72,11 +69,11 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
         String resultInstanceId = execution.getJSONObject("data").getJSONObject("attributes").getJSONObject("result").getJSONObject("data").getJSONArray(resultTypeId).getJSONObject(0).getString("_id");
         // write assigned Resource in map
 
-        String taskId = Integer.toString(event.getNodeId());
-        String processInstanceId = Integer.toString(event.getProcessInstance().getId());
-        Pair < String, String> resourceidentifier = new Pair<> (taskId, processInstanceId);
+        int taskId = event.getNodeId();
+        int processInstanceId = event.getProcessInstance().getId();
+        Pair<Integer, Integer> resourceidentifier = new Pair<>(taskId, processInstanceId);
 
-        if (rembrandtConnectorUtils.resourceTaskMap.containsValue(resultInstanceId)){
+        if (rembrandtConnectorUtils.resourceTaskMap.containsValue(resultInstanceId)) {
             //put in waiting queue
             //Pair < String, String> resourceidentifier = new Pair<> (taskId, processInstanceId);
             rembrandtConnectorUtils.eventsWaitingMap.get(resultInstanceId).add(resourceidentifier);
@@ -87,7 +84,19 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
         }
 
         //build resourceObject
+        int size = model.getResourceManager().getResourceObjects().get(rembrandtConnectorUtils.getPseudoResourceTypeName()).size();
+        boolean isPresent = false;
         ResourceObject assignedResource = new ResourceObject(rembrandtConnectorUtils.getPseudoResourceTypeName(), resultInstanceId);
+        for (int i = 0; i < size; i++) {
+            if (model.getResourceManager().getResourceObjects().get(rembrandtConnectorUtils.getPseudoResourceTypeName()).peek().getId() == resultInstanceId ) {
+                assignedResource = model.getResourceManager().getResourceObjects().get(rembrandtConnectorUtils.getPseudoResourceTypeName()).poll();
+                break;
+            }
+            else{
+                model.getResourceManager().getResourceObjects().get(rembrandtConnectorUtils.getPseudoResourceTypeName()).add(model.getResourceManager().getResourceObjects().get(rembrandtConnectorUtils.getPseudoResourceTypeName()).poll());
+            }
+
+        }
 
         // does not have to be added to the queue, because it is assigned immediately (thus would be removed from the queue again)
 
