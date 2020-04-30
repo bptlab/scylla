@@ -3,7 +3,7 @@
   <bsim:resourceData>
     <bsim:dynamicResource id="Worker" defaultQuantity="2" defaultCost="1.0" defaultTimeUnit="SECONDS">
       <bsim:instance name="Me" />
-      <bsim:instance name="Myself" />
+      <bsim:instance name="&lt;enter name&gt;" />
     </bsim:dynamicResource>
   </bsim:resourceData>
 </bsim:globalConfiguration>

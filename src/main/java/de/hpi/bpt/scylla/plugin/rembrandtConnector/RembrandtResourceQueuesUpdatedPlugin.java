@@ -1,10 +1,7 @@
 package de.hpi.bpt.scylla.plugin.rembrandtConnector;
 import de.hpi.bpt.scylla.exception.ScyllaRuntimeException;
 import de.hpi.bpt.scylla.plugin_type.simulation.resource.ResourceQueueUpdatedPluggable;
-import de.hpi.bpt.scylla.simulation.ResourceObject;
-import de.hpi.bpt.scylla.simulation.ResourceObjectTuple;
-import de.hpi.bpt.scylla.simulation.ScyllaEventQueue;
-import de.hpi.bpt.scylla.simulation.SimulationModel;
+import de.hpi.bpt.scylla.simulation.*;
 import de.hpi.bpt.scylla.simulation.event.ScyllaEvent;
 import org.javatuples.Pair;
 
@@ -23,37 +20,55 @@ public class RembrandtResourceQueuesUpdatedPlugin extends ResourceQueueUpdatedPl
     @Override
     public ScyllaEvent eventToBeScheduled(SimulationModel model, Set<String> resourceQueuesUpdated){
 
-        System.out.println(resourceQueuesUpdated);
-        System.out.println(model.getResourceManager().getResourceTypes());
-
+System.out.println("now looking for waiting event");
+        System.out.println("of Type: " + resourceQueuesUpdated);
         // if resource is from Rembrandt
         for (String resourceID : resourceQueuesUpdated ) {
             //if it is not a pre defined resource
-            if (!model.getGlobalConfiguration().getResources().containsKey(resourceID) || resourceID.equals("Worker")){
-
+            if (!model.getGlobalConfiguration().getResources().containsKey(resourceID) || resourceID.equals(rembrandtConnectorUtils.getPseudoResourceTypeName())){
+                System.out.println("it was a Rembrandt resource!");
                 // return event from queue of pseudoresourcetyp
                 ScyllaEventQueue pseudoTypeQueue = model.getEventQueues().get(rembrandtConnectorUtils.getPseudoResourceTypeName());
+                System.out.println("in Eventqueue waiting: ");
+                System.out.println(pseudoTypeQueue);
                 for (ResourceObject resource : model.getResourceManager().getResourceObjects().get(rembrandtConnectorUtils.getPseudoResourceTypeName())) {
-
+                    System.out.println("checking for resource: " + resource.getId());
                     if (rembrandtConnectorUtils.eventsWaitingMap.containsKey(resource.getId())) {
                         // if there are events waiting for this specific resource
-                        Pair<Integer, Integer> resourceIdentifier = rembrandtConnectorUtils.eventsWaitingMap.get(resource.getId()).poll();
-                        Integer taskId = resourceIdentifier.getValue0();
-                        Integer processId = resourceIdentifier.getValue1();
+                        System.out.println("there are events waiting for this specific resource!");
+                        System.out.println();
+                        Pair<Integer, Integer> taskIdentifier = rembrandtConnectorUtils.eventsWaitingMap.get(resource.getId()).poll();
+                        //if it was the last waiting event, delete the entry
+                        if (rembrandtConnectorUtils.eventsWaitingMap.get(resource.getId()).isEmpty()) {
+                            rembrandtConnectorUtils.eventsWaitingMap.remove(resource.getId());
+                        }
+                        System.out.println("taskidentifier: " + taskIdentifier);
+                        Integer taskId = taskIdentifier.getValue0();
+                        Integer processId = taskIdentifier.getValue1();
+                        System.out.println("all waiting events: " + rembrandtConnectorUtils.eventsWaitingMap.get(resource.getId()));
+                        System.out.println("longest waiting Event: processId: " + processId + " and taskId: "+ taskId);
 
                         // search for correct event in the eventwaiting Queue of the pseudo resource Type
                         ScyllaEventQueue pseudoTypeEventQueue = model.getEventQueues().get(rembrandtConnectorUtils.getPseudoResourceTypeName());
-                        List<ScyllaEvent> events = new ArrayList<ScyllaEvent>();
+
                         for (int i = 0; i < pseudoTypeEventQueue.size(); i++) {
                             if (pseudoTypeEventQueue.peek().getNodeId() == taskId && pseudoTypeEventQueue.peek().getProcessInstance().getId() == processId) {
                                 // if the correct event
+                                System.out.println("PseudotypeeventQueue: " + pseudoTypeEventQueue);
+                                for (ScyllaEvent ev : pseudoTypeEventQueue){
+                                    System.out.println(ev.getNodeId() + " " + ev.getProcessInstance().getId());
+                                }
                                 ScyllaEvent eventToBeSheduled = pseudoTypeEventQueue.poll();
-
+                                System.out.println("PseudotypeeventQueue after poll: " + pseudoTypeEventQueue);
                                 ResourceObjectTuple assignedResourceTuple = new ResourceObjectTuple();
                                 assignedResourceTuple.getResourceObjects().add(resource);
+                                // assign resource to event
                                 model.getResourceManager().assignResourcesToEvent(eventToBeSheduled, assignedResourceTuple);
+                                //iterate over all resources to remove the assigned resource from available resources
 
+                                model.getResourceManager().getResourceObjects().get(rembrandtConnectorUtils.getPseudoResourceTypeName()).remove(resource);
                                 model.removeFromEventQueues(eventToBeSheduled);
+                                System.out.println("returning event: " + eventToBeSheduled);
                                 return eventToBeSheduled;
                             }
                             else {
@@ -62,13 +77,12 @@ public class RembrandtResourceQueuesUpdatedPlugin extends ResourceQueueUpdatedPl
                             }
                         }
                         // if there is no such event in the eventQueue
-                        throw new ScyllaRuntimeException("could not find specified Event in the queue of the pseudo event type!");
+                        //throw new ScyllaRuntimeException("could not find specified Event in the queue of the pseudo event type!");
                    }
                 }
 
             }
         }
-//TODO: what if there is no event in the queue? what should the plugin return? is null ok?
         // if there is no event waiting for this specific resource
         return null;
     }
