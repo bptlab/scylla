@@ -30,7 +30,6 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
         for (ResourceReference ref : resourceReferences) {
             // Todo: change to real resourcename
             if(ref.getResourceId().equals(rembrandtConnectorUtils.getPseudoResourceTypeName())) {
-                System.out.println("starting Rembrandt Assignment");
                 return true;
             }
         }
@@ -39,9 +38,7 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
 
     @Override
     public Optional<ResourceObjectTuple> getResourcesForEvent(SimulationModel model, ScyllaEvent event) {
-        if (!rembrandtConnectorUtils.resourceTaskMap.containsKey(1)) {
-            rembrandtConnectorUtils.resourceTaskMap.put("1", "5e7b762d7c6d5f10fce4b6a3");
-        }
+
         String recipeId = "";
         // if activity is already sheduled and waiting, do not schedule it again
         int taskId = event.getNodeId();
@@ -59,9 +56,7 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
 
 
         // find recipeID based on taskName
-        System.out.println("started plugin to assign a resource!");
-        System.out.println("taskid: " + event.getNodeId());
-        System.out.println("processId: " + event.getProcessInstance().getId());
+        System.out.println("starting Rembrandt Assignment");
         String taskName = event.getDisplayName();
         //Todo: delete this hardcoded name
         taskName = "SMile Tour Planning - Munkres";
@@ -73,7 +68,7 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
             JSONObject recipes = new JSONObject(rembrandtConnectorUtils.getResponse("https://rembrandt.voelker.dev/api/optimization/recipes"));
             recipeId = findRecipeForTask(recipes, taskName);
         } catch (Exception e) {
-            System.out.println("could not find recipe wit name: " + taskName);
+            System.out.println("Error: could not find recipe wit name: " + taskName);
             ResourceObjectTuple emptyTuple = new ResourceObjectTuple();
             return Optional.of(emptyTuple);
         }
@@ -89,11 +84,8 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
         // check if resource is free and write it in corresponding map
 
         if (rembrandtConnectorUtils.resourceTaskMap.containsValue(resultInstanceId)) {
-            System.out.println("putting it to sleep");
             //put in waiting queue
-            //Pair < String, String> resourceidentifier = new Pair<> (taskId, processInstanceId);
             if (rembrandtConnectorUtils.eventsWaitingMap.containsKey(resultInstanceId)){
-                System.out.println(("present!"));
                 rembrandtConnectorUtils.eventsWaitingMap.get(resultInstanceId).add(taskidentifier);
             }
             else {
@@ -105,7 +97,7 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
 
             return Optional.empty();
         } else {
-            rembrandtConnectorUtils.resourceTaskMap.put(taskId + "." + processInstanceId, resultInstanceId);
+            rembrandtConnectorUtils.resourceTaskMap.put(processInstanceId + "." + taskId, resultInstanceId);
         }
         //build resourceObject
         int size = model.getResourceManager().getResourceObjects().get(rembrandtConnectorUtils.getPseudoResourceTypeName()).size();
@@ -131,6 +123,8 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
     }
 
     public String getResultTypeId(String recipeId) {
+        // return the resourceType of the recipe result
+        //Todo: use correct link
         JSONObject recipe = new JSONObject(rembrandtConnectorUtils.getResponse("https://rembrandt.voelker.dev/api/optimization/recipes/"+recipeId));
         Integer arrayLength = recipe.getJSONObject("data").getJSONObject("attributes").getJSONArray("ingredients").length();
         return recipe.getJSONObject("data").getJSONObject("attributes").getJSONArray("ingredients").getJSONObject(arrayLength-1).getString("ingredientDefinition");
@@ -138,6 +132,7 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
 
 
     public String findRecipeForTask(JSONObject recipes, String taskName) {
+        // selects the correct recipeID based on the task name
         Integer i = 0;
         JSONArray recipearray = recipes.getJSONArray("data");
         while (i < recipearray.length()) {

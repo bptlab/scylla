@@ -40,7 +40,7 @@ public class DelayEndEventByResource extends TaskBeginEventPluggable {
         //look at map from assignment and return the resourceID for current task
         String taskId = Integer.toString(beginEvent.getNodeId());
         String processInstanceId = Integer.toString(beginEvent.getProcessInstance().getId());
-        return rembrandtConnectorUtils.resourceTaskMap.get(taskId + "." + processInstanceId);
+        return rembrandtConnectorUtils.resourceTaskMap.get(processInstanceId + "." + taskId);
     }
 
     private Integer getResourceTime(String resourceId) {
@@ -77,7 +77,6 @@ public class DelayEndEventByResource extends TaskBeginEventPluggable {
         Integer i  = 0;
         while (i < attributesArray.length()) {
             if (attributesArray.getJSONObject(i).getString("name").equals(attributeName)){
-                System.out.println("found it!");
                 return i;
             }
             else {
