@@ -5,8 +5,6 @@ import de.hpi.bpt.scylla.simulation.*;
 import de.hpi.bpt.scylla.simulation.event.ScyllaEvent;
 import org.javatuples.Pair;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 public class RembrandtResourceQueuesUpdatedPlugin extends ResourceQueueUpdatedPluggable {
@@ -36,7 +34,6 @@ System.out.println("now looking for waiting event");
                     if (rembrandtConnectorUtils.eventsWaitingMap.containsKey(resource.getId())) {
                         // if there are events waiting for this specific resource
                         System.out.println("there are events waiting for this specific resource!");
-                        System.out.println();
                         Pair<Integer, Integer> taskIdentifier = rembrandtConnectorUtils.eventsWaitingMap.get(resource.getId()).poll();
                         //if it was the last waiting event, delete the entry
                         if (rembrandtConnectorUtils.eventsWaitingMap.get(resource.getId()).isEmpty()) {

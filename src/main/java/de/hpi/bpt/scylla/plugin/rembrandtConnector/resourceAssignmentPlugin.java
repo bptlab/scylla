@@ -43,6 +43,21 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
             rembrandtConnectorUtils.resourceTaskMap.put("1", "5e7b762d7c6d5f10fce4b6a3");
         }
         String recipeId = "";
+        // if activity is already sheduled and waiting, do not schedule it again
+        int taskId = event.getNodeId();
+        int processInstanceId = event.getProcessInstance().getId();
+        Pair<Integer, Integer> taskidentifier = new Pair<>(taskId, processInstanceId);
+
+        for ( Map.Entry<String, Queue<Pair<Integer, Integer>>> resourceId : rembrandtConnectorUtils.eventsWaitingMap.entrySet()){
+            Queue<Pair<Integer, Integer>> taskQueue = resourceId.getValue();
+            for (Pair<Integer, Integer> task : taskQueue){
+                if (task.equals(taskidentifier)){
+                    return Optional.empty();
+                }
+            }
+        }
+
+
         // find recipeID based on taskName
         System.out.println("started plugin to assign a resource!");
         System.out.println("taskid: " + event.getNodeId());
@@ -58,7 +73,6 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
             JSONObject recipes = new JSONObject(rembrandtConnectorUtils.getResponse("https://rembrandt.voelker.dev/api/optimization/recipes"));
             recipeId = findRecipeForTask(recipes, taskName);
         } catch (Exception e) {
-            //TODO: write taskname and searched recipe into error message
             System.out.println("could not find recipe wit name: " + taskName);
             ResourceObjectTuple emptyTuple = new ResourceObjectTuple();
             return Optional.of(emptyTuple);
@@ -70,11 +84,10 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
         JSONObject execution = new JSONObject(rembrandtConnectorUtils.getResponse("https://rembrandt.voelker.dev/api/optimization/executions/5df739392b29e200119d8611"));
         String resultTypeId = getResultTypeId(recipeId);
         String resultInstanceId = execution.getJSONObject("data").getJSONObject("attributes").getJSONObject("result").getJSONObject("data").getJSONArray(resultTypeId).getJSONObject(0).getString("_id");
-        // write assigned Resource in map
 
-        int taskId = event.getNodeId();
-        int processInstanceId = event.getProcessInstance().getId();
-        Pair<Integer, Integer> taskidentifier = new Pair<>(taskId, processInstanceId);
+
+        // check if resource is free and write it in corresponding map
+
         if (rembrandtConnectorUtils.resourceTaskMap.containsValue(resultInstanceId)) {
             System.out.println("putting it to sleep");
             //put in waiting queue
