@@ -12,7 +12,7 @@ import org.json.JSONObject;
 
 public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
     // Ask rembrandt to assign a ResourceInstance and convert it to scylla readable assignment --> see function in QueueManager
-    // hold static map which source+nodeID has which asssignment, to free them in Endevent and to delay tasktime
+    // hold static map which source+nodeID has which assignment, to free them in end-event and to delay tasktime
 
 
     //Todo: more than one resource required by scylla? Rembrandt can only handle a single Output atm, start multiple times by resource Type or improve Rembrandt and read the result in a loop.
@@ -28,7 +28,6 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
     public boolean wantsToHandleAssignment(SimulationModel model, ScyllaEvent event) {
         Set<ResourceReference> resourceReferences = event.getSimulationComponents().getSimulationConfiguration().getResourceReferenceSet(event.getNodeId());
         for (ResourceReference ref : resourceReferences) {
-            // Todo: change to real resourcename
             if(ref.getResourceId().equals(rembrandtConnectorUtils.getPseudoResourceTypeName())) {
                 return true;
             }
@@ -40,7 +39,7 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
     public Optional<ResourceObjectTuple> getResourcesForEvent(SimulationModel model, ScyllaEvent event) {
 
         String recipeId = "";
-        // if activity is already sheduled and waiting, do not schedule it again
+        // if activity is already scheduled and waiting, do not schedule it again
         int taskId = event.getNodeId();
         int processInstanceId = event.getProcessInstance().getId();
         Pair<Integer, Integer> taskidentifier = new Pair<>(taskId, processInstanceId);
@@ -59,24 +58,38 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
         System.out.println("starting Rembrandt Assignment");
         String taskName = event.getDisplayName();
         //Todo: delete this hardcoded name
-        taskName = "SMile Tour Planning - Munkres";
+        taskName = "SMile Tour Planning - Rule";
         System.out.println("looking for recipe: " + taskName);
 
 
         try {
-            // TODO: use correct link to backend
-            JSONObject recipes = new JSONObject(rembrandtConnectorUtils.getResponse("https://rembrandt.voelker.dev/api/optimization/recipes"));
+            JSONObject recipes = new JSONObject(rembrandtConnectorUtils.getResponse(rembrandtConnectorUtils.getBackendUrl()+"/optimization/recipes"));
             recipeId = findRecipeForTask(recipes, taskName);
         } catch (Exception e) {
             System.out.println("Error: could not find recipe wit name: " + taskName);
             ResourceObjectTuple emptyTuple = new ResourceObjectTuple();
             return Optional.of(emptyTuple);
         }
-        //start recipe by ID Todo: include it
-        //JSONObject execution = new JSONObject(rembrandtConnectorUtils.getResponse("https://rembrandt.voelker.dev/api/optimization/recipes/" + recipeId + "/execute"));
-        // Todo: wait for result
+        //start recipe by ID
+        JSONObject startExecution = new JSONObject(rembrandtConnectorUtils.getResponse(rembrandtConnectorUtils.getBackendUrl()+ "/optimization/recipes/" + recipeId + "/execute"));
+        System.out.println(startExecution.getJSONObject("data").getString("id"));
+        String executionId = startExecution.getJSONObject("data").getString("id");
+
+        // wait for result
+        boolean finished = false;
+        JSONObject execution = new JSONObject(rembrandtConnectorUtils.getResponse(rembrandtConnectorUtils.getBackendUrl()+ "/optimization/executions/" +executionId));
+        while (!finished){
+            try {
+                execution = new JSONObject(rembrandtConnectorUtils.getResponse(rembrandtConnectorUtils.getBackendUrl()+ "/optimization/executions/" +executionId));
+                System.out.println("Optimisation finished at: " + execution.getJSONObject("data").getJSONObject("attributes").getString("finishedAt"));
+                finished = true;
+            } catch (Exception e) {
+                System.out.println("waiting for Rembrandt optimisation");
+            }
+
+        }
+
         // read result from execution
-        JSONObject execution = new JSONObject(rembrandtConnectorUtils.getResponse("https://rembrandt.voelker.dev/api/optimization/executions/5df739392b29e200119d8611"));
         String resultTypeId = getResultTypeId(recipeId);
         String resultInstanceId = execution.getJSONObject("data").getJSONObject("attributes").getJSONObject("result").getJSONObject("data").getJSONArray(resultTypeId).getJSONObject(0).getString("_id");
 
@@ -124,8 +137,7 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
 
     public String getResultTypeId(String recipeId) {
         // return the resourceType of the recipe result
-        //Todo: use correct link
-        JSONObject recipe = new JSONObject(rembrandtConnectorUtils.getResponse("https://rembrandt.voelker.dev/api/optimization/recipes/"+recipeId));
+        JSONObject recipe = new JSONObject(rembrandtConnectorUtils.getResponse(rembrandtConnectorUtils.getBackendUrl()+"/optimization/recipes/"+recipeId));
         Integer arrayLength = recipe.getJSONObject("data").getJSONObject("attributes").getJSONArray("ingredients").length();
         return recipe.getJSONObject("data").getJSONObject("attributes").getJSONArray("ingredients").getJSONObject(arrayLength-1).getString("ingredientDefinition");
     }
@@ -134,10 +146,10 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
     public String findRecipeForTask(JSONObject recipes, String taskName) {
         // selects the correct recipeID based on the task name
         Integer i = 0;
-        JSONArray recipearray = recipes.getJSONArray("data");
-        while (i < recipearray.length()) {
-            if (recipearray.getJSONObject(i).getJSONObject("attributes").getString("name").equals(taskName)){
-                return recipearray.getJSONObject(i).getString("id");
+        JSONArray recipeArray = recipes.getJSONArray("data");
+        while (i < recipeArray.length()) {
+            if (recipeArray.getJSONObject(i).getJSONObject("attributes").getString("name").equals(taskName)){
+                return recipeArray.getJSONObject(i).getString("id");
             }
             else {
                 i++;
