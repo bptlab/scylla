@@ -27,9 +27,17 @@ public class DelayEndEventByResource extends TaskBeginEventPluggable {
         String resourceId = findAssignedResourceInstance(beginEvent, processInstance);
         System.out.println("looking for resourceID: " + resourceId);
         //  read/ calculate resource time.
-        int resourceBasedTime = getResourceTime(resourceId);
+        float resourceBasedTime = getResourceTime(resourceId);
+        //check if it is a decimal or flat value
+        TimeSpan timeForTaskByResource;
+        if (resourceBasedTime == (int)resourceBasedTime){
+            timeForTaskByResource = new TimeSpan(resourceBasedTime, TimeUnit.SECONDS);
+        }
+        else {
+            timeForTaskByResource = new TimeSpan(standardTime * resourceBasedTime, TimeUnit.SECONDS);
+        }
         // and overwrite the time to the next task in the timeSpanToNextEventMap (=set the calculated time as the new time)
-        TimeSpan timeForTaskByResource = new TimeSpan(standardTime + resourceBasedTime, TimeUnit.SECONDS);
+
         beginEvent.getTimeSpanToNextEventMap().put(0, timeForTaskByResource);
 
         return;
@@ -43,9 +51,9 @@ public class DelayEndEventByResource extends TaskBeginEventPluggable {
         return rembrandtConnectorUtils.resourceTaskMap.get(processInstanceId + "." + taskId);
     }
 
-    private Integer getResourceTime(String resourceId) {
+    private float getResourceTime(String resourceId) {
         String timeAttribute = "";
-        Integer additionalTime = 0;
+        float additionalTime = 0;
         JSONObject resource = new JSONObject();
         try {
             resource = new JSONObject(rembrandtConnectorUtils.getResponse(rembrandtConnectorUtils.getBackendUrl() + "/organization/resource-instances/" + resourceId));
@@ -63,7 +71,7 @@ public class DelayEndEventByResource extends TaskBeginEventPluggable {
         try {
             JSONObject resourceInstance = resource.getJSONObject("data");
             JSONArray attributes  = resourceInstance.getJSONObject("attributes").getJSONArray("attributes");
-            additionalTime = Integer.parseInt(attributes.getJSONObject(findIndexOfAttribute(timeAttribute, attributes)).getString("value"));
+            additionalTime = Float.parseFloat(attributes.getJSONObject(findIndexOfAttribute(timeAttribute, attributes)).getString("value"));
             System.out.println(timeAttribute + " is " + additionalTime);
         }
         catch (Exception e) {
