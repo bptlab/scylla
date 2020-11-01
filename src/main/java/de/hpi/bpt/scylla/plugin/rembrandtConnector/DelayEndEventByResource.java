@@ -27,10 +27,10 @@ public class DelayEndEventByResource extends TaskBeginEventPluggable {
         String resourceId = findAssignedResourceInstance(beginEvent, processInstance);
         System.out.println("looking for resourceID: " + resourceId);
         //  read/ calculate resource time.
-        float resourceBasedTime = getResourceTime(resourceId);
+        double resourceBasedTime = getResourceTime(resourceId);
         //check if it is a decimal or flat value
         TimeSpan timeForTaskByResource;
-        if (resourceBasedTime == (int)resourceBasedTime){
+        if (!String.valueOf(resourceBasedTime).contains(".")){
             timeForTaskByResource = new TimeSpan(resourceBasedTime, TimeUnit.SECONDS);
         }
         else {
@@ -51,9 +51,9 @@ public class DelayEndEventByResource extends TaskBeginEventPluggable {
         return rembrandtConnectorUtils.resourceTaskMap.get(processInstanceId + "." + taskId);
     }
 
-    private float getResourceTime(String resourceId) {
+    private double getResourceTime(String resourceId) {
         String timeAttribute = "";
-        float additionalTime = 0;
+        double additionalTime = 0;
         JSONObject resource = new JSONObject();
         try {
             resource = new JSONObject(rembrandtConnectorUtils.getResponse(rembrandtConnectorUtils.getBackendUrl() + "/organization/resource-instances/" + resourceId));
@@ -76,6 +76,7 @@ public class DelayEndEventByResource extends TaskBeginEventPluggable {
         }
         catch (Exception e) {
             System.out.println("error during reading of timeAttribute of resource");
+            additionalTime = 1.0;
         }
         return additionalTime;
     }

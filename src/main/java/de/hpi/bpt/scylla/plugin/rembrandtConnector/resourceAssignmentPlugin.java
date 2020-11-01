@@ -48,6 +48,7 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
             Queue<Pair<Integer, Integer>> taskQueue = resourceId.getValue();
             for (Pair<Integer, Integer> task : taskQueue){
                 if (task.equals(taskidentifier)){
+                    System.out.println("already sheduled");
                     return Optional.empty();
                 }
             }
