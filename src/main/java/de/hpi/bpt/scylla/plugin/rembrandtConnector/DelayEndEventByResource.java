@@ -4,6 +4,7 @@ import de.hpi.bpt.scylla.plugin_type.simulation.event.TaskBeginEventPluggable;
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
 import de.hpi.bpt.scylla.simulation.event.TaskBeginEvent;
 import desmoj.core.simulator.TimeSpan;
+import org.jdom2.CDATA;
 import org.json.*;
 
 import java.util.concurrent.TimeUnit;
@@ -27,14 +28,14 @@ public class DelayEndEventByResource extends TaskBeginEventPluggable {
         String resourceId = findAssignedResourceInstance(beginEvent, processInstance);
         System.out.println("looking for resourceID: " + resourceId);
         //  read/ calculate resource time.
-        double resourceBasedTime = getResourceTime(resourceId);
+        String resourceBasedTime = getResourceTime(resourceId);
         //check if it is a decimal or flat value
         TimeSpan timeForTaskByResource;
-        if (!String.valueOf(resourceBasedTime).contains(".")){
-            timeForTaskByResource = new TimeSpan(resourceBasedTime, TimeUnit.SECONDS);
+        if (!resourceBasedTime.contains(".")){
+            timeForTaskByResource = new TimeSpan(Integer.parseInt(resourceBasedTime), TimeUnit.SECONDS);
         }
         else {
-            timeForTaskByResource = new TimeSpan(standardTime * resourceBasedTime, TimeUnit.SECONDS);
+            timeForTaskByResource = new TimeSpan(standardTime * Float.parseFloat(resourceBasedTime), TimeUnit.SECONDS);
         }
         // and overwrite the time to the next task in the timeSpanToNextEventMap (=set the calculated time as the new time)
 
@@ -51,9 +52,9 @@ public class DelayEndEventByResource extends TaskBeginEventPluggable {
         return rembrandtConnectorUtils.resourceTaskMap.get(processInstanceId + "." + taskId);
     }
 
-    private double getResourceTime(String resourceId) {
+    private String getResourceTime(String resourceId) {
         String timeAttribute = "";
-        double additionalTime = 0;
+        String additionalTime = "";
         JSONObject resource = new JSONObject();
         try {
             resource = new JSONObject(rembrandtConnectorUtils.getResponse(rembrandtConnectorUtils.getBackendUrl() + "/organization/resource-instances/" + resourceId));
@@ -61,22 +62,23 @@ public class DelayEndEventByResource extends TaskBeginEventPluggable {
             System.out.println("resource " + resourceId + " not found.");
         }
         try {
-
             JSONArray resourceType = resource.getJSONArray("included");
+            System.out.println(resourceType);
             timeAttribute = resourceType.getJSONObject(0).getJSONObject("attributes").getString("timeAttribute");
         }
         catch (Exception e) {
             System.out.println("could not read timeAttribute of resourceType.");
+
         }
         try {
             JSONObject resourceInstance = resource.getJSONObject("data");
             JSONArray attributes  = resourceInstance.getJSONObject("attributes").getJSONArray("attributes");
-            additionalTime = Float.parseFloat(attributes.getJSONObject(findIndexOfAttribute(timeAttribute, attributes)).getString("value"));
+            additionalTime = attributes.getJSONObject(findIndexOfAttribute(timeAttribute, attributes)).getString("value");
             System.out.println(timeAttribute + " is " + additionalTime);
         }
         catch (Exception e) {
             System.out.println("error during reading of timeAttribute of resource");
-            additionalTime = 1.0;
+            additionalTime = "1.0";
         }
         return additionalTime;
     }

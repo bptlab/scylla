@@ -48,7 +48,6 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
             Queue<Pair<Integer, Integer>> taskQueue = resourceId.getValue();
             for (Pair<Integer, Integer> task : taskQueue){
                 if (task.equals(taskidentifier)){
-                    System.out.println("already sheduled");
                     return Optional.empty();
                 }
             }
@@ -56,18 +55,16 @@ public class resourceAssignmentPlugin extends ResourceAssignmentPluggable {
 
 
         // find recipeID based on taskName
-        System.out.println("starting Rembrandt Assignment");
         String taskName = event.getDisplayName();
-        //Todo: delete this hardcoded name
-        taskName = "SMile Tour Planning - Rule";
-        System.out.println("looking for recipe: " + taskName);
+        System.out.println("starting Rembrandt Assignment, looking for recipe: " + taskName);
 
 
         try {
             JSONObject recipes = new JSONObject(rembrandtConnectorUtils.getResponse(rembrandtConnectorUtils.getBackendUrl()+"/optimization/recipes"));
             recipeId = findRecipeForTask(recipes, taskName);
+            System.out.println("recipe found: " + recipeId);
         } catch (Exception e) {
-            System.out.println("Error: could not find recipe wit name: " + taskName);
+            System.out.println("Error: could not find recipe with name: " + taskName);
             ResourceObjectTuple emptyTuple = new ResourceObjectTuple();
             return Optional.of(emptyTuple);
         }
