@@ -25,7 +25,7 @@ public class rembrandtConnectorUtils {
     };
 
     //Todo change name of Pseudotype
-    public static String getPseudoResourceTypeName() { return "Worker"; };
+    public static String getPseudoResourceTypeName() { return "RembrandtResource"; };
 
 
     public static String getResponse( String requestURL) {
