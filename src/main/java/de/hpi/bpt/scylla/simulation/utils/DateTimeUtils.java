@@ -133,7 +133,7 @@ public class DateTimeUtils {
         if (dateString == null) {
             return null;
         }
-        return ZonedDateTime.parse(dateString, dtf);
+        return ZonedDateTime.parse(dateString, dtf).withNano(0);
     }
 
     public static String format(ZonedDateTime date) {

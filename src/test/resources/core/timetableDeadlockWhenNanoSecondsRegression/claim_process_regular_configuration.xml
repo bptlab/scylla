@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bsim:definitions xmlns:bsim="http://bsim.hpi.uni-potsdam.de/scylla/simModel" targetNamespace="http://www.hpi.de">
+  <bsim:simulationConfiguration startDateTime="2020-12-18T14:01:13.117216200+01:00[Europe/Berlin]" id="claim_process_regular_configuration" processRef="Process_04483xw" processInstances="1">
+    <bsim:startEvent id="StartEvent_1">
+      <bsim:arrivalRate timeUnit="DAYS">
+        <bsim:triangularDistribution>
+          <bsim:lower>0.5</bsim:lower>
+          <bsim:peak>1.5</bsim:peak>
+          <bsim:upper>3.0</bsim:upper>
+        </bsim:triangularDistribution>
+      </bsim:arrivalRate>
+    </bsim:startEvent>
+    <bsim:Task id="Activity_0l29psa" name="check claim completeness">
+      <bsim:duration timeUnit="DAYS">
+        <bsim:triangularDistribution>
+          <bsim:lower>0.25</bsim:lower>
+          <bsim:peak>1.0</bsim:peak>
+          <bsim:upper>5.0</bsim:upper>
+        </bsim:triangularDistribution>
+      </bsim:duration>
+      <bsim:resources>
+        <bsim:resource id="Clerk" amount="1" />
+      </bsim:resources>
+    </bsim:Task>
+  </bsim:simulationConfiguration>
+</bsim:definitions>

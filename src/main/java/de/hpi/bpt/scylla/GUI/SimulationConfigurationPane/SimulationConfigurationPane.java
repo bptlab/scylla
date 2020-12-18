@@ -18,9 +18,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.event.ChangeEvent;
 import javax.swing.filechooser.FileFilter;
 
 import org.jdom2.Document;
@@ -389,13 +386,13 @@ public class SimulationConfigurationPane extends EditorPane {
 			
 			@Override
 			protected void setSavedValue(LocalTime v) {
-				startDateTime = startDateTime.with(v);
+				startDateTime = startDateTime.with(v).withNano(0);
 				creator.setStartDateTime(startDateTime);
 			}
 			
 			@Override
 			protected LocalTime getSavedValue() {
-				if(startDateTime == null)startDateTime = ZonedDateTime.now();
+				if(startDateTime == null)startDateTime = ZonedDateTime.now().withNano(0);
 				return startDateTime.toLocalTime();
 			}
 		};
@@ -435,13 +432,13 @@ public class SimulationConfigurationPane extends EditorPane {
 		textfieldEndDate = new DateField(this) {
 			@Override
 			protected void setSavedValue(LocalDate v) {
-				endDateTime = endDateTime.with(v);
+				endDateTime = endDateTime.with(v).withNano(0);
 				creator.setEndDateTime(endDateTime);
 			}
 			
 			@Override
 			protected LocalDate getSavedValue() {
-				if(endDateTime == null)endDateTime = ZonedDateTime.now();
+				if(endDateTime == null)endDateTime = ZonedDateTime.now().withNano(0);
 				return endDateTime.toLocalDate();
 			}
 		};
@@ -509,10 +506,13 @@ public class SimulationConfigurationPane extends EditorPane {
 			textfieldEndDate.getComponent().setEnabled(!checked);
 			textfieldEndTime.getComponent().setEnabled(!checked);
 			if(isChangeFlag())return;
-			if(checked){
+			if(checked) {
 				creator.removeEndDateTime();
-			}else{
+				setSaved(false);
+			} else {
+				String oldEndTime = creator.getEndDateTime();
 				creator.setEndDateTime(endDateTime);
+				if(!oldEndTime.equals(creator.getEndDateTime())) setSaved(false);
 			}
 		});
 		GridBagConstraints gbc_checkboxUnlimited = new GridBagConstraints();
