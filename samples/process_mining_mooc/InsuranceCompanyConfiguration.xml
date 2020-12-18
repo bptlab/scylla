@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bsim:globalConfiguration xmlns:bsim="http://bsim.hpi.uni-potsdam.de/scylla/simModel" targetNamespace="http://www.hpi.de" id="InsuranceCompanyConfiguration">
+  <bsim:zoneOffset>+01:00</bsim:zoneOffset>
+  <bsim:timetables>
+    <bsim:timetable id="8-to-5">
+      <bsim:timetableItem from="MONDAY" to="MONDAY" beginTime="08:00" endTime="12:00" />
+      <bsim:timetableItem from="MONDAY" to="MONDAY" beginTime="13:00" endTime="17:00" />
+      <bsim:timetableItem from="TUESDAY" to="TUESDAY" beginTime="08:00" endTime="12:00" />
+      <bsim:timetableItem from="TUESDAY" to="TUESDAY" beginTime="13:00" endTime="17:00" />
+      <bsim:timetableItem from="WEDNESDAY" to="WEDNESDAY" beginTime="08:00" endTime="12:00" />
+      <bsim:timetableItem from="WEDNESDAY" to="WEDNESDAY" beginTime="13:00" endTime="17:00" />
+      <bsim:timetableItem from="THURSDAY" to="THURSDAY" beginTime="08:00" endTime="12:00" />
+      <bsim:timetableItem from="THURSDAY" to="THURSDAY" beginTime="13:00" endTime="17:00" />
+      <bsim:timetableItem from="FRIDAY" to="FRIDAY" beginTime="08:00" endTime="12:00" />
+      <bsim:timetableItem from="FRIDAY" to="FRIDAY" beginTime="13:00" endTime="16:00" />
+    </bsim:timetable>
+  </bsim:timetables>
+  <bsim:resourceData>
+    <bsim:dynamicResource id="Clerk" defaultQuantity="5" defaultCost="13.0" defaultTimeUnit="HOURS" defaultTimetableId="8-to-5" />
+  </bsim:resourceData>
+</bsim:globalConfiguration>
