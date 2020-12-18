@@ -15,6 +15,7 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.filechooser.FileFilter;
 
 import org.eclipse.wb.swing.FocusTraversalOnArray;
 import org.jdom2.JDOMException;
@@ -22,6 +23,7 @@ import org.jdom2.JDOMException;
 import de.hpi.bpt.scylla.GUI.EditorPane;
 import de.hpi.bpt.scylla.GUI.ExpandPanel;
 import de.hpi.bpt.scylla.GUI.ExtendedListChooserPanel;
+import de.hpi.bpt.scylla.GUI.ScalingFileChooser;
 import de.hpi.bpt.scylla.GUI.ListChooserPanel.ComponentHolder;
 import de.hpi.bpt.scylla.GUI.ScyllaGUI;
 import de.hpi.bpt.scylla.GUI.InputFields.NumberField;
@@ -534,8 +536,12 @@ public class GlobalConfigurationPane extends EditorPane implements GCFormManager
 			}
 		};
 	}
-
 	
+
+	@Override
+	public FileFilter fileFilter() {
+		return ScalingFileChooser.FILEFILTER_XML;
+	}	
 	
 	
 	

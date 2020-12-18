@@ -21,6 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
+import javax.swing.filechooser.FileFilter;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -606,6 +607,7 @@ public class SimulationConfigurationPane extends EditorPane {
 		//Choose file to be opened
 		ScalingFileChooser chooser = new ScalingFileChooser(ScyllaGUI.DEFAULTFILEPATH);
 		chooser.setDialogTitle("Open Process Model File");
+		chooser.setBPMNFilter();
 		int c = chooser.showDialog(SimulationConfigurationPane.this,"Open");
 		//if the process is canceled, nothing happens
 		if(c == ScalingFileChooser.APPROVE_OPTION){
@@ -633,6 +635,7 @@ public class SimulationConfigurationPane extends EditorPane {
 		//Choose file to be opened
 		ScalingFileChooser chooser = new ScalingFileChooser(ScyllaGUI.DEFAULTFILEPATH);
 		chooser.setDialogTitle("Open Global Configuration File");
+		chooser.setXMLFilter();
 		int c = chooser.showDialog(SimulationConfigurationPane.this,"Open");
 		//if the process is canceled, nothing happens
 		if(c == ScalingFileChooser.APPROVE_OPTION){
@@ -906,6 +909,11 @@ public class SimulationConfigurationPane extends EditorPane {
 		errorLabel.setForeground(ScyllaGUI.ERRORFONT_COLOR);
 		errorLabel.setFont(ScyllaGUI.DEFAULTFONT);
 		return errorLabel;
+	}
+
+	@Override
+	public FileFilter fileFilter() {
+		return ScalingFileChooser.FILEFILTER_XML;
 	}
 
 }
