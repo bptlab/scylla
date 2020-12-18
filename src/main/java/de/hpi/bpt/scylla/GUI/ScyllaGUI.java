@@ -37,7 +37,7 @@ import de.hpi.bpt.scylla.GUI.SimulationPane.SimulationPane;
 public class ScyllaGUI extends JFrame {
 	
 	/**A Developer variable to suppress e.g. output forwarding*/
-	public static final boolean DEBUG = true;
+	public static final boolean USE_IDE_CONSOLE = true;
 	
 	/**Tells whether the programm is running in a jar or not*/
 	public static final boolean INJAR = ScyllaGUI.class.getResource(ScyllaGUI.class.getSimpleName()+".class").toString().startsWith("jar:");
@@ -226,7 +226,7 @@ public class ScyllaGUI extends JFrame {
 	    initKeyBindings();
 		contentPane.addTab("Simulation", simulationPane);
 		
-		if(!DEBUG)System.setOut(simulationPane.getConsole().getOut());
+		if(!USE_IDE_CONSOLE)System.setOut(simulationPane.getConsole().getOut());
 	}
 	
 	public static Image getResource(String path) {
