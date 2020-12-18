@@ -25,6 +25,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.filechooser.FileFilter;
 
 import org.jdom2.JDOMException;
 
@@ -301,6 +302,7 @@ public abstract class EditorPane extends JPanel implements FormManager{
 		if(getFile() != null && getFile().exists())chooser.setSelectedFile(getFile());
 		else if(!getId().equals("")) chooser.setSelectedFile(new File(normalizePath(ScyllaGUI.DEFAULTFILEPATH+"/"+getId()+".xml")));
 		chooser.setDialogTitle("Save");
+		chooser.setFileFilter(fileFilter());
 		int c = chooser.showDialog(null,"Save");
 		if(c == ScalingFileChooser.APPROVE_OPTION){
 			setFile(chooser.getSelectedFile());
@@ -325,6 +327,7 @@ public abstract class EditorPane extends JPanel implements FormManager{
 		//Choose file to be opened
 		ScalingFileChooser chooser = new ScalingFileChooser(ScyllaGUI.DEFAULTFILEPATH);
 		chooser.setDialogTitle("Open");
+		chooser.setFileFilter(fileFilter());
 		int c = chooser.showDialog(this,"Open");
 		//if the process is canceled, nothing happens
 		if(c == ScalingFileChooser.APPROVE_OPTION){
@@ -376,6 +379,8 @@ public abstract class EditorPane extends JPanel implements FormManager{
 			e.printStackTrace();
 		}
 	}
+	
+	public abstract FileFilter fileFilter();
 
 
 	@Override
