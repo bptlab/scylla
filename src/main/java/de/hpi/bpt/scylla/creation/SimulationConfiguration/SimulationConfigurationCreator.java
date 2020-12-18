@@ -282,6 +282,9 @@ public class SimulationConfigurationCreator extends ElementLink{
 				elements.put(t.getId(),t);
 			} else if(name.endsWith("Event")) {
 				elements.put(id, new ElementLink(child) {});
+			} else {
+				//TODO default case wasn't in original code, reflect on it
+				elements.put(id, new ElementLink(child) {});
 			}
 			break;
 		}

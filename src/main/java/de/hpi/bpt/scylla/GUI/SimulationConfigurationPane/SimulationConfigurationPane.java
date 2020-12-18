@@ -608,7 +608,7 @@ public class SimulationConfigurationPane extends EditorPane {
 		ScalingFileChooser chooser = new ScalingFileChooser(ScyllaGUI.DEFAULTFILEPATH);
 		chooser.setDialogTitle("Open Process Model File");
 		chooser.setBPMNFilter();
-		int c = chooser.showDialog(SimulationConfigurationPane.this,"Open");
+		int c = chooser.showDialog(this,"Open");
 		//if the process is canceled, nothing happens
 		if(c == ScalingFileChooser.APPROVE_OPTION){
 			if(chooser.getSelectedFile() != null){
