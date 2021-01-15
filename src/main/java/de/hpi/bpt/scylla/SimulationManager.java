@@ -176,8 +176,9 @@ public class SimulationManager {
                 outputPath = strb.toString()+Scylla.FILEDELIM;
         	}
             File outputPathFolder = new File(outputPath);
-            if(outputPathFolder.exists())throw new Error("Output already exists!");
-            outputPathFolder.mkdir();
+            if(outputPathFolder.exists()) throw new Error("Output already exists!");
+            outputPathFolder.mkdirs();
+            assert outputPathFolder.exists();
             OutputLoggerPluggable.runPlugins(sm, outputPath);
 
         }

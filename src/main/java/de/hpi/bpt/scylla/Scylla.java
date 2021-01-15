@@ -71,6 +71,7 @@ public class Scylla {
     }
     
 	public static String normalizePath(String path) {
+		if(path == null) return path;
 		path = path.replace("\\", FILEDELIM);
 		path = path.replace("/", FILEDELIM);
 		return path;
