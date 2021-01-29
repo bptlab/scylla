@@ -333,7 +333,7 @@ public class PluginLoader {
 			@SuppressWarnings("unchecked")
 			Class<? extends IPluggable> enclosingClass = (Class<? extends IPluggable>) entryPoint.getEnclosingClass();
 			if(enclosingClass == null || Modifier.isStatic(entryPoint.getModifiers())){
-				inst = (T)(entryPoint.newInstance());
+				inst = (T)(entryPoint.getDeclaredConstructor().newInstance());
 			} else {
 				inst = (T)(entryPoint.getDeclaredConstructor(enclosingClass).newInstance(getInstance(enclosingClass)));
 			}
