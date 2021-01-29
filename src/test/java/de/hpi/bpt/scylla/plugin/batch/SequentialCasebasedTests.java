@@ -31,7 +31,7 @@ public class SequentialCasebasedTests extends BatchSimulationTest{
 	}
 	
 	public static void main(String[] args) {
-		PluginLoader.getDefaultPluginLoader().getExtensions().get(OutputLoggerPluggable.class).stream().filter(each -> each.equals(StatisticsLogger.class)).findAny().get().stateChanged(false);
+		PluginLoader.getDefaultPluginLoader().getExtensions().get(OutputLoggerPluggable.class).stream().filter(each -> each.equals(StatisticsLogger.class)).findAny().get().setActive(false);
 		DebugLogger.allowDebugLogging = false;
 		SequentialCasebasedTests x = new SequentialCasebasedTests();
 		//x.testResourceStable(8619657395064501318L);

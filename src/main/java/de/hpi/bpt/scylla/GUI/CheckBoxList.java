@@ -53,7 +53,7 @@ public class CheckBoxList<T extends CheckBoxList.StateObserver> extends JList<T>
 					//Setback selection (fires another element, thats what if(i == -1) is for)
 					source.clearSelection();
 					//Notify observer if existing
-					if(observer != null)observer.stateChanged(anythingSelected());
+					if(observer != null) observer.setActive(anythingSelected());
 				}
 			}
 		});
@@ -126,11 +126,11 @@ public class CheckBoxList<T extends CheckBoxList.StateObserver> extends JList<T>
 		 * Notification for state change
 		 * @param b : The new state, can be nearly anything
 		 */
-		public void stateChanged(boolean b);
+		public void setActive(boolean b);
 		/**
 		 * @return The current state that the observer has (for synchronization purpose)
 		 */
-		public boolean getState();
+		public boolean isActive();
 	}
 
 	/**
@@ -151,7 +151,7 @@ public class CheckBoxList<T extends CheckBoxList.StateObserver> extends JList<T>
 		private ObserverCheckBox(StateObserver o) {
 			super();
 			observer = o;
-			setSelected(o.getState());
+			setSelected(o.isActive());
 			setIcon(new ScalingCheckBoxIcon(ScyllaGUI.DEFAULTFONT.getSize()));
 		}
 		
@@ -159,7 +159,7 @@ public class CheckBoxList<T extends CheckBoxList.StateObserver> extends JList<T>
 		@Override
 		public void setSelected(boolean b){
 			super.setSelected(b);
-			observer.stateChanged(b);
+			observer.setActive(b);
 		}
 		
 	}
