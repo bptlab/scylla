@@ -315,16 +315,16 @@ public class SimulationModel extends Model {
 
         for (String resourceId : resourceQueuesUpdated) {
             ScyllaEventQueue eventQueue = getEventQueues().get(resourceId);
-            for (int i = 0; i < eventQueue.size(); i++) {
-                ScyllaEvent eventFromQueue = eventQueue.peek(i);
+            for (ScyllaEvent eventFromQueue : eventQueue) {
                 if (eventCandidates.contains(eventFromQueue)) {
                     continue;
                 }
 
-                int index = 0;
                 boolean eventIsEligible = resourceManager.hasResourcesForEvent(eventFromQueue);
 
                 if (eventIsEligible) {
+                    int index = 0;
+                    
                     ProcessSimulationComponents simulationComponents = eventFromQueue.getSimulationComponents();
                     int nodeId = eventFromQueue.getNodeId();
                     Set<ResourceReference> resourceReferences = simulationComponents.getSimulationConfiguration()
@@ -353,8 +353,7 @@ public class SimulationModel extends Model {
 
         if (eventCandidates.isEmpty()) {
             return null;
-        }
-        else {
+        } else {
             Collections.sort(eventCandidates, new Comparator<ScyllaEvent>() {
                 @Override
                 public int compare(ScyllaEvent e1, ScyllaEvent e2) {
