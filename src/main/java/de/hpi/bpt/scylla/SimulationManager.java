@@ -3,6 +3,8 @@ package de.hpi.bpt.scylla;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -96,6 +98,8 @@ public class SimulationManager {
      */
     public String run() {
     	
+    	Instant startTime = Instant.now();
+    	
     	try {
 			PluginLoader.getDefaultPluginLoader().prepareForSimulation();
 		} catch (CycleException e) {
@@ -187,7 +191,23 @@ public class SimulationManager {
         } finally {
         	cleanup();
         }
+        
+    	Instant endTime = Instant.now();
+    	Duration timeElapsed = Duration.between(startTime, endTime);
+    	System.out.println(formatSimulationTime(timeElapsed));
+        
         return outputPath;
+    }
+    
+    protected String formatSimulationTime(Duration timeElapsed) {
+    	StringBuilder sb = new StringBuilder("Total simulation time:");
+    	if(timeElapsed.toDaysPart() > 0) sb.append(" ").append(timeElapsed.toDaysPart()).append(" days");
+    	if(timeElapsed.toHoursPart() > 0) sb.append(" ").append(timeElapsed.toHoursPart()).append(" hours");
+    	if(timeElapsed.toMinutesPart() > 0) sb.append(" ").append(timeElapsed.toMinutesPart()).append(" mins");
+    	if(timeElapsed.toSecondsPart() > 0) sb.append(" ").append(timeElapsed.toSecondsPart()).append(" secs");
+    	if(timeElapsed.toMillisPart() > 0) sb.append(" ").append(timeElapsed.toMillisPart()).append(" ms");
+    	
+    	return sb.toString();
     }
     
     protected void parseInput() throws ScyllaValidationException, JDOMException, IOException {
