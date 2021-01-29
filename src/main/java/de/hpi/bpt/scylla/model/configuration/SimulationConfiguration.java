@@ -1,6 +1,7 @@
 package de.hpi.bpt.scylla.model.configuration;
 
 import java.time.ZonedDateTime;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -108,7 +109,7 @@ public class SimulationConfiguration extends SimulationInput {
     public Set<ResourceReference> getResourceReferenceSet(Integer nodeId) {
         Set<ResourceReference> resourceRefSet = resourceReferences.get(nodeId);
         if (resourceRefSet == null) {
-            resourceRefSet = new HashSet<ResourceReference>();
+            resourceRefSet = Collections.emptySet();
         }
         return resourceRefSet;
     }
