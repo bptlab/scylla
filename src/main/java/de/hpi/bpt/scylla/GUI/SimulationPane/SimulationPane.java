@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -33,6 +34,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import de.hpi.bpt.scylla.SimulationManager;
+import de.hpi.bpt.scylla.GUI.CheckBoxList.StateObserver;
 import de.hpi.bpt.scylla.GUI.CheckboxListPanel;
 import de.hpi.bpt.scylla.GUI.Console;
 import de.hpi.bpt.scylla.GUI.EditorPane;
@@ -567,7 +569,12 @@ public class SimulationPane extends JPanel{
 		gbc.ipady = 0;
 		gbc.insets = new Insets(0,0,(int)(5.0*ScyllaGUI.SCALE),0);
 		for(Entry<String, ArrayList<PluginLoader.PluginWrapper>> e : plugins.entrySet()){
-			CheckboxListPanel listpanel = new CheckboxListPanel(e.getKey(),e.getValue());
+			CheckboxListPanel listpanel = new CheckboxListPanel(e.getKey(), e.getValue().stream().map(plugin -> new StateObserver() {
+				@Override
+				public void setActive(boolean b) {plugin.setActive(b);}
+				@Override
+				public boolean isActive() {return plugin.isActive();}
+			}).collect(Collectors.toList()));
 			gbc.gridy = i;
 			if(i == plugins.entrySet().size()-1)gbc.weighty = 1.0;
 			panel_plugins.add(listpanel,gbc);

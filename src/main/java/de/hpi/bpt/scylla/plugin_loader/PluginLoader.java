@@ -44,12 +44,15 @@ public class PluginLoader {
 	/**Caches created plugin objects*/
 	private Map<Class<? extends IPluggable>,IPluggable> cachedPluginObjects = new HashMap<>();
 	
+	/**Caches the plugin objects for entry points*/
+	private Map<Class<?>, List<? extends IPluggable>> cachedEntrypoints = new HashMap<>();
+	
 	/**Default plugin loader*/
 	private static PluginLoader defaultPluginLoader;
 	
 	
 	
-	public class PluginWrapper<T extends IPluggable> implements EventListener,StateObserver{
+	public class PluginWrapper<T extends IPluggable> {
 		private Class<T> plugin;
 		private List<TemporalDependent> temporalDependencies;
 		private boolean active;
@@ -81,17 +84,21 @@ public class PluginLoader {
 				p instanceof Class<?> ? plugin.equals(p) : false;
 		}
 
-		@Override
 		public void setActive(boolean b) {
 			active = b;
 			
 		}
-		@Override
+
 		public boolean isActive() {
 			return active;
 		}
+		
 		public Package getPackage(){
 			return plugin.getPackage();
+		}
+		
+		public Class<T> getPlugin() {
+			return plugin;
 		}
 		
 		public List<TemporalDependent> getTemporalDependents() {return temporalDependencies;}
@@ -108,6 +115,7 @@ public class PluginLoader {
 	}
 	
 	
+	//			Plugin loading
 	
 	/**
 	 * Loads all plugins from all packages from META-INF/plugins/plugins_list,
@@ -261,10 +269,49 @@ public class PluginLoader {
 			System.out.println(entry_point.getKey().getName());
 			List<PluginWrapper> plugins = entry_point.getValue();
 			for(PluginWrapper plugin : plugins){
-				System.out.println("\t "+plugin.toString());
+				System.out.println("\t "+(plugin.isActive() ? "X" : "_")+" "+plugin.toString());
 			}
 		}
 	}
+	
+	//			Plugin Selection
+	
+	public PluginLoader activateNone() {
+		getExtensions().values().stream()
+			.flatMap(List::stream)
+			.forEach(plugin -> plugin.setActive(false));
+		return this;
+	}
+	
+	public <T extends IPluggable> PluginLoader activateClass(Class<T> plugin) {
+		getWrapper(plugin).setActive(true);
+		return this;
+	}
+	
+	public <T extends IPluggable> PluginLoader deactivateClass(Class<T> plugin) {
+		getWrapper(plugin).setActive(false);
+		return this;
+	}
+
+	
+	public <T extends IPluggable> PluginLoader activatePackage(String packageName) {
+		getExtensions().values().stream()
+			.flatMap(List::stream)
+			.filter(plugin -> plugin.getPackage().getName().equals(packageName))
+			.forEach(plugin -> plugin.setActive(true));
+		return this;
+	}
+	
+	public <T extends IPluggable> PluginLoader deactivatePackage(String packageName) {
+		getExtensions().values().stream()
+			.flatMap(List::stream)
+			.filter(plugin -> plugin.getPackage().getName().equals(packageName))
+			.forEach(plugin -> plugin.setActive(false));
+		return this;
+	}
+	
+	
+	//			Simulation preparation	
 	
 	public void prepareForSimulation() throws CycleException {
 		resolveTemporalDependencies();
@@ -304,6 +351,9 @@ public class PluginLoader {
 		
 		return graph.resolve();
 	}
+	
+	
+	//		Retrieving instances & loaded classes
 
 	/**
 	 * @return All loaded Plugins, sorted by their entry point
@@ -319,12 +369,37 @@ public class PluginLoader {
 	 */
 	@SuppressWarnings("unchecked")
 	public <S extends IPluggable> List<S> getPlugins(Class<S> entrypoint) {
-		return (List<S>) extensions.entrySet().stream()
-			.filter(each -> entrypoint.isAssignableFrom(each.getKey()))
-			.flatMap(each -> each.getValue().stream())
-			.filter(PluginWrapper::isActive)
-			.map(PluginWrapper::getInstance)
-			.collect(Collectors.toList());
+		List<S> plugins = getCachedPlugins(entrypoint);
+		if(plugins == null) {
+			plugins = (List<S>) extensions.entrySet().stream()
+					.filter(each -> entrypoint.isAssignableFrom(each.getKey()))
+					.flatMap(each -> each.getValue().stream())
+					.filter(PluginWrapper::isActive)
+					.map(PluginWrapper::getInstance)
+					.collect(Collectors.toList());
+			cachePlugins(entrypoint, plugins);
+		}
+		return plugins;
+	}
+	
+	private <T extends IPluggable> void cachePlugins(Class<T> entryPoint, List<T> plugins) {
+		cachedEntrypoints.put(entryPoint, plugins);
+	}
+	
+	@SuppressWarnings("unchecked")
+	private  <S extends IPluggable> List<S> getCachedPlugins(Class<S> entrypoint) {
+		return (List<S>) cachedEntrypoints.get(entrypoint);
+	}
+	
+	
+	
+	@SuppressWarnings("unchecked")
+	public <T extends IPluggable> PluginWrapper<T> getWrapper(Class<T> pluginClass) {
+		return getExtensions().values().stream()
+			.flatMap(List::stream)
+			.filter(plugin -> plugin.getPlugin().equals(pluginClass))
+			.map(plugin -> (PluginWrapper<T>) plugin)
+			.findAny().get();
 	}
 	
 	private <T extends IPluggable> T getInstance(Class<T> entryPoint) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
@@ -353,7 +428,11 @@ public class PluginLoader {
 	
 	private void flushCache() {
 		cachedPluginObjects.clear();
+		cachedEntrypoints.clear();
 	}
+	
+	
+	//		Static Access to default loader
 	
 	public static void flushDefault() {
 		getDefaultPluginLoader().flushCache();
