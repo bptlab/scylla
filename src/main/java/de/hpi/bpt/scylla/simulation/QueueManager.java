@@ -150,21 +150,22 @@ public class QueueManager {
         }
 
         //Id and amount of needed resources
-        Map<String, Integer> resourcesRequired = new HashMap<String, Integer>();
+        String[] resourceIds = new String[resourceReferences.size()];
+        int[] resourceAmountsRequired = new int[resourceReferences.size()];
+        int i = 0;
         for (ResourceReference ref : resourceReferences) {
             String resourceId = ref.getResourceId();
             int amount = ref.getAmount();
-            resourcesRequired.put(resourceId, amount);
+            resourceIds[i] = resourceId;
+            resourceAmountsRequired[i] = amount;
+            i++;
         }
-
-        // keySet() on HashMap returns values on random order
-        // but we need some fixed order of processing the different resource types
-        String[] resourceIds = resourcesRequired.keySet().toArray(new String[0]);
 
         // retrieve all available resources
         boolean enoughPotentialResourceInstancesAvailable = true;
+        i = 0;
         for (String resourceId : resourceIds) {
-            int amount = resourcesRequired.get(resourceId);
+            int amount = resourceAmountsRequired[i];
             ResourceQueue queue = getResourceObjects().get(resourceId);
             List<ResourceObject> resourceObjects = queue.pollAvailable(currentSimulationTime);
             availableResourceObjects.put(resourceId, resourceObjects);
@@ -172,6 +173,7 @@ public class QueueManager {
                 enoughPotentialResourceInstancesAvailable = false;
                 break;
             }
+            i++;
         }
 
         //Put back all already polled resources, they are not needed as there are not enough of them
@@ -185,14 +187,16 @@ public class QueueManager {
 
         // find timetable-matching instances per resource -> one match = one tuple
         Map<String, List<ResourceObjectTuple>> tuplesPerResource = new HashMap<String, List<ResourceObjectTuple>>();
+        i = 0;
         for (String resourceId : resourceIds) {
-            int amount = resourcesRequired.get(resourceId);
+            int amount = resourceAmountsRequired[i];
             List<ResourceObject> resourceObjects = availableResourceObjects.get(resourceId);
             List<ResourceObjectTuple> tuples = new ArrayList<ResourceObjectTuple>();
             for (int index = 0; index < resourceObjects.size(); index++) {
                 tuples.addAll(findMatchingResourceObjects(resourceObjects, index, amount));
             }
             tuplesPerResource.put(resourceId, tuples);
+            i++;
         }
 
         // match tuples of different resource types
@@ -279,7 +283,6 @@ public class QueueManager {
         String nameOfResponsibleEvent = releasingEvent.getSource();
 
         // release resources
-        Set<String> resourceQueuesUpdated = new HashSet<String>();
         Set<ResourceObject> assignedResources = new HashSet<ResourceObject>();
 
         if (nameOfResponsibleEvent == null) { // release all resources of process instance
@@ -294,6 +297,8 @@ public class QueueManager {
         Map<String, ResourceQueue> resourceObjects = getResourceObjects();
         TimeInstant presentTime = model.presentTime();
 
+        String[] resourceQueuesUpdated = new String[assignedResources.size()];
+        int i = 0;
         for (ResourceObject resourceObject : assignedResources) {
             String resourceId = resourceObject.getResourceType();
             resourceObjects.get(resourceId).offer(presentTime, resourceObject, processInstance, nodeId);
@@ -303,7 +308,8 @@ public class QueueManager {
                 traceNote += ", source: " + nameOfResponsibleEvent;
             }
             model.sendTraceNote(traceNote);
-            resourceQueuesUpdated.add(resourceId);
+            resourceQueuesUpdated[i] = resourceId;
+            i++;
         }
         if (nameOfResponsibleEvent == null) {
             processInstance.getAssignedResources().clear();
