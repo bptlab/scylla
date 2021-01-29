@@ -52,11 +52,11 @@ public class PluginLoader {
 	public class PluginWrapper<T extends IPluggable> implements EventListener,StateObserver{
 		private Class<T> plugin;
 		private List<TemporalDependent> temporalDependencies;
-		private boolean chosen;
+		private boolean active;
 		
 		private PluginWrapper(Class<T> p, boolean b){
 			plugin = p;
-			chosen = b;
+			active = b;
 			parseTemporalDependencies();
 		}
 		
@@ -82,13 +82,13 @@ public class PluginLoader {
 		}
 
 		@Override
-		public void stateChanged(boolean b) {
-			chosen = b;
+		public void setActive(boolean b) {
+			active = b;
 			
 		}
 		@Override
-		public boolean getState() {
-			return chosen;
+		public boolean isActive() {
+			return active;
 		}
 		public Package getPackage(){
 			return plugin.getPackage();
@@ -322,7 +322,7 @@ public class PluginLoader {
 		return (List<S>) extensions.entrySet().stream()
 			.filter(each -> entrypoint.isAssignableFrom(each.getKey()))
 			.flatMap(each -> each.getValue().stream())
-			.filter(PluginWrapper::getState)
+			.filter(PluginWrapper::isActive)
 			.map(PluginWrapper::getInstance)
 			.collect(Collectors.toList());
 	}

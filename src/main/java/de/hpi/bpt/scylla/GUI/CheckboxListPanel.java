@@ -17,7 +17,7 @@ import de.hpi.bpt.scylla.GUI.CheckBoxList.StateObserver;
  *
  */
 @SuppressWarnings("serial")
-public class CheckboxListPanel extends ExpandPanel implements StateObserver{
+public class CheckboxListPanel extends ExpandPanel implements StateObserver {
 
 	/**Checkbox to make Panel selectable*/
 	private JCheckBox checkbox_title;
@@ -38,7 +38,7 @@ public class CheckboxListPanel extends ExpandPanel implements StateObserver{
 		checkbox_title = (JCheckBox) header;
 		checkbox_title.setIcon(new ScalingCheckBoxIcon(ScyllaGUI.DEFAULTFONT.getSize()));
 		checkbox_title.setHorizontalAlignment(SwingConstants.LEFT);
-		checkbox_title.addActionListener(new ActionListener(){
+		checkbox_title.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				list.setAll(checkbox_title.isSelected());
 			}
@@ -64,7 +64,7 @@ public class CheckboxListPanel extends ExpandPanel implements StateObserver{
 	 * Sets general checkbox based on if there are any selected checkboxes in the checkboxlist
 	 */
 	@Override
-	public void stateChanged(boolean b) {
+	public void setActive(boolean b) {
 		checkbox_title.setSelected(b);
 	}
 
@@ -72,7 +72,7 @@ public class CheckboxListPanel extends ExpandPanel implements StateObserver{
 	 * @return the state of the general checkbox
 	 */
 	@Override
-	public boolean getState() {
+	public boolean isActive() {
 		return checkbox_title.isSelected();
 	}
 	
