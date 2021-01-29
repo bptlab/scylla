@@ -41,9 +41,9 @@ public class ResourceAvailabilityEvent extends ExternalEvent {
 
         TimeInstant currentSimulationTime = model.presentTime();
 
-        Set<String> resourceQueuesUpdated = new HashSet<String>();
         String resourceType = resourceObject.getResourceType();
-        resourceQueuesUpdated.add(resourceType);
+        String[] resourceQueuesUpdated = new String[] {resourceType};
+        
         try {
             model.scheduleAllEventsFromQueueReadyForSchedule(resourceQueuesUpdated);
 

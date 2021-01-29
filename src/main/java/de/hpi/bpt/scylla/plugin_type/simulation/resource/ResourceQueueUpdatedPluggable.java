@@ -17,7 +17,7 @@ import de.hpi.bpt.scylla.simulation.event.ScyllaEvent;
  */
 public abstract class ResourceQueueUpdatedPluggable implements IPluggable{
 
-    public static ScyllaEvent runPlugins(SimulationModel model, Set<String> resourceQueuesUpdated) {
+    public static ScyllaEvent runPlugins(SimulationModel model, String[] resourceQueuesUpdated) {
         Class<ResourceQueueUpdatedPluggable> clazz = ResourceQueueUpdatedPluggable.class;
         Iterator<? extends ResourceQueueUpdatedPluggable> plugins = PluginLoader.dGetPlugins(clazz);
         while (plugins.hasNext()) {
@@ -28,6 +28,7 @@ public abstract class ResourceQueueUpdatedPluggable implements IPluggable{
         return null;
     }
     
-    public abstract ScyllaEvent eventToBeScheduled(SimulationModel model, Set<String> resourceQueuesUpdated);
+    /** resourceQueuesUpdated is set-like */
+    public abstract ScyllaEvent eventToBeScheduled(SimulationModel model, String[] resourceQueuesUpdated);
 
 }

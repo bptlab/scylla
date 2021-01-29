@@ -302,17 +302,18 @@ public class SimulationModel extends Model {
      * 
      * @param resourceQueuesUpdated
      *            resource queues which have been updated recently -> only the events which require resources from these
-     *            queues are considered
+     *            queues are considered, must be set-like
      * @return the DesmoJ event which is ready to be scheduled for immediate execution
      */
-    public ScyllaEvent getEventFromQueueReadyForSchedule(Set<String> resourceQueuesUpdated) {
+    public ScyllaEvent getEventFromQueueReadyForSchedule(String[] resourceQueuesUpdated) {
     	
     	ScyllaEvent eventFromPlugin = ResourceQueueUpdatedPluggable.runPlugins(this, resourceQueuesUpdated);
     	if(eventFromPlugin != null)return eventFromPlugin;
 
-        List<ScyllaEvent> eventCandidates = new ArrayList<ScyllaEvent>();
+        Set<ScyllaEvent> eventCandidates = new HashSet<ScyllaEvent>();
         int accumulatedIndex = Integer.MAX_VALUE;
 
+        
         for (String resourceId : resourceQueuesUpdated) {
             ScyllaEventQueue eventQueue = getEventQueues().get(resourceId);
             for (ScyllaEvent eventFromQueue : eventQueue) {
@@ -354,14 +355,13 @@ public class SimulationModel extends Model {
         if (eventCandidates.isEmpty()) {
             return null;
         } else {
-            Collections.sort(eventCandidates, new Comparator<ScyllaEvent>() {
+            
+        	ScyllaEvent event = Collections.min(eventCandidates, new Comparator<ScyllaEvent>() {
                 @Override
                 public int compare(ScyllaEvent e1, ScyllaEvent e2) {
                     return e1.getSimulationTimeOfSource().compareTo(e2.getSimulationTimeOfSource());
                 }
             });
-
-            ScyllaEvent event = eventCandidates.get(0);
 
             // get and assign resources
 
@@ -450,7 +450,7 @@ public class SimulationModel extends Model {
      * @param resourceQueuesUpdated : Set of ids of resources that have been updated (usually have become available again)
      * @throws ScyllaRuntimeException
      */
-    public void scheduleAllEventsFromQueueReadyForSchedule(Set<String> resourceQueuesUpdated) throws ScyllaRuntimeException {
+    public void scheduleAllEventsFromQueueReadyForSchedule(String[] resourceQueuesUpdated) throws ScyllaRuntimeException {
     	ScyllaEvent eventFromQueue = getEventFromQueueReadyForSchedule(resourceQueuesUpdated);
         while (eventFromQueue != null) {
         	SimulationUtils.scheduleEvent(eventFromQueue, new TimeSpan(0));

@@ -14,7 +14,7 @@ public class BatchResourceQueueUpdatedPlugin extends ResourceQueueUpdatedPluggab
 	}
 
 	@Override
-	public ScyllaEvent eventToBeScheduled(SimulationModel model, Set<String> resourceQueuesUpdated) {
+	public ScyllaEvent eventToBeScheduled(SimulationModel model, String[] resourceQueuesUpdated) {
 		for(BatchStashResourceEvent stashEvent : BatchPluginUtils.getInstance().getStashEvents()) {
 			if(stashEvent.interestedInResources(resourceQueuesUpdated)) {
 				BatchPluginUtils.getInstance().getStashEvents().remove(stashEvent);

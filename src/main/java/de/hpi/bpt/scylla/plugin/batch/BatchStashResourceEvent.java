@@ -1,6 +1,9 @@
 package de.hpi.bpt.scylla.plugin.batch;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import de.hpi.bpt.scylla.simulation.ProcessInstance;
@@ -44,7 +47,8 @@ public class BatchStashResourceEvent extends ScyllaEvent {
 	 * @param resourceIds : Ids of released resources
 	 * @return
 	 */
-	public boolean interestedInResources(Set<String> resourceIds) {
+	public boolean interestedInResources(String[] resourceIdArray) {
+		List<String> resourceIds = Arrays.asList(resourceIdArray);
 		return resources.getResourceObjects().stream().anyMatch((any)->{return resourceIds.contains(any.getResourceType());})
 				&& resourcesFree();
 		//return !processInstance.getAssignedResources().containsKey(taskSource);
