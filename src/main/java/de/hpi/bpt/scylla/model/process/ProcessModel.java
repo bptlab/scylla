@@ -266,6 +266,10 @@ public class ProcessModel extends SimulationInput {
     public Graph<Integer> getGraph() {
         return graph;
     }
+    
+    public int getNumberOfNodes() {
+    	return identifiers.size();
+    }
 
     //TODO: Maybe create a direct map method
     public Map<Integer, String> getIdentifiers() {
