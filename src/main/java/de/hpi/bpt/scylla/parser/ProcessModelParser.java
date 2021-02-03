@@ -175,7 +175,7 @@ public class ProcessModelParser extends Parser<ProcessModel> {
         Map<Integer, Element> sequenceFlows = new HashMap<Integer, Element>();
         Map<Integer, List<Element>> tasksWithDataInputAssociations = new HashMap<Integer, List<Element>>(); //not only tasks anymore, also events
         Map<Integer, List<Element>> tasksWithDataOutputAssociations = new HashMap<Integer, List<Element>>(); //not only tasks anymore, also events
-        int nodeId = 1;
+        int nodeId = 0;
         for (Element el : process.getChildren()) {
             String elementName = el.getName();
             if (isKnownElement(elementName)) {

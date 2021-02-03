@@ -14,6 +14,7 @@ import org.jdom2.Namespace;
 import de.hpi.bpt.scylla.SimulationManager;
 import de.hpi.bpt.scylla.exception.ScyllaValidationException;
 import de.hpi.bpt.scylla.logger.DebugLogger;
+import de.hpi.bpt.scylla.model.NodeMap;
 import de.hpi.bpt.scylla.model.configuration.ResourceReference;
 import de.hpi.bpt.scylla.model.configuration.SimulationConfiguration;
 import de.hpi.bpt.scylla.model.configuration.distribution.BinomialDistribution;
@@ -130,7 +131,7 @@ public class SimulationConfigurationParser extends Parser<SimulationConfiguratio
         Map<Integer, TimeDistributionWrapper> arrivalRates = new HashMap<Integer, TimeDistributionWrapper>();
         Map<Integer, TimeDistributionWrapper> durations = new HashMap<Integer, TimeDistributionWrapper>();
         Map<Integer, TimeDistributionWrapper> setUpDurations = new HashMap<Integer, TimeDistributionWrapper>();
-        Map<Integer, Set<ResourceReference>> resourceReferences = new HashMap<Integer, Set<ResourceReference>>();
+        Map<Integer, Set<ResourceReference>> resourceReferences = new NodeMap<Set<ResourceReference>>(processModel.getNumberOfNodes());
         // gateways and events
         // Map<Integer, BranchingBehavior> branchingBehaviors = new HashMap<Integer, BranchingBehavior>();
         Map<Integer, SimulationConfiguration> configurationsOfSubProcesses = new HashMap<Integer, SimulationConfiguration>();
