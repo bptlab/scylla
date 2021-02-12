@@ -135,7 +135,7 @@ public class QueueManager {
     public ResourceObjectTuple getResourcesForEvent(ScyllaEvent event) {
     	
     	Optional<ResourceAssignmentPluggable> plugin = ResourceAssignmentPluggable.getInterestedPlugin(model, event);
-    	if(plugin.isPresent())return plugin.get().getResourcesForEvent(model, event).orElse(null);
+    	if(plugin.isPresent()) return plugin.get().getResourcesForEvent(model, event).orElse(null);
     	
         TimeInstant currentSimulationTime = model.presentTime();
 
