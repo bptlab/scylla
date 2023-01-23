@@ -12,7 +12,7 @@ RUN mvn install
 FROM openjdk:8-jre-alpine
 ARG scylla   
 ARG 0.0.1-SNAPSHOT.  
-ENV artifact scylla-0.0.1-SNAPSHOT.jar. 
+ENV artifact scylla-0.0.1-SNAPSHOT.jar 
 WORKDIR /app
 COPY --from=build /app/target/scylla-0.0.1-SNAPSHOT/app
 EXPOSE 8080
