@@ -1,5 +1,7 @@
 package de.hpi.bpt.scylla;
 
+import de.hpi.bpt.scylla.GUI.ScyllaGUI;
+
 import java.util.Arrays;
 
 /**
@@ -16,8 +18,13 @@ public class Scylla {
     public static void main(String[] args) throws IllegalArgumentException {
 
         if (Arrays.stream(args).anyMatch(x -> x.contains("--help"))) {
-                System.out.println("Usage: Scylla --config=<your config file> --bpmn=<your first bpmn file> [--bpmn=<your second bpmn file>] [--bpmn=...] --sim=<your first sim file> [--sim=<your second sim file>] [--sim=...] [--output=<your output path>]");
+                System.out.println("Console Usage: Scylla --headless --config=<your config file> --bpmn=<your first bpmn file> [--bpmn=<your second bpmn file>] [--bpmn=...] --sim=<your first sim file> [--sim=<your second sim file>] [--sim=...] [--output=<your output path>]");
                 return;
+        }
+
+        if (Arrays.stream(args).noneMatch(arg -> arg.contains("--headless"))) {
+            ScyllaGUI.main(args);
+            return;
         }
 
         String configurationFile = Arrays.stream(args)
@@ -53,8 +60,8 @@ public class Scylla {
                 throw new IllegalArgumentException("You have to provide at least one simulation file. Usage: --sim=<your file path>");
         }
 
-        boolean enableBpsLogging = Arrays.stream(args).anyMatch(x -> "--enable-bps-logging".equalsIgnoreCase(x));
-        boolean enableDesmojLogging = Arrays.stream(args).anyMatch(x -> "--desmoj-logging".equalsIgnoreCase(x));
+        boolean enableBpsLogging = Arrays.stream(args).anyMatch("--enable-bps-logging"::equalsIgnoreCase);
+        boolean enableDesmojLogging = Arrays.stream(args).anyMatch("--desmoj-logging"::equalsIgnoreCase);
 
         String outputFolder = Arrays.stream(args)
                                         .filter(x -> x.contains("--output"))

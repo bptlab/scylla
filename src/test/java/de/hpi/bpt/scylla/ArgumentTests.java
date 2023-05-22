@@ -29,7 +29,7 @@ public class ArgumentTests {
      */
     @Test
     public void missingConfigurationFile() {
-        String[] args = {};
+        String[] args = {"--headless"};
         Executable e = () -> Scylla.main(args);
 
         assertThrows(IllegalArgumentException.class, e);

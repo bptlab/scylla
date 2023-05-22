@@ -132,7 +132,7 @@
 							<addClasspath>true</addClasspath>
 							<classpathPrefix>libs/</classpathPrefix>
 							<mainClass>
-								de.hpi.bpt.scylla.GUI.ScyllaGUI
+								de.hpi.bpt.scylla.Scylla
 							</mainClass>
 						</manifest>
 					</archive>
