@@ -15,7 +15,7 @@ Scylla needs a JRE 1.8 installation to run.
 
 ## Prerequisites
 
-- Apache Maven 3+
+- Apache Maven 3+ 
 - Java 8
 
 ## Extensions on Scylla
