@@ -30,8 +30,6 @@ jobs:
       with:
         java-version: ${{ matrix.java_version }}
         distribution: 'temurin'
-    - name: clean maven
-      run: rm -r ~/.m2/repository/
     - name: Setup dependencies
       run: mvn -B clean --file pom.xml
     - name: Build with Maven
