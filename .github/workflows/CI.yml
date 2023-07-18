@@ -21,7 +21,7 @@ jobs:
     
     strategy:
       matrix:
-        java_version: [11]
+        java_version: [11, 17]
 
     steps:
     - uses: actions/checkout@v3
@@ -30,6 +30,7 @@ jobs:
       with:
         java-version: ${{ matrix.java_version }}
         distribution: 'temurin'
+        cache: maven
     - name: Setup dependencies
       run: mvn -B clean --file pom.xml
     - name: Build with Maven
