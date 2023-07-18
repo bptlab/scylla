@@ -170,7 +170,7 @@
 				<executions>
 					<execution>
 						<id>copy-dependencies</id>
-						<phase>post-clean</phase>
+						<phase>prepare-package</phase>
 						<goals>
 							<goal>copy-dependencies</goal>
 						</goals>
