@@ -107,7 +107,7 @@
 						<goals>
 							<goal>install-file</goal>
 						</goals>
-						<phase>validate</phase>
+						<phase>clean</phase>
 						<configuration>
 							<groupId>desmoj</groupId>
 							<artifactId>desmoj</artifactId>
@@ -122,7 +122,7 @@
 						<goals>
 							<goal>install-file</goal>
 						</goals>
-						<phase>validate</phase>
+						<phase>clean</phase>
 						<configuration>
 							<groupId>org.deckfour</groupId>
 							<artifactId>openxes</artifactId>
@@ -137,7 +137,7 @@
 						<goals>
 							<goal>install-file</goal>
 						</goals>
-						<phase>validate</phase>
+						<phase>clean</phase>
 						<configuration>
 							<groupId>org.deckfour</groupId>
 							<artifactId>ospex</artifactId>
@@ -152,7 +152,7 @@
 						<goals>
 							<goal>install-file</goal>
 						</goals>
-						<phase>validate</phase>
+						<phase>clean</phase>
 						<configuration>
 							<groupId>org.deckfour</groupId>
 							<artifactId>openxes-xstream</artifactId>
