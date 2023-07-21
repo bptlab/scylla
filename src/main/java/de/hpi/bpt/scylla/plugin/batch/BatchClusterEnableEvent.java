@@ -8,6 +8,7 @@ import de.hpi.bpt.scylla.simulation.event.TaskEnableEvent;
 public class BatchClusterEnableEvent extends TaskEnableEvent{
 	
 	protected BatchCluster cluster;
+	protected boolean hasAlreadyFired;
 
 
 	public BatchClusterEnableEvent(ProcessInstance processInstance, BatchCluster cluster) {
@@ -24,12 +25,16 @@ public class BatchClusterEnableEvent extends TaskEnableEvent{
 	public void eventRoutine(ProcessInstance processInstance) throws SuspendExecution {
         sendTraceNote("Enabling batch cluster "+cluster);
 		super.eventRoutine(processInstance);
+		hasAlreadyFired = true;
 	}
-	
-    @Override
+
+	@Override
     protected void addToLog(ProcessInstance processInstance) {
     	//Shhhh TODO
     }
 
 
+	public boolean hasAlreadyFired() {
+		return hasAlreadyFired;
+	}
 }

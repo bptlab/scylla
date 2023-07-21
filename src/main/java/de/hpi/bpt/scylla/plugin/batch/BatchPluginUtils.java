@@ -171,9 +171,19 @@ public class BatchPluginUtils {
         if (cluster.getState() == BatchClusterState.MAXLOADED || cluster.getState() == BatchClusterState.READY) {
             // (2a) if bc is maxloaded, reschedule BatchClusterStart
             // there is only one event already scheduled for the cluster which is the BatchClusterStart
-        	BatchClusterEnableEvent clusterStartEvent = cluster.getEnableEvent();
-            if(clusterStartEvent.isScheduled())clusterStartEvent.cancel();
-            clusterStartEvent.schedule(); // schedule for immediate execution
+            BatchClusterEnableEvent clusterEnableEvent = cluster.getEnableEvent();
+
+            // (Re-)Schedule enablement event for immediate execution
+            if(clusterEnableEvent.getProcessInstance().getScheduledEvents().contains(clusterEnableEvent)) {
+                clusterEnableEvent.cancel();
+            }
+            if (!clusterEnableEvent.hasAlreadyFired()) {
+                clusterEnableEvent.schedule();
+            } else {
+                //Do nothing, edge case when the enable event has already triggered
+                //and scheduled its start event, but this method is called between both
+                //(because another activity instance was enabled at the same time)
+            }
         }
 
     }
