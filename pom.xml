@@ -205,4 +205,12 @@
         	</plugin>
 		</plugins>
 	</build>
+
+	<distributionManagement>
+		<repository>
+			<id>github</id>
+			<name>GitHub Packages</name>
+			<url>https://maven.pkg.github.com/bptlab/scylla</url>
+		</repository>
+	</distributionManagement>
 </project>
