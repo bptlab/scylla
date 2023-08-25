@@ -10,7 +10,7 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  Release:
 
     runs-on: ubuntu-latest
     permissions:
@@ -35,7 +35,19 @@ jobs:
       with:
         run: mvn -B package --file pom.xml
 
-    - name: Publish to GitHub Packages Apache Maven
+    - name: Publish as Maven package to GitHub Packages Apache Maven
       run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml -DskipTests
       env:
         GITHUB_TOKEN: ${{ github.token }}
+
+    - name: Prepare zipping
+      run: |
+        cp -r ./scylla/target/libs ./zip
+        mv *.jar ./zip/scylla.jar
+
+    - name: Publish as .zip
+      uses: thedoctor0/zip-release@0.7.1
+      with:
+        type: 'zip'
+        directory: './zip'
+        filename: 'scylla.zip'
