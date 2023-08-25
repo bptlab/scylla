@@ -42,8 +42,8 @@ jobs:
 
     - name: Prepare zipping
       run: |
-        cp -r ./scylla/target/libs ./zip
-        mv *.jar ./zip/scylla.jar
+        cp -r ./target/libs ./zip
+        mv ./target/*.jar ./zip/scylla.jar
 
     - name: Publish as .zip
       uses: thedoctor0/zip-release@0.7.1
