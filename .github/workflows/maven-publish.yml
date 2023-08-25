@@ -40,14 +40,19 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ github.token }}
 
-    - name: Prepare zipping
+    - name: Prepare as .zip
       run: |
         cp -r ./target/libs ./zip
         mv ./target/*.jar ./zip/scylla.jar
-
-    - name: Publish as .zip
+    - name: Create .zip
       uses: thedoctor0/zip-release@0.7.1
       with:
         type: 'zip'
         directory: './zip'
         filename: 'scylla.zip'
+    - name: Upload Zip
+      uses: ncipollo/release-action@v1.12.0
+      with:
+        artifacts: "scylla.zip"
+        token: ${{ secrets.GITHUB_TOKEN }}
+        
