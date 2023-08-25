@@ -4,19 +4,13 @@ Scylla is an extensible BPMN process simulator which relies on the building bloc
 
 Scylla is implemented in the Java programming language and can be extended. It offers well-defined entry points for extensions based on a plug-in structure.
 
-## Runnable JAR
-The most recent JAR was built on June 21, 2018.
+## Quick Start
+Download the [latest release](https://github.com/bptlab/scylla/releases/latest) zipfile and unpack it.
+It is important that the `lib` folder stays in the same directory as the `scylla.jar` file.
 
-The runnable JAR can be found inside the [Scylla_zip](https://github.com/bptlab/scylla/files/2123548/Scylla.zip).
-To run scylla, simply exctract all the files inside and run the jar file.
-It is important that the Scylla_lib folder stays in the same directory as the .jar file.
+You can then start Scylla by executing the jarfile, e.g., by calling `java -jar scylla.jar` in the unpacked folder.
 
-Scylla needs a JRE 1.8 installation to run.
-
-## Prerequisites
-
-- Apache Maven 3+ 
-- Java 8
+Note that a valid Java installation is needed to run Scylla, we recommend at least Java 11.
 
 ## Extensions on Scylla
 
