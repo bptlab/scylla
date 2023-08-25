@@ -37,3 +37,7 @@ To load additional plugins, put their respective jarfiles into the `plugins` fol
 
 Import the *scylla* Maven project in your Java IDE (e.g. Eclipse).
 More information on the plug-in structure and how plug-ins can be developed are given in the [developer documentation](https://github.com/bptlab/scylla/wiki).
+
+## Related Projects
+- [INSM-TUM/Scylla-Container](https://github.com/INSM-TUM/Scylla-Container) provides a simple http API and dockerization of Scylla
+- [SimuBridge](https://github.com/INSM-TUM/SimuBridge) is an application that bridges between process mining and business process simulation. It uses Scylla as Simulator and provides a generic metamodel and GUI for the construction of business process simulation models, usable in Scylla. 
