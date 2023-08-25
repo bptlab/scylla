@@ -58,5 +58,5 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: scylla_zip_${{RELEASE_VERSION}}
-        path: ${{ github.workspace }}/result.zip
+        path: ${{ github.workspace }}/scylla.zip
         
