@@ -58,6 +58,6 @@ jobs:
     - name: Upload Zip
       uses: actions/upload-artifact@v1
       with:
-        name: scylla_zip_${{RELEASE_VERSION}}
+        name: scylla_zip_${{env.RELEASE_VERSION}}
         path: ${{ github.workspace }}/scylla.zip
         
