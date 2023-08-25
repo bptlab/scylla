@@ -60,4 +60,5 @@ jobs:
         artifacts: "scylla.zip"
         token: ${{ secrets.GITHUB_TOKEN }}
         tag: ${{env.RELEASE_VERSION}}
+        commit: 'main'
         
