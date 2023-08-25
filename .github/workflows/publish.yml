@@ -56,8 +56,10 @@ jobs:
         path: './zip'
         filename: 'scylla.zip'
     - name: Upload Zip
-      uses: actions/upload-artifact@v1
+      uses: ncipollo/release-action@v1.12.0
       with:
-        name: scylla_zip_${{env.RELEASE_VERSION}}
-        path: ${{ github.workspace }}/scylla.zip
+        artifacts: "scylla.zip"
+        token: ${{ secrets.GITHUB_TOKEN }}
+        tag: ${{env.RELEASE_VERSION}}
+        commit: 'main'
         
