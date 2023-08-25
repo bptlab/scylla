@@ -12,6 +12,14 @@ You can then start Scylla by executing the jarfile, e.g., by calling `java -jar 
 
 Note that a valid Java installation is needed to run Scylla, we recommend at least Java 11.
 
+## Usage
+
+...
+
+### Loading Plugins
+To load additional plugins, put their respective jarfiles into the `plugins` folder of your Scylla folder. You can check whether a plugin has been loaded by starting the Scylla GUI and asserting that it appears in the plugins list.
+
+
 ## Extensions on Scylla
 
 Import the *scylla* Maven project in your Java IDE (e.g. Eclipse).
