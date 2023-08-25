@@ -53,7 +53,7 @@ jobs:
       uses: thedoctor0/zip-release@0.7.1
       with:
         type: 'zip'
-        directory: './zip'
+        path: './zip'
         filename: 'scylla.zip'
     - name: Upload Zip
       uses: actions/upload-artifact@v1
