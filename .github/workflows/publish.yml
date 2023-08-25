@@ -1,0 +1,62 @@
+# This workflow will build a package using Maven and then publish it to GitHub packages when a release is created
+# For more information see: https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#apache-maven-with-a-settings-path
+
+name: Publish Jarfile
+
+on:
+  release:
+    types: [created]
+  push:
+    branches: [ main ]
+
+jobs:
+  Release:
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up JDK
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
+        settings-path: ${{ github.workspace }} # location for the settings.xml file
+        cache: maven
+
+    - name: Setup dependencies
+      run: mvn -B clean --file pom.xml
+
+    - name: Build with Maven
+      uses: coactions/setup-xvfb@v1
+      with:
+        run: mvn -B package --file pom.xml
+
+    - name: Publish as Maven package to GitHub Packages Apache Maven
+      run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml -DskipTests
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+        
+    - name: Set Release version env variable
+      run: |
+        echo "RELEASE_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
+
+    - name: Create .zip
+      run: |
+        cd ./target/
+        mv ./*.jar ./scylla.jar
+        zip -r ../scylla.zip ./*.jar ./libs/*
+        cd ..
+    - name: Upload Zip
+      uses: ncipollo/release-action@v1.12.0
+      with:
+        artifacts: "scylla.zip"
+        token: ${{ secrets.GITHUB_TOKEN }}
+        tag: ${{env.RELEASE_VERSION}}
+        commit: 'main'
+        allowUpdates: true
+        
