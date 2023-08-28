@@ -17,9 +17,10 @@ Note that a valid Java installation is needed to run Scylla, we recommend at lea
 
 
 ## Usage
+Scylla has two main ways of operation, with a graphical user interface and via a command line interface.
 
 ### UI
-When starting Scylla without any additional parameters, the Scylla UI opens.
+When starting Scylla without any additional parameters, the Scylla GUI opens.
 ![grafik](https://github.com/bptlab/scylla/assets/28008098/c932693d-2324-42ab-9c7d-a50f32b0d823)
 
 The UI is structured as follows:
@@ -30,7 +31,7 @@ The UI is structured as follows:
 Note that to run a simulation, at the following inputs are needed: One global configuration file, at least one bpmn file, simulation configuration files for all processes of the bpmn files. For details on the simulation inputs, please refer to the [wiki](../../wiki).
 
 ### CLI/Headless Mode
-Scylla can also be run without UI. This is useful, e.g., when calling it from another program or when running the same Simulation multiple times. Configuration of the simulation then happens with the following program parameters (defined directly in the main class [Scylla.java](src/main/java/de/hpi/bpt/scylla/Scylla.java)):
+Scylla can also be run without GUI. This is useful, e.g., when calling it from another program or when running the same Simulation multiple times. Configuration of the simulation then happens with the following program parameters (defined directly in the main class [Scylla.java](src/main/java/de/hpi/bpt/scylla/Scylla.java)):
 - `--help` prints information about the command line usage of Scylla
 - `--headless` activates the headless mode
 - `--config=<path to file>` where `<path to file>` must lead to a global configuration file. This parameter must be present exactly once in headless mode
@@ -40,12 +41,16 @@ Scylla can also be run without UI. This is useful, e.g., when calling it from an
 - `--enable-des-logging` enables logging of the descrete event simulation used. The flag is optional, recommended only to use for debugging
 - `--output=<path to folder>` sets the output folder to `<path to folder>`. Optional, otherwise a default path will be used
 
+### Calling from Code
+Scylla can also be directly called from another Java application. For this, the application has to import Scylla as Maven dependency.
+Then, either call the main class `Scylla`'s `main` method, or manually create a new `SimulationManager` and call `run.`
+
 
 ## Plugins
+One distinctive feature of Scylla is its plugin system, which allows to easily add functionality for specialized or refined simulation behavior.
 
 ### Loading Plugins
 To load additional plugins, put their respective jarfiles into the `plugins` subfolder of your Scylla folder. You can check whether a plugin has been loaded by starting the Scylla GUI and asserting that it appears in the plugins list.
-
 
 ### Plugin Development
 Import the *scylla* Maven project in your Java IDE (e.g. Eclipse).
