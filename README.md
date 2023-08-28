@@ -20,7 +20,7 @@ Note that a valid Java installation is needed to run Scylla, we recommend at lea
 
 ### CLI/Headless Mode
 Scylla can also be run without UI. This is useful, e.g., when calling it from another program or when running the same Simulation multiple times. Configuration of the simulation then happens with the following program parameters (defined directly in the main class [Scylla.java](src/main/java/de/hpi/bpt/scylla/Scylla.java)):
-- '--help' prints information about the command line usage of Scylla
+- `--help` prints information about the command line usage of Scylla
 - `--headless` activates the headless mode
 - `--config=<path to file>` where `<path to file>` must lead to a global configuration file. This parameter must be present exactly once in headless mode
 - `--bpmn=<path to file>` where `<path to file>` must lead to a bpmn process model. This parameter must be present at least once in headless mode, but might be multiple times
