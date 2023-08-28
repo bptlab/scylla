@@ -1,8 +1,11 @@
 # Scylla - An extensible BPMN process simulator [![Build Status](https://github.com/bptlab/scylla/actions/workflows/CI.yml/badge.svg)]([https://travis-ci.org/bptlab/scylla](https://github.com/bptlab/scylla/actions/workflows/CI.yml/))
 
-Scylla is an extensible BPMN process simulator which relies on the building blocks of discrete event simulation.  The process simulator offers an UI where BPMN models can be extended with simulation-specific information (e.g., inter-arrival time of instances, task duration). Resources are centrally specified in an extra file, such that the simulator also allows multi-process simulation (a simulation with several process models using the same resources).
+Scylla is an extensible business process simulator.
+Simulations are configured with a file for general information, such as resources, multiple BPMN model files, which allow multi-process simulation with shared resources, and simulation configuration files, which extend the BPMN files with simulation-specific information, e.g., inter-arrival time of instances, task duration.
+Scylla simulates these inputs using discrete event simulation (DES) and produces information on the simulated process instances, such as an XES event log.
 
-Scylla is implemented in the Java programming language and can be extended. It offers well-defined entry points for extensions based on a plug-in structure.
+The engine can be controlled via a GUI, which also provides an interface for creating the configuration input files, or by command line.
+Scylla stands out by offering well-defined entry points for extensions based on a plug-in structure, which allows to make it fulfil specific simulation requirements.
 
 ## Quick Start
 Download the [latest release](https://github.com/bptlab/scylla/releases/latest) zipfile and unpack it.
@@ -12,11 +15,19 @@ You can then start Scylla by executing the jarfile, e.g., by calling `java -jar 
 
 Note that a valid Java installation is needed to run Scylla, we recommend at least Java 11.
 
+
 ## Usage
 
-...
+### UI
+When starting Scylla without any additional parameters, the Scylla UI opens.
+![grafik](https://github.com/bptlab/scylla/assets/28008098/c932693d-2324-42ab-9c7d-a50f32b0d823)
 
+The UI is structured as follows:
+- The left side shows the simulation inputs. There, configuration and process model files can be loaded and removed. Further new configuration files can be created or existing ones edited. This then opens the respective interfaces as new tabs.
+- The right side shows the loaded plugins. It allows to select which plugins are active, and even to (de-)activate single classes.
+- The bottom shows the simulation console output and provides the controls to start the simulation and inspect the last simulation outputs.
 
+Note that to run a simulation, at the following inputs are needed: One global configuration file, at least one bpmn file, simulation configuration files for all processes of the bpmn files. For details on the simulation inputs, please refer to the [wiki](../../wiki).
 
 ### CLI/Headless Mode
 Scylla can also be run without UI. This is useful, e.g., when calling it from another program or when running the same Simulation multiple times. Configuration of the simulation then happens with the following program parameters (defined directly in the main class [Scylla.java](src/main/java/de/hpi/bpt/scylla/Scylla.java)):
@@ -29,14 +40,18 @@ Scylla can also be run without UI. This is useful, e.g., when calling it from an
 - `--enable-des-logging` enables logging of the descrete event simulation used. The flag is optional, recommended only to use for debugging
 - `--output=<path to folder>` sets the output folder to `<path to folder>`. Optional, otherwise a default path will be used
 
+
+## Plugins
+
 ### Loading Plugins
-To load additional plugins, put their respective jarfiles into the `plugins` folder of your Scylla folder. You can check whether a plugin has been loaded by starting the Scylla GUI and asserting that it appears in the plugins list.
+To load additional plugins, put their respective jarfiles into the `plugins` subfolder of your Scylla folder. You can check whether a plugin has been loaded by starting the Scylla GUI and asserting that it appears in the plugins list.
 
 
-## Extensions on Scylla
-
+### Plugin Development
 Import the *scylla* Maven project in your Java IDE (e.g. Eclipse).
+TBD
 More information on the plug-in structure and how plug-ins can be developed are given in the [developer documentation](https://github.com/bptlab/scylla/wiki).
+
 
 ## Related Projects
 - [INSM-TUM/Scylla-Container](https://github.com/INSM-TUM/Scylla-Container) provides a simple http API and dockerization of Scylla
