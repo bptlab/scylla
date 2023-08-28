@@ -44,7 +44,8 @@ More information on the plug-in structure and how plug-ins can be developed are 
 
 ## Related Publications
 - [Pufahl, L., Wong, T.Y., Weske, M. (2018). **Design of an Extensible BPMN Process Simulator**. In: Teniente, E., Weidlich, M. (eds) Business Process Management Workshops. BPM 2017. Lecture Notes in Business Information Processing, vol 308. Springer, Cham. https://doi.org/10.1007/978-3-319-74030-0_62](https://doi.org/10.1007/978-3-319-74030-0_62)
-- [Pufahl, L., & Weske, M. (2017). **Extensible BPMN Process Simulator**. In BPM (Demos).](https://ceur-ws.org/Vol-1920/BPM_2017_paper_198.pdf)
+- [Pufahl, L., & Weske, M. (2017). **Extensible BPMN Process Simulator**. In: Proceedings of the
+BPM Demo Track and BPM Dissertation Award](https://ceur-ws.org/Vol-1920/BPM_2017_paper_198.pdf)
 
 ## About
 Scylla was initially developed in 2017 as part of a Master's Thesis by Tsun Yin Wong at the chair for Business Process Technologies (BPT) at the Hasso Plattner Institute Potsdam. Further development was then done at the BPT chair. Currently, the project is being developed further and maintained in cooperation by the HPI BPT chair and the chair for Information Systems at the University of Munich.
