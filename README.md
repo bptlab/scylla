@@ -53,13 +53,14 @@ One distinctive feature of Scylla is its plugin system, which allows to easily a
 To load additional plugins, put their respective jarfiles into the `plugins` subfolder of your Scylla folder. You can check whether a plugin has been loaded by starting the Scylla GUI and asserting that it appears in the plugins list.
 
 ### Plugin Development
-Import the *scylla* Maven project in your Java IDE (e.g. Eclipse).
-TBD
-More information on the plug-in structure and how plug-ins can be developed are given in the [developer documentation](https://github.com/bptlab/scylla/wiki).
+To create a new plugin, create a new Maven project for your plugin. Add Scylla as a Maven dependency to that project. Potentially, you first need to install Scylla via Maven.
+Then, create your plugin classes. These are all classes that extend one of the entrypoints (see wiki), which in turn implement the `IPluggable` interface. Note that all classes belonging to the same plugin should return the same value in their implementation of `getName`.
+To load your plugin, run Maven package to generate a jarfile and put it into the `plugins` subfolder of your scylla folder.
+More information on the plug-in structure and how plug-ins can be developed are given in the [wiki](../../wiki/Plugin-Concept).
 
 
 ## Related Projects
-- [INSM-TUM/Scylla-Container](https://github.com/INSM-TUM/Scylla-Container) provides a simple http API and dockerization of Scylla
+- [Scylla-Container](https://github.com/INSM-TUM/Scylla-Container) provides a simple http API and dockerization of Scylla
 - [SimuBridge](https://github.com/INSM-TUM/SimuBridge) is an application that bridges between process mining and business process simulation. It uses Scylla as Simulator and provides a generic metamodel and GUI for the construction of business process simulation models, usable in Scylla. 
 
 ## Related Publications
