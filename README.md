@@ -48,4 +48,4 @@ More information on the plug-in structure and how plug-ins can be developed are 
 BPM Demo Track and BPM Dissertation Award](https://ceur-ws.org/Vol-1920/BPM_2017_paper_198.pdf)
 
 ## About
-Scylla was initially developed in 2017 as part of a Master's Thesis by Tsun Yin Wong at the chair for Business Process Technologies (BPT) at the Hasso Plattner Institute Potsdam. Further development was then done at the BPT chair. Currently, the project is being developed further and maintained in cooperation by the HPI BPT chair and the chair for Information Systems at the University of Munich.
+Scylla was initially developed in 2017 as part of a Master's Thesis by Tsun Yin Wong at the chair for Business Process Technologies (BPT) at the Hasso Plattner Institute Potsdam. Further development was then done at the BPT chair. Currently, the project is being developed further and maintained in cooperation by the HPI BPT chair and the chair for Information Systems at the Technical University of Munich.
