@@ -71,7 +71,8 @@ More information on the plug-in structure and how plug-ins can be developed are 
 
 ## Related Projects
 - [Scylla-Container](https://github.com/INSM-TUM/Scylla-Container) provides a simple http API and dockerization of Scylla
-- [SimuBridge](https://github.com/INSM-TUM/SimuBridge) is an application that bridges between process mining and business process simulation. It uses Scylla as Simulator and provides a generic metamodel and GUI for the construction of business process simulation models, usable in Scylla. 
+- [SimuBridge](https://github.com/INSM-TUM/SimuBridge) is an application that bridges between process mining and business process simulation. It uses Scylla as Simulator and provides a generic metamodel and GUI for the construction of business process simulation models, usable in Scylla.
+- [scylla-ui](https://github.com/bptlab/scylla-ui) (discontinued) provides a GUI for visualizing Scylla simulation outputs
 
 ## Related Publications
 - [Pufahl, L., Wong, T.Y., Weske, M. (2018). **Design of an Extensible BPMN Process Simulator**. In: Teniente, E., Weidlich, M. (eds) Business Process Management Workshops. BPM 2017. Lecture Notes in Business Information Processing, vol 308. Springer, Cham. https://doi.org/10.1007/978-3-319-74030-0_62](https://doi.org/10.1007/978-3-319-74030-0_62)
