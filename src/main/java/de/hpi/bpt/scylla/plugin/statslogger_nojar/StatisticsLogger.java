@@ -151,14 +151,14 @@ public class StatisticsLogger extends OutputLoggerPluggable {
                 Map<TaskInstanceIdentifier, Long> enabledTasks = new HashMap<TaskInstanceIdentifier, Long>();
                 Map<TaskInstanceIdentifier, Long> pausedTasks = new HashMap<TaskInstanceIdentifier, Long>();
                 for (int i = 0; i < nodeInfoList.size(); i++) {
-                	
-                	String taskInstanceId = String.valueOf(i);
+                    ProcessNodeInfo ni = nodeInfoList.get(i);
+
+                	String taskInstanceId = ni.getSource();
                 	long taskDurationEffective = 0;
                     long taskDurationResourcesIdle = 0;
                     long taskDurationWaiting = 0;
                     double taskCosts = 0;
 
-                    ProcessNodeInfo ni = nodeInfoList.get(i);
                     long timestamp = ni.getTimestamp();
                     String processScopeNodeId = ni.getProcessScopeNodeId();
                     String source = ni.getSource();
@@ -244,10 +244,7 @@ public class StatisticsLogger extends OutputLoggerPluggable {
                     stio.setDurationWaiting(taskDurationWaiting);
                     stio.setCost(taskCosts);
                     
-                    if (!statsPerTaskOfProcess.containsKey(processScopeNodeId)) {
-                        statsPerTaskOfProcess.put(processScopeNodeId, new HashMap<String, StatisticsTaskInstanceObject>());
-                    }
-                    
+                    statsPerTaskOfProcess.putIfAbsent(processScopeNodeId, new HashMap<>());
                     statsPerTaskOfProcess.get(processScopeNodeId).put(taskInstanceId, stio);
 
                     previousTimestamp = ni.getTimestamp();
