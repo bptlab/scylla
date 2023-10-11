@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bsim:globalConfiguration xmlns:bsim="http://bsim.hpi.uni-potsdam.de/scylla/simModel" id="GlobalConf_1" targetNamespace="http://www.hpi.de">
+	<bsim:resourceAssignmentOrder>priority,simulationTime</bsim:resourceAssignmentOrder>
+	<bsim:randomSeed>3096</bsim:randomSeed>
+	<bsim:zoneOffset>+00:00</bsim:zoneOffset>
+	<bsim:timetables>
+		<bsim:timetable id="Student_Hero">
+			<bsim:timetableItem from="MONDAY" to="SUNDAY" beginTime="09:00:00" endTime="17:00:00"/>
+		</bsim:timetable>
+		<bsim:timetable id="Student_Normal">
+			<bsim:timetableItem from="MONDAY" to="FRIDAY" beginTime="09:00:00" endTime="17:00:00"/>
+		</bsim:timetable>
+		<bsim:timetable id="Student_Lazy">
+			<bsim:timetableItem from="MONDAY" to="WEDNESDAY" beginTime="09:00:00" endTime="13:00:00"/>
+			<bsim:timetableItem from="THURSDAY" to="FRIDAY" beginTime="17:00:00" endTime="19:00:00"/>
+		</bsim:timetable>
+		<bsim:timetable id="Prof_Busy">
+			<bsim:timetableItem from="MONDAY" to="FRIDAY" beginTime="07:00:00" endTime="09:00:00"/>
+		</bsim:timetable>
+	</bsim:timetables>
+	<bsim:resourceData>
+		<bsim:dynamicResource id="Student" name="master student" defaultQuantity="5" defaultCost="10" defaultTimeUnit="MINUTES" defaultTimetableId="Student_Normal">
+			<bsim:instance name="Anna" timetableId="Student_Hero" cost="20" />
+			<bsim:instance name="Bernd" timetableId="Student_Normal"/>
+			<bsim:instance name="Christian" timetableId="Student_Normal"/>
+			<bsim:instance name="Dieter" timetableId="Student_Lazy" cost="5"/>
+			<bsim:instance name="Eva" timetableId="Student_Lazy" cost="5"/>
+			<!-- advanced resource management TODO -->
+		</bsim:dynamicResource>
+		<bsim:dynamicResource id="Professor" name="professor abc" defaultQuantity="2" defaultCost="50" defaultTimeUnit="MINUTES">
+			<!-- advanced resource management TODO -->
+			<bsim:instance name="Franz" cost="100"/>
+			<bsim:instance name="Gerd" timetableId="Prof_Busy"/>
+		</bsim:dynamicResource>
+	</bsim:resourceData>
+</bsim:globalConfiguration>
