@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import de.hpi.bpt.scylla.exception.ScyllaRuntimeException;
 import de.hpi.bpt.scylla.logger.ResourceInfo;
@@ -34,8 +35,8 @@ import desmoj.core.simulator.TimeInstant;
  *
  */
 public class QueueManager {
-	
-	private SimulationModel model;
+
+    private SimulationModel model;
     private Map<String, ResourceQueue> resourceObjects = new HashMap<String, ResourceQueue>();
     
 
@@ -336,19 +337,9 @@ public class QueueManager {
      * @return resource instances of all resource types
      */
     public Set<ResourceObject> getAllResourceObjects() {
-        Set<ResourceObject> objects = new HashSet<ResourceObject>();
-        Map<String, ResourceQueue> resources = getResourceObjects();
-        for (String resourceType : resources.keySet()) {
-            ResourceQueue resourceQueue = resources.get(resourceType);
-            ResourceObject obj = resourceQueue.poll();
-            while (obj != null) {
-                objects.add(obj);
-                obj = resourceQueue.poll();
-            }
-            resourceQueue.addAll(objects);
-        }
-        return objects;
-
+        return resourceObjects.values().stream()
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
     }
     
 

@@ -90,17 +90,11 @@ class ScyllaEventQueue extends PriorityQueue<ScyllaEvent> {
      * @return the index of the event in the event queue
      */
     public int getIndex(ScyllaEvent event) {
-        int index = -1;
-        int size = size();
-        List<ScyllaEvent> events = new ArrayList<ScyllaEvent>();
-        for (int i = 0; i < size; i++) {
-            if (peek().equals(event)) {
-                index = i;
-                break;
-            }
-            events.add(poll());
+        int index = 0;
+        for (ScyllaEvent otherEvent : this) {
+            if (otherEvent.equals(event)) return index;
+            index++;
         }
-        addAll(events);
-        return index;
+        return -1;
     }
 }

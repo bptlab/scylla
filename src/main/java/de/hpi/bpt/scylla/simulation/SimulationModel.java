@@ -316,7 +316,7 @@ public class SimulationModel extends Model {
         
         for (String resourceId : resourceQueuesUpdated) {
             ScyllaEventQueue eventQueue = getEventQueues().get(resourceId);
-            for (ScyllaEvent eventFromQueue : eventQueue) {
+            for (ScyllaEvent eventFromQueue : eventQueue) { // Danger zone: During this iteration, there must not be any concurrent modification of the queue
                 if (eventCandidates.contains(eventFromQueue)) {
                     continue;
                 }
