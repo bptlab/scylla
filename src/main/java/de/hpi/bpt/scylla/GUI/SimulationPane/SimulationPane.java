@@ -490,7 +490,8 @@ public class SimulationPane extends JPanel{
 		gbc_button_OpenLastOutput.gridx = 0;
 		gbc_button_OpenLastOutput.gridy = 1;
 		panelBottom.add(button_OpenLastOutput, gbc_button_OpenLastOutput);
-			
+		
+	
 		panel_AdvancedOptions = new JPanel();
 		JPanel panel_AdvancedOptionsWrapper = new JPanel();
 		panel_AdvancedOptionsWrapper.setLayout(new GridLayout());
@@ -519,7 +520,8 @@ public class SimulationPane extends JPanel{
 		checkbox_desmoj.setHorizontalAlignment(SwingConstants.LEFT);
 		checkbox_desmoj.setFont(ScyllaGUI.DEFAULTFONT);
 		checkbox_desmoj.setIcon(new ScalingCheckBoxIcon(ScyllaGUI.DEFAULTFONT.getSize()));
-		panel_AdvancedOptions.add(checkbox_desmoj);		button_AdvancedOptions = new JButton("");
+		panel_AdvancedOptions.add(checkbox_desmoj);
+		button_AdvancedOptions = new JButton("");
 		button_AdvancedOptions.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				panel_AdvancedOptions.setVisible(!panel_AdvancedOptions.isVisible());
@@ -574,6 +576,11 @@ public class SimulationPane extends JPanel{
 				public void setActive(boolean b) {plugin.setActive(b);}
 				@Override
 				public boolean isActive() {return plugin.isActive();}
+
+				@Override
+				public String toString() {
+					return plugin.toString();
+				}
 			}).collect(Collectors.toList()));
 			gbc.gridy = i;
 			if(i == plugins.entrySet().size()-1)gbc.weighty = 1.0;
