@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bsim:definitions xmlns:bsim="http://bsim.hpi.uni-potsdam.de/scylla/simModel" targetNamespace="http://www.hpi.de">
+  <bsim:simulationConfiguration startDateTime="2018-04-26T00:00+02:00[Europe/Berlin]" id="BatchTestSimulationConfiguration" processRef="Process_12yhipc" processInstances="10">
+    <bsim:startEvent id="StartEvent_1">
+      <bsim:arrivalRate timeUnit="MINUTES">
+        <bsim:constantDistribution>
+          <bsim:constantValue>2</bsim:constantValue>
+        </bsim:constantDistribution>
+      </bsim:arrivalRate>
+    </bsim:startEvent>
+
+    <bsim:catchEvent id="Event_0a3hyb8">
+      <bsim:arrivalRate timeUnit="MINUTES">
+        <bsim:constantDistribution>
+          <bsim:constantValue>5</bsim:constantValue>
+        </bsim:constantDistribution>
+      </bsim:arrivalRate>
+    </bsim:catchEvent>
+
+    <bsim:catchEvent id="Event_12arasr">
+      <bsim:arrivalRate timeUnit="MINUTES">
+        <bsim:constantDistribution>
+          <bsim:constantValue>4</bsim:constantValue>
+        </bsim:constantDistribution>
+      </bsim:arrivalRate>
+    </bsim:catchEvent>
+
+    <bsim:catchEvent id="Event_02zdyqi">
+      <bsim:arrivalRate timeUnit="MINUTES">
+        <bsim:constantDistribution>
+          <bsim:constantValue>10</bsim:constantValue>
+        </bsim:constantDistribution>
+      </bsim:arrivalRate>
+    </bsim:catchEvent>
+
+
+  </bsim:simulationConfiguration>
+</bsim:definitions>
