@@ -11,7 +11,8 @@ on:
 
 jobs:
   Release:
-
+    if: github.repository == 'bptlab/scylla' # Only main repo has permissions to publish this 
+    
     runs-on: ubuntu-latest
     permissions:
       contents: write
