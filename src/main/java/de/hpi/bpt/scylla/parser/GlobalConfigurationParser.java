@@ -162,6 +162,8 @@ public class GlobalConfigurationParser extends Parser<GlobalConfiguration> {
                                 String timetableId = element.getAttributeValue("timetableId");
                                 if (timetableId != null) {
                                     resourcesToTimetableIds.get(resourceId).put(name, timetableId);
+                                } else if (defaultTimetableId != null) {
+                                    resourcesToTimetableIds.get(resourceId).put(name, defaultTimetableId);
                                 }
                             }
 

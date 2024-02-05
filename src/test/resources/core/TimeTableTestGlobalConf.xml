@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bsim:globalConfiguration xmlns:bsim="http://bsim.hpi.uni-potsdam.de/scylla/simModel" id="TimeTableTestGlobalConf" targetNamespace="http://www.hpi.de">
+	<bsim:resourceAssignmentOrder>priority,simulationTime</bsim:resourceAssignmentOrder>
+	<bsim:randomSeed>3096</bsim:randomSeed>
+	<bsim:zoneOffset>+00:00</bsim:zoneOffset>
+	<bsim:timetables>
+		<bsim:timetable id="Monday">
+			<bsim:timetableItem from="MONDAY" to="MONDAY" beginTime="09:00:00" endTime="17:00:00"/>
+		</bsim:timetable>
+		<bsim:timetable id="Tuesday">
+			<bsim:timetableItem from="TUESDAY" to="TUESDAY" beginTime="09:00:00" endTime="17:00:00"/>
+		</bsim:timetable>
+		<bsim:timetable id="Wednesday">
+			<bsim:timetableItem from="WEDNESDAY" to="WEDNESDAY" beginTime="09:00:00" endTime="17:00:00"/>
+		</bsim:timetable>
+	</bsim:timetables>
+	<bsim:resourceData>
+		<bsim:dynamicResource id="Student" defaultQuantity="3" defaultCost="10" defaultTimeUnit="MINUTES" defaultTimetableId="Monday">
+			<bsim:instance name="Using_Default_Timetable"/>
+			<bsim:instance name="Overriding_Default_Timetable" timetableId="Tuesday" />
+		</bsim:dynamicResource>
+	</bsim:resourceData>
+</bsim:globalConfiguration>
