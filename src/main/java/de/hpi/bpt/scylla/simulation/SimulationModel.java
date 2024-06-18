@@ -23,6 +23,7 @@ import de.hpi.bpt.scylla.model.configuration.SimulationConfiguration;
 import de.hpi.bpt.scylla.model.global.GlobalConfiguration;
 import de.hpi.bpt.scylla.model.process.CommonProcessElements;
 import de.hpi.bpt.scylla.model.process.ProcessModel;
+import de.hpi.bpt.scylla.plugin_loader.PluginLoader;
 import de.hpi.bpt.scylla.plugin_type.parser.EventOrderType;
 import de.hpi.bpt.scylla.plugin_type.simulation.resource.ResourceQueueUpdatedPluggable;
 import de.hpi.bpt.scylla.simulation.event.ProcessInstanceGenerationEvent;
@@ -105,6 +106,10 @@ public class SimulationModel extends Model {
             if (enableBpsLogging) {
                 outputLoggingIsOn = true;
                 processNodeInfos.put(processId, new TreeMap<Integer, List<ProcessNodeInfo>>());
+            } else {
+                // TODO hacky solution; consider whether the BPS flag is actually still valid or should be removed
+                DebugLogger.log("Warning: BPS Logging not enabled. Disabling XESLogger Plugin");
+                PluginLoader.getDefaultPluginLoader().deactivatePackage("de.hpi.bpt.scylla.plugin.xeslogger");
             }
         }
     }
