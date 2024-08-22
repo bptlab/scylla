@@ -72,6 +72,7 @@ More information on the plug-in structure and how plug-ins can be developed are 
 ## Related Projects
 - [Scylla-Container](https://github.com/INSM-TUM/Scylla-Container) provides a simple http API and dockerization of Scylla
 - [SimuBridge](https://github.com/INSM-TUM/SimuBridge) is an application that bridges between process mining and business process simulation. It uses Scylla as Simulator and provides a generic metamodel and GUI for the construction of business process simulation models, usable in Scylla.
+- [Scylla-Plugin--SOPA](https://github.com/INSM-TUM/Scylla-Plugin--SOPA) a plugin for the sustatinability simulation framework SOPA.
 - [scylla-ui](https://github.com/bptlab/scylla-ui) (discontinued) provides a GUI for visualizing Scylla simulation outputs
 
 ## Related Publications
