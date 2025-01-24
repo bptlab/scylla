@@ -33,7 +33,7 @@ public class StatisticsLogger extends OutputLoggerPluggable {
     }
 
     public void writeToLog(SimulationModel model, String outputPathWithoutExtension) throws IOException {
-
+        
         TimeUnit timeUnit = DateTimeUtils.getReferenceTimeUnit();
         double totalEndTime = model.presentTime().getTimeAsDouble(timeUnit);
         Map<String, Map<Integer, List<ProcessNodeInfo>>> processNodeInfos = model.getProcessNodeInfos();
@@ -352,8 +352,12 @@ public class StatisticsLogger extends OutputLoggerPluggable {
         
             
             Map<String, Map<String, StatisticsTaskInstanceObject>> statsPerTaskOfProcess = statsPerTask.get(processId);
+            Map<Integer, String> originalIdentifiers = model.getDesmojObjectsMap().get(processId).getProcessModel().getIdentifiers();
             // add activities
             for (String processScopeNodeId : statsPerTaskOfProcess.keySet()) {
+
+
+                String originalId = originalIdentifiers.get(Integer.parseInt(processScopeNodeId));
             	
             	long taskDuration = 0;
             	for (StatisticsTaskInstanceObject instance : statsPerTaskOfProcess.get(processScopeNodeId).values()) {
@@ -372,7 +376,7 @@ public class StatisticsLogger extends OutputLoggerPluggable {
 	            Element activity = new Element("activity");
 	            processActivities.addContent(activity);
 	            
-	            activity.addContent(new Element("id").setText(processScopeNodeId));
+	            activity.addContent(new Element("id").setText(originalId));
 	            Element activityName = new Element("name");
 	            Element activityCost = new Element("cost");
 	            Element activityTime = new Element("time");
