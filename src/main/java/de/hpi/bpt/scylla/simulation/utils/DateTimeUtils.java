@@ -327,7 +327,7 @@ public class DateTimeUtils {
         String source = event.getSource();
         String taskName = event.getDisplayName();
         int nodeId = event.getNodeId();
-        String processScopeNodeId = SimulationUtils.getProcessScopeNodeId(processModel, nodeId);
+        String processScopeNodeId = processModel.getRootProcessScopeNodeId(nodeId);
 
         Set<String> resources = new HashSet<String>();
         Set<ResourceObject> resourceObjects = tuple.getResourceObjects();

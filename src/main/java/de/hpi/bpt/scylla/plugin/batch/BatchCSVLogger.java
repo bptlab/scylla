@@ -201,7 +201,7 @@ public class BatchCSVLogger extends OutputLoggerPluggable{
                 		batchActivity.clusterId = clusterId;
                 		/**Write information for all tasks inside cluster*/
                 		for(Integer taskId : tasksOfCluster) {
-                			BatchCSVEntry task = tasksOfProcessInstance.get(SimulationUtils.getProcessScopeNodeId(clusterSubProcess, taskId));
+                			BatchCSVEntry task = tasksOfProcessInstance.get(clusterSubProcess.getRootProcessScopeNodeId(taskId));
                 			if(task == null)continue; //Not all tasks are necessarily visited due to XOR-Gateways and similar
                 			task.batchNumber = batchNumber;
                     		task.batchType = batchType;

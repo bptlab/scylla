@@ -12,6 +12,7 @@ import de.hpi.bpt.scylla.logger.ProcessNodeInfo;
 import de.hpi.bpt.scylla.logger.ProcessNodeTransitionType;
 import de.hpi.bpt.scylla.logger.ResourceInfo;
 import de.hpi.bpt.scylla.logger.ResourceStatus;
+import de.hpi.bpt.scylla.model.process.ProcessModel;
 import de.hpi.bpt.scylla.plugin_type.logger.OutputLoggerPluggable;
 import de.hpi.bpt.scylla.simulation.ResourceObject;
 import de.hpi.bpt.scylla.simulation.SimulationModel;
@@ -33,7 +34,7 @@ public class StatisticsLogger extends OutputLoggerPluggable {
     }
 
     public void writeToLog(SimulationModel model, String outputPathWithoutExtension) throws IOException {
-
+        
         TimeUnit timeUnit = DateTimeUtils.getReferenceTimeUnit();
         double totalEndTime = model.presentTime().getTimeAsDouble(timeUnit);
         Map<String, Map<Integer, List<ProcessNodeInfo>>> processNodeInfos = model.getProcessNodeInfos();
@@ -352,8 +353,12 @@ public class StatisticsLogger extends OutputLoggerPluggable {
         
             
             Map<String, Map<String, StatisticsTaskInstanceObject>> statsPerTaskOfProcess = statsPerTask.get(processId);
+            ProcessModel rootProcessModel = model.getDesmojObjectsMap().get(processId).getProcessModel();
             // add activities
             for (String processScopeNodeId : statsPerTaskOfProcess.keySet()) {
+
+
+                String originalId = rootProcessModel.rootScopeIdToProcessElementId(processScopeNodeId);
             	
             	long taskDuration = 0;
             	for (StatisticsTaskInstanceObject instance : statsPerTaskOfProcess.get(processScopeNodeId).values()) {
@@ -372,7 +377,7 @@ public class StatisticsLogger extends OutputLoggerPluggable {
 	            Element activity = new Element("activity");
 	            processActivities.addContent(activity);
 	            
-	            activity.addContent(new Element("id").setText(processScopeNodeId));
+	            activity.addContent(new Element("id").setText(originalId));
 	            Element activityName = new Element("name");
 	            Element activityCost = new Element("cost");
 	            Element activityTime = new Element("time");
