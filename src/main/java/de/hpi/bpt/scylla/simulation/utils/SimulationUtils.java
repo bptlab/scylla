@@ -222,27 +222,6 @@ public class SimulationUtils {
     }
 
     /**
-     * Builds a identifier of a node which is unique across all levels of a BPMN process.
-     * 
-     * @param processModel
-     *            the (sub-)process model
-     * @param nodeId
-     *            the identifier of the node
-     * @return the identifier which is unique across all levels of the BPMN process
-     */
-    public static String getProcessScopeNodeId(ProcessModel processModel, Integer nodeId) {
-        String processScopeNodeId = nodeId.toString();
-        ProcessModel parent = processModel.getParent();
-        while (parent != null) {
-            Integer nodeIdInParent = processModel.getNodeIdInParent();
-            processScopeNodeId = nodeIdInParent + "_" + processScopeNodeId;
-
-            parent = parent.getParent();
-        }
-        return processScopeNodeId;
-    }
-
-    /**
      * Creates and schedules a DesmoJ event which represents a resource instance which returns from idle
      * for the beginning of the next timetable item for this resource instance.
      * 

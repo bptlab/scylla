@@ -127,7 +127,7 @@ public class TaskBeginEvent extends TaskEvent {
 
         SimulationModel model = (SimulationModel) getModel();
         ProcessModel processModel = processInstance.getProcessModel();
-        String processScopeNodeId = SimulationUtils.getProcessScopeNodeId(processModel, nodeId);
+        String processScopeNodeId = processModel.getRootProcessScopeNodeId(nodeId);
 
         ProcessNodeInfo info = new ProcessNodeInfo(nodeId, processScopeNodeId, source, timestamp, taskName, resources,
                 transition);

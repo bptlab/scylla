@@ -1,10 +1,7 @@
 package de.hpi.bpt.scylla.model.process;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import org.jdom2.Element;
 
@@ -120,6 +117,43 @@ public class ProcessModel extends SimulationInput {
 
     public void setNodeIdInParent(Integer nodeIdInParent) {
         this.nodeIdInParent = nodeIdInParent;
+    }
+
+    /**
+     * Builds a identifier of a node which is unique across all levels of a BPMN process.
+     *
+     * @param nodeId
+     *            the identifier of the node
+     * @return the identifier which is unique across all levels of the BPMN process
+     *
+     * TODO This method is only used for ProcessNodeInfo; consider replacing
+     */
+    public String getRootProcessScopeNodeId(Integer nodeId) {
+        String processScopeNodeId = nodeId.toString();
+        ProcessModel processModel = this;
+        while (processModel.getParent() != null) {
+            Integer nodeIdInParent = processModel.getNodeIdInParent();
+            processScopeNodeId = nodeIdInParent + "_" + processScopeNodeId;
+
+            processModel = processModel.getParent();
+        }
+        return processScopeNodeId;
+    }
+
+    /**
+     * Inverts {@link ProcessModel#getRootProcessScopeNodeId(Integer)}
+     * @param nodeId
+     * @return
+     */
+    public String rootScopeIdToProcessElementId(String nodeId) {
+        List<Integer> levelIds = Arrays.stream(nodeId.split("_")).map(Integer::parseInt).collect(Collectors.toList());
+        ProcessModel contextModel = this;
+        Integer id = levelIds.remove(0);
+        for (Integer nextId : levelIds) {
+            contextModel = contextModel.getSubProcesses().get(id);
+            id = nextId;
+        }
+        return contextModel.getIdentifiers().get(id);
     }
 
     public ProcessModel getParent() {

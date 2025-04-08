@@ -12,6 +12,7 @@ import de.hpi.bpt.scylla.logger.ProcessNodeInfo;
 import de.hpi.bpt.scylla.logger.ProcessNodeTransitionType;
 import de.hpi.bpt.scylla.logger.ResourceInfo;
 import de.hpi.bpt.scylla.logger.ResourceStatus;
+import de.hpi.bpt.scylla.model.process.ProcessModel;
 import de.hpi.bpt.scylla.plugin_type.logger.OutputLoggerPluggable;
 import de.hpi.bpt.scylla.simulation.ResourceObject;
 import de.hpi.bpt.scylla.simulation.SimulationModel;
@@ -352,12 +353,12 @@ public class StatisticsLogger extends OutputLoggerPluggable {
         
             
             Map<String, Map<String, StatisticsTaskInstanceObject>> statsPerTaskOfProcess = statsPerTask.get(processId);
-            Map<Integer, String> originalIdentifiers = model.getDesmojObjectsMap().get(processId).getProcessModel().getIdentifiers();
+            ProcessModel rootProcessModel = model.getDesmojObjectsMap().get(processId).getProcessModel();
             // add activities
             for (String processScopeNodeId : statsPerTaskOfProcess.keySet()) {
 
 
-                String originalId = originalIdentifiers.get(Integer.parseInt(processScopeNodeId));
+                String originalId = rootProcessModel.rootScopeIdToProcessElementId(processScopeNodeId);
             	
             	long taskDuration = 0;
             	for (StatisticsTaskInstanceObject instance : statsPerTaskOfProcess.get(processScopeNodeId).values()) {

@@ -106,7 +106,7 @@ public class ParallelBatchCluster extends BatchCluster {
 
         String taskName = event.getDisplayName();
         int nodeId = event.getNodeId();
-        String processScopeNodeId = SimulationUtils.getProcessScopeNodeId(processModel, nodeId);
+        String processScopeNodeId = processModel.getRootProcessScopeNodeId(nodeId);
         String source = event.getSource();
 
         int sourceSuffix = 0;
@@ -142,7 +142,7 @@ public class ParallelBatchCluster extends BatchCluster {
 
         String taskName = event.getDisplayName();
         int nodeId = event.getNodeId();
-        String processScopeNodeId = SimulationUtils.getProcessScopeNodeId(processModel, nodeId);
+        String processScopeNodeId = processModel.getRootProcessScopeNodeId(nodeId);
         String source = event.getSource();
 
         ProcessNodeTransitionType transition;
